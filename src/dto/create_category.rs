@@ -9,5 +9,5 @@ pub struct CreateCategoryDto {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CreateCategoryResponseDto {
-    id: String,
+    pub id: String,
 }

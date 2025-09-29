@@ -1,7 +1,7 @@
 use crate::db_models::db_category::NewDbCategory;
+use crate::entities::category::Category;
 use crate::repository::category_repository::CategoryRepository;
 use crate::services::service_error::ServiceError;
-use shared::entities::category::Category;
 
 pub struct CreateCategoryCommand {
     pub name: String,
