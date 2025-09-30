@@ -10,29 +10,23 @@ pub mod services;
 
 use crate::config::{app_state::AppState, openapi::ApiDoc};
 use axum::Router;
-use utoipa::OpenApi;
-use utoipa_swagger_ui::SwaggerUi;
 use tracing_subscriber::prelude::__tracing_subscriber_SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
+use utoipa::OpenApi;
+use utoipa_swagger_ui::SwaggerUi;
 
 pub async fn run() {
-    // Carica environment variables
     dotenvy::dotenv().ok();
 
-    // Setup logging
     init_tracing();
 
-    // Setup database
     let pool = database::setup_database().await;
     database::run_migrations(&pool).await;
 
-    // Crea app state
     let state = AppState::new(pool);
 
-    // Build router
     let app = build_router(state);
 
-    // Start server
     start_server(app).await;
 }
 
@@ -53,7 +47,6 @@ fn build_router(state: AppState) -> Router {
         .with_state(state)
 }
 
-
 async fn start_server(app: Router) {
     let server_port = std::env::var("SERVER_PORT").expect("SERVER_PORT must be set");
     let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", server_port))
@@ -65,4 +58,3 @@ async fn start_server(app: Router) {
         .await
         .expect("Server failed to start");
 }
-

@@ -10,7 +10,7 @@ pub const CATEGORY_TAG: &str = "category";
         (name = CATEGORY_TAG, description = "Category items management API")
     ),
     paths(
-        api::category_api::create_category_api
+        api::category::create_category_api::create_category_api
     ),
     components(
         schemas(CreateCategoryDto, CreateCategoryResponseDto)

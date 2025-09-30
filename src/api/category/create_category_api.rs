@@ -2,9 +2,8 @@ use crate::AppState;
 use crate::api::api_error::ApiError;
 use crate::dto::create_category::{CreateCategoryDto, CreateCategoryResponseDto};
 use crate::services::category_service::CreateCategoryCommand;
+use axum::Json;
 use axum::extract::State;
-use axum::routing::post;
-use axum::{Json, Router};
 use validator::Validate;
 
 #[utoipa::path(
@@ -38,8 +37,4 @@ pub async fn create_category_api(
     Ok(Json(CreateCategoryResponseDto {
         id: category.id.to_string(),
     }))
-}
-
-pub fn router() -> Router<AppState> {
-    Router::new().route("/createCategory", post(create_category_api))
 }

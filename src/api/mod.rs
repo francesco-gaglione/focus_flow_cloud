@@ -1,3 +1,3 @@
 pub mod api_error;
-pub mod category_api;
+pub mod category;
 pub mod routes;
