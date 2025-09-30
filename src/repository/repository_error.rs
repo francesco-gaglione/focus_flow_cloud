@@ -14,6 +14,9 @@ pub enum RepositoryError {
     #[error("Unique constraint violation: {0}")]
     UniqueViolation(String),
 
+    #[error("Foreign key violation: {0}")]
+    ForeignKeyViolation(String),
+
     #[error("Diesel error: {0}")]
     DieselError(#[from] diesel::result::Error),
 

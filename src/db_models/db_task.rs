@@ -9,7 +9,7 @@ use uuid::Uuid;
 pub struct DbTask {
     pub id: Uuid,
     pub template_id: Option<Uuid>,
-    pub category_id: Uuid,
+    pub category_id: Option<Uuid>,
     pub name: String,
     pub description: Option<String>,
     pub scheduled_date: Option<NaiveDate>,

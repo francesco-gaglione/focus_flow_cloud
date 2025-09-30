@@ -1,6 +1,6 @@
 use crate::AppState;
 use crate::api::api_error::ApiError;
-use crate::dto::create_category::{CreateCategoryDto, CreateCategoryResponseDto};
+use crate::dto::category_api::create_category::{CreateCategoryDto, CreateCategoryResponseDto};
 use crate::services::category_service::CreateCategoryCommand;
 use axum::Json;
 use axum::extract::State;

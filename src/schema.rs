@@ -46,7 +46,7 @@ diesel::table! {
     tasks (id) {
         id -> Uuid,
         template_id -> Nullable<Uuid>,
-        category_id -> Uuid,
+        category_id -> Nullable<Uuid>,
         #[max_length = 255]
         name -> Varchar,
         description -> Nullable<Text>,
@@ -57,8 +57,6 @@ diesel::table! {
     }
 }
 
-diesel::joinable!(focus_session -> categories (category_id));
-diesel::joinable!(focus_session -> tasks (task_id));
 diesel::joinable!(session_events -> focus_session (session_id));
 diesel::joinable!(tasks -> categories (category_id));
 

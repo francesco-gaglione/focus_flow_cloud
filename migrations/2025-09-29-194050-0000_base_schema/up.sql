@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS tasks
 (
     id             UUID PRIMARY KEY      DEFAULT gen_random_uuid(),
     template_id    UUID,
-    category_id    UUID         NOT NULL,
+    category_id    UUID,
     name           VARCHAR(255) NOT NULL,
     description    TEXT,
     scheduled_date DATE,

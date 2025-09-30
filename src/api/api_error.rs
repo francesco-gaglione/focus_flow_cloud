@@ -88,7 +88,7 @@ impl From<ServiceError> for ApiError {
             ServiceError::CategoryNotFound => {
                 ApiError::NotFound(String::from("Category not found"))
             }
-            ServiceError::RepositoryError(err) => {
+            ServiceError::RepositoryError(_err) => {
                 ApiError::GenericError(String::from("Generic error happened, try again later"))
             }
         }
