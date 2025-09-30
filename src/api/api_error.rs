@@ -25,6 +25,9 @@ pub enum ApiError {
     #[error(transparent)]
     JsonValidationError(#[from] JsonRejection),
 
+    #[error("Bad request: {0}")]
+    BadRequest(String),
+
     #[error("Unauthorized")]
     Unauthorized,
 
@@ -40,6 +43,7 @@ impl ApiError {
             ApiError::ResourceAlreadyExist(_) => StatusCode::CONFLICT,
             ApiError::ValidationError(_) => StatusCode::BAD_REQUEST,
             ApiError::JsonValidationError(_) => StatusCode::BAD_REQUEST,
+            ApiError::BadRequest(_) => StatusCode::BAD_REQUEST,
             ApiError::Unauthorized => StatusCode::UNAUTHORIZED,
             ApiError::Forbidden => StatusCode::FORBIDDEN,
             ApiError::GenericError(_) => StatusCode::INTERNAL_SERVER_ERROR,
@@ -52,6 +56,7 @@ impl ApiError {
             ApiError::ResourceAlreadyExist(_) => "CONFLICT",
             ApiError::ValidationError(_) => "BAD_REQUEST",
             ApiError::JsonValidationError(_) => "BAD_REQUEST",
+            ApiError::BadRequest(_) => "BAD_REQUEST",
             ApiError::Unauthorized => "UNAUTHORIZED",
             ApiError::Forbidden => "FORBIDDEN",
             ApiError::GenericError(_) => "INTERNAL_ERROR",
@@ -91,6 +96,7 @@ impl From<ServiceError> for ApiError {
             ServiceError::RepositoryError(_err) => {
                 ApiError::GenericError(String::from("Generic error happened, try again later"))
             }
+            ServiceError::GenericError => ApiError::GenericError(String::default()),
         }
     }
 }

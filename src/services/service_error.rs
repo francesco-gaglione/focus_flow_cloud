@@ -11,4 +11,7 @@ pub enum ServiceError {
     // Common service errors
     #[error("Repository error: {0}")]
     RepositoryError(#[from] crate::repository::repository_error::RepositoryError),
+
+    #[error("Generic error")]
+    GenericError,
 }

@@ -5,11 +5,12 @@ use crate::services::category_service::CreateCategoryCommand;
 use axum::Json;
 use axum::extract::State;
 use validator::Validate;
+use crate::config::openapi::CATEGORY_TAG;
 
 #[utoipa::path(
     post,
     path = "/category/createCategory",
-    tag = "category",
+    tag = CATEGORY_TAG,
     request_body = CreateCategoryDto,
     responses(
         (status = 200, description = "Category created successfully", body = CreateCategoryResponseDto),
