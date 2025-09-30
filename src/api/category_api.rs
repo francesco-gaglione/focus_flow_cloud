@@ -5,10 +5,21 @@ use crate::services::category_service::CreateCategoryCommand;
 use axum::extract::State;
 use axum::routing::post;
 use axum::{Json, Router};
-use serde_json::{Value, json};
 use validator::Validate;
 
-async fn create_category_api(
+#[utoipa::path(
+    post,
+    path = "/category/createCategory",
+    tag = "category",
+    request_body = CreateCategoryDto,
+    responses(
+        (status = 200, description = "Category created successfully", body = CreateCategoryResponseDto),
+        (status = 400, description = "Bad request - validation error"),
+        (status = 409, description = "Category already exists"),
+        (status = 500, description = "Internal server error")
+    )
+)]
+pub async fn create_category_api(
     State(state): State<AppState>,
     Json(payload): Json<CreateCategoryDto>,
 ) -> Result<Json<CreateCategoryResponseDto>, ApiError> {
