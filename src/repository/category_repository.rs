@@ -4,6 +4,8 @@ use crate::schema::categories;
 use chrono::Utc;
 use deadpool_diesel::postgres::Pool;
 use diesel::prelude::*;
+use diesel::result::DatabaseErrorKind;
+use diesel::result::Error::DatabaseError;
 use log::{debug, info, warn};
 use std::fmt::Debug;
 use uuid::Uuid;
@@ -40,7 +42,18 @@ impl CategoryRepository {
                     .returning(DbCategory::as_returning())
                     .get_result(conn)
             })
-            .await??;
+            .await?
+            .map_err(|e| {
+                // Converti unique violation in un errore specifico
+                match e {
+                    DatabaseError(DatabaseErrorKind::UniqueViolation, info) => {
+                        let message = info.message().to_string();
+                        warn!("Unique constraint violation: {}", message);
+                        RepositoryError::UniqueViolation(message)
+                    }
+                    other => RepositoryError::DieselError(other),
+                }
+            })?;
 
         info!("Created category with id: {}", result.id);
         Ok(result)

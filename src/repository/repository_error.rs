@@ -11,6 +11,9 @@ pub enum RepositoryError {
     #[error("Resource not found")]
     NotFound,
 
+    #[error("Unique constraint violation: {0}")]
+    UniqueViolation(String),
+
     #[error("Diesel error: {0}")]
     DieselError(#[from] diesel::result::Error),
 

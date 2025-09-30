@@ -18,3 +18,7 @@ diesel_migrations = "2"
 deadpool-diesel = { version = "0.6.1", features = ["postgres"] }
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 log = "0.4.28"
+tracing = "0.1.41"
+validator = { version = "0.20.0", features = ["derive"] }
+lazy_static = "1.5.0"
+regex = "1.11.3"
