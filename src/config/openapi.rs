@@ -26,6 +26,9 @@ pub const TASK_TAG: &str = "task";
         schemas(CreateTaskDto, CreateTaskResponseDto),
         schemas(GetCategoriesResponseDto),
         schemas(DeleteTasksDto, DeleteTasksResponseDto),
+    ),
+    servers(
+        (url = "/api", description = "API server")
     )
 )]
 pub struct ApiDoc;
