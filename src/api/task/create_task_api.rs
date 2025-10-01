@@ -16,7 +16,7 @@ use validator::Validate;
     responses(
         (status = 200, description = "Task created successfully", body = CreateTaskResponseDto),
         (status = 400, description = "Bad request - validation error"),
-        (status = 409, description = "Category already exists"),
+        (status = 409, description = "Task already exists"),
         (status = 500, description = "Internal server error")
     )
 )]

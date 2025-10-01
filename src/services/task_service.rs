@@ -1,5 +1,6 @@
 use crate::db_models::db_task::NewDbTask;
 use crate::entities::task::Task;
+use crate::repository::repository_error::RepositoryError;
 use crate::repository::task_repository::TaskRepository;
 use crate::services::service_error::ServiceError;
 use chrono::NaiveDate;
@@ -64,5 +65,22 @@ impl TaskService {
             .map_err(|e| ServiceError::RepositoryError(e))?;
 
         Ok(db_task.into())
+    }
+
+    pub async fn delete_tasks(&self, task_ids: Vec<Uuid>) -> Result<Vec<Uuid>, ServiceError> {
+        let mut deleted_ids: Vec<Uuid> = vec![];
+        for task_id in task_ids {
+            let res = self.task_repository.soft_delete(task_id).await;
+            log::debug!("{:?}", res);
+            match res {
+                Ok(_) => {
+                    deleted_ids.push(task_id);
+                }
+                Err(err) => {
+                    log::error!("{:?}", err);
+                }
+            }
+        }
+        Ok(deleted_ids)
     }
 }
