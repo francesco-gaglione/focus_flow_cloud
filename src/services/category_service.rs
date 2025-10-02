@@ -5,6 +5,7 @@ use crate::repository::category_repository::CategoryRepository;
 use crate::repository::repository_error::RepositoryError;
 use crate::repository::task_repository::TaskRepository;
 use crate::services::service_error::ServiceError;
+use uuid::Uuid;
 
 #[derive(Clone, Debug)]
 pub struct CreateCategoryCommand {
@@ -96,5 +97,24 @@ impl CategoryService {
                 .map(|t| t.into())
                 .collect(),
         })
+    }
+
+    pub async fn delete_categories(
+        &self,
+        cagory_ids: Vec<Uuid>,
+    ) -> Result<Vec<Uuid>, ServiceError> {
+        let mut deleted_ids: Vec<Uuid> = vec![];
+        for category_id in cagory_ids {
+            let linked_tasks = self.task_repository.find_by_category(category_id).await?;
+
+            for task in linked_tasks {
+                self.task_repository.hard_delete(task.id).await?;
+                deleted_ids.push(task.id);
+            }
+
+            self.category_repository.hard_delete(category_id).await?;
+            deleted_ids.push(category_id);
+        }
+        Ok(deleted_ids)
     }
 }

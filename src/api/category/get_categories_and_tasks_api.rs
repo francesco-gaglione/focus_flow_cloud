@@ -3,11 +3,12 @@ use crate::api::api_error::ApiError;
 use crate::dto::category_api::get_categories::GetCategoriesResponseDto;
 use axum::Json;
 use axum::extract::State;
+use crate::config::openapi::CATEGORY_TAG;
 
 #[utoipa::path(
     get,
     path = "/category/getCategoriesAndTasks",
-    tag = "category",
+    tag = CATEGORY_TAG,
     responses(
         (status = 200, description = "Category list", body = GetCategoriesResponseDto),
         (status = 500, description = "Internal server error")

@@ -1,7 +1,7 @@
+use crate::dto::validators::validate_uuid::validate_uuid;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
-use uuid::Uuid;
-use validator::{Validate, ValidationError};
+use validator::Validate;
 
 #[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
 #[serde(rename_all = "camelCase")]
@@ -25,13 +25,4 @@ pub struct CreateTaskDto {
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct CreateTaskResponseDto {
     pub id: String,
-}
-
-// Custom validator per UUID
-fn validate_uuid(uuid_str: &str) -> Result<(), ValidationError> {
-    Uuid::parse_str(uuid_str).map(|_| ()).map_err(|_| {
-        let mut error = ValidationError::new("invalid_uuid");
-        error.message = Some("Category ID must be a valid UUID".into());
-        error
-    })
 }

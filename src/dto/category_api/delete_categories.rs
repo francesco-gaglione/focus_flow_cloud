@@ -5,12 +5,12 @@ use validator::Validate;
 
 #[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
 #[serde(rename_all = "camelCase")]
-pub struct DeleteTasksDto {
+pub struct DeleteCategoriesDto {
     #[validate(custom(function = "validate_uuids"))]
-    pub task_ids: Vec<String>,
+    pub category_ids: Vec<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
-pub struct DeleteTasksResponseDto {
+pub struct DeleteCategoriesResponseDto {
     pub deleted_ids: Vec<String>,
 }

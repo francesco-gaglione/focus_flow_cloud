@@ -79,7 +79,7 @@ impl TaskService {
     pub async fn delete_tasks(&self, task_ids: Vec<Uuid>) -> Result<Vec<Uuid>, ServiceError> {
         let mut deleted_ids: Vec<Uuid> = vec![];
         for task_id in task_ids {
-            let res = self.task_repository.soft_delete(task_id).await;
+            let res = self.task_repository.hard_delete(task_id).await;
             log::debug!("{:?}", res);
             match res {
                 Ok(_) => {
