@@ -1,9 +1,8 @@
-use crate::db_models::db_task::NewDbTask;
+use crate::db_models::db_task::{NewDbTask, UpdateDbTask};
 use crate::entities::task::Task;
-use crate::repository::repository_error::RepositoryError;
 use crate::repository::task_repository::TaskRepository;
 use crate::services::service_error::ServiceError;
-use chrono::NaiveDate;
+use chrono::{DateTime, NaiveDate, Utc};
 use uuid::Uuid;
 
 #[derive(Clone, Debug)]
@@ -12,6 +11,16 @@ pub struct CreateTaskCommand {
     pub description: Option<String>,
     pub category_id: Option<String>,
     pub scheduled_date: Option<NaiveDate>,
+}
+
+#[derive(Clone, Debug)]
+pub struct UpdateTaskCommand {
+    pub task_id: Uuid,
+    pub name: Option<String>,
+    pub description: Option<String>,
+    pub category_id: Option<String>,
+    pub scheduled_date: Option<NaiveDate>,
+    pub completed_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Clone, Debug)]
@@ -82,5 +91,29 @@ impl TaskService {
             }
         }
         Ok(deleted_ids)
+    }
+
+    pub async fn update_task(&self, command: UpdateTaskCommand) -> Result<Task, ServiceError> {
+        let db_task = self
+            .task_repository
+            .update(
+                command.task_id,
+                UpdateDbTask {
+                    category_id: command
+                        .category_id
+                        .map(|id| Uuid::parse_str(id.as_str()).unwrap()), // should be safe due to validation
+                    name: command.name,
+                    description: command.description,
+                    scheduled_date: command.scheduled_date,
+                    completed_at: command.completed_at,
+                },
+            )
+            .await
+            .map_err(|e| ServiceError::RepositoryError(e))?;
+
+        match db_task {
+            None => Err(ServiceError::GenericError),
+            Some(db_task) => Ok(db_task.into()),
+        }
     }
 }

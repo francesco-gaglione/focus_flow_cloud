@@ -9,6 +9,7 @@ lazy_static! {
 }
 
 #[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct CreateCategoryDto {
     #[validate(length(min = 1, max = 255))]
     pub name: String,

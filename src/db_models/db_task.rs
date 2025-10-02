@@ -30,7 +30,6 @@ pub struct NewDbTask {
 #[derive(Debug, Clone, AsChangeset, Serialize, Deserialize)]
 #[diesel(table_name = crate::schema::tasks)]
 pub struct UpdateDbTask {
-    pub template_id: Option<Uuid>,
     pub category_id: Option<Uuid>,
     pub name: Option<String>,
     pub description: Option<String>,
