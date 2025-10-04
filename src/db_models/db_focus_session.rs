@@ -25,8 +25,8 @@ pub struct DbFocusSession {
 pub struct NewDbFocusSession {
     pub task_id: Option<Uuid>,
     pub category_id: Uuid,
-    pub session_type: Option<String>, // Optional to use default 'work'
-    pub planned_duration_minutes: Option<i32>, // Optional to use default 25
+    pub session_type: String,
+    pub planned_duration_minutes: i32,
     pub concentration_score: Option<i32>,
     pub notes: Option<String>,
 }

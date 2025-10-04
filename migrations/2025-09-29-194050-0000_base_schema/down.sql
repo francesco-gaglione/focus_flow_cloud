@@ -28,7 +28,6 @@ DROP INDEX IF EXISTS idx_categories_active;
 
 -- Drop tables in reverse order of dependencies
 -- Tables with foreign keys first
-DROP TABLE IF EXISTS session_events CASCADE;
 DROP TABLE IF EXISTS pomodoro_sessions CASCADE;
 DROP TABLE IF EXISTS tasks CASCADE;
 

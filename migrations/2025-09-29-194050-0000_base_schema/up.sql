@@ -48,19 +48,6 @@ CREATE TABLE IF NOT EXISTS focus_session
     FOREIGN KEY (category_id) REFERENCES categories (id) ON DELETE CASCADE
 );
 
--- Session events table
-CREATE TABLE IF NOT EXISTS session_events
-(
-    id         UUID PRIMARY KEY     DEFAULT gen_random_uuid(),
-    session_id UUID        NOT NULL,
-    event_type VARCHAR(20) NOT NULL
-        CHECK (event_type IN ('start', 'pause', 'resume', 'break_start', 'break_end', 'complete', 'abandon')),
-    timestamp  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    notes      TEXT,
-    FOREIGN KEY (session_id) REFERENCES focus_session (id) ON DELETE CASCADE
-);
-
--- Function for automatic timestamp updates
 CREATE OR REPLACE FUNCTION update_updated_at_column()
     RETURNS TRIGGER AS
 $$
@@ -102,9 +89,3 @@ CREATE INDEX IF NOT EXISTS idx_sessions_concentration
 
 CREATE INDEX IF NOT EXISTS idx_sessions_completed
     ON focus_session (actual_duration_minutes) WHERE actual_duration_minutes IS NOT NULL;
-
-CREATE INDEX IF NOT EXISTS idx_events_session_time
-    ON session_events (session_id, timestamp DESC);
-
-CREATE INDEX IF NOT EXISTS idx_events_type_time
-    ON session_events (event_type, timestamp DESC);

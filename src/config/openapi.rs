@@ -2,6 +2,8 @@ use crate::api;
 use crate::dto::category_api::create_category::{CreateCategoryDto, CreateCategoryResponseDto};
 use crate::dto::category_api::delete_categories::DeleteCategoriesDto;
 use crate::dto::category_api::get_categories::GetCategoriesResponseDto;
+use crate::dto::session_api::create_manual_session::CreateManualSessionDto;
+use crate::dto::session_api::create_manual_session::CreateManualSessionResponseDto;
 use crate::dto::task_api::create_task::{CreateTaskDto, CreateTaskResponseDto};
 use crate::dto::task_api::delete_task::DeleteTasksDto;
 use crate::dto::task_api::delete_task::DeleteTasksResponseDto;
@@ -11,6 +13,7 @@ use utoipa::OpenApi;
 
 pub const CATEGORY_TAG: &str = "Category";
 pub const TASK_TAG: &str = "Task";
+pub const SESSION_TAG: &str = "Session";
 
 #[derive(OpenApi)]
 #[openapi(
@@ -29,6 +32,7 @@ pub const TASK_TAG: &str = "Task";
         api::task::create_task_api::create_task_api,
         api::task::update_task_api::update_task_api,
         api::task::delete_tasks_api::delete_tasks_api,
+        api::session::create_manual_session_api::create_manual_session_api,
     ),
     components(
         schemas(CreateCategoryDto, CreateCategoryResponseDto),
@@ -37,6 +41,7 @@ pub const TASK_TAG: &str = "Task";
         schemas(GetCategoriesResponseDto),
         schemas(UpdateTaskDto, UpdateTaskResponseDto),
         schemas(DeleteTasksDto, DeleteTasksResponseDto),
+        schemas(CreateManualSessionDto, CreateManualSessionResponseDto),
     ),
     servers(
         (url = "/api", description = "API server")

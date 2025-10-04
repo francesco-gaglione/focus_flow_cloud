@@ -32,17 +32,6 @@ diesel::table! {
 }
 
 diesel::table! {
-    session_events (id) {
-        id -> Uuid,
-        session_id -> Uuid,
-        #[max_length = 20]
-        event_type -> Varchar,
-        timestamp -> Timestamptz,
-        notes -> Nullable<Text>,
-    }
-}
-
-diesel::table! {
     tasks (id) {
         id -> Uuid,
         template_id -> Nullable<Uuid>,
@@ -57,7 +46,6 @@ diesel::table! {
     }
 }
 
-diesel::joinable!(session_events -> focus_session (session_id));
 diesel::joinable!(tasks -> categories (category_id));
 
-diesel::allow_tables_to_appear_in_same_query!(categories, focus_session, session_events, tasks,);
+diesel::allow_tables_to_appear_in_same_query!(categories, focus_session, tasks,);
