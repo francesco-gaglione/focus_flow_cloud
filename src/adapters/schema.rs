@@ -7,7 +7,7 @@ diesel::table! {
         name -> Varchar,
         description -> Nullable<Text>,
         #[max_length = 7]
-        color -> Nullable<Varchar>,
+        color -> Varchar,
         created_at -> Timestamptz,
         updated_at -> Timestamptz,
         deleted_at -> Nullable<Timestamptz>,
@@ -45,8 +45,6 @@ diesel::table! {
     }
 }
 
-diesel::joinable!(focus_session -> categories (category_id));
-diesel::joinable!(focus_session -> tasks (task_id));
 diesel::joinable!(tasks -> categories (category_id));
 
 diesel::allow_tables_to_appear_in_same_query!(categories, focus_session, tasks,);

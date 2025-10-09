@@ -28,7 +28,7 @@ pub async fn update_task_api(
 
     let command = TaskMapper::update_dto_to_command(payload)?;
 
-    let task = state.task_use_cases.update_task(&command).await?;
+    let task = state.task_use_cases.update_task(command).await?;
 
     let task_dto = TaskMapper::entity_to_dto(task);
 

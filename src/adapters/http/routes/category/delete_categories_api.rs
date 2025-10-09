@@ -6,7 +6,7 @@ use crate::adapters::openapi::CATEGORY_TAG;
 use crate::application::app_error::{AppError, AppResult};
 use axum::Json;
 use axum::extract::State;
-use tracing::{debug, error};
+use tracing::debug;
 use uuid::Uuid;
 use validator::Validate;
 

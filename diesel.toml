@@ -6,4 +6,4 @@ file = "src/adapters/schema.rs"
 custom_type_derives = ["diesel::query_builder::QueryId", "Clone"]
 
 [migrations_directory]
-dir = "/Users/francescopiogaglione/RustroverProjects/focus_flow_cloud/migrations"
+dir = "migrations"

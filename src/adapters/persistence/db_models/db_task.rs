@@ -1,11 +1,11 @@
-use crate::application::use_cases::commands::create_task::CreateTaskCommand;
-use crate::application::use_cases::commands::update_task::UpdateTaskCommand;
+use crate::adapters::schema;
+use crate::application::use_cases::persistance_command::create_task_data::CreateTaskData;
+use crate::application::use_cases::persistance_command::update_task_data::UpdateTaskData;
 use crate::domain::entities::task::Task;
 use chrono::{DateTime, NaiveDate, Utc};
 use diesel::{AsChangeset, Insertable, Queryable, Selectable};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-use crate::adapters::schema;
 
 #[derive(Debug, Clone, Queryable, Selectable, Serialize, Deserialize)]
 #[diesel(table_name = schema::tasks)]
@@ -40,8 +40,8 @@ pub struct UpdateDbTask {
     pub completed_at: Option<DateTime<Utc>>,
 }
 
-impl From<CreateTaskCommand> for NewDbTask {
-    fn from(value: CreateTaskCommand) -> Self {
+impl From<CreateTaskData> for NewDbTask {
+    fn from(value: CreateTaskData) -> Self {
         Self {
             category_id: value.category_id,
             name: value.name,
@@ -91,8 +91,8 @@ impl From<DbTask> for Task {
     }
 }
 
-impl From<UpdateTaskCommand> for UpdateDbTask {
-    fn from(value: UpdateTaskCommand) -> Self {
+impl From<UpdateTaskData> for UpdateDbTask {
+    fn from(value: UpdateTaskData) -> Self {
         Self {
             category_id: value.category_id,
             name: value.name,

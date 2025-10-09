@@ -7,6 +7,7 @@ use crate::adapters::openapi::SESSION_TAG;
 use crate::application::app_error::{AppError, AppResult};
 use axum::Json;
 use axum::extract::State;
+use tracing::debug;
 use validator::Validate;
 
 #[utoipa::path(
@@ -25,7 +26,7 @@ pub async fn create_manual_session_api(
     State(state): State<AppState>,
     Json(payload): Json<CreateManualSessionDto>,
 ) -> AppResult<Json<CreateManualSessionResponseDto>> {
-    log::debug!("{:?}", payload);
+    debug!("{:?}", payload);
     payload
         .validate()
         .map_err(|e| AppError::BadRequest(e.to_string()))?;

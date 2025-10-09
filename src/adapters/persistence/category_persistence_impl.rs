@@ -2,22 +2,21 @@ use crate::adapters::persistence::PostgresPersistence;
 use crate::adapters::persistence::db_models::db_category::{
     DbCategory, NewDbCategory, UpdateDbCategory,
 };
+use crate::adapters::schema;
 use crate::application::app_error::{AppError, AppResult};
 use crate::application::traits::CategoryPersistence;
-use crate::application::use_cases::commands::create_category::CreateCategoryCommand;
-use crate::application::use_cases::commands::update_category::UpdateCategoryCommand;
+use crate::application::use_cases::persistance_command::create_category_data::CreateCategoryData;
+use crate::application::use_cases::persistance_command::update_category_data::UpdateCategoryData;
 use crate::domain::entities::category::Category;
 use async_trait::async_trait;
 use chrono::Utc;
 use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, SelectableHelper};
-use tracing::{info, warn};
+use tracing::{error, info};
 use uuid::Uuid;
-use crate::adapters::schema;
 
 #[async_trait]
 impl CategoryPersistence for PostgresPersistence {
-    async fn create_category(&self, create_command: &CreateCategoryCommand) -> AppResult<()> {
-        let category = create_command.clone();
+    async fn create_category(&self, create_data: CreateCategoryData) -> AppResult<()> {
         let conn = self
             .pool
             .get()
@@ -27,12 +26,15 @@ impl CategoryPersistence for PostgresPersistence {
         let result = conn
             .interact(move |conn| {
                 diesel::insert_into(schema::categories::table)
-                    .values(NewDbCategory::from(category))
+                    .values(NewDbCategory::from(create_data))
                     .returning(DbCategory::as_returning())
                     .get_result(conn)
             })
             .await
-            .map_err(|e| AppError::Database("Category not created".to_string()))??;
+            .map_err(|e| {
+                error!("Failed to create category: {}", e);
+                AppError::Database("Category not created".to_string())
+            })??;
 
         info!("Created category with id: {}", result.id);
 
@@ -63,8 +65,11 @@ impl CategoryPersistence for PostgresPersistence {
         Ok(categories)
     }
 
-    async fn update_category(&self, update_command: &UpdateCategoryCommand) -> AppResult<Category> {
-        let category = update_command.clone();
+    async fn update_category(
+        &self,
+        category_id: Uuid,
+        update_command: UpdateCategoryData,
+    ) -> AppResult<Category> {
         let conn = self
             .pool
             .get()
@@ -74,10 +79,10 @@ impl CategoryPersistence for PostgresPersistence {
         let result = conn
             .interact(move |conn| {
                 diesel::update(schema::categories::table)
-                    .filter(schema::categories::id.eq(category.id))
+                    .filter(schema::categories::id.eq(category_id))
                     .filter(schema::categories::deleted_at.is_null())
                     .set((
-                        &UpdateDbCategory::from(category),
+                        &UpdateDbCategory::from(update_command),
                         schema::categories::updated_at.eq(Utc::now()), // Manual updated_at handling
                     ))
                     .returning(DbCategory::as_returning())

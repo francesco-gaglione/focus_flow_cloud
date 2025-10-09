@@ -1,8 +1,6 @@
-use uuid::Uuid;
 
 #[derive(Debug, Clone)]
-pub struct Category {
-    pub id: Uuid,
+pub struct CreateCategoryData {
     pub name: String,
     pub description: Option<String>,
     pub color: String,

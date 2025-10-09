@@ -7,6 +7,6 @@ pub struct CategoryDto {
     pub id: String,
     pub name: String,
     pub description: Option<String>,
-    pub color: Option<String>,
+    pub color: String,
     pub tasks: Vec<TaskDto>,
 }

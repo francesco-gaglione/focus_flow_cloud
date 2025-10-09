@@ -1,20 +1,19 @@
 use crate::adapters::persistence::PostgresPersistence;
 use crate::adapters::persistence::db_models::db_task::{DbTask, NewDbTask, UpdateDbTask};
+use crate::adapters::schema;
 use crate::application::app_error::{AppError, AppResult};
 use crate::application::traits::TaskPersistence;
-use crate::application::use_cases::commands::create_task::CreateTaskCommand;
-use crate::application::use_cases::commands::update_task::UpdateTaskCommand;
+use crate::application::use_cases::persistance_command::create_task_data::CreateTaskData;
+use crate::application::use_cases::persistance_command::update_task_data::UpdateTaskData;
 use crate::domain::entities::task::Task;
 use async_trait::async_trait;
 use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, SelectableHelper};
-use tracing::{debug, info};
+use tracing::info;
 use uuid::Uuid;
-use crate::adapters::schema;
 
 #[async_trait]
 impl TaskPersistence for PostgresPersistence {
-    async fn create_task(&self, create_task_command: &CreateTaskCommand) -> AppResult<Uuid> {
-        let task = create_task_command.clone();
+    async fn create_task(&self, create_task_command: CreateTaskData) -> AppResult<Uuid> {
         let conn = self
             .pool
             .get()
@@ -24,7 +23,7 @@ impl TaskPersistence for PostgresPersistence {
         let result = conn
             .interact(move |conn| {
                 diesel::insert_into(schema::tasks::table)
-                    .values(&NewDbTask::from(task))
+                    .values(&NewDbTask::from(create_task_command))
                     .returning(DbTask::as_returning())
                     .get_result(conn)
             })
@@ -100,8 +99,7 @@ impl TaskPersistence for PostgresPersistence {
         Ok(tasks)
     }
 
-    async fn update_task(&self, task: &UpdateTaskCommand) -> AppResult<Task> {
-        let task = task.clone();
+    async fn update_task(&self, task_id: Uuid, task: UpdateTaskData) -> AppResult<Task> {
         let conn = self
             .pool
             .get()
@@ -111,7 +109,7 @@ impl TaskPersistence for PostgresPersistence {
         let result = conn
             .interact(move |conn| {
                 diesel::update(schema::tasks::table)
-                    .filter(schema::tasks::id.eq(task.id))
+                    .filter(schema::tasks::id.eq(task_id))
                     .filter(schema::tasks::deleted_at.is_null())
                     .set(&UpdateDbTask::from(task))
                     .returning(DbTask::as_returning())

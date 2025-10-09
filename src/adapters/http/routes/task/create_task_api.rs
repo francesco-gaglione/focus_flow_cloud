@@ -29,7 +29,7 @@ pub async fn create_task_api(
 
     let command = TaskMapper::create_dto_to_command(payload)?;
 
-    let id = state.task_use_cases.create_task(&command).await?;
+    let id = state.task_use_cases.create_task(command).await?;
 
     Ok(Json(CreateTaskResponseDto { id: id.to_string() }))
 }

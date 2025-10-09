@@ -9,7 +9,7 @@ use crate::application::use_cases::persistance_command::create_manual_session_da
 use crate::domain::entities::focus_session::FocusSession;
 use async_trait::async_trait;
 use diesel::{RunQueryDsl, SelectableHelper};
-use tracing::info;
+use tracing::{error, info};
 
 #[async_trait]
 impl FocusSessionPersistence for PostgresPersistence {
@@ -32,7 +32,10 @@ impl FocusSessionPersistence for PostgresPersistence {
                     .get_result(conn)
             })
             .await
-            .map_err(|e| AppError::Database("Focus session not created".to_string()))??;
+            .map_err(|e| {
+                error!("Error creating manual session: {}", e);
+                AppError::Database("Focus session not created".to_string())
+            })??;
 
         info!("Created focus session with id: {}", result.id);
 

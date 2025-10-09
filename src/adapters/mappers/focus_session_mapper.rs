@@ -7,9 +7,7 @@ use crate::{
     },
     application::{
         app_error::{AppError, AppResult},
-        use_cases::commands::{
-            create_manual_session::CreateManualFocusSessionCommand, create_task::CreateTaskCommand,
-        },
+        use_cases::commands::create_manual_session::CreateManualFocusSessionCommand,
     },
     domain::entities::focus_session_type::FocusSessionType,
 };

@@ -33,7 +33,7 @@ pub async fn create_category_api(
 
     state
         .category_use_cases
-        .create_category(&CreateCategoryCommand {
+        .create_category(CreateCategoryCommand {
             name: payload.name,
             description: payload.description,
             color: payload.color,
