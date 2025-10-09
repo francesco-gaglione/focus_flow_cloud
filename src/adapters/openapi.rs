@@ -3,6 +3,8 @@ use crate::adapters::http::dto::category_api::delete_categories::DeleteCategorie
 use crate::adapters::http::dto::category_api::get_categories::GetCategoriesResponseDto;
 use crate::adapters::http::dto::session_api::create_manual_session::CreateManualSessionDto;
 use crate::adapters::http::dto::session_api::create_manual_session::CreateManualSessionResponseDto;
+use crate::adapters::http::dto::session_api::get_sessions::GetSessionByDateRangeResponseDto;
+use crate::adapters::http::dto::session_api::get_sessions::GetSessionFiltersDto;
 use crate::adapters::http::dto::task_api::create_task::CreateTaskResponseDto;
 use crate::adapters::http::dto::task_api::delete_task::DeleteTasksDto;
 use crate::adapters::http::dto::task_api::update_task::UpdateTaskDto;
@@ -30,6 +32,7 @@ pub const SESSION_TAG: &str = "Session";
         crate::adapters::http::routes::task::update_task_api::update_task_api,
         crate::adapters::http::routes::task::delete_tasks_api::delete_tasks_api,
         crate::adapters::http::routes::session::create_manual_session_api::create_manual_session_api,
+        crate::adapters::http::routes::session::get_sessions::get_sessions,
     ),
     components(
         schemas(CreateCategoryDto, CreateCategoryDto),
@@ -39,6 +42,7 @@ pub const SESSION_TAG: &str = "Session";
         schemas(UpdateTaskDto, CreateTaskResponseDto),
         schemas(DeleteTasksDto, CreateTaskResponseDto),
         schemas(CreateManualSessionDto, CreateManualSessionResponseDto),
+        schemas(GetSessionFiltersDto, GetSessionByDateRangeResponseDto),
     ),
     servers(
         (url = "/api", description = "API server")

@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
+use crate::domain::entities::focus_session_type::FocusSessionType;
+
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub enum SessionTypeEnum {
     Work,
@@ -23,6 +25,16 @@ impl SessionTypeEnum {
             "short_break" => Some(SessionTypeEnum::ShortBreak),
             "long_break" => Some(SessionTypeEnum::LongBreak),
             _ => None,
+        }
+    }
+}
+
+impl From<FocusSessionType> for SessionTypeEnum {
+    fn from(value: FocusSessionType) -> Self {
+        match value {
+            FocusSessionType::Work => SessionTypeEnum::Work,
+            FocusSessionType::ShortBreak => SessionTypeEnum::ShortBreak,
+            FocusSessionType::LongBreak => SessionTypeEnum::LongBreak,
         }
     }
 }

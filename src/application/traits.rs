@@ -2,6 +2,7 @@ use crate::application::app_error::AppResult;
 use crate::application::use_cases::persistance_command::create_category_data::CreateCategoryData;
 use crate::application::use_cases::persistance_command::create_manual_session_data::CreateManualSessionData;
 use crate::application::use_cases::persistance_command::create_task_data::CreateTaskData;
+use crate::application::use_cases::persistance_command::find_session_by_filters_data::FindSessionByFiltersData;
 use crate::application::use_cases::persistance_command::update_category_data::UpdateCategoryData;
 use crate::application::use_cases::persistance_command::update_task_data::UpdateTaskData;
 use crate::domain::entities::category::Category;
@@ -34,6 +35,11 @@ pub trait TaskPersistence: Send + Sync {
 
 #[async_trait]
 pub trait FocusSessionPersistence: Send + Sync {
+    async fn find_by_filters(
+        &self,
+        filters: FindSessionByFiltersData,
+    ) -> AppResult<Vec<FocusSession>>;
+
     async fn create_manual_session(
         &self,
         session: &CreateManualSessionData,

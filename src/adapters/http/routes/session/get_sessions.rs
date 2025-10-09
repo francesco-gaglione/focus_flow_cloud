@@ -1,0 +1,95 @@
+use crate::adapters::http::app_state::AppState;
+use crate::adapters::http::dto::session_api::get_sessions::{
+    GetSessionByDateRangeResponseDto, GetSessionFiltersDto,
+};
+use crate::adapters::mappers::focus_session_mapper::FocusSessionMapper;
+use crate::adapters::openapi::SESSION_TAG;
+use crate::application::app_error::{AppError, AppResult};
+use crate::application::use_cases::commands::find_session_filters::{
+    ConcentrationScoreFilter, FindSessionFiltersCommand, FocusSessionDateFilter,
+};
+use crate::domain::entities::focus_session_type::FocusSessionType;
+use axum::Json;
+use axum::extract::{Query, State};
+use tracing::debug;
+
+#[utoipa::path(
+    get,
+    path = "/focusSession",
+    tag = SESSION_TAG,
+    params(
+        GetSessionFiltersDto
+    ),
+    responses(
+        (status = 200, description = "Session fetched successfully", body = GetSessionByDateRangeResponseDto),
+        (status = 400, description = "Bad request - validation error"),
+        (status = 500, description = "Internal server error")
+    )
+)]
+pub async fn get_sessions(
+    State(state): State<AppState>,
+    query: Query<GetSessionFiltersDto>,
+) -> AppResult<Json<GetSessionByDateRangeResponseDto>> {
+    debug!("query: {:?}", query);
+
+    if (query.start_date.is_some() && query.end_date.is_none())
+        || (query.start_date.is_none() && query.end_date.is_some())
+    {
+        return Err(AppError::BadRequest(
+            "Both start and end date should be set, or none of them".to_string(),
+        ));
+    }
+
+    if (query.min_concentration_score.is_some() && query.max_concentration_score.is_none())
+        || (query.min_concentration_score.is_none() && query.max_concentration_score.is_some())
+    {
+        return Err(AppError::BadRequest(
+            "Both min and max concentration score should be set, or none of them".to_string(),
+        ));
+    }
+
+    let date_range = match (query.start_date, query.end_date) {
+        (Some(start), Some(end)) => Some(FocusSessionDateFilter {
+            start_date: start,
+            end_date: end,
+        }),
+        (None, None) => None,
+        _ => return Err(AppError::GenericError("Invalid state error".to_string())),
+    };
+
+    let concentration_score_range =
+        match (query.min_concentration_score, query.max_concentration_score) {
+            (Some(min), Some(max)) => Some(ConcentrationScoreFilter { min, max }),
+            (None, None) => None,
+            _ => unreachable!(),
+        };
+
+    let session_type = match &query.session_type {
+        Some(t) => Some(
+            FocusSessionType::from_str(t.as_str())
+                .ok_or_else(|| AppError::BadRequest("Invalid session type".to_string()))?,
+        ),
+        None => None,
+    };
+
+    let filters = FindSessionFiltersCommand {
+        date_range,
+        category_ids: query.category_ids.clone(),
+        session_type,
+        concentration_score_range,
+    };
+
+    let sessions = state
+        .focus_session_use_cases
+        .find_sessions_by_filters(filters)
+        .await?;
+
+    let response_dto = GetSessionByDateRangeResponseDto {
+        focus_sessions: sessions
+            .into_iter()
+            .map(|session| FocusSessionMapper::to_dto(&session))
+            .collect(),
+    };
+
+    Ok(Json(response_dto))
+}

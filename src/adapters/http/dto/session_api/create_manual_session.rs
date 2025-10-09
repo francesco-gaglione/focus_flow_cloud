@@ -1,5 +1,6 @@
-use crate::adapters::http::dto::session_api::session_type_enum::SessionTypeEnum;
-use crate::adapters::http::dto::validators::validate_uuid::validate_uuid;
+use crate::adapters::http::dto::{
+    common::session_type_enum::SessionTypeEnum, validators::validate_uuid::validate_uuid,
+};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use validator::Validate;

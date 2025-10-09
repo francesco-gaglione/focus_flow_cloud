@@ -2,20 +2,44 @@ use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
 use crate::{
-    adapters::http::dto::session_api::{
-        create_manual_session::CreateManualSessionDto, session_type_enum::SessionTypeEnum,
+    adapters::http::dto::{
+        common::{focus_session::FocusSessionDto, session_type_enum::SessionTypeEnum},
+        session_api::{
+            create_manual_session::CreateManualSessionDto, get_sessions::GetSessionFiltersDto,
+        },
     },
     application::{
         app_error::{AppError, AppResult},
-        use_cases::commands::create_manual_session::CreateManualFocusSessionCommand,
+        use_cases::commands::{
+            create_manual_session::CreateManualFocusSessionCommand,
+            find_session_filters::{
+                ConcentrationScoreFilter, FindSessionFiltersCommand, FocusSessionDateFilter,
+            },
+        },
     },
-    domain::entities::focus_session_type::FocusSessionType,
+    domain::entities::{focus_session::FocusSession, focus_session_type::FocusSessionType},
 };
 
 /// Mapper for FocusSession-related conversions between HTTP layer and Application layer
 pub struct FocusSessionMapper;
 
 impl FocusSessionMapper {
+    pub fn to_dto(session: &FocusSession) -> FocusSessionDto {
+        // Esempio di mapping - completare con i campi corretti
+        FocusSessionDto {
+            id: session.id.to_string(),
+            category_id: session.category_id.map(|id| id.to_string()),
+            task_id: session.task_id.map(|id| id.to_string()),
+            session_type: SessionTypeEnum::from(session.session_type.clone()),
+            actual_duration_minutes: session.actual_duration_minutes,
+            concentration_score: session.concentration_score,
+            notes: session.notes.clone(),
+            started_at: session.started_at.timestamp(),
+            ended_at: session.ended_at.map(|dt| dt.timestamp()),
+            created_at: session.created_at.timestamp(),
+        }
+    }
+
     /// Convert CreateManualSessionDto to CreateManualFocusSessionCommand
     pub fn manual_create_dto_to_command(
         dto: &CreateManualSessionDto,
