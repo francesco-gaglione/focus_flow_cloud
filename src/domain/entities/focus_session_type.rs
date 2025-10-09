@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 #[derive(Debug, Clone)]
 pub enum FocusSessionType {
     Work,
@@ -21,5 +23,11 @@ impl FocusSessionType {
             "long_break" => Some(FocusSessionType::LongBreak),
             _ => None,
         }
+    }
+}
+
+impl Display for FocusSessionType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.as_str())
     }
 }

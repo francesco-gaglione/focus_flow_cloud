@@ -34,11 +34,10 @@ CREATE TABLE IF NOT EXISTS focus_session
 (
     id                       UUID PRIMARY KEY     DEFAULT gen_random_uuid(),
     task_id                  UUID,
-    category_id              UUID        NOT NULL,
+    category_id              UUID,
     session_type             VARCHAR(20) NOT NULL DEFAULT 'work'
         CHECK (session_type IN ('work', 'short_break', 'long_break')),
-    planned_duration_minutes INTEGER     NOT NULL DEFAULT 25,
-    actual_duration_minutes  INTEGER CHECK (actual_duration_minutes > 0),
+    actual_duration_minutes  BIGINT CHECK (actual_duration_minutes > 0),
     concentration_score      INTEGER CHECK (concentration_score >= 0 AND concentration_score <= 5),
     notes                    TEXT,
     started_at               TIMESTAMPTZ NOT NULL DEFAULT NOW(),

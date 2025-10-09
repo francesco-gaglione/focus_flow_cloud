@@ -15,11 +15,13 @@ pub struct CreateManualSessionDto {
 
     pub session_type: SessionTypeEnum,
 
-    #[validate(range(min = 1, max = 1440))]
-    pub planned_duration_minutes: i32,
-
     #[validate(range(min = 0, max = 10))]
     pub concentration_score: Option<i32>,
+
+    //TODO validate
+    pub started_at: i64, // timestamp in seconds
+
+    pub ended_at: i64,
 
     //TODO should be validated?
     pub notes: Option<String>,

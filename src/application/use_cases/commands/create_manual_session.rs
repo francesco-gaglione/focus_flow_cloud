@@ -3,15 +3,12 @@ use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
 #[derive(Debug, Clone)]
-pub struct FocusSession {
-    pub id: Uuid,
+pub struct CreateManualFocusSessionCommand {
     pub category_id: Option<Uuid>,
     pub task_id: Option<Uuid>,
     pub session_type: FocusSessionType,
-    pub actual_duration_minutes: Option<i64>,
-    pub concentration_score: Option<i32>,
+    pub concentration_score: Option<i32>, // if none a default will be used (5)
     pub notes: Option<String>,
     pub started_at: DateTime<Utc>,
-    pub ended_at: Option<DateTime<Utc>>,
-    pub created_at: DateTime<Utc>,
+    pub ended_at: DateTime<Utc>,
 }

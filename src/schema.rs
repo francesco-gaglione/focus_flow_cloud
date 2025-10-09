@@ -18,10 +18,11 @@ diesel::table! {
     focus_session (id) {
         id -> Uuid,
         task_id -> Nullable<Uuid>,
-        category_id -> Nullable<Uuid>,
+        category_id -> Uuid,
         #[max_length = 20]
         session_type -> Varchar,
-        actual_duration_minutes -> Nullable<Int8>,
+        planned_duration_minutes -> Int4,
+        actual_duration_minutes -> Nullable<Int4>,
         concentration_score -> Nullable<Int4>,
         notes -> Nullable<Text>,
         started_at -> Timestamptz,
@@ -45,8 +46,6 @@ diesel::table! {
     }
 }
 
-diesel::joinable!(focus_session -> categories (category_id));
-diesel::joinable!(focus_session -> tasks (task_id));
 diesel::joinable!(tasks -> categories (category_id));
 
 diesel::allow_tables_to_appear_in_same_query!(categories, focus_session, tasks,);

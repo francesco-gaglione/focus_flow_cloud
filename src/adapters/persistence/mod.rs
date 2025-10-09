@@ -2,8 +2,9 @@ use crate::application::app_error::AppError;
 use deadpool_diesel::postgres::Pool;
 use diesel::result::Error;
 
-pub mod db_models;
 mod category_persistence_impl;
+pub mod db_models;
+pub mod focus_session_persistence_impl;
 mod task_persistence_impl;
 
 #[derive(Clone)]

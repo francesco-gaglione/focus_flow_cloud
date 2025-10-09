@@ -13,7 +13,7 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d money_manager"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d focus_flow"]
       interval: 5s
       timeout: 5s
       retries: 10

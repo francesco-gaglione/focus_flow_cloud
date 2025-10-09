@@ -2,6 +2,7 @@ use crate::adapters::http::app_state::AppState;
 use crate::adapters::http::dto::session_api::create_manual_session::{
     CreateManualSessionDto, CreateManualSessionResponseDto,
 };
+use crate::adapters::mappers::focus_session_mapper::FocusSessionMapper;
 use crate::adapters::openapi::SESSION_TAG;
 use crate::application::app_error::{AppError, AppResult};
 use axum::Json;
@@ -10,7 +11,7 @@ use validator::Validate;
 
 #[utoipa::path(
     post,
-    path = "/session/createManualSession",
+    path = "/focusSession/createManualSession",
     tag = SESSION_TAG,
     request_body = CreateManualSessionDto,
     responses(
@@ -29,7 +30,12 @@ pub async fn create_manual_session_api(
         .validate()
         .map_err(|e| AppError::BadRequest(e.to_string()))?;
 
-    //TODO
+    let res = state
+        .focus_session_use_cases
+        .create_session(&FocusSessionMapper::manual_create_dto_to_command(&payload)?)
+        .await?;
 
-    Ok(Json(CreateManualSessionResponseDto { id: "".to_string() }))
+    Ok(Json(CreateManualSessionResponseDto {
+        id: res.id.to_string(),
+    }))
 }
