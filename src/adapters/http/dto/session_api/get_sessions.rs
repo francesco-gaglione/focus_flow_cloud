@@ -23,6 +23,6 @@ pub struct GetSessionFiltersDto {
 
 #[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
 #[serde(rename_all = "camelCase")]
-pub struct GetSessionByDateRangeResponseDto {
+pub struct GetSessionFiltersResponseDto {
     pub focus_sessions: Vec<FocusSessionDto>,
 }

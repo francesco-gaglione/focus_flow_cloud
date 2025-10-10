@@ -1,6 +1,6 @@
 use crate::adapters::http::app_state::AppState;
 use crate::adapters::http::dto::session_api::get_sessions::{
-    GetSessionByDateRangeResponseDto, GetSessionFiltersDto,
+    GetSessionFiltersResponseDto, GetSessionFiltersDto,
 };
 use crate::adapters::mappers::focus_session_mapper::FocusSessionMapper;
 use crate::adapters::openapi::SESSION_TAG;
@@ -21,7 +21,7 @@ use tracing::debug;
         GetSessionFiltersDto
     ),
     responses(
-        (status = 200, description = "Session fetched successfully", body = GetSessionByDateRangeResponseDto),
+        (status = 200, description = "Session fetched successfully", body = GetSessionFiltersResponseDto),
         (status = 400, description = "Bad request - validation error"),
         (status = 500, description = "Internal server error")
     )
@@ -29,7 +29,7 @@ use tracing::debug;
 pub async fn get_sessions(
     State(state): State<AppState>,
     query: Query<GetSessionFiltersDto>,
-) -> AppResult<Json<GetSessionByDateRangeResponseDto>> {
+) -> AppResult<Json<GetSessionFiltersResponseDto>> {
     debug!("query: {:?}", query);
 
     if (query.start_date.is_some() && query.end_date.is_none())
@@ -84,7 +84,7 @@ pub async fn get_sessions(
         .find_sessions_by_filters(filters)
         .await?;
 
-    let response_dto = GetSessionByDateRangeResponseDto {
+    let response_dto = GetSessionFiltersResponseDto {
         focus_sessions: sessions
             .into_iter()
             .map(|session| FocusSessionMapper::to_dto(&session))
