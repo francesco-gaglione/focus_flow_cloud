@@ -1,5 +1,5 @@
 use crate::adapters::http::app_state::AppState;
-use crate::adapters::http::routes::api_routes;
+use crate::adapters::http::routes::{api_routes, ws_routes};
 use crate::adapters::openapi::ApiDoc;
 use crate::infra::setup::init_tracing;
 use axum::Router;
@@ -14,6 +14,7 @@ pub fn create_app(app_state: AppState) -> Router {
     Router::new()
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
         .nest("/api", api_routes())
+        .nest("/ws", ws_routes())
         .with_state(app_state)
         .layer(
             TraceLayer::new_for_http().make_span_with(|request: &http::Request<_>| {
