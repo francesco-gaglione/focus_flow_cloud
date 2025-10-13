@@ -3,6 +3,7 @@ use utoipa::ToSchema;
 
 use crate::adapters::http::dto::ws_msg::{
     note_update_ws::NoteUpdate, start_session_ws::StartSession,
+    update_workspace_ws::UpdateWorkspace,
 };
 
 // Requests
@@ -20,6 +21,7 @@ pub struct WsRequest {
 pub enum WsMessage {
     StartSession(StartSession),
     NoteUpdate(NoteUpdate),
+    UpdateWorkspace(UpdateWorkspace),
 }
 
 // Responses

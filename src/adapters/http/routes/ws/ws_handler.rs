@@ -5,6 +5,7 @@ use axum::{
     },
     response::{IntoResponse, Response},
 };
+use diesel::update;
 use futures_util::{SinkExt, StreamExt};
 use serde_json;
 use tokio::sync::Mutex;
@@ -16,7 +17,7 @@ use crate::adapters::http::{
     dto::ws_msg::ws_message::{
         WsErrorResponse, WsMessage, WsRequest, WsResponse, WsSuccessResponse,
     },
-    routes::ws::start_session::start_session,
+    routes::ws::{start_session::start_session, update_workspace::update_workspace},
 };
 
 pub async fn session_handler(ws: WebSocketUpgrade, state: State<AppState>) -> Response {
@@ -76,20 +77,22 @@ async fn handle_socket(ws: WebSocket, State(state): State<AppState>) {
                             }
 
                             match &ws_request.message {
-                                WsMessage::StartSession(start_session_dto) => {
-                                    match start_session(
-                                        request_id.clone(),
-                                        start_session_dto,
+                                WsMessage::UpdateWorkspace(update_workspace_msg) => {
+                                    match update_workspace(
+                                        update_workspace_msg,
                                         &session_state_clone,
                                     )
                                     .await
                                     {
-                                        Ok(response) => {
-                                            debug!("Session started: {}", response);
+                                        Ok(msg) => {
+                                            debug!(
+                                                "Session started, command to clients: {:?}",
+                                                msg
+                                            );
 
                                             send_success_to_client(
                                                 &tx_clone,
-                                                &response,
+                                                "Session started",
                                                 request_id.clone(),
                                             )
                                             .await;
@@ -97,23 +100,50 @@ async fn handle_socket(ws: WebSocket, State(state): State<AppState>) {
                                             broadcast_message(
                                                 &clients_clone,
                                                 my_id,
-                                                &ws_request.message,
+                                                &WsMessage::UpdateWorkspace(msg),
+                                                true,
                                             )
                                             .await;
                                         }
                                         Err(e) => {
                                             error!("Failed to start session: {:?}", e);
-                                            send_error_to_client(
+                                            send_error_to_client(&tx_clone, e.as_ref(), request_id)
+                                                .await;
+                                        }
+                                    }
+                                }
+                                WsMessage::StartSession(start_session_msg) => {
+                                    match start_session(start_session_msg, &session_state_clone)
+                                        .await
+                                    {
+                                        Ok(msg) => {
+                                            debug!("Session started: {:?}", msg);
+
+                                            send_success_to_client(
                                                 &tx_clone,
-                                                "SESSION_ERROR",
-                                                request_id,
+                                                "Session started",
+                                                request_id.clone(),
                                             )
                                             .await;
+
+                                            broadcast_message(
+                                                &clients_clone,
+                                                my_id,
+                                                &WsMessage::StartSession(msg),
+                                                true,
+                                            )
+                                            .await;
+                                        }
+                                        Err(e) => {
+                                            error!("Failed to start session: {:?}", e);
+                                            send_error_to_client(&tx_clone, e.as_ref(), request_id)
+                                                .await;
                                         }
                                     }
                                 }
                                 WsMessage::NoteUpdate(note_update_dto) => {
                                     debug!("Note update: {:?}", note_update_dto);
+                                    //TODO update note
 
                                     send_success_to_client(
                                         &tx_clone,
@@ -122,8 +152,13 @@ async fn handle_socket(ws: WebSocket, State(state): State<AppState>) {
                                     )
                                     .await;
 
-                                    broadcast_message(&clients_clone, my_id, &ws_request.message)
-                                        .await;
+                                    broadcast_message(
+                                        &clients_clone,
+                                        my_id,
+                                        &ws_request.message,
+                                        false,
+                                    )
+                                    .await;
                                 }
                             }
                         }
@@ -198,23 +233,31 @@ async fn send_error_to_client(
 
 fn validate_message(message: &WsMessage) -> Result<(), String> {
     match message {
-        WsMessage::StartSession(dto) => dto
+        WsMessage::StartSession(msg) => msg
             .validate()
             .map_err(|e| format!("StartSession validation failed: {}", e)),
-        WsMessage::NoteUpdate(dto) => dto
+        WsMessage::NoteUpdate(msg) => msg
             .validate()
             .map_err(|e| format!("NoteUpdate validation failed: {}", e)),
+        WsMessage::UpdateWorkspace(msg) => msg
+            .validate()
+            .map_err(|e| format!("StartSession validation failed: {}", e)),
     }
 }
 
-async fn broadcast_message(clients: &Clients, sender_id: usize, message: &WsMessage) {
+async fn broadcast_message(
+    clients: &Clients,
+    sender_id: usize,
+    message: &WsMessage,
+    include_msg_sender: bool,
+) {
     match serde_json::to_string(message) {
         Ok(json) => {
             let clients_read = clients.read().await;
             let mut sent_count = 0;
 
             for (&id, tx) in clients_read.iter() {
-                if id != sender_id {
+                if id != sender_id || include_msg_sender {
                     if tx.send(Message::text(json.clone())).is_ok() {
                         sent_count += 1;
                     } else {
