@@ -5,7 +5,7 @@ use validator::Validate;
 
 #[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
 #[serde(rename_all = "camelCase")]
-pub struct StartSessionDto {
+pub struct StartSession {
     pub session_type: SessionTypeEnum,
     pub start_date: i64,
     pub category_id: Option<String>,

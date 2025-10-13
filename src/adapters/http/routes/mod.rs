@@ -14,5 +14,5 @@ pub fn api_routes() -> Router<AppState> {
 }
 
 pub fn ws_routes() -> Router<AppState> {
-    Router::new().nest("/test", ws::routes::router())
+    Router::new().nest("/workspace", ws::routes::router())
 }

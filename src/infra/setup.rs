@@ -1,4 +1,5 @@
 use crate::adapters::http::app_state::AppState;
+use crate::adapters::http::focus_sessions_state::FocusSessionsState;
 use crate::application::use_cases::category_use_cases::CategoryUseCases;
 use crate::application::use_cases::focus_session_use_cases::FocusSessionUseCases;
 use crate::application::use_cases::task_use_cases::TaskUseCases;
@@ -22,6 +23,7 @@ pub async fn init_app_state() -> Result<AppState, Box<dyn std::error::Error>> {
 
     Ok(AppState {
         ws_clients: Arc::new(RwLock::new(HashMap::new())),
+        focus_session_state: Arc::new(RwLock::new(FocusSessionsState::default())),
         config,
         category_use_cases: Arc::new(category_use_cases),
         task_use_cases: Arc::new(task_use_cases),
