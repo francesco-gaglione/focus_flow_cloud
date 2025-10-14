@@ -17,8 +17,8 @@ use crate::adapters::http::{
         WsErrorResponse, WsMessage, WsRequest, WsResponse, WsSuccessResponse,
     },
     routes::ws::{
-        complete_session::complete_session, end_session::end_session, start_session::start_session,
-        update_workspace::update_workspace,
+        complete_session::complete_session, end_session::end_session, note_update::note_update,
+        start_session::start_session, update_workspace::update_workspace,
     },
 };
 
@@ -200,7 +200,28 @@ async fn handle_socket(ws: WebSocket, state: AppState) {
                                 }
                                 WsMessage::NoteUpdate(note_update_dto) => {
                                     debug!("Note update: {:?}", note_update_dto);
-                                    //TODO update note
+
+                                    match note_update(note_update_dto, &state_for_receive).await {
+                                        Ok(_) => {
+                                            debug!("Note updated");
+
+                                            send_success_to_client(
+                                                &tx_clone,
+                                                "Note updated",
+                                                request_id.clone(),
+                                            )
+                                            .await;
+
+                                            broadcast_message(
+                                                &clients_clone,
+                                                my_id,
+                                                &WsMessage::NoteUpdate(note_update_dto.clone()),
+                                                true,
+                                            )
+                                            .await;
+                                        }
+                                        Err(_) => todo!(),
+                                    }
 
                                     send_success_to_client(
                                         &tx_clone,
