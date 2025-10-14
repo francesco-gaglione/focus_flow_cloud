@@ -220,23 +220,12 @@ async fn handle_socket(ws: WebSocket, state: AppState) {
                                             )
                                             .await;
                                         }
-                                        Err(_) => todo!(),
+                                        Err(e) => {
+                                            error!("Failed to update note: {}", e);
+                                            send_error_to_client(&tx_clone, e.as_ref(), request_id)
+                                                .await;
+                                        }
                                     }
-
-                                    send_success_to_client(
-                                        &tx_clone,
-                                        "Note updated successfully",
-                                        request_id.clone(),
-                                    )
-                                    .await;
-
-                                    broadcast_message(
-                                        &clients_clone,
-                                        my_id,
-                                        &ws_request.message,
-                                        false,
-                                    )
-                                    .await;
                                 }
                             }
                         }
