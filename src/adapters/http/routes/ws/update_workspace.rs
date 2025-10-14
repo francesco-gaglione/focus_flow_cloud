@@ -1,17 +1,15 @@
-use std::sync::Arc;
-use tokio::sync::RwLock;
 use tracing::debug;
 
 use crate::adapters::http::{
-    dto::ws_msg::{update_workspace_ws::UpdateWorkspace, ws_message::WsErrorResponse},
-    focus_sessions_state::FocusSessionsState,
+    app_state::AppState, dto::ws_msg::update_workspace_ws::UpdateWorkspace,
 };
 
 pub async fn update_workspace(
     message: &UpdateWorkspace,
-    sessions_state: &Arc<RwLock<FocusSessionsState>>,
+    state: &AppState,
 ) -> Result<UpdateWorkspace, String> {
     debug!("Starting session");
+    let sessions_state = state.focus_session_state.clone();
 
     let mut state = sessions_state.write().await;
 

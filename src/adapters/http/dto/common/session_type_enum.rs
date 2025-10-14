@@ -3,7 +3,7 @@ use utoipa::ToSchema;
 
 use crate::domain::entities::focus_session_type::FocusSessionType;
 
-#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema, PartialEq)]
 pub enum SessionTypeEnum {
     Work,
     ShortBreak,
@@ -35,6 +35,16 @@ impl From<FocusSessionType> for SessionTypeEnum {
             FocusSessionType::Work => SessionTypeEnum::Work,
             FocusSessionType::ShortBreak => SessionTypeEnum::ShortBreak,
             FocusSessionType::LongBreak => SessionTypeEnum::LongBreak,
+        }
+    }
+}
+
+impl From<SessionTypeEnum> for FocusSessionType {
+    fn from(value: SessionTypeEnum) -> Self {
+        match value {
+            SessionTypeEnum::Work => FocusSessionType::Work,
+            SessionTypeEnum::ShortBreak => FocusSessionType::ShortBreak,
+            SessionTypeEnum::LongBreak => FocusSessionType::LongBreak,
         }
     }
 }

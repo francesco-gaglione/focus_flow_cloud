@@ -33,7 +33,7 @@ pub async fn create_manual_session_api(
 
     let res = state
         .focus_session_use_cases
-        .create_session(&FocusSessionMapper::manual_create_dto_to_command(&payload)?)
+        .create_manual_session(FocusSessionMapper::manual_create_dto_to_command(&payload)?)
         .await?;
 
     Ok(Json(CreateManualSessionResponseDto {

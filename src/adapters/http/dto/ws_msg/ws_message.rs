@@ -2,8 +2,8 @@ use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
 use crate::adapters::http::dto::ws_msg::{
-    note_update_ws::NoteUpdate, start_session_ws::StartSession,
-    update_workspace_ws::UpdateWorkspace,
+    complete_session_ws::CompleteSession, note_update_ws::NoteUpdate,
+    start_session_ws::StartSession, update_workspace_ws::UpdateWorkspace,
 };
 
 // Requests
@@ -20,6 +20,8 @@ pub struct WsRequest {
 #[serde(rename_all = "camelCase")]
 pub enum WsMessage {
     StartSession(StartSession),
+    CompleteSession(CompleteSession),
+    EndSession,
     NoteUpdate(NoteUpdate),
     UpdateWorkspace(UpdateWorkspace),
 }

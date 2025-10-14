@@ -1,3 +1,4 @@
+use crate::application::use_cases::persistance_command::create_focus_session_data::CreateSessionData;
 use crate::domain::entities::focus_session::FocusSession;
 use crate::domain::entities::focus_session_type::FocusSessionType;
 use crate::{
@@ -66,6 +67,21 @@ impl From<DbFocusSession> for FocusSession {
 
 impl From<CreateManualSessionData> for NewDbFocusSession {
     fn from(value: CreateManualSessionData) -> Self {
+        Self {
+            task_id: value.task_id,
+            category_id: value.category_id,
+            session_type: value.session_type.to_string(),
+            concentration_score: value.concentration_score,
+            notes: value.notes,
+            actual_duration_minutes: Some(value.actual_duration_minutes),
+            started_at: value.started_at,
+            ended_at: Some(value.ended_at),
+        }
+    }
+}
+
+impl From<CreateSessionData> for NewDbFocusSession {
+    fn from(value: CreateSessionData) -> Self {
         Self {
             task_id: value.task_id,
             category_id: value.category_id,

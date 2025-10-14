@@ -1,5 +1,6 @@
 use crate::application::app_error::AppResult;
 use crate::application::use_cases::persistance_command::create_category_data::CreateCategoryData;
+use crate::application::use_cases::persistance_command::create_focus_session_data::CreateSessionData;
 use crate::application::use_cases::persistance_command::create_manual_session_data::CreateManualSessionData;
 use crate::application::use_cases::persistance_command::create_task_data::CreateTaskData;
 use crate::application::use_cases::persistance_command::find_session_by_filters_data::FindSessionByFiltersData;
@@ -44,4 +45,6 @@ pub trait FocusSessionPersistence: Send + Sync {
         &self,
         session: &CreateManualSessionData,
     ) -> AppResult<FocusSession>;
+
+    async fn create_session(&self, session: CreateSessionData) -> AppResult<FocusSession>;
 }

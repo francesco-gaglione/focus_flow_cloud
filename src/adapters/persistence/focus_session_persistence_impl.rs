@@ -5,14 +5,12 @@ use crate::adapters::persistence::db_models::db_focus_session::{
 use crate::adapters::schema;
 use crate::application::app_error::{AppError, AppResult};
 use crate::application::traits::FocusSessionPersistence;
+use crate::application::use_cases::persistance_command::create_focus_session_data::CreateSessionData;
 use crate::application::use_cases::persistance_command::create_manual_session_data::CreateManualSessionData;
 use crate::application::use_cases::persistance_command::find_session_by_filters_data::FindSessionByFiltersData;
 use crate::domain::entities::focus_session::FocusSession;
 use async_trait::async_trait;
-use diesel::{
-    BoolExpressionMethods, ExpressionMethods, PgExpressionMethods, QueryDsl, RunQueryDsl,
-    SelectableHelper,
-};
+use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper};
 use tracing::{error, info};
 
 #[async_trait]
@@ -21,6 +19,32 @@ impl FocusSessionPersistence for PostgresPersistence {
         &self,
         session: &CreateManualSessionData,
     ) -> AppResult<FocusSession> {
+        let session = session.clone();
+        let conn = self
+            .pool
+            .get()
+            .await
+            .map_err(|e| AppError::Database(e.to_string()))?;
+
+        let result = conn
+            .interact(move |conn| {
+                diesel::insert_into(schema::focus_session::table)
+                    .values(NewDbFocusSession::from(session))
+                    .returning(DbFocusSession::as_returning())
+                    .get_result(conn)
+            })
+            .await
+            .map_err(|e| {
+                error!("Error creating manual session: {}", e);
+                AppError::Database("Focus session not created".to_string())
+            })??;
+
+        info!("Created focus session with id: {}", result.id);
+
+        Ok(result.into())
+    }
+
+    async fn create_session(&self, session: CreateSessionData) -> AppResult<FocusSession> {
         let session = session.clone();
         let conn = self
             .pool

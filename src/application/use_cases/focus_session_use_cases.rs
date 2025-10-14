@@ -3,8 +3,10 @@ use uuid::Uuid;
 
 use crate::application::app_error::{AppError, AppResult};
 use crate::application::traits::FocusSessionPersistence;
+use crate::application::use_cases::commands::create_foucs_session::CreateFocusSessionCommand;
 use crate::application::use_cases::commands::create_manual_session::CreateManualFocusSessionCommand;
 use crate::application::use_cases::commands::find_session_filters::FindSessionFiltersCommand;
+use crate::application::use_cases::persistance_command::create_focus_session_data::CreateSessionData;
 use crate::application::use_cases::persistance_command::create_manual_session_data::CreateManualSessionData;
 use crate::application::use_cases::persistance_command::find_session_by_filters_data::FindSessionByFiltersData;
 use crate::domain::entities::focus_session::FocusSession;
@@ -62,9 +64,9 @@ impl FocusSessionUseCases {
             .await
     }
 
-    pub async fn create_session(
+    pub async fn create_manual_session(
         &self,
-        session: &CreateManualFocusSessionCommand,
+        session: CreateManualFocusSessionCommand,
     ) -> AppResult<FocusSession> {
         let duration_minutes = (session.ended_at.timestamp() - session.started_at.timestamp()) / 60;
 
@@ -82,5 +84,23 @@ impl FocusSessionUseCases {
         self.session_persistence
             .create_manual_session(&manual_session_data)
             .await
+    }
+
+    pub async fn create_session(
+        &self,
+        session: CreateFocusSessionCommand,
+    ) -> AppResult<FocusSession> {
+        let session_data = CreateSessionData {
+            task_id: session.task_id,
+            category_id: session.category_id,
+            session_type: session.session_type.clone(),
+            concentration_score: session.concentration_score,
+            notes: session.notes.clone(),
+            actual_duration_minutes: session.actual_duration,
+            started_at: session.started_at,
+            ended_at: session.ended_at,
+        };
+
+        self.session_persistence.create_session(session_data).await
     }
 }
