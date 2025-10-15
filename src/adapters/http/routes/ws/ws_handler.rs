@@ -13,12 +13,14 @@ use validator::Validate;
 
 use crate::adapters::http::{
     app_state::{AppState, Clients},
-    dto::ws_msg::ws_message::{
-        WsErrorResponse, WsMessage, WsRequest, WsResponse, WsSuccessResponse,
+    dto::ws_msg::{
+        sync_workspace_ws::SyncWorkspace,
+        ws_message::{WsErrorResponse, WsMessage, WsRequest, WsResponse, WsSuccessResponse},
     },
     routes::ws::{
         complete_session::complete_session, end_session::end_session, note_update::note_update,
-        start_session::start_session, update_workspace::update_workspace,
+        start_session::start_session, sync_workspace::sync_workspace,
+        update_workspace::update_workspace,
     },
 };
 
@@ -85,6 +87,23 @@ async fn handle_socket(ws: WebSocket, state: AppState) {
                             }
 
                             match &ws_request.message {
+                                WsMessage::RequestSync => {
+                                    match sync_workspace(&state_for_receive).await {
+                                        Ok(msg) => {
+                                            send_sync_to_client(&tx_clone, msg).await;
+                                        }
+                                        Err(e) => {
+                                            error!("Failed to start session: {:?}", e);
+                                            send_error_to_client(
+                                                &tx_clone,
+                                                "ERROR",
+                                                e.as_ref(),
+                                                request_id,
+                                            )
+                                            .await;
+                                        }
+                                    }
+                                }
                                 WsMessage::UpdateWorkspace(update_workspace_msg) => {
                                     match update_workspace(update_workspace_msg, &state_for_receive)
                                         .await
@@ -201,7 +220,6 @@ async fn handle_socket(ws: WebSocket, state: AppState) {
                                         }
                                     }
                                 }
-
                                 WsMessage::EndSession => {
                                     match end_session(&state_for_receive).await {
                                         Ok(msg) => {
@@ -329,6 +347,17 @@ async fn send_success_to_client(
     }
 }
 
+async fn send_sync_to_client(
+    tx: &tokio::sync::mpsc::UnboundedSender<Message>,
+    message: SyncWorkspace,
+) {
+    let response = WsResponse::Sync(message);
+
+    if let Ok(json) = serde_json::to_string(&response) {
+        let _ = tx.send(Message::text(json));
+    }
+}
+
 async fn send_error_to_client(
     tx: &tokio::sync::mpsc::UnboundedSender<Message>,
     code: &str,
@@ -347,6 +376,7 @@ async fn send_error_to_client(
 
 fn validate_message(message: &WsMessage) -> Result<(), String> {
     match message {
+        WsMessage::RequestSync => Ok(()),
         WsMessage::StartSession(msg) => msg
             .validate()
             .map_err(|e| format!("StartSession validation failed: {}", e)),

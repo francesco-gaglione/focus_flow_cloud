@@ -293,3 +293,233 @@ async fn test_update_note_during_session() {
         .await;
     client.expect_success("req-002").await;
 }
+
+#[tokio::test]
+async fn test_sync_workspace() {
+    let (ws_url, _handle) = spawn_app().await;
+    let mut client = TestClient::new(&ws_url).await;
+
+    // First, update workspace with category and task
+    client
+        .send(json!({
+            "requestId": "req-000",
+            "updateWorkspace": {
+                "categoryId": "123e4567-e89b-12d3-a456-426614174000",
+                "taskId": "223e4567-e89b-12d3-a456-426614174000"
+            }
+        }))
+        .await;
+
+    client.expect_success("req-000").await;
+    client.expect_broadcast("updateWorkspace").await;
+
+    // Start a session
+    client
+        .send(json!({
+            "requestId": "req-001",
+            "startSession": {
+                "sessionType": "Work",
+                "startDate": 1728936000,
+                "categoryId": "123e4567-e89b-12d3-a456-426614174000",
+                "taskId": "223e4567-e89b-12d3-a456-426614174000"
+            }
+        }))
+        .await;
+
+    client.expect_success("req-001").await;
+    client.expect_broadcast("startSession").await;
+
+    // Update note during session
+    client
+        .send(json!({
+            "requestId": "req-002",
+            "noteUpdate": {
+                "newNote": "Working on feature X"
+            }
+        }))
+        .await;
+
+    client.expect_success("req-002").await;
+    client.expect_broadcast("noteUpdate").await;
+
+    // Request sync
+    client
+        .send(json!({
+            "requestId": "req-003",
+            "requestSync": null
+        }))
+        .await;
+
+    let sync_response = client.recv().await;
+
+    // Verify sync response structure
+    assert!(
+        sync_response.get("sync").is_some(),
+        "Expected 'sync' field in response: {:?}",
+        sync_response
+    );
+
+    let sync = &sync_response["sync"];
+
+    // Verify session data
+    assert!(
+        sync.get("session").is_some() && !sync["session"].is_null(),
+        "Expected session data"
+    );
+    let session = &sync["session"];
+    assert_eq!(session["sessionType"].as_str().unwrap(), "Work");
+    assert_eq!(session["startDate"].as_i64().unwrap(), 1728936000);
+
+    // Check note
+    if let Some(note) = session.get("note") {
+        if !note.is_null() {
+            assert_eq!(note.as_str().unwrap(), "Working on feature X");
+        }
+    }
+
+    // Verify workspace data (from updateWorkspace, not from startSession)
+    assert_eq!(
+        sync["categoryId"].as_str().unwrap(),
+        "123e4567-e89b-12d3-a456-426614174000"
+    );
+    assert_eq!(
+        sync["taskId"].as_str().unwrap(),
+        "223e4567-e89b-12d3-a456-426614174000"
+    );
+}
+
+#[tokio::test]
+async fn test_sync_workspace_no_active_session() {
+    let (ws_url, _handle) = spawn_app().await;
+    let mut client = TestClient::new(&ws_url).await;
+
+    // Request sync without active session
+    client
+        .send(json!({
+            "requestId": "req-001",
+            "requestSync": null
+        }))
+        .await;
+
+    // Receive the sync response
+    let sync_response = client.recv().await;
+
+    // Verify sync response structure
+    assert!(
+        sync_response.get("sync").is_some(),
+        "Expected 'sync' field in response: {:?}",
+        sync_response
+    );
+
+    let sync = &sync_response["sync"];
+
+    // Should have no session
+    assert!(sync["session"].is_null());
+
+    // Workspace should be empty
+    assert!(sync["categoryId"].is_null());
+    assert!(sync["taskId"].is_null());
+}
+
+#[tokio::test]
+async fn test_sync_after_workspace_update() {
+    let (ws_url, _handle) = spawn_app().await;
+    let mut client = TestClient::new(&ws_url).await;
+
+    // Update workspace without starting session
+    client
+        .send(json!({
+            "requestId": "req-001",
+            "updateWorkspace": {
+                "categoryId": "123e4567-e89b-12d3-a456-426614174000",
+                "taskId": "223e4567-e89b-12d3-a456-426614174000"
+            }
+        }))
+        .await;
+
+    // Expect success response for workspace update
+    client.expect_success("req-001").await;
+    // Consume the broadcast of updateWorkspace
+    client.expect_broadcast("updateWorkspace").await;
+
+    // Request sync
+    client
+        .send(json!({
+            "requestId": "req-002",
+            "requestSync": null
+        }))
+        .await;
+
+    // Receive the sync response
+    let sync_response = client.recv().await;
+
+    assert!(
+        sync_response.get("sync").is_some(),
+        "Expected 'sync' field in response: {:?}",
+        sync_response
+    );
+    let sync = &sync_response["sync"];
+
+    // No session should be active
+    assert!(sync["session"].is_null());
+
+    // But workspace should have the updated values
+    assert_eq!(
+        sync["categoryId"].as_str().unwrap(),
+        "123e4567-e89b-12d3-a456-426614174000"
+    );
+    assert_eq!(
+        sync["taskId"].as_str().unwrap(),
+        "223e4567-e89b-12d3-a456-426614174000"
+    );
+}
+
+#[tokio::test]
+async fn test_multiple_clients_sync_independence() {
+    let (ws_url, _handle) = spawn_app().await;
+    let mut client1 = TestClient::new(&ws_url).await;
+    let mut client2 = TestClient::new(&ws_url).await;
+
+    // Client 1 starts a session
+    client1
+        .send(json!({
+            "requestId": "req-001",
+            "startSession": {
+                "sessionType": "Work",
+                "startDate": 1728936000,
+                "categoryId": "123e4567-e89b-12d3-a456-426614174000",
+                "taskId": null
+            }
+        }))
+        .await;
+
+    // Client 1 expects success
+    client1.expect_success("req-001").await;
+
+    // Client 2 should receive the broadcast of the session start
+    let broadcast = client2.recv().await;
+    assert!(broadcast.get("startSession").is_some());
+
+    // Client 2 requests sync
+    client2
+        .send(json!({
+            "requestId": "req-002",
+            "requestSync": null
+        }))
+        .await;
+
+    // Receive the sync response
+    let sync_response = client2.recv().await;
+
+    assert!(
+        sync_response.get("sync").is_some(),
+        "Expected 'sync' field in response: {:?}",
+        sync_response
+    );
+    let sync = &sync_response["sync"];
+
+    // Client 2 should see client 1's session since they share state
+    assert!(sync["session"].is_object());
+    let session = &sync["session"];
+    assert_eq!(session["sessionType"].as_str().unwrap(), "Work");
+}

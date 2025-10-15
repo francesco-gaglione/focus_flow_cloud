@@ -3,7 +3,8 @@ use utoipa::ToSchema;
 
 use crate::adapters::http::dto::ws_msg::{
     complete_session_ws::CompleteSession, note_update_ws::NoteUpdate,
-    start_session_ws::StartSession, update_workspace_ws::UpdateWorkspace,
+    start_session_ws::StartSession, sync_workspace_ws::SyncWorkspace,
+    update_workspace_ws::UpdateWorkspace,
 };
 
 // Requests
@@ -19,6 +20,7 @@ pub struct WsRequest {
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum WsMessage {
+    RequestSync,
     StartSession(StartSession),
     CompleteSession(CompleteSession),
     EndSession,
@@ -33,6 +35,7 @@ pub enum WsMessage {
 pub enum WsResponse {
     Success(WsSuccessResponse),
     Error(WsErrorResponse),
+    Sync(SyncWorkspace),
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
