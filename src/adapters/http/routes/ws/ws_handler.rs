@@ -74,8 +74,13 @@ async fn handle_socket(ws: WebSocket, state: AppState) {
                                     my_id, validation_errors
                                 );
 
-                                send_error_to_client(&tx_clone, "VALIDATION_ERROR", request_id)
-                                    .await;
+                                send_error_to_client(
+                                    &tx_clone,
+                                    "VALIDATION_ERROR",
+                                    validation_errors.as_ref(),
+                                    request_id,
+                                )
+                                .await;
                                 continue;
                             }
 
@@ -107,8 +112,13 @@ async fn handle_socket(ws: WebSocket, state: AppState) {
                                         }
                                         Err(e) => {
                                             error!("Failed to start session: {:?}", e);
-                                            send_error_to_client(&tx_clone, e.as_ref(), request_id)
-                                                .await;
+                                            send_error_to_client(
+                                                &tx_clone,
+                                                "ERROR",
+                                                e.as_ref(),
+                                                request_id,
+                                            )
+                                            .await;
                                         }
                                     }
                                 }
@@ -135,42 +145,63 @@ async fn handle_socket(ws: WebSocket, state: AppState) {
                                         }
                                         Err(e) => {
                                             error!("Failed to start session: {:?}", e);
-                                            send_error_to_client(&tx_clone, e.as_ref(), request_id)
-                                                .await;
+                                            send_error_to_client(
+                                                &tx_clone,
+                                                "ERROR",
+                                                e.as_ref(),
+                                                request_id,
+                                            )
+                                            .await;
                                         }
                                     }
                                 }
-                                WsMessage::CompleteSession(complete_session_msg) => {
-                                    match complete_session(complete_session_msg, &state_for_receive)
+                                WsMessage::CompleteSession(complete_session_dto) => {
+                                    match complete_session(complete_session_dto, &state_for_receive)
                                         .await
                                     {
-                                        Ok(msg) => {
-                                            debug!("Session started: {:?}", msg);
-
+                                        Ok(next_session_opt) => {
                                             send_success_to_client(
                                                 &tx_clone,
                                                 "Session completed",
                                                 request_id.clone(),
                                             )
                                             .await;
-
                                             broadcast_message(
                                                 &clients_clone,
                                                 my_id,
-                                                &WsMessage::CompleteSession(
-                                                    complete_session_msg.clone(),
-                                                ),
+                                                &ws_request.message,
                                                 true,
                                             )
                                             .await;
+
+                                            // Broadcast suggested next session if available
+                                            if let Some(next_session) = next_session_opt {
+                                                debug!(
+                                                    "Broadcasting suggested next session: {:?}",
+                                                    next_session
+                                                );
+                                                broadcast_message(
+                                                    &clients_clone,
+                                                    my_id,
+                                                    &WsMessage::StartSession(next_session),
+                                                    true,
+                                                )
+                                                .await;
+                                            }
                                         }
                                         Err(e) => {
-                                            error!("Failed to start session: {:?}", e);
-                                            send_error_to_client(&tx_clone, e.as_ref(), request_id)
-                                                .await;
+                                            error!("Failed to complete session: {:?}", e);
+                                            send_error_to_client(
+                                                &tx_clone,
+                                                "ERROR",
+                                                e.as_ref(),
+                                                request_id,
+                                            )
+                                            .await;
                                         }
                                     }
                                 }
+
                                 WsMessage::EndSession => {
                                     match end_session(&state_for_receive).await {
                                         Ok(msg) => {
@@ -193,8 +224,13 @@ async fn handle_socket(ws: WebSocket, state: AppState) {
                                         }
                                         Err(e) => {
                                             error!("Failed to start session: {:?}", e);
-                                            send_error_to_client(&tx_clone, e.as_ref(), request_id)
-                                                .await;
+                                            send_error_to_client(
+                                                &tx_clone,
+                                                "ERROR",
+                                                e.as_ref(),
+                                                request_id,
+                                            )
+                                            .await;
                                         }
                                     }
                                 }
@@ -222,8 +258,13 @@ async fn handle_socket(ws: WebSocket, state: AppState) {
                                         }
                                         Err(e) => {
                                             error!("Failed to update note: {}", e);
-                                            send_error_to_client(&tx_clone, e.as_ref(), request_id)
-                                                .await;
+                                            send_error_to_client(
+                                                &tx_clone,
+                                                "ERROR",
+                                                e.as_ref(),
+                                                request_id,
+                                            )
+                                            .await;
                                         }
                                     }
                                 }
@@ -232,7 +273,13 @@ async fn handle_socket(ws: WebSocket, state: AppState) {
                         Err(e) => {
                             error!("Failed to parse JSON from client {}: {}", my_id, e);
 
-                            send_error_to_client(&tx_clone, "PARSE_ERROR", None).await;
+                            send_error_to_client(
+                                &tx_clone,
+                                "PARSE_ERROR",
+                                "Failed to parse request",
+                                None,
+                            )
+                            .await;
                         }
                     }
                 }
@@ -282,17 +329,17 @@ async fn send_success_to_client(
     }
 }
 
-/// Invia un errore al client
 async fn send_error_to_client(
     tx: &tokio::sync::mpsc::UnboundedSender<Message>,
+    code: &str,
     message: &str,
     request_id: Option<String>,
 ) {
     let response = WsResponse::Error(WsErrorResponse {
+        code: code.to_string(),
         message: message.to_string(),
         request_id,
     });
-
     if let Ok(json) = serde_json::to_string(&response) {
         let _ = tx.send(Message::text(json));
     }

@@ -13,25 +13,20 @@ pub async fn start_session(
 
     let mut session_state = state.focus_session_state.write().await;
 
-    match &session_state.current_session {
-        Some(_) => {
-            return Err("Session already running".to_string());
-        }
-        None => {
-            session_state.current_session = Some(FocusSessionState {
-                session_type: message.session_type.clone(),
-                start_date: message.start_date,
-                end_date: None,
-                category_id: message.category_id.clone(),
-                task_id: message.task_id.clone(),
-                note: None,
-            });
-            Ok(StartSession {
-                session_type: message.session_type.clone(),
-                start_date: message.start_date,
-                category_id: message.category_id.clone(),
-                task_id: message.task_id.clone(),
-            })
-        }
+    if session_state.current_session.is_some() {
+        return Err("A session is already running. Please complete it first.".to_string());
     }
+
+    let focus_session_state = FocusSessionState {
+        session_type: message.session_type.clone(),
+        start_date: message.start_date,
+        category_id: message.category_id.clone(),
+        task_id: message.task_id.clone(),
+        note: None,
+        end_date: None,
+    };
+
+    session_state.current_session = Some(focus_session_state);
+
+    Ok(message.clone())
 }

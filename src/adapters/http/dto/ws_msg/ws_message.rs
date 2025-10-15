@@ -45,7 +45,7 @@ pub struct WsSuccessResponse {
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct WsErrorResponse {
-    // pub code: String, //TODO define error codes
+    pub code: String, //TODO define error codes
     pub message: String,
     pub request_id: Option<String>,
 }
