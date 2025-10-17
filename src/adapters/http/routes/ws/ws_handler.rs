@@ -219,7 +219,7 @@ async fn handle_socket(ws: WebSocket, state: AppState) {
                                             broadcast_message(
                                                 &clients_clone,
                                                 my_id,
-                                                &WsMessage::TerminateSession,
+                                                &WsMessage::TerminateSession{},
                                                 true,
                                             )
                                             .await;
@@ -420,7 +420,7 @@ fn validate_message(message: &WsMessage) -> Result<(), String> {
         | WsMessage::StartEvent
         | WsMessage::BreakEvent
         | WsMessage::TerminateEvent
-        | WsMessage::TerminateSession => Ok(()),
+        | WsMessage::TerminateSession{} => Ok(()),
 
         WsMessage::NoteUpdate(msg) => validate_variant!(msg, "NoteUpdate"),
         WsMessage::UpdateWorkspace(msg) => validate_variant!(msg, "UpdateWorkspace"),

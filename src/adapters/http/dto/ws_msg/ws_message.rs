@@ -33,7 +33,7 @@ pub enum WsMessage {
 
     // To client message
     StartSession(StartSession),
-    TerminateSession,
+    TerminateSession {}, // {} To serialize as object
 }
 
 // Responses
