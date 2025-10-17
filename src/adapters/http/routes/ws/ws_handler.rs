@@ -18,8 +18,10 @@ use crate::adapters::http::{
         ws_message::{WsErrorResponse, WsMessage, WsRequest, WsResponse, WsSuccessResponse},
     },
     routes::ws::{
-        complete_session::complete_session, end_session::end_session, note_update::note_update,
-        start_session::start_session, sync_workspace::sync_workspace,
+        handle_break_event::handle_break_event, handle_start_event::handle_start_event,
+        handle_terminate_event::handle_terminate_event,
+        handle_update_concentration_score::handle_update_concentration_score,
+        note_update::note_update, sync_workspace::sync_workspace,
         update_workspace::update_workspace,
     },
 };
@@ -138,9 +140,8 @@ async fn handle_socket(ws: WebSocket, state: AppState) {
                                         }
                                     }
                                 }
-                                WsMessage::StartSession(start_session_msg) => {
-                                    match start_session(start_session_msg, &state_for_receive).await
-                                    {
+                                WsMessage::StartEvent => {
+                                    match handle_start_event(&state_for_receive).await {
                                         Ok(msg) => {
                                             debug!("Session started: {:?}", msg);
 
@@ -171,42 +172,28 @@ async fn handle_socket(ws: WebSocket, state: AppState) {
                                         }
                                     }
                                 }
-                                WsMessage::CompleteSession(complete_session_dto) => {
-                                    match complete_session(complete_session_dto, &state_for_receive)
-                                        .await
-                                    {
-                                        Ok(next_session_opt) => {
+                                WsMessage::BreakEvent => {
+                                    match handle_break_event(&state_for_receive).await {
+                                        Ok(msg) => {
+                                            debug!("Break session started: {:?}", msg);
+
                                             send_success_to_client(
                                                 &tx_clone,
-                                                "Session completed",
+                                                "Break session started",
                                                 request_id.clone(),
                                             )
                                             .await;
+
                                             broadcast_message(
                                                 &clients_clone,
                                                 my_id,
-                                                &ws_request.message,
+                                                &WsMessage::StartSession(msg),
                                                 true,
                                             )
                                             .await;
-
-                                            // Broadcast suggested next session if available
-                                            if let Some(next_session) = next_session_opt {
-                                                debug!(
-                                                    "Broadcasting suggested next session: {:?}",
-                                                    next_session
-                                                );
-                                                broadcast_message(
-                                                    &clients_clone,
-                                                    my_id,
-                                                    &WsMessage::StartSession(next_session),
-                                                    true,
-                                                )
-                                                .await;
-                                            }
                                         }
                                         Err(e) => {
-                                            error!("Failed to complete session: {:?}", e);
+                                            error!("Failed to start break session: {:?}", e);
                                             send_error_to_client(
                                                 &tx_clone,
                                                 "ERROR",
@@ -217,14 +204,14 @@ async fn handle_socket(ws: WebSocket, state: AppState) {
                                         }
                                     }
                                 }
-                                WsMessage::EndSession => {
-                                    match end_session(&state_for_receive).await {
-                                        Ok(msg) => {
-                                            debug!("Session ended: {:?}", msg);
+                                WsMessage::TerminateEvent => {
+                                    match handle_terminate_event(&state_for_receive).await {
+                                        Ok(_) => {
+                                            debug!("Session terminated");
 
                                             send_success_to_client(
                                                 &tx_clone,
-                                                "Session ended",
+                                                "Session terminated",
                                                 request_id.clone(),
                                             )
                                             .await;
@@ -232,13 +219,52 @@ async fn handle_socket(ws: WebSocket, state: AppState) {
                                             broadcast_message(
                                                 &clients_clone,
                                                 my_id,
-                                                &WsMessage::EndSession,
+                                                &WsMessage::TerminateSession,
                                                 true,
                                             )
                                             .await;
                                         }
                                         Err(e) => {
-                                            error!("Failed to end session: {:?}", e);
+                                            error!("Failed to terminate session: {:?}", e);
+                                            send_error_to_client(
+                                                &tx_clone,
+                                                "ERROR",
+                                                e.as_ref(),
+                                                request_id,
+                                            )
+                                            .await;
+                                        }
+                                    }
+                                }
+                                WsMessage::UpdateConcentrationScore(concentration_score_dto) => {
+                                    match handle_update_concentration_score(
+                                        concentration_score_dto,
+                                        &state_for_receive,
+                                    )
+                                    .await
+                                    {
+                                        Ok(_) => {
+                                            debug!("Concentration score updated");
+
+                                            send_success_to_client(
+                                                &tx_clone,
+                                                "Concentration score updated",
+                                                request_id.clone(),
+                                            )
+                                            .await;
+
+                                            broadcast_message(
+                                                &clients_clone,
+                                                my_id,
+                                                &WsMessage::UpdateConcentrationScore(
+                                                    concentration_score_dto.clone(),
+                                                ),
+                                                true,
+                                            )
+                                            .await;
+                                        }
+                                        Err(e) => {
+                                            error!("Failed to update concentration score: {}", e);
                                             send_error_to_client(
                                                 &tx_clone,
                                                 "ERROR",
@@ -282,6 +308,16 @@ async fn handle_socket(ws: WebSocket, state: AppState) {
                                             .await;
                                         }
                                     }
+                                }
+                                _ => {
+                                    debug!("Server received a not handled message");
+                                    send_error_to_client(
+                                        &tx_clone,
+                                        "ERROR",
+                                        "Server is not able to handle this message",
+                                        request_id,
+                                    )
+                                    .await;
                                 }
                             }
                         }
@@ -371,22 +407,27 @@ async fn send_error_to_client(
     }
 }
 
+macro_rules! validate_variant {
+    ($msg:expr, $variant:literal) => {
+        $msg.validate()
+            .map_err(|e| format!("{} validation failed: {}", $variant, e))
+    };
+}
+
 fn validate_message(message: &WsMessage) -> Result<(), String> {
     match message {
-        WsMessage::RequestSync => Ok(()),
-        WsMessage::StartSession(msg) => msg
-            .validate()
-            .map_err(|e| format!("StartSession validation failed: {}", e)),
-        WsMessage::NoteUpdate(msg) => msg
-            .validate()
-            .map_err(|e| format!("NoteUpdate validation failed: {}", e)),
-        WsMessage::UpdateWorkspace(msg) => msg
-            .validate()
-            .map_err(|e| format!("StartSession validation failed: {}", e)),
-        WsMessage::EndSession => Ok(()),
-        WsMessage::CompleteSession(msg) => msg
-            .validate()
-            .map_err(|e| format!("CompleteSession validation failed: {}", e)),
+        WsMessage::RequestSync
+        | WsMessage::StartEvent
+        | WsMessage::BreakEvent
+        | WsMessage::TerminateEvent
+        | WsMessage::TerminateSession => Ok(()),
+
+        WsMessage::NoteUpdate(msg) => validate_variant!(msg, "NoteUpdate"),
+        WsMessage::UpdateWorkspace(msg) => validate_variant!(msg, "UpdateWorkspace"),
+        WsMessage::UpdateConcentrationScore(msg) => {
+            validate_variant!(msg, "UpdateConcentrationScore")
+        }
+        WsMessage::StartSession(msg) => validate_variant!(msg, "StartSession"),
     }
 }
 

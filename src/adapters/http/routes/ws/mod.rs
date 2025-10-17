@@ -1,8 +1,9 @@
-pub mod complete_session;
-pub mod end_session;
+pub mod handle_break_event;
+pub mod handle_start_event;
+pub mod handle_terminate_event;
+pub mod handle_update_concentration_score;
 pub mod note_update;
 pub mod routes;
-pub mod start_session;
 pub mod sync_workspace;
 pub mod update_workspace;
 pub mod ws_handler;

@@ -2,9 +2,8 @@ use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
 use crate::adapters::http::dto::ws_msg::{
-    complete_session_ws::CompleteSession, note_update_ws::NoteUpdate,
-    start_session_ws::StartSession, sync_workspace_ws::SyncWorkspace,
-    update_workspace_ws::UpdateWorkspace,
+    note_update_ws::NoteUpdate, start_session_ws::StartSession, sync_workspace_ws::SyncWorkspace,
+    update_concentration_score::UpdateConcentrationScore, update_workspace_ws::UpdateWorkspace,
 };
 
 // Requests
@@ -20,12 +19,21 @@ pub struct WsRequest {
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum WsMessage {
+    // From client message
     RequestSync,
-    StartSession(StartSession),
-    CompleteSession(CompleteSession),
-    EndSession,
+
+    StartEvent,
+    BreakEvent,
+    TerminateEvent,
+
+    // Both to and from client
     NoteUpdate(NoteUpdate),
+    UpdateConcentrationScore(UpdateConcentrationScore),
     UpdateWorkspace(UpdateWorkspace),
+
+    // To client message
+    StartSession(StartSession),
+    TerminateSession,
 }
 
 // Responses

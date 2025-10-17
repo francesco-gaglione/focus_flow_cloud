@@ -15,6 +15,7 @@ pub struct FocusSessionState {
     pub category_id: Option<String>,
     pub task_id: Option<String>,
     pub note: Option<String>,
+    pub concentration_score: Option<i32>
 }
 
 #[derive(Debug, Default, Clone)]
