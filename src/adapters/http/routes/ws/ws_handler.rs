@@ -93,7 +93,7 @@ async fn handle_socket(ws: WebSocket, state: AppState) {
                                             send_sync_to_client(&tx_clone, msg).await;
                                         }
                                         Err(e) => {
-                                            error!("Failed to start session: {:?}", e);
+                                            error!("Failed to sync clients: {:?}", e);
                                             send_error_to_client(
                                                 &tx_clone,
                                                 "ERROR",
@@ -127,7 +127,7 @@ async fn handle_socket(ws: WebSocket, state: AppState) {
                                             .await;
                                         }
                                         Err(e) => {
-                                            error!("Failed to start session: {:?}", e);
+                                            error!("Failed to update workspace: {:?}", e);
                                             send_error_to_client(
                                                 &tx_clone,
                                                 "ERROR",
@@ -220,7 +220,7 @@ async fn handle_socket(ws: WebSocket, state: AppState) {
                                 WsMessage::EndSession => {
                                     match end_session(&state_for_receive).await {
                                         Ok(msg) => {
-                                            debug!("Session started: {:?}", msg);
+                                            debug!("Session ended: {:?}", msg);
 
                                             send_success_to_client(
                                                 &tx_clone,
@@ -238,7 +238,7 @@ async fn handle_socket(ws: WebSocket, state: AppState) {
                                             .await;
                                         }
                                         Err(e) => {
-                                            error!("Failed to start session: {:?}", e);
+                                            error!("Failed to end session: {:?}", e);
                                             send_error_to_client(
                                                 &tx_clone,
                                                 "ERROR",
