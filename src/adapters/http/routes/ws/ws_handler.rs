@@ -109,14 +109,11 @@ async fn handle_socket(ws: WebSocket, state: AppState) {
                                         .await
                                     {
                                         Ok(msg) => {
-                                            debug!(
-                                                "Session started, command to clients: {:?}",
-                                                msg
-                                            );
+                                            debug!("Workspace updated: {:?}", msg);
 
                                             send_success_to_client(
                                                 &tx_clone,
-                                                "Session started",
+                                                "Workspace updated",
                                                 request_id.clone(),
                                             )
                                             .await;
