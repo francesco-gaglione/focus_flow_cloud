@@ -13,18 +13,16 @@ use crate::{
     domain::entities::{focus_session::FocusSession, focus_session_type::FocusSessionType},
 };
 
-/// Mapper for FocusSession-related conversions between HTTP layer and Application layer
 pub struct FocusSessionMapper;
 
 impl FocusSessionMapper {
     pub fn to_dto(session: &FocusSession) -> FocusSessionDto {
-        // Esempio di mapping - completare con i campi corretti
         FocusSessionDto {
             id: session.id.to_string(),
             category_id: session.category_id.map(|id| id.to_string()),
             task_id: session.task_id.map(|id| id.to_string()),
             session_type: SessionTypeEnum::from(session.session_type.clone()),
-            actual_duration_minutes: session.actual_duration_minutes,
+            actual_duration: session.actual_duration,
             concentration_score: session.concentration_score,
             notes: session.notes.clone(),
             started_at: session.started_at.timestamp(),

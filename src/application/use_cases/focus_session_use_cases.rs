@@ -68,7 +68,7 @@ impl FocusSessionUseCases {
         &self,
         session: CreateManualFocusSessionCommand,
     ) -> AppResult<FocusSession> {
-        let duration_minutes = (session.ended_at.timestamp() - session.started_at.timestamp()) / 60;
+        let duration = (session.ended_at.timestamp() - session.started_at.timestamp());
 
         let manual_session_data = CreateManualSessionData {
             task_id: session.task_id,
@@ -76,7 +76,7 @@ impl FocusSessionUseCases {
             session_type: session.session_type.clone(),
             concentration_score: session.concentration_score,
             notes: session.notes.clone(),
-            actual_duration_minutes: duration_minutes,
+            actual_duration: duration,
             started_at: session.started_at,
             ended_at: session.ended_at,
         };
@@ -96,7 +96,7 @@ impl FocusSessionUseCases {
             session_type: session.session_type.clone(),
             concentration_score: session.concentration_score,
             notes: session.notes.clone(),
-            actual_duration_minutes: session.actual_duration,
+            actual_duration: session.actual_duration,
             started_at: session.started_at,
             ended_at: session.ended_at,
         };

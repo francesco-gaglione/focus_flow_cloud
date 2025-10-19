@@ -21,7 +21,7 @@ diesel::table! {
         category_id -> Nullable<Uuid>,
         #[max_length = 20]
         session_type -> Varchar,
-        actual_duration_minutes -> Nullable<Int8>,
+        actual_duration -> Nullable<Int8>,
         concentration_score -> Nullable<Int4>,
         notes -> Nullable<Text>,
         started_at -> Timestamptz,

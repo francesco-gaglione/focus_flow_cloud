@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS focus_session
     category_id              UUID,
     session_type             VARCHAR(20) NOT NULL DEFAULT 'work'
         CHECK (session_type IN ('work', 'short_break', 'long_break')),
-    actual_duration_minutes  BIGINT CHECK (actual_duration_minutes > 0),
+    actual_duration  BIGINT CHECK (actual_duration > 0),
     concentration_score      INTEGER CHECK (concentration_score >= 0 AND concentration_score <= 5),
     notes                    TEXT,
     started_at               TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -85,6 +85,3 @@ CREATE INDEX IF NOT EXISTS idx_sessions_started_at
 
 CREATE INDEX IF NOT EXISTS idx_sessions_concentration
     ON focus_session (concentration_score) WHERE concentration_score IS NOT NULL;
-
-CREATE INDEX IF NOT EXISTS idx_sessions_completed
-    ON focus_session (actual_duration_minutes) WHERE actual_duration_minutes IS NOT NULL;

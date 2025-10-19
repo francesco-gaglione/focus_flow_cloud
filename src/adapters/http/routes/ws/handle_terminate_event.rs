@@ -49,7 +49,11 @@ pub async fn handle_terminate_event(state: &AppState) -> Result<(), String> {
                     ended_at: DateTime::from_timestamp(old_session_state.end_date.unwrap(), 0)
                         .ok_or("Failed to parse session end time".to_string())?,
                 })
-                .await;
+                .await
+                .map_err(|e| {
+                    debug!("Error creating a new session: {:?}", e);
+                    "Error creating a new session".to_string()
+                })?;
 
             session_state.current_session = None;
             session_state.consecutive_sessions = Vec::new();

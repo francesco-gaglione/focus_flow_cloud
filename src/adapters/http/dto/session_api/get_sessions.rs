@@ -15,9 +15,9 @@ pub struct GetSessionFiltersDto {
     #[validate(custom(function = "validate_uuids"))]
     pub category_ids: Option<Vec<String>>,
     pub session_type: Option<SessionTypeEnum>,
-    #[schema(example = "5")]
+    #[schema(example = "1")]
     pub min_concentration_score: Option<i32>,
-    #[schema(example = "8")]
+    #[schema(example = "5")]
     pub max_concentration_score: Option<i32>,
 }
 

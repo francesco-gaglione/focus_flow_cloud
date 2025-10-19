@@ -17,7 +17,8 @@ use crate::{
         focus_session::FocusSession,
         focus_session_type::FocusSessionType,
         stats::{
-            CategoryDistributionItem, ConcentrationPeriod, DailyActivityDistributionItem, DailyActivityItem, Stats, TaskDistributionItem
+            CategoryDistributionItem, ConcentrationPeriod, DailyActivityDistributionItem,
+            DailyActivityItem, Stats, TaskDistributionItem,
         },
     },
 };
@@ -73,12 +74,12 @@ impl StatsUseCases {
 
         let total_focus_time: i64 = sessions
             .iter()
-            .map(|s| s.actual_duration_minutes.unwrap_or(0) * 60)
+            .map(|s| s.actual_duration.unwrap_or(0))
             .sum();
 
         let total_break_time: i64 = sessions
             .iter()
-            .map(|s| s.actual_duration_minutes.unwrap_or(0))
+            .map(|s| s.actual_duration.unwrap_or(0))
             .sum();
 
         Ok(Stats {
@@ -158,7 +159,7 @@ impl StatsUseCases {
         let morning_avg = if morning_count > 0 {
             morning_total as f64 / morning_count as f64
         } else {
-            f64::MAX // Se non ci sono dati, considera la media infinita
+            f64::MAX
         };
 
         let afternoon_avg = if afternoon_count > 0 {
@@ -179,7 +180,7 @@ impl StatsUseCases {
 
         for session in sessions {
             if let Some(score) = session.concentration_score {
-                if score >= 0 && score <= 10 {
+                if score >= 0 && score <= 5 {
                     distribution[score as usize] += 1;
                 }
             }
@@ -197,10 +198,10 @@ impl StatsUseCases {
 
         for session in sessions {
             if let (Some(category_id), Some(duration)) =
-                (session.category_id, session.actual_duration_minutes)
+                (session.category_id, session.actual_duration)
             {
-                *category_times.entry(category_id).or_insert(0) += duration * 60;
-                total_time += duration * 60;
+                *category_times.entry(category_id).or_insert(0) += duration;
+                total_time += duration;
             }
         }
 
@@ -244,11 +245,9 @@ impl StatsUseCases {
         let mut total_time: i64 = 0;
 
         for session in sessions {
-            if let (Some(task_id), Some(duration)) =
-                (session.task_id, session.actual_duration_minutes)
-            {
-                *task_times.entry(task_id).or_insert(0) += duration * 60;
-                total_time += duration * 60;
+            if let (Some(task_id), Some(duration)) = (session.task_id, session.actual_duration) {
+                *task_times.entry(task_id).or_insert(0) += duration;
+                total_time += duration;
             }
         }
 
@@ -292,7 +291,7 @@ impl StatsUseCases {
 
         for session in sessions {
             if let (Some(category_id), Some(duration)) =
-                (session.category_id, session.actual_duration_minutes)
+                (session.category_id, session.actual_duration)
             {
                 let date = session.started_at.date_naive();
 
@@ -300,8 +299,8 @@ impl StatsUseCases {
                     .entry(date)
                     .or_insert_with(HashMap::new)
                     .entry(category_id)
-                    .and_modify(|time| *time += duration * 60)
-                    .or_insert(duration * 60);
+                    .and_modify(|time| *time += duration)
+                    .or_insert(duration);
             }
         }
 

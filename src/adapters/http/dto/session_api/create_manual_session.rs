@@ -16,7 +16,7 @@ pub struct CreateManualSessionDto {
 
     pub session_type: SessionTypeEnum,
 
-    #[validate(range(min = 0, max = 10))]
+    #[validate(range(min = 0, max = 5))]
     pub concentration_score: Option<i32>,
 
     //TODO validate

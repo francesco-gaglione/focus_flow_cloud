@@ -8,7 +8,7 @@ pub struct Stats {
     pub total_break_time: i64,
     pub most_concentrated_period: ConcentrationPeriod,
     pub less_concentrated_period: ConcentrationPeriod,
-    pub concentration_distribution: [u32; 11], // vec of 10 elements rapresenting the number of session of each 10 rating
+    pub concentration_distribution: [u32; 11], // vec of 10 elements rapresenting the number of session of each 5 rating
     pub category_distribution: Vec<CategoryDistributionItem>,
     pub task_distribution: Vec<TaskDistributionItem>,
     pub daily_activity: Vec<DailyActivityItem>

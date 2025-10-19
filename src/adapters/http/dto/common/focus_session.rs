@@ -10,7 +10,7 @@ pub struct FocusSessionDto {
     pub category_id: Option<String>,
     pub task_id: Option<String>,
     pub session_type: SessionTypeEnum,
-    pub actual_duration_minutes: Option<i64>,
+    pub actual_duration: Option<i64>,
     pub concentration_score: Option<i32>,
     pub notes: Option<String>,
     pub started_at: i64,

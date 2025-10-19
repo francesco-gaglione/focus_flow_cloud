@@ -10,7 +10,7 @@ pub struct CreateManualSessionData {
     pub session_type: FocusSessionType,
     pub concentration_score: Option<i32>,
     pub notes: Option<String>,
-    pub actual_duration_minutes: i64,
+    pub actual_duration: i64,
     pub started_at: DateTime<Utc>,
     pub ended_at: DateTime<Utc>,
 }
