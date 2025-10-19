@@ -74,11 +74,13 @@ impl StatsUseCases {
 
         let total_focus_time: i64 = sessions
             .iter()
+            .filter(|s| s.session_type == FocusSessionType::Work)
             .map(|s| s.actual_duration.unwrap_or(0))
             .sum();
 
         let total_break_time: i64 = sessions
             .iter()
+            .filter(|s| s.session_type != FocusSessionType::Work)
             .map(|s| s.actual_duration.unwrap_or(0))
             .sum();
 
