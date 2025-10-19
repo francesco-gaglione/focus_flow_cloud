@@ -293,7 +293,7 @@ async fn handle_socket(ws: WebSocket, state: AppState) {
                                                 &clients_clone,
                                                 my_id,
                                                 &WsMessage::NoteUpdate(note_update_dto.clone()),
-                                                true,
+                                                false,
                                             )
                                             .await;
                                         }
