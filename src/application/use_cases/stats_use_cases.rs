@@ -73,7 +73,7 @@ impl StatsUseCases {
 
         let total_focus_time: i64 = sessions
             .iter()
-            .map(|s| s.actual_duration_minutes.unwrap_or(0))
+            .map(|s| s.actual_duration_minutes.unwrap_or(0) * 60)
             .sum();
 
         let total_break_time: i64 = sessions
@@ -199,8 +199,8 @@ impl StatsUseCases {
             if let (Some(category_id), Some(duration)) =
                 (session.category_id, session.actual_duration_minutes)
             {
-                *category_times.entry(category_id).or_insert(0) += duration;
-                total_time += duration;
+                *category_times.entry(category_id).or_insert(0) += duration * 60;
+                total_time += duration * 60;
             }
         }
 
@@ -247,8 +247,8 @@ impl StatsUseCases {
             if let (Some(task_id), Some(duration)) =
                 (session.task_id, session.actual_duration_minutes)
             {
-                *task_times.entry(task_id).or_insert(0) += duration;
-                total_time += duration;
+                *task_times.entry(task_id).or_insert(0) += duration * 60;
+                total_time += duration * 60;
             }
         }
 
@@ -300,12 +300,12 @@ impl StatsUseCases {
                     .entry(date)
                     .or_insert_with(HashMap::new)
                     .entry(category_id)
-                    .and_modify(|time| *time += duration)
-                    .or_insert(duration);
+                    .and_modify(|time| *time += duration * 60)
+                    .or_insert(duration * 60);
             }
         }
 
-        let mut unique_category_ids: Vec<Uuid> = daily_data
+        let unique_category_ids: Vec<Uuid> = daily_data
             .values()
             .flat_map(|categories| categories.keys())
             .copied()
