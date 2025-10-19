@@ -1,7 +1,7 @@
 [package]
 name = "focus_flow_cloud"
 version = "0.1.0"
-edition = "2024"
+edition = "2021"
 
 [dependencies]
 tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }

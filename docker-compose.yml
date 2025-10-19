@@ -3,20 +3,36 @@ version: "3"
 services:
   db:
     image: postgres:16
-    container_name: focus_flow_db
+    container_name: focusflow_db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: focus_flow
+      POSTGRES_DB: focusflow
     ports:
       - "5432:5432"
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - db:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d focus_flow"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d focusflow"]
       interval: 5s
       timeout: 5s
       retries: 10
 
-volumes:
-  db_data:
+  app:
+    image: focus_flow_cloud:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: focusflow_cloud
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/focusflow
+      SERVER_PORT: 8080
+      RUST_LOG: info
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+
+volumes: 
+  db:

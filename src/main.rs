@@ -11,7 +11,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let app = create_app(app_state.clone());
 
     let listener =
-        tokio::net::TcpListener::bind(format!("127.0.0.1:{}", app_state.config.server_port))
+        tokio::net::TcpListener::bind(format!("0.0.0.0:{}", app_state.config.server_port))
             .await
             .unwrap();
 
