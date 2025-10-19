@@ -65,6 +65,35 @@ impl CategoryPersistence for PostgresPersistence {
         Ok(categories)
     }
 
+    async fn find_by_id(&self, category_id: Uuid) -> AppResult<Category> {
+        let conn = self
+            .pool
+            .get()
+            .await
+            .map_err(|e| AppError::Database(e.to_string()))?;
+
+        let result = conn
+            .interact(move |conn| {
+                schema::categories::table
+                    .filter(schema::categories::id.eq(category_id))
+                    .filter(schema::categories::deleted_at.is_null())
+                    .select(DbCategory::as_select())
+                    .first(conn)
+                    .optional()
+            })
+            .await
+            .map_err(|e| AppError::Database(e.to_string()))?
+            .map_err(|e| AppError::Database(e.to_string()))?;
+
+        match result {
+            Some(db_category) => Ok(db_category.into()),
+            None => Err(AppError::NotFound(format!(
+                "Category with id {} not found",
+                category_id
+            ))),
+        }
+    }
+
     async fn update_category(
         &self,
         category_id: Uuid,

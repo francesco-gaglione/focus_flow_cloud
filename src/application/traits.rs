@@ -16,6 +16,7 @@ use uuid::Uuid;
 pub trait CategoryPersistence: Send + Sync {
     async fn create_category(&self, category: CreateCategoryData) -> AppResult<()>;
     async fn find_all(&self) -> AppResult<Vec<Category>>;
+    async fn find_by_id(&self, category_id: Uuid) -> AppResult<Category>;
     async fn update_category(
         &self,
         category_id: Uuid,
@@ -30,6 +31,7 @@ pub trait TaskPersistence: Send + Sync {
     async fn find_all(&self) -> AppResult<Vec<Task>>;
     async fn find_orphan_tasks(&self) -> AppResult<Vec<Task>>;
     async fn find_by_category_id(&self, category_id: Uuid) -> AppResult<Vec<Task>>;
+    async fn find_by_id(&self, task_id: Uuid) -> AppResult<Task>;
     async fn update_task(&self, task_id: Uuid, task: UpdateTaskData) -> AppResult<Task>;
     async fn delete_task(&self, task: Uuid) -> AppResult<()>;
 }

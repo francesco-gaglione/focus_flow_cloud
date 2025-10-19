@@ -1,5 +1,6 @@
 pub mod category;
 pub mod session;
+pub mod stats;
 pub mod task;
 pub mod ws;
 
@@ -11,6 +12,7 @@ pub fn api_routes() -> Router<AppState> {
         .nest("/category", category::routes::router())
         .nest("/task", task::routes::router())
         .nest("/focusSession", session::routes::router())
+        .nest("/stats", stats::routes::router())
 }
 
 pub fn ws_routes() -> Router<AppState> {

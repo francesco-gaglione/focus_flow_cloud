@@ -4,18 +4,11 @@ use uuid::Uuid;
 use crate::{
     adapters::http::dto::{
         common::{focus_session::FocusSessionDto, session_type_enum::SessionTypeEnum},
-        session_api::{
-            create_manual_session::CreateManualSessionDto, get_sessions::GetSessionFiltersDto,
-        },
+        session_api::create_manual_session::CreateManualSessionDto,
     },
     application::{
         app_error::{AppError, AppResult},
-        use_cases::commands::{
-            create_manual_session::CreateManualFocusSessionCommand,
-            find_session_filters::{
-                ConcentrationScoreFilter, FindSessionFiltersCommand, FocusSessionDateFilter,
-            },
-        },
+        use_cases::commands::create_manual_session::CreateManualFocusSessionCommand,
     },
     domain::entities::{focus_session::FocusSession, focus_session_type::FocusSessionType},
 };

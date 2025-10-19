@@ -99,6 +99,35 @@ impl TaskPersistence for PostgresPersistence {
         Ok(tasks)
     }
 
+    async fn find_by_id(&self, task_id: Uuid) -> AppResult<Task> {
+        let conn = self
+            .pool
+            .get()
+            .await
+            .map_err(|e| AppError::Database(e.to_string()))?;
+
+        let result = conn
+            .interact(move |conn| {
+                schema::tasks::table
+                    .filter(schema::tasks::id.eq(task_id))
+                    .filter(schema::tasks::deleted_at.is_null())
+                    .select(DbTask::as_select())
+                    .first(conn)
+                    .optional()
+            })
+            .await
+            .map_err(|e| AppError::Database(e.to_string()))?
+            .map_err(|e| AppError::Database(e.to_string()))?;
+
+        match result {
+            Some(db_task) => Ok(db_task.into()),
+            None => Err(AppError::NotFound(format!(
+                "Task with id {} not found",
+                task_id
+            ))),
+        }
+    }
+
     async fn update_task(&self, task_id: Uuid, task: UpdateTaskData) -> AppResult<Task> {
         let conn = self
             .pool
