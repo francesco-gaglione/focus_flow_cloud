@@ -45,7 +45,6 @@ impl StatsUseCases {
 
     pub async fn calculate_stats_by_period(&self, period: StatsPeriod) -> AppResult<Stats> {
         let start_date: Option<DateTime<Utc>> = DateTime::from_timestamp(period.start_date, 0);
-
         let end_date: Option<DateTime<Utc>> = period
             .end_date
             .and_then(|timestamp| DateTime::from_timestamp(timestamp, 0));
@@ -62,27 +61,27 @@ impl StatsUseCases {
             })
             .await?;
 
-        let total_sessions = sessions
-            .iter()
-            .filter(|s| s.session_type == FocusSessionType::Work)
-            .count();
+        let is_multi_day = Self::is_multi_day_period(start_date, end_date);
 
-        let total_breaks = sessions
+        let (work_sessions, break_sessions): (Vec<_>, Vec<_>) = sessions
             .iter()
-            .filter(|s| s.session_type != FocusSessionType::Work)
-            .count();
+            .partition(|s| s.session_type == FocusSessionType::Work);
 
-        let total_focus_time: i64 = sessions
+        let total_sessions = work_sessions.len();
+        let total_breaks = break_sessions.len();
+
+        let total_focus_time: i64 = work_sessions.iter().filter_map(|s| s.actual_duration).sum();
+
+        let total_break_time: i64 = break_sessions
             .iter()
-            .filter(|s| s.session_type == FocusSessionType::Work)
-            .map(|s| s.actual_duration.unwrap_or(0))
+            .filter_map(|s| s.actual_duration)
             .sum();
 
-        let total_break_time: i64 = sessions
-            .iter()
-            .filter(|s| s.session_type != FocusSessionType::Work)
-            .map(|s| s.actual_duration.unwrap_or(0))
-            .sum();
+        let daily_activity = if is_multi_day {
+            self.calculate_daily_activity(&sessions).await?
+        } else {
+            Vec::new()
+        };
 
         Ok(Stats {
             total_sessions,
@@ -95,29 +94,34 @@ impl StatsUseCases {
                 .into(),
             category_distribution: self.calculate_category_distribution(&sessions).await?,
             task_distribution: self.calculate_task_distribution(&sessions).await?,
-            daily_activity: self.calculate_daily_activity(&sessions).await?,
+            daily_activity,
         })
     }
 
-    fn calculate_most_concentrated_period(sessions: &Vec<FocusSession>) -> ConcentrationPeriod {
-        let mut morning_total = 0;
-        let mut morning_count = 0;
-        let mut afternoon_total = 0;
-        let mut afternoon_count = 0;
-
-        for session in sessions {
-            if let Some(score) = session.concentration_score {
-                let hour = session.started_at.hour();
-
-                if hour < 12 {
-                    morning_total += score;
-                    morning_count += 1;
-                } else {
-                    afternoon_total += score;
-                    afternoon_count += 1;
-                }
+    fn is_multi_day_period(start_date: Option<DateTime<Utc>>, end_date: Option<DateTime<Utc>>) -> bool {
+        match (start_date, end_date) {
+            (Some(start), Some(end)) => {
+                let duration = end.signed_duration_since(start);
+                duration.num_days() > 1
             }
+            _ => false,
         }
+    }
+
+    fn calculate_most_concentrated_period(sessions: &[FocusSession]) -> ConcentrationPeriod {
+        let (morning_total, morning_count, afternoon_total, afternoon_count) =
+            sessions.iter().fold((0, 0, 0, 0), |acc, session| {
+                if let Some(score) = session.concentration_score {
+                    let hour = session.started_at.hour();
+                    if hour < 12 {
+                        (acc.0 + score, acc.1 + 1, acc.2, acc.3)
+                    } else {
+                        (acc.0, acc.1, acc.2 + score, acc.3 + 1)
+                    }
+                } else {
+                    acc
+                }
+            });
 
         let morning_avg = if morning_count > 0 {
             morning_total as f64 / morning_count as f64
@@ -138,25 +142,20 @@ impl StatsUseCases {
         }
     }
 
-    fn calculate_least_concentrated_period(sessions: &Vec<FocusSession>) -> ConcentrationPeriod {
-        let mut morning_total = 0;
-        let mut morning_count = 0;
-        let mut afternoon_total = 0;
-        let mut afternoon_count = 0;
-
-        for session in sessions {
-            if let Some(score) = session.concentration_score {
-                let hour = session.started_at.hour();
-
-                if hour < 12 {
-                    morning_total += score;
-                    morning_count += 1;
+    fn calculate_least_concentrated_period(sessions: &[FocusSession]) -> ConcentrationPeriod {
+        let (morning_total, morning_count, afternoon_total, afternoon_count) =
+            sessions.iter().fold((0, 0, 0, 0), |acc, session| {
+                if let Some(score) = session.concentration_score {
+                    let hour = session.started_at.hour();
+                    if hour < 12 {
+                        (acc.0 + score, acc.1 + 1, acc.2, acc.3)
+                    } else {
+                        (acc.0, acc.1, acc.2 + score, acc.3 + 1)
+                    }
                 } else {
-                    afternoon_total += score;
-                    afternoon_count += 1;
+                    acc
                 }
-            }
-        }
+            });
 
         let morning_avg = if morning_count > 0 {
             morning_total as f64 / morning_count as f64
@@ -177,12 +176,12 @@ impl StatsUseCases {
         }
     }
 
-    fn calculate_concentration_distribution(sessions: &Vec<FocusSession>) -> [u32; 11] {
+    fn calculate_concentration_distribution(sessions: &[FocusSession]) -> [u32; 11] {
         let mut distribution = [0u32; 11];
 
         for session in sessions {
             if let Some(score) = session.concentration_score {
-                if score >= 0 && score <= 5 {
+                if (0..=5).contains(&score) {
                     distribution[score as usize] += 1;
                 }
             }
@@ -193,7 +192,7 @@ impl StatsUseCases {
 
     async fn calculate_category_distribution(
         &self,
-        sessions: &Vec<FocusSession>,
+        sessions: &[FocusSession],
     ) -> AppResult<Vec<CategoryDistributionItem>> {
         let mut category_times: HashMap<Uuid, i64> = HashMap::new();
         let mut total_time: i64 = 0;
@@ -207,27 +206,87 @@ impl StatsUseCases {
             }
         }
 
-        let category_futures: Vec<_> = category_times
+        let category_ids: Vec<Uuid> = category_times.keys().copied().collect();
+        let category_futures: Vec<_> = category_ids
             .iter()
-            .map(|(category_id, _)| self.category_persistence.find_by_id(*category_id))
+            .map(|id| self.category_persistence.find_by_id(*id))
             .collect();
 
         let categories = join_all(category_futures).await;
 
-        let mut distribution: Vec<CategoryDistributionItem> = category_times
+        let mut distribution: Vec<CategoryDistributionItem> = category_ids
             .into_iter()
             .zip(categories)
-            .filter_map(|((category_id, total_focus_time), category_result)| {
-                category_result.ok().map(|category| {
+            .filter_map(|(category_id, category_result)| {
+                category_result.ok().and_then(|category| {
+                    category_times.get(&category_id).map(|&total_focus_time| {
+                        let percentage = if total_time > 0 {
+                            (total_focus_time as f32 / total_time as f32) * 100.0
+                        } else {
+                            0.0
+                        };
+
+                        CategoryDistributionItem {
+                            category_name: category.name,
+                            category_id: category.id,
+                            total_focus_time,
+                            percentage,
+                        }
+                    })
+                })
+            })
+            .collect();
+
+        distribution.sort_by(|a, b| b.total_focus_time.cmp(&a.total_focus_time));
+
+        Ok(distribution)
+    }
+
+    async fn calculate_task_distribution(
+        &self,
+        sessions: &[FocusSession],
+    ) -> AppResult<Vec<TaskDistributionItem>> {
+        let mut task_times: HashMap<Uuid, i64> = HashMap::new();
+        let mut total_time: i64 = 0;
+
+        for session in sessions {
+            if let (Some(task_id), Some(duration)) = (session.task_id, session.actual_duration) {
+                *task_times.entry(task_id).or_insert(0) += duration;
+                total_time += duration;
+            }
+        }
+
+        let task_futures: Vec<_> = task_times
+            .keys()
+            .map(|task_id| async move {
+                let task = self.task_persistence.find_by_id(*task_id).await?;
+                let category_name = if let Some(category_id) = task.category_id {
+                    let category = self.category_persistence.find_by_id(category_id).await?;
+                    Some(category.name)
+                } else {
+                    None
+                };
+                Ok::<_, crate::application::app_error::AppError>((task, category_name))
+            })
+            .collect();
+
+        let task_results = join_all(task_futures).await;
+
+        let mut distribution: Vec<TaskDistributionItem> = task_times
+            .into_iter()
+            .zip(task_results)
+            .filter_map(|((task_id, total_focus_time), result)| {
+                result.ok().map(|(task, category_name)| {
                     let percentage = if total_time > 0 {
                         (total_focus_time as f32 / total_time as f32) * 100.0
                     } else {
                         0.0
                     };
 
-                    CategoryDistributionItem {
-                        category_name: category.name,
-                        category_id: category.id,
+                    TaskDistributionItem {
+                        category_name,
+                        category_id: task.category_id,
+                        task_name: task.name,
                         total_focus_time,
                         percentage,
                     }
@@ -240,56 +299,9 @@ impl StatsUseCases {
         Ok(distribution)
     }
 
-    async fn calculate_task_distribution(
-        &self,
-        sessions: &Vec<FocusSession>,
-    ) -> AppResult<Vec<TaskDistributionItem>> {
-        let mut task_times: HashMap<Uuid, i64> = HashMap::new();
-        let mut total_time: i64 = 0;
-
-        for session in sessions {
-            if let (Some(task_id), Some(duration)) = (session.task_id, session.actual_duration) {
-                *task_times.entry(task_id).or_insert(0) += duration;
-                total_time += duration;
-            }
-        }
-
-        let mut distribution: Vec<TaskDistributionItem> = Vec::new();
-
-        for (task_id, total_focus_time) in task_times {
-            let percentage = if total_time > 0 {
-                (total_focus_time as f32 / total_time as f32) * 100.0
-            } else {
-                0.0
-            };
-
-            let task = self.task_persistence.find_by_id(task_id).await?;
-
-            let category = match task.category_id {
-                Some(category_id) => {
-                    let category = self.category_persistence.find_by_id(category_id).await?;
-                    Some(category.name)
-                }
-                None => None,
-            };
-
-            distribution.push(TaskDistributionItem {
-                category_name: category,
-                category_id: task.category_id,
-                task_name: task.name,
-                total_focus_time,
-                percentage,
-            });
-        }
-
-        distribution.sort_by(|a, b| b.total_focus_time.cmp(&a.total_focus_time));
-
-        Ok(distribution)
-    }
-
     async fn calculate_daily_activity(
         &self,
-        sessions: &Vec<FocusSession>,
+        sessions: &[FocusSession],
     ) -> AppResult<Vec<DailyActivityItem>> {
         let mut daily_data: HashMap<NaiveDate, HashMap<Uuid, i64>> = HashMap::new();
 
@@ -298,10 +310,9 @@ impl StatsUseCases {
                 (session.category_id, session.actual_duration)
             {
                 let date = session.started_at.date_naive();
-
                 daily_data
                     .entry(date)
-                    .or_insert_with(HashMap::new)
+                    .or_default()
                     .entry(category_id)
                     .and_modify(|time| *time += duration)
                     .or_insert(duration);
@@ -310,18 +321,23 @@ impl StatsUseCases {
 
         let unique_category_ids: Vec<Uuid> = daily_data
             .values()
-            .flat_map(|categories| categories.keys())
-            .copied()
+            .flat_map(|categories| categories.keys().copied())
             .collect::<std::collections::HashSet<_>>()
             .into_iter()
             .collect();
 
-        let mut category_names: HashMap<Uuid, String> = HashMap::new();
-        for category_id in unique_category_ids {
-            if let Ok(category) = self.category_persistence.find_by_id(category_id).await {
-                category_names.insert(category_id, category.name);
-            }
-        }
+        let category_futures: Vec<_> = unique_category_ids
+            .iter()
+            .map(|id| self.category_persistence.find_by_id(*id))
+            .collect();
+
+        let categories = join_all(category_futures).await;
+
+        let category_names: HashMap<Uuid, String> = unique_category_ids
+            .into_iter()
+            .zip(categories)
+            .filter_map(|(id, result)| result.ok().map(|cat| (id, cat.name)))
+            .collect();
 
         let mut daily_activity: Vec<DailyActivityItem> = daily_data
             .into_iter()
@@ -333,7 +349,7 @@ impl StatsUseCases {
                             .get(&category_id)
                             .map(|name| DailyActivityDistributionItem {
                                 category_name: name.clone(),
-                                category_id: category_id,
+                                category_id,
                                 total_focus_time,
                             })
                     })
