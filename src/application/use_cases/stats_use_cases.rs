@@ -227,6 +227,7 @@ impl StatsUseCases {
 
                     CategoryDistributionItem {
                         category_name: category.name,
+                        category_id: category.id,
                         total_focus_time,
                         percentage,
                     }
@@ -274,6 +275,7 @@ impl StatsUseCases {
 
             distribution.push(TaskDistributionItem {
                 category_name: category,
+                category_id: task.category_id,
                 task_name: task.name,
                 total_focus_time,
                 percentage,
@@ -331,6 +333,7 @@ impl StatsUseCases {
                             .get(&category_id)
                             .map(|name| DailyActivityDistributionItem {
                                 category_name: name.clone(),
+                                category_id: category_id,
                                 total_focus_time,
                             })
                     })

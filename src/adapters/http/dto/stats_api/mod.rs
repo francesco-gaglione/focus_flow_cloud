@@ -41,6 +41,7 @@ pub enum ConcentrationPeriodDto {
 #[serde(rename_all = "camelCase")]
 pub struct CategoryDistributionDto {
     pub category_name: String,
+    pub category_id: String,
     pub total_focus_time: i64,
     pub percentage: f32,
 }
@@ -49,6 +50,7 @@ pub struct CategoryDistributionDto {
 #[serde(rename_all = "camelCase")]
 pub struct TaskDistributionDto {
     pub category_name: Option<String>,
+    pub category_id: Option<String>,
     pub task_name: String,
     pub total_focus_time: i64,
     pub percentage: f32,
@@ -65,6 +67,7 @@ pub struct DailyActivityDto {
 #[serde(rename_all = "camelCase")]
 pub struct DailyActivityDistributionDto {
     pub category_name: String,
+    pub category_id: String,
     pub total_focus_time: i64,
 }
 
@@ -110,6 +113,7 @@ impl From<CategoryDistributionItem> for CategoryDistributionDto {
     fn from(item: CategoryDistributionItem) -> Self {
         Self {
             category_name: item.category_name,
+            category_id: item.category_id.to_string(),
             total_focus_time: item.total_focus_time,
             percentage: item.percentage,
         }
@@ -120,6 +124,7 @@ impl From<TaskDistributionItem> for TaskDistributionDto {
     fn from(item: TaskDistributionItem) -> Self {
         Self {
             category_name: item.category_name,
+            category_id: item.category_id.map(|id| id.to_string()),
             task_name: item.task_name,
             total_focus_time: item.total_focus_time,
             percentage: item.percentage,
@@ -144,6 +149,7 @@ impl From<DailyActivityDistributionItem> for DailyActivityDistributionDto {
     fn from(item: DailyActivityDistributionItem) -> Self {
         Self {
             category_name: item.category_name,
+            category_id: item.category_id.to_string(),
             total_focus_time: item.total_focus_time,
         }
     }

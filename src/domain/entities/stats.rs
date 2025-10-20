@@ -1,4 +1,5 @@
 use chrono::NaiveDate;
+use uuid::Uuid;
 
 #[derive(Debug, Clone)]
 pub struct Stats {
@@ -11,7 +12,7 @@ pub struct Stats {
     pub concentration_distribution: [u32; 11], // vec of 10 elements rapresenting the number of session of each 5 rating
     pub category_distribution: Vec<CategoryDistributionItem>,
     pub task_distribution: Vec<TaskDistributionItem>,
-    pub daily_activity: Vec<DailyActivityItem>
+    pub daily_activity: Vec<DailyActivityItem>,
 }
 
 #[derive(Debug, Clone)]
@@ -23,26 +24,29 @@ pub enum ConcentrationPeriod {
 #[derive(Debug, Clone)]
 pub struct CategoryDistributionItem {
     pub category_name: String,
+    pub category_id: Uuid,
     pub total_focus_time: i64,
-    pub percentage: f32
+    pub percentage: f32,
 }
 
 #[derive(Debug, Clone)]
 pub struct TaskDistributionItem {
     pub category_name: Option<String>,
+    pub category_id: Option<Uuid>,
     pub task_name: String,
     pub total_focus_time: i64,
-    pub percentage: f32
+    pub percentage: f32,
 }
 
 #[derive(Debug, Clone)]
 pub struct DailyActivityItem {
     pub date: NaiveDate,
-    pub category_distribution: Vec<DailyActivityDistributionItem>
+    pub category_distribution: Vec<DailyActivityDistributionItem>,
 }
 
 #[derive(Debug, Clone)]
 pub struct DailyActivityDistributionItem {
     pub category_name: String,
-    pub total_focus_time: i64
+    pub category_id: Uuid,
+    pub total_focus_time: i64,
 }
