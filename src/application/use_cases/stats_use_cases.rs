@@ -176,12 +176,12 @@ impl StatsUseCases {
         }
     }
 
-    fn calculate_concentration_distribution(sessions: &[FocusSession]) -> [u32; 11] {
-        let mut distribution = [0u32; 11];
+    fn calculate_concentration_distribution(sessions: &[FocusSession]) -> [u32; 5] {
+        let mut distribution = [0u32; 5];
 
         for session in sessions {
             if let Some(score) = session.concentration_score {
-                if (0..=5).contains(&score) {
+                if (1..=5).contains(&score) {
                     distribution[score as usize] += 1;
                 }
             }
