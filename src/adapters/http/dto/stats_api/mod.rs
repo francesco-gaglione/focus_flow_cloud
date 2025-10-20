@@ -24,7 +24,7 @@ pub struct GetStatsByPeriodResponseDto {
     pub total_break_time: i64,
     pub most_concentrated_period: ConcentrationPeriodDto,
     pub less_concentrated_period: ConcentrationPeriodDto,
-    pub concentration_distribution: [u32; 11],
+    pub concentration_distribution: [u32; 5],
     pub category_distribution: Vec<CategoryDistributionDto>,
     pub task_distribution: Vec<TaskDistributionDto>,
     pub daily_activity: Vec<DailyActivityDto>,
