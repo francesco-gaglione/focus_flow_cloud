@@ -101,5 +101,298 @@ impl CategoryUseCases {
 
 #[cfg(test)]
 mod tests {
-    //TODO tests implementation asap on first pre alpha version (when models are stabe)
+    use crate::{
+        application::{
+            app_error::AppError,
+            traits::{MockCategoryPersistence, MockTaskPersistence},
+            use_cases::{
+                category_use_cases::CategoryUseCases,
+                commands::{
+                    create_category::CreateCategoryCommand, update_category::UpdateCategoryCommand,
+                },
+            },
+        },
+        domain::entities::{category::Category, task::Task},
+    };
+    use chrono::NaiveDate;
+    use std::sync::Arc;
+    use uuid::Uuid;
+
+    #[tokio::test]
+    async fn test_create_category_success() {
+        let mut mock_category_persistence = MockCategoryPersistence::new();
+        let mock_task_persistence = MockTaskPersistence::new();
+
+        mock_category_persistence
+            .expect_create_category()
+            .returning(|_| Ok(()));
+
+        let use_case = CategoryUseCases::new(
+            Arc::new(mock_category_persistence),
+            Arc::new(mock_task_persistence),
+        );
+
+        let cmd = CreateCategoryCommand {
+            name: "Work".to_string(),
+            description: Some("Work related tasks".to_string()),
+            color: Some("#FF5733".to_string()),
+        };
+
+        let result = use_case.create_category(cmd).await;
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_create_category_with_random_color() {
+        let mut mock_category_persistence = MockCategoryPersistence::new();
+        let mock_task_persistence = MockTaskPersistence::new();
+
+        mock_category_persistence
+            .expect_create_category()
+            .withf(|data| {
+                data.name == "Work"
+                    && data.description == Some("Work related tasks".to_string())
+                    && data.color.starts_with("#")
+                    && data.color.len() == 7
+            })
+            .returning(|_| Ok(()));
+
+        let use_case = CategoryUseCases::new(
+            Arc::new(mock_category_persistence),
+            Arc::new(mock_task_persistence),
+        );
+
+        let cmd = CreateCategoryCommand {
+            name: "Work".to_string(),
+            description: Some("Work related tasks".to_string()),
+            color: None, // Should generate random color
+        };
+
+        let result = use_case.create_category(cmd).await;
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_create_category_persistence_error() {
+        let mut mock_category_persistence = MockCategoryPersistence::new();
+        let mock_task_persistence = MockTaskPersistence::new();
+
+        mock_category_persistence
+            .expect_create_category()
+            .returning(|_| Err(AppError::Database("Database error".to_string())));
+
+        let use_case = CategoryUseCases::new(
+            Arc::new(mock_category_persistence),
+            Arc::new(mock_task_persistence),
+        );
+
+        let cmd = CreateCategoryCommand {
+            name: "Work".to_string(),
+            description: Some("Work related tasks".to_string()),
+            color: Some("#FF5733".to_string()),
+        };
+
+        let result = use_case.create_category(cmd).await;
+        assert!(result.is_err());
+    }
+
+    #[tokio::test]
+    async fn test_get_all_category_and_tasks_success() {
+        let mut mock_category_persistence = MockCategoryPersistence::new();
+        let mut mock_task_persistence = MockTaskPersistence::new();
+
+        let category_id = Uuid::new_v4();
+        let category = Category {
+            id: category_id,
+            name: "Work".to_string(),
+            description: Some("Work related tasks".to_string()),
+            color: "#FF5733".to_string(),
+        };
+
+        let task1 = Task {
+            id: Uuid::new_v4(),
+            name: "Task 1".to_string(),
+            description: Some("First task".to_string()),
+            category_id: Some(category_id),
+            scheduled_date: NaiveDate::from_ymd_opt(2025, 12, 20),
+            completed_at: None,
+        };
+
+        mock_category_persistence
+            .expect_find_all()
+            .returning(move || Ok(vec![category.clone()]));
+
+        mock_task_persistence
+            .expect_find_by_category_id()
+            .with(mockall::predicate::eq(category_id))
+            .returning(move |_| Ok(vec![task1.clone()]));
+
+        mock_task_persistence
+            .expect_find_orphan_tasks()
+            .returning(|| Ok(vec![]));
+
+        let use_case = CategoryUseCases::new(
+            Arc::new(mock_category_persistence),
+            Arc::new(mock_task_persistence),
+        );
+
+        let result = use_case.get_all_category_and_tasks().await.unwrap();
+        assert_eq!(result.category_with_tasks.len(), 1);
+        assert_eq!(result.category_with_tasks[0].tasks.len(), 1);
+        assert_eq!(result.orphan_tasks.len(), 0);
+    }
+
+    #[tokio::test]
+    async fn test_get_all_category_and_tasks_with_orphan_tasks() {
+        let mut mock_category_persistence = MockCategoryPersistence::new();
+        let mut mock_task_persistence = MockTaskPersistence::new();
+
+        let category_id = Uuid::new_v4();
+        let category = Category {
+            id: category_id,
+            name: "Work".to_string(),
+            description: Some("Work related tasks".to_string()),
+            color: "#FF5733".to_string(),
+        };
+
+        let orphan_task = Task {
+            id: Uuid::new_v4(),
+            name: "Orphan Task".to_string(),
+            description: Some("Task without category".to_string()),
+            category_id: None,
+            scheduled_date: NaiveDate::from_ymd_opt(2025, 12, 20),
+            completed_at: Some(chrono::Utc::now()),
+        };
+
+        mock_category_persistence
+            .expect_find_all()
+            .returning(move || Ok(vec![category.clone()]));
+
+        mock_task_persistence
+            .expect_find_by_category_id()
+            .with(mockall::predicate::eq(category_id))
+            .returning(|_| Ok(vec![]));
+
+        mock_task_persistence
+            .expect_find_orphan_tasks()
+            .returning(move || Ok(vec![orphan_task.clone()]));
+
+        let use_case = CategoryUseCases::new(
+            Arc::new(mock_category_persistence),
+            Arc::new(mock_task_persistence),
+        );
+
+        let result = use_case.get_all_category_and_tasks().await.unwrap();
+        assert_eq!(result.category_with_tasks.len(), 1);
+        assert_eq!(result.category_with_tasks[0].tasks.len(), 0);
+        assert_eq!(result.orphan_tasks.len(), 1);
+    }
+
+    #[tokio::test]
+    async fn test_update_category_success() {
+        let mut mock_category_persistence = MockCategoryPersistence::new();
+        let mock_task_persistence = MockTaskPersistence::new();
+
+        let category_id = Uuid::new_v4();
+        let updated_category = Category {
+            id: category_id,
+            name: "Updated Work".to_string(),
+            description: Some("Updated description".to_string()),
+            color: "#000000".to_string(),
+        };
+
+        mock_category_persistence
+            .expect_update_category()
+            .with(
+                mockall::predicate::eq(category_id),
+                mockall::predicate::always(),
+            )
+            .returning(move |_, _| Ok(updated_category.clone()));
+
+        let use_case = CategoryUseCases::new(
+            Arc::new(mock_category_persistence),
+            Arc::new(mock_task_persistence),
+        );
+
+        let cmd = UpdateCategoryCommand {
+            id: category_id,
+            name: Some("Updated Work".to_string()),
+            description: Some("Updated description".to_string()),
+            color: Some("#000000".to_string()),
+        };
+
+        let result = use_case.update_category(cmd).await.unwrap();
+        assert_eq!(result.name, "Updated Work");
+    }
+
+    #[tokio::test]
+    async fn test_delete_category_success() {
+        let mut mock_category_persistence = MockCategoryPersistence::new();
+        let mock_task_persistence = MockTaskPersistence::new();
+
+        let category_id = Uuid::new_v4();
+
+        mock_category_persistence
+            .expect_delete_category_by_id()
+            .with(mockall::predicate::eq(category_id))
+            .returning(|_| Ok(()));
+
+        let use_case = CategoryUseCases::new(
+            Arc::new(mock_category_persistence),
+            Arc::new(mock_task_persistence),
+        );
+
+        let result = use_case.delete_category(category_id).await;
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_delete_categories_success() {
+        let mut mock_category_persistence = MockCategoryPersistence::new();
+        let mock_task_persistence = MockTaskPersistence::new();
+
+        let ids = vec![Uuid::new_v4(), Uuid::new_v4()];
+
+        mock_category_persistence
+            .expect_delete_category_by_id()
+            .returning(|_| Ok(()))
+            .times(ids.len());
+
+        let use_case = CategoryUseCases::new(
+            Arc::new(mock_category_persistence),
+            Arc::new(mock_task_persistence),
+        );
+
+        let result = use_case.delete_categories(ids.clone()).await.unwrap();
+        assert_eq!(result.len(), 2);
+    }
+
+    #[tokio::test]
+    async fn test_delete_categories_partial_failure() {
+        let mut mock_category_persistence = MockCategoryPersistence::new();
+        let mock_task_persistence = MockTaskPersistence::new();
+
+        let ids = vec![Uuid::new_v4(), Uuid::new_v4()];
+        let first_id = ids[0];
+
+        // First call succeeds, second fails
+        mock_category_persistence
+            .expect_delete_category_by_id()
+            .with(mockall::predicate::eq(first_id))
+            .returning(|_| Ok(()))
+            .times(1);
+
+        mock_category_persistence
+            .expect_delete_category_by_id()
+            .returning(|_| Err(AppError::NotFound("Category not found".to_string())))
+            .times(1);
+
+        let use_case = CategoryUseCases::new(
+            Arc::new(mock_category_persistence),
+            Arc::new(mock_task_persistence),
+        );
+
+        let result = use_case.delete_categories(ids).await;
+        assert!(result.is_err());
+    }
 }

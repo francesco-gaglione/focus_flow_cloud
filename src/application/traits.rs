@@ -12,6 +12,8 @@ use crate::domain::entities::task::Task;
 use async_trait::async_trait;
 use uuid::Uuid;
 
+
+#[cfg_attr(test, mockall::automock)]
 #[async_trait]
 pub trait CategoryPersistence: Send + Sync {
     async fn create_category(&self, category: CreateCategoryData) -> AppResult<()>;
@@ -25,6 +27,7 @@ pub trait CategoryPersistence: Send + Sync {
     async fn delete_category_by_id(&self, category_id: Uuid) -> AppResult<()>;
 }
 
+#[cfg_attr(test, mockall::automock)]
 #[async_trait]
 pub trait TaskPersistence: Send + Sync {
     async fn create_task(&self, task: CreateTaskData) -> AppResult<Uuid>;
@@ -36,6 +39,7 @@ pub trait TaskPersistence: Send + Sync {
     async fn delete_task(&self, task: Uuid) -> AppResult<()>;
 }
 
+#[cfg_attr(test, mockall::automock)]
 #[async_trait]
 pub trait FocusSessionPersistence: Send + Sync {
     async fn find_by_filters(
