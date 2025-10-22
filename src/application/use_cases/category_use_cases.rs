@@ -100,7 +100,7 @@ impl CategoryUseCases {
 }
 
 #[cfg(test)]
-mod tests {
+mod category_use_cases_tests {
     use crate::{
         application::{
             app_error::AppError,
