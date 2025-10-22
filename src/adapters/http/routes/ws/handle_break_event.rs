@@ -68,8 +68,8 @@ pub async fn handle_break_event(state: &AppState) -> Result<StartSession, String
                     session_type: next_session_type.unwrap_or(SessionTypeEnum::ShortBreak),
                     start_date: Utc::now().timestamp(),
                     end_date: None,
-                    category_id: session_state.workspace.category_id.clone(),
-                    task_id: session_state.workspace.task_id.clone(),
+                    category_id: None,
+                    task_id: None,
                     note: None,
                     concentration_score: None,
                 };
