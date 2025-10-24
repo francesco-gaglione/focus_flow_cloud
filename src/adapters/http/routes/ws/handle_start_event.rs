@@ -32,23 +32,31 @@ pub async fn handle_start_event(state: &AppState) -> Result<StartSession, String
                         .consecutive_sessions
                         .push(old_session_state.clone());
 
-                    let task_id = old_session_state
-                        .task_id
-                        .as_ref()
-                        .map(|id| {
-                            Uuid::parse_str(id.as_str())
-                                .map_err(|_| "Failed to parse task id".to_string())
-                        })
-                        .transpose()?;
+                    let task_id = if old_session_state.session_type == SessionTypeEnum::Work {
+                        old_session_state
+                            .task_id
+                            .as_ref()
+                            .map(|id| {
+                                Uuid::parse_str(id.as_str())
+                                    .map_err(|_| "Failed to parse task id".to_string())
+                            })
+                            .transpose()?
+                    } else {
+                        None
+                    };
 
-                    let category_id = old_session_state
-                        .category_id
-                        .as_ref()
-                        .map(|id| {
-                            Uuid::parse_str(id.as_str())
-                                .map_err(|_| "Failed to parse category id".to_string())
-                        })
-                        .transpose()?;
+                    let category_id = if old_session_state.session_type == SessionTypeEnum::Work {
+                        old_session_state
+                            .category_id
+                            .as_ref()
+                            .map(|id| {
+                                Uuid::parse_str(id.as_str())
+                                    .map_err(|_| "Failed to parse category id".to_string())
+                            })
+                            .transpose()?
+                    } else {
+                        None
+                    };
 
                     let _ = state
                         .focus_session_use_cases
