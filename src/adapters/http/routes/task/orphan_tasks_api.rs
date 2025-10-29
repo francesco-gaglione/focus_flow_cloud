@@ -20,14 +20,10 @@ pub async fn fetch_orphan_tasks_api(
     State(state): State<AppState>,
 ) -> AppResult<Json<OrphanTasksResponseDto>> {
     let res = state.task_use_cases.orphan_tasks().await?;
-
-    match res.len() > 0 {
-        true => Ok(Json(OrphanTasksResponseDto {
-            orphan_tasks: res
-                .iter()
-                .map(|task| TaskMapper::entity_to_dto(task.clone()))
-                .collect(),
-        })),
-        false => Err(AppError::GenericError("Tasks not found".to_string())),
-    }
+    Ok(Json(OrphanTasksResponseDto {
+        orphan_tasks: res
+            .iter()
+            .map(|task| TaskMapper::entity_to_dto(task.clone()))
+            .collect(),
+    }))
 }

@@ -38,5 +38,10 @@ pub async fn get_categories_and_tasks_api(
             .collect(),
     };
 
+    tracing::info!(
+        "Categories and tasks retrieved successfully: {:?}",
+        response
+    );
+
     Ok(Json(response))
 }
