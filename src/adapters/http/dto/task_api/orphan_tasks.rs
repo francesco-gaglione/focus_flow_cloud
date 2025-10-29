@@ -5,5 +5,5 @@ use utoipa::ToSchema;
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct OrphanTasksResponseDto {
-    pub updated_task: Vec<TaskDto>,
+    pub orphan_tasks: Vec<TaskDto>,
 }

@@ -23,7 +23,7 @@ pub async fn fetch_orphan_tasks_api(
 
     match res.len() > 0 {
         true => Ok(Json(OrphanTasksResponseDto {
-            updated_task: res
+            orphan_tasks: res
                 .iter()
                 .map(|task| TaskMapper::entity_to_dto(task.clone()))
                 .collect(),
