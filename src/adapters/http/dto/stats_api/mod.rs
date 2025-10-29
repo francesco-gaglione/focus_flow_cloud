@@ -1,4 +1,4 @@
-use chrono::NaiveDate;
+use chrono::{NaiveDate, TimeZone, Utc};
 use serde::{Deserialize, Serialize};
 use utoipa::{IntoParams, ToSchema};
 use validator::Validate;
@@ -59,7 +59,7 @@ pub struct TaskDistributionDto {
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct DailyActivityDto {
-    pub date: NaiveDate,
+    pub date: i64,
     pub category_distribution: Vec<DailyActivityDistributionDto>,
 }
 
@@ -135,7 +135,12 @@ impl From<TaskDistributionItem> for TaskDistributionDto {
 impl From<DailyActivityItem> for DailyActivityDto {
     fn from(item: DailyActivityItem) -> Self {
         Self {
-            date: item.date,
+            date: item
+                .date
+                .and_hms_opt(0, 0, 0)
+                .unwrap()
+                .and_utc()
+                .timestamp(),
             category_distribution: item
                 .category_distribution
                 .into_iter()
