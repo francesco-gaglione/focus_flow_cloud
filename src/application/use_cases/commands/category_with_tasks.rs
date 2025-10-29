@@ -1,5 +1,4 @@
-use crate::domain::entities::category::Category;
-use crate::domain::entities::task::Task;
+use crate::domain::entities::{category::Category, task::Task};
 
 pub struct CategoryWithTasks {
     pub category: Category,
@@ -8,5 +7,4 @@ pub struct CategoryWithTasks {
 
 pub struct CategoryAndTasks {
     pub category_with_tasks: Vec<CategoryWithTasks>,
-    pub orphan_tasks: Vec<Task>,
 }

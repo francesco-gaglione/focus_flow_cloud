@@ -4,8 +4,8 @@ use crate::adapters::http::dto::common::category_dto::CategoryDto;
 use crate::adapters::mappers::task_mapper::TaskMapper;
 use crate::adapters::openapi::CATEGORY_TAG;
 use crate::application::app_error::AppResult;
-use axum::Json;
 use axum::extract::State;
+use axum::Json;
 
 #[utoipa::path(
     get,
@@ -36,7 +36,6 @@ pub async fn get_categories_and_tasks_api(
                 tasks: TaskMapper::entities_to_dtos(c.tasks),
             })
             .collect(),
-        orphan_tasks: TaskMapper::entities_to_dtos(categories_and_tasks.orphan_tasks),
     };
 
     Ok(Json(response))

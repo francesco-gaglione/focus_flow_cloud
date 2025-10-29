@@ -18,6 +18,10 @@ impl TaskUseCases {
         Self { task_persistence }
     }
 
+    pub async fn orphan_tasks(&self) -> AppResult<Vec<Task>> {
+        self.task_persistence.find_orphan_tasks().await
+    }
+
     pub async fn create_task(&self, task: CreateTaskCommand) -> AppResult<Uuid> {
         self.task_persistence
             .create_task(CreateTaskData {

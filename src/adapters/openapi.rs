@@ -11,6 +11,7 @@ use crate::adapters::http::dto::stats_api::GetStatsByPeriodDto;
 use crate::adapters::http::dto::stats_api::GetStatsByPeriodResponseDto;
 use crate::adapters::http::dto::task_api::create_task::CreateTaskResponseDto;
 use crate::adapters::http::dto::task_api::delete_task::DeleteTasksDto;
+use crate::adapters::http::dto::task_api::orphan_tasks::OrphanTasksResponseDto;
 use crate::adapters::http::dto::task_api::update_task::UpdateTaskDto;
 use utoipa::OpenApi;
 
@@ -36,6 +37,7 @@ pub const STATS_TAG: &str = "Statistics";
         crate::adapters::http::routes::category::update_category_api::update_category_api,
         crate::adapters::http::routes::category::get_categories_and_tasks_api::get_categories_and_tasks_api,
         crate::adapters::http::routes::category::delete_categories_api::delete_categories_api,
+        crate::adapters::http::routes::task::orphan_tasks_api::fetch_orphan_tasks_api,
         crate::adapters::http::routes::task::create_task_api::create_task_api,
         crate::adapters::http::routes::task::update_task_api::update_task_api,
         crate::adapters::http::routes::task::delete_tasks_api::delete_tasks_api,
@@ -49,6 +51,7 @@ pub const STATS_TAG: &str = "Statistics";
         schemas(UpdateTaskDto, CreateTaskResponseDto),
         schemas(DeleteCategoriesDto, GetCategoriesResponseDto),
         schemas(GetCategoriesResponseDto),
+        schemas(OrphanTasksResponseDto),
         schemas(UpdateTaskDto, CreateTaskResponseDto),
         schemas(DeleteTasksDto, CreateTaskResponseDto),
         schemas(CreateManualSessionDto, CreateManualSessionResponseDto),

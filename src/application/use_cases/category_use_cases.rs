@@ -51,11 +51,8 @@ impl CategoryUseCases {
             });
         }
 
-        let orphan_tasks = self.task_persistence.find_orphan_tasks().await?;
-
         Ok(CategoryAndTasks {
             category_with_tasks: categories_with_tasks,
-            orphan_tasks,
         })
     }
 
