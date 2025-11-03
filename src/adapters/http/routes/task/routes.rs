@@ -8,8 +8,8 @@ use axum::Router;
 
 pub fn router() -> Router<AppState> {
     Router::new()
-        .route("/orphanTasks", get(fetch_orphan_tasks_api))
-        .route("/createTask", post(create_task_api))
-        .route("/deleteTasks", delete(delete_tasks_api))
-        .route("/updateTask", put(update_task_api))
+        .route("/", post(create_task_api))
+        .route("/", delete(delete_tasks_api))
+        .route("/{id}", put(update_task_api))
+        .route("/orphans", get(fetch_orphan_tasks_api))
 }

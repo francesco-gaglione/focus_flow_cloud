@@ -5,18 +5,18 @@ use crate::adapters::http::dto::session_api::create_manual_session::{
 use crate::adapters::mappers::focus_session_mapper::FocusSessionMapper;
 use crate::adapters::openapi::SESSION_TAG;
 use crate::application::app_error::{AppError, AppResult};
-use axum::Json;
 use axum::extract::State;
+use axum::Json;
 use tracing::debug;
 use validator::Validate;
 
 #[utoipa::path(
     post,
-    path = "/focusSession/createManualSession",
+    path = "/api/focus-sessions/manual",
     tag = SESSION_TAG,
     request_body = CreateManualSessionDto,
     responses(
-        (status = 200, description = "Session created successfully", body = CreateManualSessionResponseDto),
+        (status = 201, description = "Session created successfully", body = CreateManualSessionResponseDto),
         (status = 400, description = "Bad request - validation error"),
         (status = 409, description = "Session already exists"),
         (status = 500, description = "Internal server error")

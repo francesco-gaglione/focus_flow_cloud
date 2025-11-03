@@ -3,19 +3,19 @@ use crate::adapters::http::dto::stats_api::{GetStatsByPeriodDto, GetStatsByPerio
 use crate::adapters::openapi::STATS_TAG;
 use crate::application::app_error::AppResult;
 use crate::application::use_cases::commands::calculate_stats_by_period::StatsPeriod;
-use axum::Json;
 use axum::extract::{Query, State};
+use axum::Json;
 use tracing::debug;
 
 #[utoipa::path(
     get,
-    path = "/stats/getStatsByPeriod",
+    path = "/api/stats/period",
     tag = STATS_TAG,
     params(
         GetStatsByPeriodDto
     ),
     responses(
-        (status = 200, description = "Session fetched successfully", body = GetStatsByPeriodResponseDto),
+        (status = 200, description = "Stats fetched successfully", body = GetStatsByPeriodResponseDto),
         (status = 400, description = "Bad request - validation error"),
         (status = 500, description = "Internal server error")
     )

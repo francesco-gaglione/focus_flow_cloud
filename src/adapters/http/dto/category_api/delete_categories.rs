@@ -4,11 +4,9 @@ use utoipa::ToSchema;
 use validator::Validate;
 
 #[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct DeleteCategoriesDto {
     #[validate(custom(function = "validate_uuid"))]
-    #[serde(rename = "categoryId")]
-    pub category_id: String,
+    pub id: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]

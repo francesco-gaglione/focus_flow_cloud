@@ -2,17 +2,17 @@ use crate::adapters::http::app_state::AppState;
 use crate::adapters::http::dto::task_api::delete_task::{DeleteTasksDto, DeleteTasksResponseDto};
 use crate::adapters::openapi::TASK_TAG;
 use crate::application::app_error::{AppError, AppResult};
-use axum::Json;
 use axum::extract::State;
+use axum::Json;
 use validator::Validate;
 
 #[utoipa::path(
     delete,
-    path = "/task/deleteTasks",
+    path = "/api/tasks",
     tag = TASK_TAG,
     request_body = DeleteTasksDto,
     responses(
-        (status = 200, description = "Task deleted successfully", body = DeleteTasksResponseDto),
+        (status = 200, description = "Tasks deleted successfully", body = DeleteTasksResponseDto),
         (status = 400, description = "Bad request - validation error"),
         (status = 500, description = "Internal server error")
     )

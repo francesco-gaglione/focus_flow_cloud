@@ -9,9 +9,9 @@ use axum::Router;
 
 pub fn api_routes() -> Router<AppState> {
     Router::new()
-        .nest("/category", category::routes::router())
-        .nest("/task", task::routes::router())
-        .nest("/focusSession", session::routes::router())
+        .nest("/categories", category::routes::router())
+        .nest("/tasks", task::routes::router())
+        .nest("/focus-sessions", session::routes::router())
         .nest("/stats", stats::routes::router())
 }
 

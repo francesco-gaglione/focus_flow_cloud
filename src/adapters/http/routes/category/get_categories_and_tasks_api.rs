@@ -9,7 +9,7 @@ use axum::Json;
 
 #[utoipa::path(
     get,
-    path = "/category/getCategoriesAndTasks",
+    path = "/api/categories",
     tag = CATEGORY_TAG,
     responses(
         (status = 200, description = "Category list", body = GetCategoriesResponseDto),

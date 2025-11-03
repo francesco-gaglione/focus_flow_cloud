@@ -5,11 +5,14 @@ use utoipa::ToSchema;
 use validator::Validate;
 
 #[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
+pub struct UpdateTaskPathDto {
+    #[validate(custom(function = "validate_uuid"))]
+    pub id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateTaskDto {
-    #[validate(custom(function = "validate_uuid"))]
-    pub task_id: String,
-
     #[validate(custom(function = "validate_uuid"))]
     pub category_id: Option<String>,
 

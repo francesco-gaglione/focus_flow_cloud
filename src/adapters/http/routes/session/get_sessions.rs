@@ -1,6 +1,6 @@
 use crate::adapters::http::app_state::AppState;
 use crate::adapters::http::dto::session_api::get_sessions::{
-    GetSessionFiltersResponseDto, GetSessionFiltersDto,
+    GetSessionFiltersDto, GetSessionFiltersResponseDto,
 };
 use crate::adapters::mappers::focus_session_mapper::FocusSessionMapper;
 use crate::adapters::openapi::SESSION_TAG;
@@ -9,19 +9,19 @@ use crate::application::use_cases::commands::find_session_filters::{
     ConcentrationScoreFilter, FindSessionFiltersCommand, FocusSessionDateFilter,
 };
 use crate::domain::entities::focus_session_type::FocusSessionType;
-use axum::Json;
 use axum::extract::{Query, State};
+use axum::Json;
 use tracing::debug;
 
 #[utoipa::path(
     get,
-    path = "/focusSession",
+    path = "/api/focus-sessions",
     tag = SESSION_TAG,
     params(
         GetSessionFiltersDto
     ),
     responses(
-        (status = 200, description = "Session fetched successfully", body = GetSessionFiltersResponseDto),
+        (status = 200, description = "Sessions fetched successfully", body = GetSessionFiltersResponseDto),
         (status = 400, description = "Bad request - validation error"),
         (status = 500, description = "Internal server error")
     )

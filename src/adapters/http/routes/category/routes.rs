@@ -8,8 +8,8 @@ use axum::Router;
 
 pub fn router() -> Router<AppState> {
     Router::new()
-        .route("/createCategory", post(create_category_api))
-        .route("/getCategoriesAndTasks", get(get_categories_and_tasks_api))
-        .route("/{categoryId}", delete(delete_categories_api))
-        .route("/updateCategory", put(update_category_api))
+        .route("/", post(create_category_api))
+        .route("/", get(get_categories_and_tasks_api))
+        .route("/{id}", delete(delete_categories_api))
+        .route("/{id}", put(update_category_api))
 }

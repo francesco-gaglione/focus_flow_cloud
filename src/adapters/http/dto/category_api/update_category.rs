@@ -1,4 +1,4 @@
-use crate::adapters::http::dto::common::{category_dto::CategoryDto, task_dto::TaskDto};
+use crate::adapters::http::dto::common::category_dto::CategoryDto;
 use crate::adapters::http::dto::validators::validate_uuid::validate_uuid;
 use lazy_static::lazy_static;
 use regex::Regex;
@@ -11,11 +11,14 @@ lazy_static! {
 }
 
 #[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
+pub struct UpdateCategoryPathDto {
+    #[validate(custom(function = "validate_uuid"))]
+    pub id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateCategoryDto {
-    #[validate(custom(function = "validate_uuid"))]
-    pub category_id: String,
-
     #[validate(length(
         min = 1,
         max = 255,

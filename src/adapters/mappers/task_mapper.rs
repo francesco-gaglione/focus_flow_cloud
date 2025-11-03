@@ -33,10 +33,10 @@ impl TaskMapper {
 
     /// Convert UpdateTaskDto to UpdateTaskCommand
     /// Handles timestamp conversions and UUID parsing
-    pub fn update_dto_to_command(dto: UpdateTaskDto) -> AppResult<UpdateTaskCommand> {
-        let task_id = Uuid::parse_str(&dto.task_id)
-            .map_err(|e| AppError::BadRequest(format!("Invalid task UUID: {}", e)))?;
-
+    pub fn update_dto_to_command(
+        task_id: Uuid,
+        dto: UpdateTaskDto,
+    ) -> AppResult<UpdateTaskCommand> {
         let category_id = dto
             .category_id
             .map(|id| Uuid::parse_str(&id))

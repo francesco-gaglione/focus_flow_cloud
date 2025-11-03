@@ -12,14 +12,14 @@ use validator::Validate;
 
 #[utoipa::path(
     delete,
-    path = "/category/{categoryId}",
+    path = "/api/categories/{id}",
     tag = CATEGORY_TAG,
-    description = "Delete multiple categories and their tasks",
+    description = "Delete a category and its tasks",
     params(
-        ("categoryId" = String, Path, description = "Category ID to delete")
+        ("id" = String, Path, description = "Category ID to delete")
     ),
     responses(
-        (status = 200, description = "Categories deleted successfully", body = DeleteCategoriesResponseDto),
+        (status = 200, description = "Category deleted successfully", body = DeleteCategoriesResponseDto),
         (status = 400, description = "Bad request - validation error"),
         (status = 500, description = "Internal server error")
     )
@@ -32,7 +32,7 @@ pub async fn delete_categories_api(
         .validate()
         .map_err(|e| AppError::BadRequest(e.to_string()))?;
 
-    let category_id = Uuid::parse_str(&payload.category_id).map_err(|e| {
+    let category_id = Uuid::parse_str(&payload.id).map_err(|e| {
         error!("Invalid category ID: {}", e);
         AppError::BadRequest("Invalid id".to_string())
     })?;

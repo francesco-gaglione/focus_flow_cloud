@@ -3,17 +3,17 @@ use crate::adapters::http::dto::task_api::create_task::{CreateTaskDto, CreateTas
 use crate::adapters::mappers::task_mapper::TaskMapper;
 use crate::adapters::openapi::TASK_TAG;
 use crate::application::app_error::{AppError, AppResult};
-use axum::Json;
 use axum::extract::State;
+use axum::Json;
 use validator::Validate;
 
 #[utoipa::path(
     post,
-    path = "/task/createTask",
+    path = "/api/tasks",
     tag = TASK_TAG,
     request_body = CreateTaskDto,
     responses(
-        (status = 200, description = "Task created successfully", body = CreateTaskResponseDto),
+        (status = 201, description = "Task created successfully", body = CreateTaskResponseDto),
         (status = 400, description = "Bad request - validation error"),
         (status = 409, description = "Task already exists"),
         (status = 500, description = "Internal server error")

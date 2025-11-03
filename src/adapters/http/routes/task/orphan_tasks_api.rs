@@ -2,17 +2,16 @@ use crate::adapters::http::app_state::AppState;
 use crate::adapters::http::dto::task_api::orphan_tasks::OrphanTasksResponseDto;
 use crate::adapters::mappers::task_mapper::TaskMapper;
 use crate::adapters::openapi::TASK_TAG;
-use crate::application::app_error::{AppError, AppResult};
+use crate::application::app_error::AppResult;
 use axum::extract::State;
 use axum::Json;
 
 #[utoipa::path(
     get,
-    path = "/task/orphanTasks",
+    path = "/api/tasks/orphans",
     tag = TASK_TAG,
     responses(
         (status = 200, description = "Orphan tasks fetched successfully", body = OrphanTasksResponseDto),
-        (status = 400, description = "Bad request - validation error"),
         (status = 500, description = "Internal server error")
     )
 )]
