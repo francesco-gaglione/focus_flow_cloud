@@ -1,4 +1,4 @@
-use crate::adapters::http::dto::validators::validate_uuids::validate_uuids;
+use crate::adapters::http::dto::validators::validate_uuid::validate_uuid;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use validator::Validate;
@@ -6,8 +6,9 @@ use validator::Validate;
 #[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteCategoriesDto {
-    #[validate(custom(function = "validate_uuids"))]
-    pub category_ids: Vec<String>,
+    #[validate(custom(function = "validate_uuid"))]
+    #[serde(rename = "categoryId")]
+    pub category_id: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]

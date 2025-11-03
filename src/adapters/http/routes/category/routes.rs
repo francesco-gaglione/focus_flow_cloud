@@ -10,6 +10,6 @@ pub fn router() -> Router<AppState> {
     Router::new()
         .route("/createCategory", post(create_category_api))
         .route("/getCategoriesAndTasks", get(get_categories_and_tasks_api))
-        .route("/deleteCategories", delete(delete_categories_api))
+        .route("/{categoryId}", delete(delete_categories_api))
         .route("/updateCategory", put(update_category_api))
 }
