@@ -1,5 +1,5 @@
 use crate::adapters::http::app_state::AppState;
-use crate::adapters::http::pomodoro_state::FocusSessionsState;
+use crate::adapters::http::pomodoro_state::PomodoroState;
 use crate::application::use_cases::category_use_cases::CategoryUseCases;
 use crate::application::use_cases::focus_session_use_cases::FocusSessionUseCases;
 use crate::application::use_cases::stats_use_cases::StatsUseCases;
@@ -11,7 +11,7 @@ use std::sync::Arc;
 use tokio::sync::RwLock;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
-use tracing_subscriber::{EnvFilter, fmt};
+use tracing_subscriber::{fmt, EnvFilter};
 
 pub async fn init_app_state() -> Result<AppState, Box<dyn std::error::Error>> {
     let config = AppConfig::from_env();
@@ -29,7 +29,7 @@ pub async fn init_app_state() -> Result<AppState, Box<dyn std::error::Error>> {
 
     Ok(AppState {
         ws_clients: Arc::new(RwLock::new(HashMap::new())),
-        focus_session_state: Arc::new(RwLock::new(FocusSessionsState::default())),
+        pomodoro_state: Arc::new(RwLock::new(PomodoroState::default())),
         config,
         category_use_cases: Arc::new(category_use_cases),
         task_use_cases: Arc::new(task_use_cases),

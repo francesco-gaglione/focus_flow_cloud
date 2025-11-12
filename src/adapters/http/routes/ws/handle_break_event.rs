@@ -5,14 +5,16 @@ use uuid::Uuid;
 use crate::{
     adapters::http::{
         app_state::AppState,
-        dto::{common::session_type_enum::SessionTypeEnum, ws_msg::start_session_ws::StartSession},
-        pomodoro_state::FocusSessionState,
+        dto::{
+            common::session_type_enum::SessionTypeEnum,
+            ws_msg::update_pomodoro_state::UpdatePomodoroState,
+        },
     },
     application::use_cases::commands::create_foucs_session::CreateFocusSessionCommand,
 };
 
-pub async fn handle_break_event(state: &AppState) -> Result<StartSession, String> {
-    debug!("Handling pause event");
+pub async fn handle_break_event(state: &AppState) -> Result<UpdatePomodoroState, String> {
+    debug!("Handling break session event");
 
     let mut pomodoro_state = state.pomodoro_state.write().await;
 
@@ -25,6 +27,7 @@ pub async fn handle_break_event(state: &AppState) -> Result<StartSession, String
                     Some(last_session) => {
                         let task_id = last_session
                             .task_id()
+                            .cloned()
                             .map(|id| {
                                 Uuid::parse_str(id.as_str())
                                     .map_err(|_| "Failed to parse task id".to_string())
@@ -33,6 +36,7 @@ pub async fn handle_break_event(state: &AppState) -> Result<StartSession, String
 
                         let category_id = last_session
                             .category_id()
+                            .cloned()
                             .map(|id| {
                                 Uuid::parse_str(id.as_str())
                                     .map_err(|_| "Failed to parse category id".to_string())
@@ -62,6 +66,8 @@ pub async fn handle_break_event(state: &AppState) -> Result<StartSession, String
                 }
 
                 let next_session_type = pomodoro_state.calculate_next_session_type();
+                let category_id = pomodoro_state.current_work_context().category_id().cloned();
+                let task_id = pomodoro_state.current_work_context().task_id().cloned();
 
                 pomodoro_state.start_new_session(
                     next_session_type,
@@ -70,12 +76,7 @@ pub async fn handle_break_event(state: &AppState) -> Result<StartSession, String
                     task_id,
                 );
 
-                Ok(StartSession {
-                    session_type: new_state.session_type,
-                    start_date: new_state.start_date,
-                    category_id: new_state.category_id,
-                    task_id: new_state.task_id,
-                })
+                Ok(UpdatePomodoroState::from(pomodoro_state.clone()))
             }
             _ => {
                 tracing::error!("Break session already running cannot start a new break");

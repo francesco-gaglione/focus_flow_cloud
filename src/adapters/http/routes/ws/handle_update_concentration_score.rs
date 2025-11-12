@@ -1,23 +1,22 @@
 use tracing::debug;
 
 use crate::adapters::http::{
-    app_state::AppState, dto::ws_msg::update_concentration_score::UpdateConcentrationScore,
+    app_state::AppState,
+    dto::ws_msg::{
+        update_concentration_score::UpdateConcentrationScore,
+        update_pomodoro_state::UpdatePomodoroState,
+    },
 };
 
 pub async fn handle_update_concentration_score(
     message: &UpdateConcentrationScore,
     state: &AppState,
-) -> Result<(), String> {
+) -> Result<UpdatePomodoroState, String> {
     debug!("Updating concentration score");
 
-    let mut state = state.focus_session_state.write().await;
+    let mut state = state.pomodoro_state.write().await;
 
-    match &mut state.current_session {
-        Some(running_session) => {
-            running_session.concentration_score = Some(message.concentration_score);
+    state.update_current_session_concentration_score(message.concentration_score);
 
-            Ok(())
-        }
-        None => Err("No running sessions".to_string()),
-    }
+    Ok(UpdatePomodoroState::from(state.clone()))
 }

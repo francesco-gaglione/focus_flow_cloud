@@ -14,18 +14,15 @@ use validator::Validate;
 use crate::adapters::http::{
     app_state::{AppState, Clients},
     dto::ws_msg::{
-        sync_workspace_ws::SyncWorkspace,
-        ws_message::{
-            BroadcastEvent, ClientMessage, ServerResponse, WsErrorResponse, WsMessage, WsRequest,
-            WsResponse, WsSuccessResponse,
-        },
+        update_pomodoro_state::UpdatePomodoroState,
+        ws_message::{BroadcastEvent, ClientMessage, ServerResponse, WsClientRequest},
     },
     routes::ws::{
         handle_break_event::handle_break_event, handle_start_event::handle_start_event,
         handle_terminate_event::handle_terminate_event,
         handle_update_concentration_score::handle_update_concentration_score,
-        note_update::note_update, sync_workspace::sync_workspace,
-        update_workspace::update_workspace,
+        note_update::note_update, sync_pomodoro_state::sync_pomodoro_state,
+        update_pomodoro_context::update_pomodoro_context,
     },
 };
 
@@ -71,7 +68,7 @@ async fn handle_socket(ws: WebSocket, state: AppState) {
                 Ok(Message::Text(text)) => {
                     debug!("Client {} received: {}", my_id, text);
 
-                    match serde_json::from_str::<WsRequest>(&text) {
+                    match serde_json::from_str::<WsClientRequest>(&text) {
                         Ok(ws_request) => {
                             let request_id = ws_request.request_id.clone();
 
@@ -92,8 +89,8 @@ async fn handle_socket(ws: WebSocket, state: AppState) {
                             }
 
                             match &ws_request.message {
-                                WsMessage::RequestSync => {
-                                    match sync_workspace(&state_for_receive).await {
+                                ClientMessage::RequestSync => {
+                                    match sync_pomodoro_state(&state_for_receive).await {
                                         Ok(msg) => {
                                             send_sync_to_client(&tx_clone, msg).await;
                                         }
@@ -109,9 +106,8 @@ async fn handle_socket(ws: WebSocket, state: AppState) {
                                         }
                                     }
                                 }
-                                WsMessage::UpdateWorkspace(update_workspace_msg) => {
-                                    match update_workspace(update_workspace_msg, &state_for_receive)
-                                        .await
+                                ClientMessage::UpdatePomodoroContext(context) => {
+                                    match update_pomodoro_context(context, &state_for_receive).await
                                     {
                                         Ok(msg) => {
                                             debug!("Workspace updated: {:?}", msg);
@@ -126,7 +122,7 @@ async fn handle_socket(ws: WebSocket, state: AppState) {
                                             broadcast_message(
                                                 &clients_clone,
                                                 my_id,
-                                                &WsMessage::UpdateWorkspace(msg),
+                                                &BroadcastEvent::PomodoroSessionUpdate(msg),
                                                 true,
                                             )
                                             .await;
@@ -143,7 +139,7 @@ async fn handle_socket(ws: WebSocket, state: AppState) {
                                         }
                                     }
                                 }
-                                WsMessage::StartEvent => {
+                                ClientMessage::StartEvent => {
                                     match handle_start_event(&state_for_receive).await {
                                         Ok(msg) => {
                                             debug!("Session started: {:?}", msg);
@@ -158,7 +154,7 @@ async fn handle_socket(ws: WebSocket, state: AppState) {
                                             broadcast_message(
                                                 &clients_clone,
                                                 my_id,
-                                                &WsMessage::StartSession(msg),
+                                                &BroadcastEvent::PomodoroSessionUpdate(msg),
                                                 true,
                                             )
                                             .await;
@@ -175,7 +171,7 @@ async fn handle_socket(ws: WebSocket, state: AppState) {
                                         }
                                     }
                                 }
-                                WsMessage::BreakEvent => {
+                                ClientMessage::BreakEvent => {
                                     match handle_break_event(&state_for_receive).await {
                                         Ok(msg) => {
                                             debug!("Break session started: {:?}", msg);
@@ -190,7 +186,7 @@ async fn handle_socket(ws: WebSocket, state: AppState) {
                                             broadcast_message(
                                                 &clients_clone,
                                                 my_id,
-                                                &WsMessage::StartSession(msg),
+                                                &BroadcastEvent::PomodoroSessionUpdate(msg),
                                                 true,
                                             )
                                             .await;
@@ -207,9 +203,9 @@ async fn handle_socket(ws: WebSocket, state: AppState) {
                                         }
                                     }
                                 }
-                                WsMessage::TerminateEvent => {
+                                ClientMessage::TerminateEvent => {
                                     match handle_terminate_event(&state_for_receive).await {
-                                        Ok(_) => {
+                                        Ok(msg) => {
                                             debug!("Session terminated");
 
                                             send_success_to_client(
@@ -222,7 +218,7 @@ async fn handle_socket(ws: WebSocket, state: AppState) {
                                             broadcast_message(
                                                 &clients_clone,
                                                 my_id,
-                                                &WsMessage::TerminateSession {},
+                                                &BroadcastEvent::PomodoroSessionUpdate(msg),
                                                 true,
                                             )
                                             .await;
@@ -239,50 +235,9 @@ async fn handle_socket(ws: WebSocket, state: AppState) {
                                         }
                                     }
                                 }
-                                WsMessage::UpdateConcentrationScore(concentration_score_dto) => {
-                                    match handle_update_concentration_score(
-                                        concentration_score_dto,
-                                        &state_for_receive,
-                                    )
-                                    .await
-                                    {
-                                        Ok(_) => {
-                                            debug!("Concentration score updated");
-
-                                            send_success_to_client(
-                                                &tx_clone,
-                                                "Concentration score updated",
-                                                request_id.clone(),
-                                            )
-                                            .await;
-
-                                            broadcast_message(
-                                                &clients_clone,
-                                                my_id,
-                                                &WsMessage::UpdateConcentrationScore(
-                                                    concentration_score_dto.clone(),
-                                                ),
-                                                true,
-                                            )
-                                            .await;
-                                        }
-                                        Err(e) => {
-                                            error!("Failed to update concentration score: {}", e);
-                                            send_error_to_client(
-                                                &tx_clone,
-                                                "ERROR",
-                                                e.as_ref(),
-                                                request_id,
-                                            )
-                                            .await;
-                                        }
-                                    }
-                                }
-                                WsMessage::NoteUpdate(note_update_dto) => {
-                                    debug!("Note update: {:?}", note_update_dto);
-
+                                ClientMessage::UpdateNote(note_update_dto) => {
                                     match note_update(note_update_dto, &state_for_receive).await {
-                                        Ok(_) => {
+                                        Ok(msg) => {
                                             debug!("Note updated");
 
                                             send_success_to_client(
@@ -295,7 +250,7 @@ async fn handle_socket(ws: WebSocket, state: AppState) {
                                             broadcast_message(
                                                 &clients_clone,
                                                 my_id,
-                                                &WsMessage::NoteUpdate(note_update_dto.clone()),
+                                                &BroadcastEvent::PomodoroSessionUpdate(msg),
                                                 false,
                                             )
                                             .await;
@@ -312,15 +267,44 @@ async fn handle_socket(ws: WebSocket, state: AppState) {
                                         }
                                     }
                                 }
-                                _ => {
-                                    debug!("Server received a not handled message");
-                                    send_error_to_client(
-                                        &tx_clone,
-                                        "ERROR",
-                                        "Server is not able to handle this message",
-                                        request_id,
+                                ClientMessage::UpdateConcentrationScore(
+                                    update_concentration_score,
+                                ) => {
+                                    match handle_update_concentration_score(
+                                        update_concentration_score,
+                                        &state_for_receive,
                                     )
-                                    .await;
+                                    .await
+                                    {
+                                        Ok(msg) => {
+                                            debug!("Concentration score updated");
+
+                                            send_success_to_client(
+                                                &tx_clone,
+                                                "Concentration score updated",
+                                                request_id.clone(),
+                                            )
+                                            .await;
+
+                                            broadcast_message(
+                                                &clients_clone,
+                                                my_id,
+                                                &BroadcastEvent::PomodoroSessionUpdate(msg),
+                                                true,
+                                            )
+                                            .await;
+                                        }
+                                        Err(e) => {
+                                            error!("Failed to update concentration score: {}", e);
+                                            send_error_to_client(
+                                                &tx_clone,
+                                                "ERROR",
+                                                e.as_ref(),
+                                                request_id,
+                                            )
+                                            .await;
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -430,11 +414,11 @@ fn validate_client_message(message: &ClientMessage) -> Result<(), String> {
         | ClientMessage::StartEvent
         | ClientMessage::BreakEvent
         | ClientMessage::TerminateEvent => Ok(()),
-
         ClientMessage::UpdateNote(msg) => validate_variant!(msg, "UpdateNote"),
         ClientMessage::UpdateConcentrationScore(msg) => {
             validate_variant!(msg, "UpdateConcentrationScore")
         }
+        ClientMessage::UpdatePomodoroContext(_) => Ok(()),
     }
 }
 
@@ -447,10 +431,10 @@ async fn send_success_to_client(
     message: &str,
     request_id: Option<String>,
 ) {
-    let response = WsResponse::Success(WsSuccessResponse {
+    let response = ServerResponse::Success {
         message: message.to_string(),
         request_id,
-    });
+    };
 
     if let Ok(json) = serde_json::to_string(&response) {
         let _ = tx.send(Message::text(json));
@@ -459,9 +443,10 @@ async fn send_success_to_client(
 
 async fn send_sync_to_client(
     tx: &tokio::sync::mpsc::UnboundedSender<Message>,
-    message: SyncWorkspace,
+
+    message: UpdatePomodoroState,
 ) {
-    let response = WsResponse::Sync(message);
+    let response = ServerResponse::SyncData(message);
 
     if let Ok(json) = serde_json::to_string(&response) {
         let _ = tx.send(Message::text(json));
@@ -474,37 +459,42 @@ async fn send_error_to_client(
     message: &str,
     request_id: Option<String>,
 ) {
-    let response = WsResponse::Error(WsErrorResponse {
+    let response = ServerResponse::Error {
         code: code.to_string(),
+
         message: message.to_string(),
+
         request_id,
-    });
+    };
+
     if let Ok(json) = serde_json::to_string(&response) {
         let _ = tx.send(Message::text(json));
     }
 }
 
-fn validate_message(message: &WsMessage) -> Result<(), String> {
+fn validate_message(message: &ClientMessage) -> Result<(), String> {
     match message {
-        WsMessage::RequestSync
-        | WsMessage::StartEvent
-        | WsMessage::BreakEvent
-        | WsMessage::TerminateEvent
-        | WsMessage::TerminateSession {} => Ok(()),
+        ClientMessage::RequestSync
+        | ClientMessage::StartEvent
+        | ClientMessage::BreakEvent
+        | ClientMessage::TerminateEvent => Ok(()),
 
-        WsMessage::NoteUpdate(msg) => validate_variant!(msg, "NoteUpdate"),
-        WsMessage::UpdateWorkspace(msg) => validate_variant!(msg, "UpdateWorkspace"),
-        WsMessage::UpdateConcentrationScore(msg) => {
+        ClientMessage::UpdateNote(msg) => validate_variant!(msg, "UpdateNote"),
+        ClientMessage::UpdatePomodoroContext(msg) => {
+            validate_variant!(msg, "UpdatePomodoroContext")
+        }
+        ClientMessage::UpdateConcentrationScore(msg) => {
             validate_variant!(msg, "UpdateConcentrationScore")
         }
-        WsMessage::StartSession(msg) => validate_variant!(msg, "StartSession"),
     }
 }
 
 async fn broadcast_message(
     clients: &Clients,
+
     sender_id: usize,
-    message: &WsMessage,
+
+    message: &BroadcastEvent,
     include_msg_sender: bool,
 ) {
     match serde_json::to_string(message) {

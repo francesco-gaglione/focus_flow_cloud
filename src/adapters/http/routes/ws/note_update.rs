@@ -1,18 +1,19 @@
 use tracing::debug;
 
-use crate::adapters::http::{app_state::AppState, dto::ws_msg::note_update_ws::NoteUpdate};
+use crate::adapters::http::{
+    app_state::AppState,
+    dto::ws_msg::{note_update_ws::NoteUpdate, update_pomodoro_state::UpdatePomodoroState},
+};
 
-pub async fn note_update(message: &NoteUpdate, state: &AppState) -> Result<(), String> {
-    debug!("Starting session");
+pub async fn note_update(
+    message: &NoteUpdate,
+    state: &AppState,
+) -> Result<UpdatePomodoroState, String> {
+    debug!("Updating current session note");
 
-    let mut state = state.focus_session_state.write().await;
+    let mut pomodoro_state = state.pomodoro_state.write().await;
 
-    match &mut state.current_session {
-        Some(running_session) => {
-            running_session.note = Some(message.new_note.clone());
+    pomodoro_state.update_current_session_note(message.new_note.clone())?;
 
-            Ok(())
-        }
-        None => Err("No running sessions".to_string()),
-    }
+    Ok(UpdatePomodoroState::from(pomodoro_state.clone()))
 }

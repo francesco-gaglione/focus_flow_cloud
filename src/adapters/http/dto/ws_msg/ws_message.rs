@@ -1,9 +1,8 @@
 use serde::{Deserialize, Serialize};
 
 use crate::adapters::http::dto::ws_msg::{
-    note_update_ws::NoteUpdate, sync_workspace_ws::SyncWorkspace,
-    update_concentration_score::UpdateConcentrationScore,
-    update_pomodoro_state::UpdatePomodoroState,
+    note_update_ws::NoteUpdate, update_concentration_score::UpdateConcentrationScore,
+    update_pomodoro_context::UpdatePomodoroContext, update_pomodoro_state::UpdatePomodoroState,
 };
 
 // ============================================
@@ -13,7 +12,7 @@ use crate::adapters::http::dto::ws_msg::{
 /// Wrapper for all client requests with optional tracking ID
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct ClientRequest {
+pub struct WsClientRequest {
     pub request_id: Option<String>,
     #[serde(flatten)]
     pub message: ClientMessage,
@@ -28,6 +27,7 @@ pub enum ClientMessage {
     BreakEvent,
     TerminateEvent,
 
+    UpdatePomodoroContext(UpdatePomodoroContext),
     UpdateNote(NoteUpdate),
     UpdateConcentrationScore(UpdateConcentrationScore),
 }
@@ -49,7 +49,7 @@ pub enum ServerResponse {
         message: String,
         request_id: Option<String>,
     },
-    SyncData(SyncWorkspace),
+    SyncData(UpdatePomodoroState),
 }
 
 // ============================================
