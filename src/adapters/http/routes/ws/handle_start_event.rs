@@ -6,7 +6,7 @@ use crate::{
     adapters::http::{
         app_state::AppState,
         dto::{common::session_type_enum::SessionTypeEnum, ws_msg::start_session_ws::StartSession},
-        focus_sessions_state::FocusSessionState,
+        pomodoro_state::FocusSessionState,
     },
     application::use_cases::commands::create_foucs_session::CreateFocusSessionCommand,
 };

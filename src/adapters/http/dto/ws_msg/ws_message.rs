@@ -1,62 +1,64 @@
 use serde::{Deserialize, Serialize};
-use utoipa::ToSchema;
 
 use crate::adapters::http::dto::ws_msg::{
-    note_update_ws::NoteUpdate, start_session_ws::StartSession, sync_workspace_ws::SyncWorkspace,
-    update_concentration_score::UpdateConcentrationScore, update_workspace_ws::UpdateWorkspace,
+    note_update_ws::NoteUpdate, sync_workspace_ws::SyncWorkspace,
+    update_concentration_score::UpdateConcentrationScore,
+    update_pomodoro_state::UpdatePomodoroState,
 };
 
-// Requests
+// ============================================
+// Client-to-Server Messages
+// ============================================
 
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
+/// Wrapper for all client requests with optional tracking ID
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct WsRequest {
+pub struct ClientRequest {
     pub request_id: Option<String>,
     #[serde(flatten)]
-    pub message: WsMessage,
+    pub message: ClientMessage,
 }
 
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
+/// Messages sent from client to server
+#[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
-pub enum WsMessage {
-    // From client message
+pub enum ClientMessage {
     RequestSync,
-
     StartEvent,
     BreakEvent,
     TerminateEvent,
 
-    // Both to and from client
-    NoteUpdate(NoteUpdate),
+    UpdateNote(NoteUpdate),
     UpdateConcentrationScore(UpdateConcentrationScore),
-    UpdateWorkspace(UpdateWorkspace),
-
-    // To client message
-    StartSession(StartSession),
-    TerminateSession {}, // {} To serialize as object
 }
 
-// Responses
+// ============================================
+// Server-to-Client Responses
+// ============================================
 
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
+/// Direct responses from server to the requesting client
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub enum WsResponse {
-    Success(WsSuccessResponse),
-    Error(WsErrorResponse),
-    Sync(SyncWorkspace),
+pub enum ServerResponse {
+    Success {
+        message: String,
+        request_id: Option<String>,
+    },
+    Error {
+        code: String,
+        message: String,
+        request_id: Option<String>,
+    },
+    SyncData(SyncWorkspace),
 }
 
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
-#[serde(rename_all = "camelCase")]
-pub struct WsSuccessResponse {
-    pub message: String,
-    pub request_id: Option<String>,
-}
+// ============================================
+// Broadcast Events
+// ============================================
 
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
+/// Events broadcast to all connected clients (or all except sender)
+#[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct WsErrorResponse {
-    pub code: String, //TODO define error codes
-    pub message: String,
-    pub request_id: Option<String>,
+pub enum BroadcastEvent {
+    PomodoroSessionUpdate(UpdatePomodoroState),
 }

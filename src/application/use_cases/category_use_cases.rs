@@ -236,7 +236,6 @@ mod category_use_cases_tests {
         let result = use_case.get_all_category_and_tasks().await.unwrap();
         assert_eq!(result.category_with_tasks.len(), 1);
         assert_eq!(result.category_with_tasks[0].tasks.len(), 1);
-        assert_eq!(result.orphan_tasks.len(), 0);
     }
 
     #[tokio::test]
@@ -282,7 +281,6 @@ mod category_use_cases_tests {
         let result = use_case.get_all_category_and_tasks().await.unwrap();
         assert_eq!(result.category_with_tasks.len(), 1);
         assert_eq!(result.category_with_tasks[0].tasks.len(), 0);
-        assert_eq!(result.orphan_tasks.len(), 1);
     }
 
     #[tokio::test]

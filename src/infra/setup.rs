@@ -1,5 +1,5 @@
 use crate::adapters::http::app_state::AppState;
-use crate::adapters::http::focus_sessions_state::FocusSessionsState;
+use crate::adapters::http::pomodoro_state::FocusSessionsState;
 use crate::application::use_cases::category_use_cases::CategoryUseCases;
 use crate::application::use_cases::focus_session_use_cases::FocusSessionUseCases;
 use crate::application::use_cases::stats_use_cases::StatsUseCases;
