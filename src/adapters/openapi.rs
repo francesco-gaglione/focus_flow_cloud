@@ -1,6 +1,7 @@
 use crate::adapters::http::dto::category_api::create_category::CreateCategoryDto;
 use crate::adapters::http::dto::category_api::delete_categories::DeleteCategoriesDto;
 use crate::adapters::http::dto::category_api::get_categories::GetCategoriesResponseDto;
+use crate::adapters::http::dto::category_api::get_category::GetCategoryResponseDto;
 use crate::adapters::http::dto::category_api::update_category::UpdateCategoryDto;
 use crate::adapters::http::dto::category_api::update_category::UpdateCategoryResponseDto;
 use crate::adapters::http::dto::session_api::create_manual_session::CreateManualSessionDto;
@@ -36,6 +37,7 @@ pub const STATS_TAG: &str = "Statistics";
         crate::adapters::http::routes::category::create_category_api::create_category_api,
         crate::adapters::http::routes::category::update_category_api::update_category_api,
         crate::adapters::http::routes::category::get_categories_and_tasks_api::get_categories_and_tasks_api,
+        crate::adapters::http::routes::category::get_category::get_category,
         crate::adapters::http::routes::category::delete_categories_api::delete_categories_api,
         crate::adapters::http::routes::task::orphan_tasks_api::fetch_orphan_tasks_api,
         crate::adapters::http::routes::task::create_task_api::create_task_api,
@@ -50,6 +52,7 @@ pub const STATS_TAG: &str = "Statistics";
         schemas(UpdateCategoryDto, UpdateCategoryResponseDto),
         schemas(UpdateTaskDto, CreateTaskResponseDto),
         schemas(DeleteCategoriesDto, GetCategoriesResponseDto),
+        schemas(GetCategoryResponseDto),
         schemas(GetCategoriesResponseDto),
         schemas(OrphanTasksResponseDto),
         schemas(UpdateTaskDto, CreateTaskResponseDto),

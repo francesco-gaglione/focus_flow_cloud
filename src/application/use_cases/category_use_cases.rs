@@ -38,6 +38,10 @@ impl CategoryUseCases {
             .await
     }
 
+    pub async fn get_category(&self, category_id: uuid::Uuid) -> AppResult<Category> {
+        self.category_persistence.find_by_id(category_id).await
+    }
+
     pub async fn get_all_category_and_tasks(&self) -> AppResult<CategoryAndTasks> {
         let mut categories = self.category_persistence.find_all().await?;
 
