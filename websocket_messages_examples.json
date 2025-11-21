@@ -1,0 +1,361 @@
+{
+  "description": "Esempi completi di tutti i messaggi WebSocket per Focus Flow",
+  "clientToServerMessages": {
+    "description": "Messaggi inviati dal client al server",
+    "examples": [
+      {
+        "type": "RequestSync",
+        "description": "Richiede la sincronizzazione dello stato corrente del Pomodoro",
+        "message": {
+          "requestId": "req-123-abc",
+          "requestSync": {}
+        }
+      },
+      {
+        "type": "StartEvent",
+        "description": "Avvia una nuova sessione Pomodoro",
+        "message": {
+          "requestId": "req-456-def",
+          "startEvent": {}
+        }
+      },
+      {
+        "type": "BreakEvent",
+        "description": "Avvia una pausa",
+        "message": {
+          "requestId": "req-789-ghi",
+          "breakEvent": {}
+        }
+      },
+      {
+        "type": "TerminateEvent",
+        "description": "Termina la sessione corrente",
+        "message": {
+          "requestId": "req-101-jkl",
+          "terminateEvent": {}
+        }
+      },
+      {
+        "type": "UpdatePomodoroContext",
+        "description": "Aggiorna il contesto di lavoro (categoria e task)",
+        "examples": [
+          {
+            "description": "Aggiorna sia categoria che task",
+            "message": {
+              "requestId": "req-202-mno",
+              "updatePomodoroContext": {
+                "categoryId": "550e8400-e29b-41d4-a716-446655440000",
+                "taskId": "660e8400-e29b-41d4-a716-446655440001"
+              }
+            }
+          },
+          {
+            "description": "Aggiorna solo la categoria",
+            "message": {
+              "requestId": "req-303-pqr",
+              "updatePomodoroContext": {
+                "categoryId": "550e8400-e29b-41d4-a716-446655440000",
+                "taskId": null
+              }
+            }
+          },
+          {
+            "description": "Rimuove sia categoria che task",
+            "message": {
+              "requestId": "req-404-stu",
+              "updatePomodoroContext": {
+                "categoryId": null,
+                "taskId": null
+              }
+            }
+          }
+        ]
+      },
+      {
+        "type": "UpdateNote",
+        "description": "Aggiorna la nota della sessione corrente",
+        "message": {
+          "requestId": "req-505-vwx",
+          "updateNote": {
+            "newNote": "Lavorando sulla feature di autenticazione"
+          }
+        }
+      },
+      {
+        "type": "UpdateConcentrationScore",
+        "description": "Aggiorna il punteggio di concentrazione (0-5)",
+        "examples": [
+          {
+            "description": "Concentrazione massima",
+            "message": {
+              "requestId": "req-606-yza",
+              "updateConcentrationScore": {
+                "concentrationScore": 5
+              }
+            }
+          },
+          {
+            "description": "Concentrazione media",
+            "message": {
+              "requestId": "req-707-bcd",
+              "updateConcentrationScore": {
+                "concentrationScore": 3
+              }
+            }
+          },
+          {
+            "description": "Concentrazione minima",
+            "message": {
+              "requestId": "req-808-efg",
+              "updateConcentrationScore": {
+                "concentrationScore": 0
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "serverToClientResponses": {
+    "description": "Risposte dirette dal server al client richiedente",
+    "examples": [
+      {
+        "type": "Success",
+        "description": "Risposta di successo generica",
+        "message": {
+          "success": {
+            "message": "Operazione completata con successo",
+            "requestId": "req-123-abc"
+          }
+        }
+      },
+      {
+        "type": "Error",
+        "description": "Risposta di errore",
+        "examples": [
+          {
+            "description": "Errore di validazione",
+            "message": {
+              "error": {
+                "code": "VALIDATION_ERROR",
+                "message": "Il punteggio di concentrazione deve essere compreso tra 0 e 5",
+                "requestId": "req-808-efg"
+              }
+            }
+          },
+          {
+            "description": "Errore di autenticazione",
+            "message": {
+              "error": {
+                "code": "UNAUTHORIZED",
+                "message": "Token di autenticazione non valido o scaduto",
+                "requestId": "req-909-hij"
+              }
+            }
+          },
+          {
+            "description": "Errore interno del server",
+            "message": {
+              "error": {
+                "code": "INTERNAL_SERVER_ERROR",
+                "message": "Si è verificato un errore interno del server",
+                "requestId": "req-010-klm"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "type": "SyncData",
+        "description": "Dati di sincronizzazione dello stato Pomodoro",
+        "examples": [
+          {
+            "description": "Stato con sessione di focus attiva",
+            "message": {
+              "syncData": {
+                "currentSession": {
+                  "sessionType": "focus",
+                  "sessionStartTime": 1700000000000,
+                  "categoryId": "550e8400-e29b-41d4-a716-446655440000",
+                  "taskId": "660e8400-e29b-41d4-a716-446655440001",
+                  "note": "Implementazione login feature",
+                  "concentrationScore": 4
+                },
+                "workContext": {
+                  "categoryId": "550e8400-e29b-41d4-a716-446655440000",
+                  "taskId": "660e8400-e29b-41d4-a716-446655440001"
+                }
+              }
+            }
+          },
+          {
+            "description": "Stato con sessione di pausa breve",
+            "message": {
+              "syncData": {
+                "currentSession": {
+                  "sessionType": "shortBreak",
+                  "sessionStartTime": 1700001500000,
+                  "categoryId": null,
+                  "taskId": null,
+                  "note": null,
+                  "concentrationScore": null
+                },
+                "workContext": {
+                  "categoryId": "550e8400-e29b-41d4-a716-446655440000",
+                  "taskId": "660e8400-e29b-41d4-a716-446655440001"
+                }
+              }
+            }
+          },
+          {
+            "description": "Stato con sessione di pausa lunga",
+            "message": {
+              "syncData": {
+                "currentSession": {
+                  "sessionType": "longBreak",
+                  "sessionStartTime": 1700003000000,
+                  "categoryId": null,
+                  "taskId": null,
+                  "note": null,
+                  "concentrationScore": null
+                },
+                "workContext": {
+                  "categoryId": null,
+                  "taskId": null
+                }
+              }
+            }
+          },
+          {
+            "description": "Stato senza sessione attiva",
+            "message": {
+              "syncData": {
+                "currentSession": null,
+                "workContext": {
+                  "categoryId": "550e8400-e29b-41d4-a716-446655440000",
+                  "taskId": null
+                }
+              }
+            }
+          },
+          {
+            "description": "Stato completamente vuoto",
+            "message": {
+              "syncData": {
+                "currentSession": null,
+                "workContext": {
+                  "categoryId": null,
+                  "taskId": null
+                }
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "broadcastEvents": {
+    "description": "Eventi broadcast a tutti i client connessi (o tutti tranne il mittente)",
+    "examples": [
+      {
+        "type": "PomodoroSessionUpdate",
+        "description": "Aggiornamento dello stato della sessione Pomodoro broadcast a tutti i client",
+        "examples": [
+          {
+            "description": "Nuova sessione di focus iniziata",
+            "message": {
+              "pomodoroSessionUpdate": {
+                "currentSession": {
+                  "sessionType": "focus",
+                  "sessionStartTime": 1700005000000,
+                  "categoryId": "550e8400-e29b-41d4-a716-446655440000",
+                  "taskId": "660e8400-e29b-41d4-a716-446655440001",
+                  "note": "Sviluppo nuova feature",
+                  "concentrationScore": null
+                },
+                "workContext": {
+                  "categoryId": "550e8400-e29b-41d4-a716-446655440000",
+                  "taskId": "660e8400-e29b-41d4-a716-446655440001"
+                }
+              }
+            }
+          },
+          {
+            "description": "Aggiornamento punteggio concentrazione durante sessione",
+            "message": {
+              "pomodoroSessionUpdate": {
+                "currentSession": {
+                  "sessionType": "focus",
+                  "sessionStartTime": 1700005000000,
+                  "categoryId": "550e8400-e29b-41d4-a716-446655440000",
+                  "taskId": "660e8400-e29b-41d4-a716-446655440001",
+                  "note": "Sviluppo nuova feature",
+                  "concentrationScore": 5
+                },
+                "workContext": {
+                  "categoryId": "550e8400-e29b-41d4-a716-446655440000",
+                  "taskId": "660e8400-e29b-41d4-a716-446655440001"
+                }
+              }
+            }
+          },
+          {
+            "description": "Cambio contesto di lavoro",
+            "message": {
+              "pomodoroSessionUpdate": {
+                "currentSession": {
+                  "sessionType": "focus",
+                  "sessionStartTime": 1700005000000,
+                  "categoryId": "770e8400-e29b-41d4-a716-446655440002",
+                  "taskId": "880e8400-e29b-41d4-a716-446655440003",
+                  "note": "Passato a nuovo task",
+                  "concentrationScore": 5
+                },
+                "workContext": {
+                  "categoryId": "770e8400-e29b-41d4-a716-446655440002",
+                  "taskId": "880e8400-e29b-41d4-a716-446655440003"
+                }
+              }
+            }
+          },
+          {
+            "description": "Sessione terminata",
+            "message": {
+              "pomodoroSessionUpdate": {
+                "currentSession": null,
+                "workContext": {
+                  "categoryId": "550e8400-e29b-41d4-a716-446655440000",
+                  "taskId": "660e8400-e29b-41d4-a716-446655440001"
+                }
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "sessionTypes": {
+    "description": "Tipi di sessione disponibili",
+    "types": [
+      {
+        "value": "focus",
+        "description": "Sessione di lavoro/focus (tipicamente 25 minuti)"
+      },
+      {
+        "value": "shortBreak",
+        "description": "Pausa breve (tipicamente 5 minuti)"
+      },
+      {
+        "value": "longBreak",
+        "description": "Pausa lunga (tipicamente 15-30 minuti)"
+      }
+    ]
+  },
+  "notes": {
+    "requestId": "Campo opzionale per tracciare le richieste. Il server lo includerà nelle risposte corrispondenti.",
+    "timestamps": "I timestamp sono in millisecondi Unix (epoch time)",
+    "uuids": "Gli ID di categoria e task sono UUID in formato stringa",
+    "concentrationScore": "Valore intero da 0 (minimo) a 5 (massimo)",
+    "camelCase": "Tutti i campi JSON usano camelCase per la serializzazione"
+  }
+}

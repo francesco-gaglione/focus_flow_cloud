@@ -16,7 +16,7 @@ pub async fn handle_update_concentration_score(
 
     let mut state = state.pomodoro_state.write().await;
 
-    state.update_current_session_concentration_score(message.concentration_score);
+    state.update_current_session_concentration_score(message.concentration_score)?;
 
     Ok(UpdatePomodoroState::from(state.clone()))
 }
