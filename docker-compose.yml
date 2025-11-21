@@ -5,15 +5,15 @@ services:
     image: postgres:16
     container_name: focusflow_db
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: focusflow
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:
       - db:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d focusflow"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -24,15 +24,13 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: focusflow_cloud
-    environment:
-      DATABASE_URL: postgres://postgres:postgres@db:5432/focusflow
-      SERVER_PORT: 8080
-      RUST_LOG: info
+    env_file:
+      - .env
     depends_on:
       db:
         condition: service_healthy
     ports:
-      - "8080:8080"
+      - "${SERVER_PORT}:${SERVER_PORT}"
 
-volumes: 
+volumes:
   db:

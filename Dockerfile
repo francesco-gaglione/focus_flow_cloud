@@ -44,16 +44,11 @@ WORKDIR /app
 # Copy the compiled binary from builder
 COPY --from=backend-builder /app/target/release/focus_flow_cloud /usr/local/bin/focus_flow_cloud
 
-# Set environment variables (FIX: SERVER_PORT invece di PORT)
-ENV RUST_LOG=info \
-    SERVER_PORT=8080 \
-    DATABASE_URL=postgres://postgres:postgres@db:5432/focusflow
-
 EXPOSE 8080
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD [ "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/api-docs/openapi.json" ] || exit 1
+    CMD wget --quiet --tries=1 --spider http://localhost:${SERVER_PORT:-8080}/api-docs/openapi.json || exit 1
 
 # Run the application
 CMD ["/usr/local/bin/focus_flow_cloud"]

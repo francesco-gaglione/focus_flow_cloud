@@ -29,7 +29,7 @@ run-trace:
 
 # Build Docker image
 docker-build:
-    docker build -t simple_pokedex:latest .
+    docker build -t focus_flow_cloud:latest .
 
 # Run with Docker Compose (includes dependencies)
 docker-up:

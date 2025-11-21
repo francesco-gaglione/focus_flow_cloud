@@ -48,35 +48,58 @@ src/
 
 - Rust 1.70+
 - Docker & Docker Compose
-- PostgreSQL (when running without Docker)
+- PostgreSQL (if running without Docker)
+- `just` command runner (optional, for convenience)
 
 ### Quick Start with Docker
 
-```bash
-# Clone the repository
-git clone https://github.com/francesco-gaglione/focusflow-cloud.git
-cd focusflow-cloud
+1.  **Clone the repository**:
+    ```bash
+    git clone https://github.com/francesco-gaglione/focusflow-cloud.git
+    cd focusflow-cloud
+    ```
 
-# Start the application
-docker-compose up --build
+2.  **Set up environment variables**:
+    Copy the example `.env.example` file to `.env` and customize it if needed. The default values are suitable for the Docker setup.
+    ```bash
+    cp .env.example .env
+    ```
 
-# The API will be available at http://localhost:8080
-# Swagger UI: http://localhost:8080/swagger-ui
-```
+3.  **Start the application**:
+    This command builds the Docker image and starts the `app` and `db` services.
+    ```bash
+    docker-compose up --build
+    ```
 
-### Development Setup
+4.  **Access the API**:
+    -   **API**: `http://localhost:8080`
+    -   **Swagger UI**: `http://localhost:8080/swagger-ui`
 
-```bash
-# Set up environment variables
-cp .env.example .env
-# Edit .env with your database configuration
+### Development Setup (without Docker)
 
-# Run database migrations
-diesel migration run
+1.  **Set up environment variables**:
+    Copy `.env.example` to `.env` and update `DATABASE_URL` to point to your local PostgreSQL instance.
+    ```bash
+    cp .env.example .env
+    # nano .env
+    ```
 
-# Start the development server
-cargo run
-```
+2.  **Run database migrations**:
+    Ensure your PostgreSQL server is running, then run:
+    ```bash
+    diesel migration run
+    ```
+
+3.  **Start the development server**:
+    You can use `just` for convenience or run the `cargo` command directly.
+    ```bash
+    # With just
+    just run
+
+    # Or with cargo
+    cargo run
+    ```
+
 
 ## 📚 API Documentation
 
