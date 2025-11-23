@@ -39,6 +39,8 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* \
     && update-ca-certificates
 
+RUN apt-get update && apt-get install -y ca-certificates curl && update-ca-certificates
+
 WORKDIR /app
 
 # Copy the compiled binary from builder
