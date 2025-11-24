@@ -24,32 +24,15 @@ pub async fn handle_start_event(state: &AppState) -> Result<UpdatePomodoroState,
                 return Err("Work session already running cannot start a new session".to_string());
             }
             _ => {
-                session_state.close_current_session(Utc::now().timestamp());
+                session_state.close_current_session(Utc::now().timestamp())?;
 
                 if let Some(last_session) = session_state.last_session() {
-                    let task_id = session_state
-                        .current_work_context()
-                        .task_id()
-                        .map(|id| {
-                            Uuid::parse_str(id)
-                                .map_err(|e| format!("Failed to parse task_id: {}", e))
-                        })
-                        .transpose()?;
-
-                    let category_id = session_state
-                        .current_work_context()
-                        .category_id()
-                        .map(|id| {
-                            Uuid::parse_str(id)
-                                .map_err(|e| format!("Failed to parse category_id: {}", e))
-                        })
-                        .transpose()?;
-
                     let _ = state
                         .focus_session_use_cases
                         .create_session(CreateFocusSessionCommand {
-                            task_id,
-                            category_id,
+                            // Break session should not have a task or category
+                            task_id: None,
+                            category_id: None,
                             session_type: last_session.session_type().clone().into(),
                             concentration_score: last_session.concentration_score(),
                             notes: last_session.note().clone(),

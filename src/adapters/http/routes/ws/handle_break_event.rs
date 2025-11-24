@@ -21,7 +21,7 @@ pub async fn handle_break_event(state: &AppState) -> Result<UpdatePomodoroState,
     match pomodoro_state.current_session_type() {
         Some(current_session_type) => match current_session_type {
             SessionTypeEnum::Work => {
-                pomodoro_state.close_current_session(Utc::now().timestamp());
+                pomodoro_state.close_current_session(Utc::now().timestamp())?;
 
                 match pomodoro_state.last_session() {
                     Some(last_session) => {
@@ -74,7 +74,7 @@ pub async fn handle_break_event(state: &AppState) -> Result<UpdatePomodoroState,
                     Utc::now().timestamp(),
                     category_id,
                     task_id,
-                );
+                )?;
 
                 Ok(UpdatePomodoroState::from(pomodoro_state.clone()))
             }
