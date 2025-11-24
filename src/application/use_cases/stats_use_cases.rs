@@ -98,7 +98,10 @@ impl StatsUseCases {
         })
     }
 
-    fn is_multi_day_period(start_date: Option<DateTime<Utc>>, end_date: Option<DateTime<Utc>>) -> bool {
+    fn is_multi_day_period(
+        start_date: Option<DateTime<Utc>>,
+        end_date: Option<DateTime<Utc>>,
+    ) -> bool {
         match (start_date, end_date) {
             (Some(start), Some(end)) => {
                 let duration = end.signed_duration_since(start);
@@ -275,7 +278,7 @@ impl StatsUseCases {
         let mut distribution: Vec<TaskDistributionItem> = task_times
             .into_iter()
             .zip(task_results)
-            .filter_map(|((task_id, total_focus_time), result)| {
+            .filter_map(|((_task_id, total_focus_time), result)| {
                 result.ok().map(|(task, category_name)| {
                     let percentage = if total_time > 0 {
                         (total_focus_time as f32 / total_time as f32) * 100.0

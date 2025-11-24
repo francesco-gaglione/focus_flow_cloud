@@ -1,6 +1,5 @@
 use chrono::{DateTime, Utc};
 use tracing::debug;
-use uuid::Uuid;
 
 use crate::{
     adapters::http::{
@@ -49,7 +48,7 @@ pub async fn handle_start_event(state: &AppState) -> Result<UpdatePomodoroState,
                 let category_id = session_state.current_work_context().category_id().cloned();
                 let task_id = session_state.current_work_context().task_id().cloned();
 
-                session_state.start_new_session(
+                let _ = session_state.start_new_session(
                     SessionTypeEnum::Work,
                     Utc::now().timestamp(),
                     category_id,
@@ -63,7 +62,7 @@ pub async fn handle_start_event(state: &AppState) -> Result<UpdatePomodoroState,
             let category_id = session_state.current_work_context().category_id().cloned();
             let task_id = session_state.current_work_context().task_id().cloned();
 
-            session_state.start_new_session(
+            let _ = session_state.start_new_session(
                 SessionTypeEnum::Work,
                 Utc::now().timestamp(),
                 category_id,

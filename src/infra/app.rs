@@ -3,7 +3,7 @@ use crate::adapters::{
     http::routes::{api_routes, ws_routes},
     openapi::ApiDoc,
 };
-use axum::{Extension, Router};
+use axum::Router;
 use tower_http::trace::TraceLayer;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;

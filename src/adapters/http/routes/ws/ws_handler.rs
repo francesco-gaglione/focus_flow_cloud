@@ -379,65 +379,6 @@ macro_rules! validate_variant {
 }
 
 // ============================================
-// New Message Type Helpers
-// ============================================
-
-/// Send a ServerResponse to a specific client
-async fn send_response(tx: &tokio::sync::mpsc::UnboundedSender<Message>, response: ServerResponse) {
-    if let Ok(json) = serde_json::to_string(&response) {
-        let _ = tx.send(Message::text(json));
-    }
-}
-
-/// Broadcast an event to all clients or all except sender
-async fn broadcast_event(
-    clients: &Clients,
-    sender_id: usize,
-    event: &BroadcastEvent,
-    include_sender: bool,
-) {
-    match serde_json::to_string(event) {
-        Ok(json) => {
-            let clients_read = clients.read().await;
-            let mut sent_count = 0;
-
-            for (&id, tx) in clients_read.iter() {
-                if id != sender_id || include_sender {
-                    if tx.send(Message::text(json.clone())).is_ok() {
-                        sent_count += 1;
-                    } else {
-                        warn!("Failed to send broadcast to client {}", id);
-                    }
-                }
-            }
-
-            debug!(
-                "Broadcast sent to {} clients (sender: {}, included: {})",
-                sent_count, sender_id, include_sender
-            );
-        }
-        Err(e) => {
-            error!("Failed to serialize broadcast event: {}", e);
-        }
-    }
-}
-
-/// Validate a ClientMessage
-fn validate_client_message(message: &ClientMessage) -> Result<(), String> {
-    match message {
-        ClientMessage::RequestSync
-        | ClientMessage::StartEvent
-        | ClientMessage::BreakEvent
-        | ClientMessage::TerminateEvent => Ok(()),
-        ClientMessage::UpdateNote(msg) => validate_variant!(msg, "UpdateNote"),
-        ClientMessage::UpdateConcentrationScore(msg) => {
-            validate_variant!(msg, "UpdateConcentrationScore")
-        }
-        ClientMessage::UpdatePomodoroContext(_) => Ok(()),
-    }
-}
-
-// ============================================
 // Legacy Helper Functions (for backward compatibility)
 // ============================================
 

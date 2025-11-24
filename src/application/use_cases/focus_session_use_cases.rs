@@ -68,7 +68,7 @@ impl FocusSessionUseCases {
         &self,
         session: CreateManualFocusSessionCommand,
     ) -> AppResult<FocusSession> {
-        let duration = (session.ended_at.timestamp() - session.started_at.timestamp());
+        let duration = session.ended_at.timestamp() - session.started_at.timestamp();
 
         let manual_session_data = CreateManualSessionData {
             task_id: session.task_id,
