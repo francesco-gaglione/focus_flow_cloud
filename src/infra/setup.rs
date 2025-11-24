@@ -11,7 +11,8 @@ use std::sync::Arc;
 use tokio::sync::RwLock;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
-use tracing_subscriber::{fmt, EnvFilter};
+use tracing_subscriber::EnvFilter;
+use tracing_tree::HierarchicalLayer;
 
 pub async fn init_app_state() -> Result<AppState, Box<dyn std::error::Error>> {
     let config = AppConfig::from_env();
@@ -40,17 +41,15 @@ pub async fn init_app_state() -> Result<AppState, Box<dyn std::error::Error>> {
 
 pub fn init_tracing() {
     let filter = EnvFilter::try_from_default_env()
-        .unwrap_or_else(|_| "axum_trainer=debug,tower_http=debug".into());
+        .unwrap_or_else(|_| "focus_flow_cloud=info,tower_http=info".into());
 
-    // Console (pretty logs)
-    let console_layer = fmt::layer()
-        .with_target(false) // don’t show target (module path)
-        .with_level(true) // show log level
-        .pretty(); // human-friendly, with colors
+    let tree_layer = HierarchicalLayer::new(2)
+        .with_targets(true)
+        .with_bracketed_fields(true);
 
     tracing_subscriber::registry()
         .with(filter)
-        .with(console_layer)
+        .with(tree_layer)
         .try_init()
         .ok();
 }

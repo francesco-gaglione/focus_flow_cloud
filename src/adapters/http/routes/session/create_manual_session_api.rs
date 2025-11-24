@@ -14,6 +14,7 @@ use validator::Validate;
     post,
     path = "/api/focus-sessions/manual",
     tag = SESSION_TAG,
+    summary = "Create a manual focus session",
     request_body = CreateManualSessionDto,
     responses(
         (status = 201, description = "Session created successfully", body = CreateManualSessionResponseDto),

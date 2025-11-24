@@ -10,6 +10,7 @@ use validator::Validate;
     delete,
     path = "/api/tasks",
     tag = TASK_TAG,
+    summary = "Delete one or more tasks",
     request_body = DeleteTasksDto,
     responses(
         (status = 200, description = "Tasks deleted successfully", body = DeleteTasksResponseDto),

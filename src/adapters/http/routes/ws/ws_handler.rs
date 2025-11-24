@@ -1,14 +1,15 @@
+use crate::adapters::http::request_id::RequestId;
 use axum::{
     extract::{
         ws::{Message, WebSocket, WebSocketUpgrade},
-        State,
+        Extension, State,
     },
     response::{IntoResponse, Response},
 };
 use futures_util::{SinkExt, StreamExt};
 use serde_json;
 use tokio::sync::Mutex;
-use tracing::{debug, error, warn};
+use tracing::{debug, error, warn, Instrument};
 use validator::Validate;
 
 use crate::adapters::http::{
@@ -26,12 +27,16 @@ use crate::adapters::http::{
     },
 };
 
-pub async fn session_handler(ws: WebSocketUpgrade, State(state): State<AppState>) -> Response {
-    ws.on_upgrade(move |socket| handle_socket(socket, state))
+pub async fn session_handler(
+    ws: WebSocketUpgrade,
+    State(state): State<AppState>,
+    Extension(request_id): Extension<RequestId>,
+) -> Response {
+    ws.on_upgrade(move |socket| handle_socket(socket, state, request_id))
         .into_response()
 }
 
-async fn handle_socket(ws: WebSocket, state: AppState) {
+async fn handle_socket(ws: WebSocket, state: AppState, request_id: RequestId) {
     static NEXT_ID: Mutex<usize> = Mutex::const_new(0);
 
     let my_id = {
@@ -41,315 +46,325 @@ async fn handle_socket(ws: WebSocket, state: AppState) {
         id
     };
 
-    debug!("Client {} connected", my_id);
+    let span =
+        tracing::info_span!("websocket-connection", request_id = %request_id, client_id = my_id);
+    async move {
+        debug!("Client connected");
 
-    let (mut sender_ws, mut receiver_ws) = ws.split();
-    let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel();
+        let (mut sender_ws, mut receiver_ws) = ws.split();
+        let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel();
 
-    state.ws_clients.write().await.insert(my_id, tx.clone());
+        state.ws_clients.write().await.insert(my_id, tx.clone());
 
-    let send_task = tokio::spawn(async move {
-        while let Some(msg) = rx.recv().await {
-            if sender_ws.send(msg).await.is_err() {
-                debug!("Failed to send message to client, connection closed");
-                break;
+        let send_task = tokio::spawn(async move {
+            while let Some(msg) = rx.recv().await {
+                if sender_ws.send(msg).await.is_err() {
+                    debug!("Failed to send message to client, connection closed");
+                    break;
+                }
             }
-        }
-    });
+        });
 
-    let clients_clone = state.ws_clients.clone();
-    let tx_clone = tx.clone();
+        let clients_clone = state.ws_clients.clone();
+        let tx_clone = tx.clone();
 
-    let state_for_receive = state.clone();
+        let state_for_receive = state.clone();
 
-    let receive_task = tokio::spawn(async move {
-        while let Some(result) = receiver_ws.next().await {
-            match result {
-                Ok(Message::Text(text)) => {
-                    debug!("Client {} received: {}", my_id, text);
+        let receive_task = tokio::spawn(async move {
+            while let Some(result) = receiver_ws.next().await {
+                match result {
+                    Ok(Message::Text(text)) => {
+                        debug!("Received: {}", text);
 
-                    match serde_json::from_str::<WsClientRequest>(&text) {
-                        Ok(ws_request) => {
-                            let request_id = ws_request.request_id.clone();
+                        match serde_json::from_str::<WsClientRequest>(&text) {
+                            Ok(ws_request) => {
+                                let request_id = ws_request.request_id.clone();
 
-                            if let Err(validation_errors) = validate_message(&ws_request.message) {
-                                error!(
-                                    "Validation failed for client {}: {}",
-                                    my_id, validation_errors
-                                );
+                                if let Err(validation_errors) =
+                                    validate_message(&ws_request.message)
+                                {
+                                    error!("Validation failed: {}", validation_errors);
+
+                                    send_error_to_client(
+                                        &tx_clone,
+                                        "VALIDATION_ERROR",
+                                        validation_errors.as_ref(),
+                                        request_id,
+                                    )
+                                    .await;
+                                    continue;
+                                }
+
+                                match &ws_request.message {
+                                    ClientMessage::RequestSync => {
+                                        match sync_pomodoro_state(&state_for_receive).await {
+                                            Ok(msg) => {
+                                                send_sync_to_client(&tx_clone, msg).await;
+                                            }
+                                            Err(e) => {
+                                                error!("Failed to sync clients: {:?}", e);
+                                                send_error_to_client(
+                                                    &tx_clone,
+                                                    "ERROR",
+                                                    e.as_ref(),
+                                                    request_id,
+                                                )
+                                                .await;
+                                            }
+                                        }
+                                    }
+                                    ClientMessage::UpdatePomodoroContext(context) => {
+                                        match update_pomodoro_context(context, &state_for_receive)
+                                            .await
+                                        {
+                                            Ok(msg) => {
+                                                debug!("Workspace updated: {:?}", msg);
+
+                                                send_success_to_client(
+                                                    &tx_clone,
+                                                    "Workspace updated",
+                                                    request_id.clone(),
+                                                )
+                                                .await;
+
+                                                broadcast_message(
+                                                    &clients_clone,
+                                                    my_id,
+                                                    &BroadcastEvent::PomodoroSessionUpdate(msg),
+                                                    true,
+                                                )
+                                                .await;
+                                            }
+                                            Err(e) => {
+                                                error!("Failed to update workspace: {:?}", e);
+                                                send_error_to_client(
+                                                    &tx_clone,
+                                                    "ERROR",
+                                                    e.as_ref(),
+                                                    request_id,
+                                                )
+                                                .await;
+                                            }
+                                        }
+                                    }
+                                    ClientMessage::StartEvent => {
+                                        match handle_start_event(&state_for_receive).await {
+                                            Ok(msg) => {
+                                                debug!("Session started: {:?}", msg);
+
+                                                send_success_to_client(
+                                                    &tx_clone,
+                                                    "Session started",
+                                                    request_id.clone(),
+                                                )
+                                                .await;
+
+                                                broadcast_message(
+                                                    &clients_clone,
+                                                    my_id,
+                                                    &BroadcastEvent::PomodoroSessionUpdate(msg),
+                                                    true,
+                                                )
+                                                .await;
+                                            }
+                                            Err(e) => {
+                                                error!("Failed to start session: {:?}", e);
+                                                send_error_to_client(
+                                                    &tx_clone,
+                                                    "ERROR",
+                                                    e.as_ref(),
+                                                    request_id,
+                                                )
+                                                .await;
+                                            }
+                                        }
+                                    }
+                                    ClientMessage::BreakEvent => {
+                                        match handle_break_event(&state_for_receive).await {
+                                            Ok(msg) => {
+                                                debug!("Break session started: {:?}", msg);
+
+                                                send_success_to_client(
+                                                    &tx_clone,
+                                                    "Break session started",
+                                                    request_id.clone(),
+                                                )
+                                                .await;
+
+                                                broadcast_message(
+                                                    &clients_clone,
+                                                    my_id,
+                                                    &BroadcastEvent::PomodoroSessionUpdate(msg),
+                                                    true,
+                                                )
+                                                .await;
+                                            }
+                                            Err(e) => {
+                                                error!("Failed to start break session: {:?}", e);
+                                                send_error_to_client(
+                                                    &tx_clone,
+                                                    "ERROR",
+                                                    e.as_ref(),
+                                                    request_id,
+                                                )
+                                                .await;
+                                            }
+                                        }
+                                    }
+                                    ClientMessage::TerminateEvent => {
+                                        match handle_terminate_event(&state_for_receive).await {
+                                            Ok(msg) => {
+                                                debug!("Session terminated");
+
+                                                send_success_to_client(
+                                                    &tx_clone,
+                                                    "Session terminated",
+                                                    request_id.clone(),
+                                                )
+                                                .await;
+
+                                                broadcast_message(
+                                                    &clients_clone,
+                                                    my_id,
+                                                    &BroadcastEvent::PomodoroSessionUpdate(msg),
+                                                    true,
+                                                )
+                                                .await;
+                                            }
+                                            Err(e) => {
+                                                error!("Failed to terminate session: {:?}", e);
+                                                send_error_to_client(
+                                                    &tx_clone,
+                                                    "ERROR",
+                                                    e.as_ref(),
+                                                    request_id,
+                                                )
+                                                .await;
+                                            }
+                                        }
+                                    }
+                                    ClientMessage::UpdateNote(note_update_dto) => {
+                                        match note_update(note_update_dto, &state_for_receive).await
+                                        {
+                                            Ok(msg) => {
+                                                debug!("Note updated");
+
+                                                send_success_to_client(
+                                                    &tx_clone,
+                                                    "Note updated",
+                                                    request_id.clone(),
+                                                )
+                                                .await;
+
+                                                broadcast_message(
+                                                    &clients_clone,
+                                                    my_id,
+                                                    &BroadcastEvent::PomodoroSessionUpdate(msg),
+                                                    false,
+                                                )
+                                                .await;
+                                            }
+                                            Err(e) => {
+                                                error!("Failed to update note: {}", e);
+                                                send_error_to_client(
+                                                    &tx_clone,
+                                                    "ERROR",
+                                                    e.as_ref(),
+                                                    request_id,
+                                                )
+                                                .await;
+                                            }
+                                        }
+                                    }
+                                    ClientMessage::UpdateConcentrationScore(
+                                        update_concentration_score,
+                                    ) => {
+                                        match handle_update_concentration_score(
+                                            update_concentration_score,
+                                            &state_for_receive,
+                                        )
+                                        .await
+                                        {
+                                            Ok(msg) => {
+                                                debug!("Concentration score updated");
+
+                                                send_success_to_client(
+                                                    &tx_clone,
+                                                    "Concentration score updated",
+                                                    request_id.clone(),
+                                                )
+                                                .await;
+
+                                                broadcast_message(
+                                                    &clients_clone,
+                                                    my_id,
+                                                    &BroadcastEvent::PomodoroSessionUpdate(msg),
+                                                    true,
+                                                )
+                                                .await;
+                                            }
+                                            Err(e) => {
+                                                error!(
+                                                    "Failed to update concentration score: {}",
+                                                    e
+                                                );
+                                                send_error_to_client(
+                                                    &tx_clone,
+                                                    "ERROR",
+                                                    e.as_ref(),
+                                                    request_id,
+                                                )
+                                                .await;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            Err(e) => {
+                                error!("Failed to parse JSON from client: {}", e);
 
                                 send_error_to_client(
                                     &tx_clone,
-                                    "VALIDATION_ERROR",
-                                    validation_errors.as_ref(),
-                                    request_id,
+                                    "PARSE_ERROR",
+                                    "Failed to parse request",
+                                    None,
                                 )
                                 .await;
-                                continue;
                             }
-
-                            match &ws_request.message {
-                                ClientMessage::RequestSync => {
-                                    match sync_pomodoro_state(&state_for_receive).await {
-                                        Ok(msg) => {
-                                            send_sync_to_client(&tx_clone, msg).await;
-                                        }
-                                        Err(e) => {
-                                            error!("Failed to sync clients: {:?}", e);
-                                            send_error_to_client(
-                                                &tx_clone,
-                                                "ERROR",
-                                                e.as_ref(),
-                                                request_id,
-                                            )
-                                            .await;
-                                        }
-                                    }
-                                }
-                                ClientMessage::UpdatePomodoroContext(context) => {
-                                    match update_pomodoro_context(context, &state_for_receive).await
-                                    {
-                                        Ok(msg) => {
-                                            debug!("Workspace updated: {:?}", msg);
-
-                                            send_success_to_client(
-                                                &tx_clone,
-                                                "Workspace updated",
-                                                request_id.clone(),
-                                            )
-                                            .await;
-
-                                            broadcast_message(
-                                                &clients_clone,
-                                                my_id,
-                                                &BroadcastEvent::PomodoroSessionUpdate(msg),
-                                                true,
-                                            )
-                                            .await;
-                                        }
-                                        Err(e) => {
-                                            error!("Failed to update workspace: {:?}", e);
-                                            send_error_to_client(
-                                                &tx_clone,
-                                                "ERROR",
-                                                e.as_ref(),
-                                                request_id,
-                                            )
-                                            .await;
-                                        }
-                                    }
-                                }
-                                ClientMessage::StartEvent => {
-                                    match handle_start_event(&state_for_receive).await {
-                                        Ok(msg) => {
-                                            debug!("Session started: {:?}", msg);
-
-                                            send_success_to_client(
-                                                &tx_clone,
-                                                "Session started",
-                                                request_id.clone(),
-                                            )
-                                            .await;
-
-                                            broadcast_message(
-                                                &clients_clone,
-                                                my_id,
-                                                &BroadcastEvent::PomodoroSessionUpdate(msg),
-                                                true,
-                                            )
-                                            .await;
-                                        }
-                                        Err(e) => {
-                                            error!("Failed to start session: {:?}", e);
-                                            send_error_to_client(
-                                                &tx_clone,
-                                                "ERROR",
-                                                e.as_ref(),
-                                                request_id,
-                                            )
-                                            .await;
-                                        }
-                                    }
-                                }
-                                ClientMessage::BreakEvent => {
-                                    match handle_break_event(&state_for_receive).await {
-                                        Ok(msg) => {
-                                            debug!("Break session started: {:?}", msg);
-
-                                            send_success_to_client(
-                                                &tx_clone,
-                                                "Break session started",
-                                                request_id.clone(),
-                                            )
-                                            .await;
-
-                                            broadcast_message(
-                                                &clients_clone,
-                                                my_id,
-                                                &BroadcastEvent::PomodoroSessionUpdate(msg),
-                                                true,
-                                            )
-                                            .await;
-                                        }
-                                        Err(e) => {
-                                            error!("Failed to start break session: {:?}", e);
-                                            send_error_to_client(
-                                                &tx_clone,
-                                                "ERROR",
-                                                e.as_ref(),
-                                                request_id,
-                                            )
-                                            .await;
-                                        }
-                                    }
-                                }
-                                ClientMessage::TerminateEvent => {
-                                    match handle_terminate_event(&state_for_receive).await {
-                                        Ok(msg) => {
-                                            debug!("Session terminated");
-
-                                            send_success_to_client(
-                                                &tx_clone,
-                                                "Session terminated",
-                                                request_id.clone(),
-                                            )
-                                            .await;
-
-                                            broadcast_message(
-                                                &clients_clone,
-                                                my_id,
-                                                &BroadcastEvent::PomodoroSessionUpdate(msg),
-                                                true,
-                                            )
-                                            .await;
-                                        }
-                                        Err(e) => {
-                                            error!("Failed to terminate session: {:?}", e);
-                                            send_error_to_client(
-                                                &tx_clone,
-                                                "ERROR",
-                                                e.as_ref(),
-                                                request_id,
-                                            )
-                                            .await;
-                                        }
-                                    }
-                                }
-                                ClientMessage::UpdateNote(note_update_dto) => {
-                                    match note_update(note_update_dto, &state_for_receive).await {
-                                        Ok(msg) => {
-                                            debug!("Note updated");
-
-                                            send_success_to_client(
-                                                &tx_clone,
-                                                "Note updated",
-                                                request_id.clone(),
-                                            )
-                                            .await;
-
-                                            broadcast_message(
-                                                &clients_clone,
-                                                my_id,
-                                                &BroadcastEvent::PomodoroSessionUpdate(msg),
-                                                false,
-                                            )
-                                            .await;
-                                        }
-                                        Err(e) => {
-                                            error!("Failed to update note: {}", e);
-                                            send_error_to_client(
-                                                &tx_clone,
-                                                "ERROR",
-                                                e.as_ref(),
-                                                request_id,
-                                            )
-                                            .await;
-                                        }
-                                    }
-                                }
-                                ClientMessage::UpdateConcentrationScore(
-                                    update_concentration_score,
-                                ) => {
-                                    match handle_update_concentration_score(
-                                        update_concentration_score,
-                                        &state_for_receive,
-                                    )
-                                    .await
-                                    {
-                                        Ok(msg) => {
-                                            debug!("Concentration score updated");
-
-                                            send_success_to_client(
-                                                &tx_clone,
-                                                "Concentration score updated",
-                                                request_id.clone(),
-                                            )
-                                            .await;
-
-                                            broadcast_message(
-                                                &clients_clone,
-                                                my_id,
-                                                &BroadcastEvent::PomodoroSessionUpdate(msg),
-                                                true,
-                                            )
-                                            .await;
-                                        }
-                                        Err(e) => {
-                                            error!("Failed to update concentration score: {}", e);
-                                            send_error_to_client(
-                                                &tx_clone,
-                                                "ERROR",
-                                                e.as_ref(),
-                                                request_id,
-                                            )
-                                            .await;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        Err(e) => {
-                            error!("Failed to parse JSON from client {}: {}", my_id, e);
-
-                            send_error_to_client(
-                                &tx_clone,
-                                "PARSE_ERROR",
-                                "Failed to parse request",
-                                None,
-                            )
-                            .await;
                         }
                     }
-                }
-                Ok(Message::Close(_)) => {
-                    debug!("Client {} requested close", my_id);
-                    break;
-                }
-                Ok(Message::Ping(_)) => {
-                    debug!("Received ping from client {}", my_id);
-                }
-                Ok(Message::Pong(_)) => {
-                    debug!("Received pong from client {}", my_id);
-                }
-                Err(e) => {
-                    error!("WebSocket error for client {}: {}", my_id, e);
-                    break;
-                }
-                _ => {
-                    warn!("Received unexpected message type from client {}", my_id);
+                    Ok(Message::Close(_)) => {
+                        debug!("Client requested close");
+                        break;
+                    }
+                    Ok(Message::Ping(_)) => {
+                        debug!("Received ping");
+                    }
+                    Ok(Message::Pong(_)) => {
+                        debug!("Received pong");
+                    }
+                    Err(e) => {
+                        error!("WebSocket error: {}", e);
+                        break;
+                    }
+                    _ => {
+                        warn!("Received unexpected message type");
+                    }
                 }
             }
+            debug!("Receive task ending");
+        });
+
+        tokio::select! {
+            _ = send_task => debug!("Send task completed"),
+            _ = receive_task => debug!("Receive task completed"),
         }
-        debug!("Receive task ending for client {}", my_id);
-    });
 
-    tokio::select! {
-        _ = send_task => debug!("Send task completed for client {}", my_id),
-        _ = receive_task => debug!("Receive task completed for client {}", my_id),
+        state.ws_clients.write().await.remove(&my_id);
+        debug!("Client disconnected");
     }
-
-    state.ws_clients.write().await.remove(&my_id);
-    debug!("Client {} disconnected", my_id);
+    .instrument(span)
+    .await
 }
 
 // ============================================

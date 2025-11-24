@@ -14,6 +14,7 @@ use validator::Validate;
     post,
     path = "/api/categories",
     tag = CATEGORY_TAG,
+    summary = "Create a new category",
     request_body = CreateCategoryDto,
     responses(
         (status = 200, description = "Category created successfully", body = CreateCategoryResponseDto),

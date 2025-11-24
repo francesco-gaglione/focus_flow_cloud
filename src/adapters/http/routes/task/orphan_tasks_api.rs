@@ -10,6 +10,7 @@ use axum::Json;
     get,
     path = "/api/tasks/orphans",
     tag = TASK_TAG,
+    summary = "Get all orphan tasks (tasks without a category)",
     responses(
         (status = 200, description = "Orphan tasks fetched successfully", body = OrphanTasksResponseDto),
         (status = 500, description = "Internal server error")

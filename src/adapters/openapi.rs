@@ -28,10 +28,10 @@ pub const STATS_TAG: &str = "Statistics";
         version = "0.1.0"
     ),
     tags(
-        (name = CATEGORY_TAG, description = "Category items management API"),
-        (name = TASK_TAG, description = "Task items management API"),
-        (name = SESSION_TAG, description = "Sessions items management API"),
-        (name = STATS_TAG, description = "Statistics management API")
+        (name = CATEGORY_TAG, description = "Endpoints for managing categories and their tasks"),
+        (name = TASK_TAG, description = "Endpoints for managing tasks"),
+        (name = SESSION_TAG, description = "Endpoints for managing focus sessions"),
+        (name = STATS_TAG, description = "Endpoints for retrieving statistics")
     ),
     paths(
         crate::adapters::http::routes::category::create_category_api::create_category_api,

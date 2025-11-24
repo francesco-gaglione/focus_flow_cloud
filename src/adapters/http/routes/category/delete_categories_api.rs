@@ -14,7 +14,8 @@ use validator::Validate;
     delete,
     path = "/api/categories/{id}",
     tag = CATEGORY_TAG,
-    description = "Delete a category and its tasks",
+    summary = "Delete a category by id",
+    description = "Delete a category and all its tasks by id",
     params(
         ("id" = String, Path, description = "Category ID to delete")
     ),

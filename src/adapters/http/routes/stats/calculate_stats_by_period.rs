@@ -11,6 +11,7 @@ use tracing::debug;
     get,
     path = "/api/stats/period",
     tag = STATS_TAG,
+    summary = "Get stats by period",
     params(
         GetStatsByPeriodDto
     ),

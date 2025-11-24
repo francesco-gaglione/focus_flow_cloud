@@ -15,6 +15,7 @@ use validator::Validate;
     put,
     path = "/api/categories/{id}",
     tag = CATEGORY_TAG,
+    summary = "Update a category",
     params(
         ("id" = String, Path, description = "Category ID to update")
     ),

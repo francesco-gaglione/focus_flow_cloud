@@ -11,6 +11,7 @@ use validator::Validate;
     post,
     path = "/api/tasks",
     tag = TASK_TAG,
+    summary = "Create a new task",
     request_body = CreateTaskDto,
     responses(
         (status = 201, description = "Task created successfully", body = CreateTaskResponseDto),

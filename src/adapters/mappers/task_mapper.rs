@@ -134,7 +134,7 @@ mod tests {
 
     #[test]
     fn test_timestamp_to_naive_date_invalid() {
-        let timestamp = -1; // Invalid timestamp
+        let timestamp = i64::MAX; // Invalid timestamp
         let result = TaskMapper::timestamp_to_naive_date(Some(timestamp));
         assert!(result.is_err());
     }

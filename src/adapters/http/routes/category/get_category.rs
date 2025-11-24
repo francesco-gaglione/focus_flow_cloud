@@ -10,6 +10,10 @@ use axum::Json;
     get,
     path = "/api/categories/{id}",
     tag = CATEGORY_TAG,
+    summary = "Get a category by id",
+    params(
+        ("id" = String, Path, description = "Category ID")
+    ),
     responses(
         (status = 200, description = "Category", body = GetCategoryResponseDto),
         (status = 500, description = "Internal server error")

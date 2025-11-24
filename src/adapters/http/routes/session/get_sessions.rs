@@ -17,6 +17,7 @@ use tracing::debug;
     get,
     path = "/api/focus-sessions",
     tag = SESSION_TAG,
+    summary = "Get focus sessions by filters",
     params(
         GetSessionFiltersDto
     ),

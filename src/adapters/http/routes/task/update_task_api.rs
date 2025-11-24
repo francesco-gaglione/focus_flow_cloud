@@ -14,6 +14,7 @@ use validator::Validate;
     put,
     path = "/api/tasks/{id}",
     tag = TASK_TAG,
+    summary = "Update a task",
     params(
         ("id" = String, Path, description = "Task ID to update")
     ),

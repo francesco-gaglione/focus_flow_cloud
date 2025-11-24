@@ -11,6 +11,7 @@ use axum::Json;
     get,
     path = "/api/categories",
     tag = CATEGORY_TAG,
+    summary = "Get all categories and their tasks",
     responses(
         (status = 200, description = "Category list", body = GetCategoriesResponseDto),
         (status = 500, description = "Internal server error")
