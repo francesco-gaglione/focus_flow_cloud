@@ -85,3 +85,10 @@ CREATE INDEX IF NOT EXISTS idx_sessions_started_at
 
 CREATE INDEX IF NOT EXISTS idx_sessions_concentration
     ON focus_session (concentration_score) WHERE concentration_score IS NOT NULL;
+
+-- User preferences table
+CREATE TABLE IF NOT EXISTS user_preferences (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL UNIQUE,
+    preferences JSONB NOT NULL
+);
