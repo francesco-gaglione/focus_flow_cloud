@@ -1,6 +1,6 @@
 # FocusFlow Cloud
 
-[![Build Status](https://github.com/francesco-gaglione/focusflow-cloud/actions/workflows/docker-build.yml/badge.svg)](https://github.com/francesco-gaglione/focusflow-cloud/actions)
+[![Build Status](https://github.com/francesco-gaglione/focus_flow_cloud/actions/workflows/docker-build.yml/badge.svg)](https://github.com/francesco-gaglione/focus_flow_cloud/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 A Pomodoro technique tracking backend service built with Rust. I created this application for my personal use to track my focus sessions and productivity, and decided to share it in case others might find it useful.
