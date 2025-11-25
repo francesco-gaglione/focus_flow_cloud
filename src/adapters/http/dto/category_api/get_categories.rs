@@ -5,5 +5,5 @@ use utoipa::ToSchema;
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct GetCategoriesResponseDto {
-    pub categories: Vec<CategoryDto>
+    pub categories: Vec<CategoryDto>,
 }

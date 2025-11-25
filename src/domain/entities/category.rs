@@ -33,5 +33,4 @@ impl Category {
     pub fn color(&self) -> &str {
         &self.color
     }
-    
 }

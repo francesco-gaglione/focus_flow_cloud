@@ -19,7 +19,7 @@ impl SessionTypeEnum {
         }
     }
 
-    pub fn from_str(s: &str) -> Option<Self> {
+    pub fn from_text(s: &str) -> Option<Self> {
         match s {
             "work" => Some(SessionTypeEnum::Work),
             "short_break" => Some(SessionTypeEnum::ShortBreak),

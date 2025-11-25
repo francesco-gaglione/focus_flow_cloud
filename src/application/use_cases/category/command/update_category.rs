@@ -1,4 +1,3 @@
-
 #[derive(Debug, Clone)]
 pub struct UpdateCategoryCommand {
     pub id: uuid::Uuid,

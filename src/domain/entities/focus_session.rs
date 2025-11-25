@@ -17,6 +17,7 @@ pub struct FocusSession {
 }
 
 impl FocusSession {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         category_id: Option<Uuid>,
         task_id: Option<Uuid>,
@@ -42,6 +43,7 @@ impl FocusSession {
         }
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub fn new_with_id(
         id: Uuid,
         category_id: Option<Uuid>,

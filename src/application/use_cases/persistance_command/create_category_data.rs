@@ -1,4 +1,3 @@
-
 #[derive(Debug, Clone)]
 pub struct CreateCategoryData {
     pub name: String,

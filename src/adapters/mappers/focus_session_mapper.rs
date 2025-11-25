@@ -6,7 +6,10 @@ use crate::{
         common::{focus_session::FocusSessionDto, session_type_enum::SessionTypeEnum},
         session_api::create_manual_session::CreateManualSessionDto,
     },
-    application::{app_error::{AppError, AppResult}, use_cases::focus_session::command::create_manual_session::CreateManualFocusSessionCommand},
+    application::{
+        app_error::{AppError, AppResult},
+        use_cases::focus_session::command::create_manual_session::CreateManualFocusSessionCommand,
+    },
     domain::entities::{focus_session::FocusSession, focus_session_type::FocusSessionType},
 };
 

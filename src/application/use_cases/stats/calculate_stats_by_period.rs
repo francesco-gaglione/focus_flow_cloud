@@ -248,7 +248,7 @@ impl CalculateStatsByPeriodUseCase {
             })
             .collect();
 
-        distribution.sort_by(|a, b| b.total_focus_time().cmp(&a.total_focus_time()));
+        distribution.sort_by_key(|b| std::cmp::Reverse(b.total_focus_time()));
 
         Ok(distribution)
     }
@@ -308,7 +308,7 @@ impl CalculateStatsByPeriodUseCase {
             })
             .collect();
 
-        distribution.sort_by(|a, b| b.total_focus_time().cmp(&a.total_focus_time()));
+        distribution.sort_by_key(|b| std::cmp::Reverse(b.total_focus_time()));
 
         Ok(distribution)
     }
@@ -369,8 +369,7 @@ impl CalculateStatsByPeriodUseCase {
                     })
                     .collect();
 
-                category_distribution
-                    .sort_by(|a, b| b.total_focus_time().cmp(&a.total_focus_time()));
+                category_distribution.sort_by_key(|b| std::cmp::Reverse(b.total_focus_time()));
 
                 DailyActivityItem::new(date, category_distribution)
             })

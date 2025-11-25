@@ -24,4 +24,3 @@ impl UpdatePomodoroContext {
         self.task_id.clone()
     }
 }
-
