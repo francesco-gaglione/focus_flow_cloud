@@ -2,7 +2,9 @@ name: PR Master
 
 on:
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
+  push:
+    branches: ["master"]
 
 env:
   CARGO_TERM_COLOR: always
