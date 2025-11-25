@@ -18,16 +18,16 @@ pub struct FocusSessionMapper;
 impl FocusSessionMapper {
     pub fn to_dto(session: &FocusSession) -> FocusSessionDto {
         FocusSessionDto {
-            id: session.id.to_string(),
-            category_id: session.category_id.map(|id| id.to_string()),
-            task_id: session.task_id.map(|id| id.to_string()),
-            session_type: SessionTypeEnum::from(session.session_type.clone()),
-            actual_duration: session.actual_duration,
-            concentration_score: session.concentration_score,
-            notes: session.notes.clone(),
-            started_at: session.started_at.timestamp(),
-            ended_at: session.ended_at.map(|dt| dt.timestamp()),
-            created_at: session.created_at.timestamp(),
+            id: session.id().to_string(),
+            category_id: session.category_id().map(|id| id.to_string()),
+            task_id: session.task_id().map(|id| id.to_string()),
+            session_type: SessionTypeEnum::from(session.session_type().clone()),
+            actual_duration: session.actual_duration(),
+            concentration_score: session.concentration_score(),
+            notes: session.notes().clone(),
+            started_at: session.started_at().timestamp(),
+            ended_at: session.ended_at().map(|dt| dt.timestamp()),
+            created_at: session.created_at().timestamp(),
         }
     }
 

@@ -107,7 +107,7 @@ impl FocusSessionUseCases {
 
 #[cfg(test)]
 mod focus_session_use_cases_tests {
-    use chrono::{DateTime, Utc};
+    use chrono::DateTime;
     use std::sync::Arc;
     use uuid::Uuid;
 
@@ -139,18 +139,18 @@ mod focus_session_use_cases_tests {
         let started_at = DateTime::from_timestamp(1761118663, 0).unwrap();
         let ended_at = DateTime::from_timestamp(1761118714, 0).unwrap();
 
-        let focus_session = FocusSession {
+        let focus_session = FocusSession::new_with_id(
             id,
-            category_id: Some(category_id),
-            task_id: Some(task_id),
-            session_type: FocusSessionType::Work,
-            actual_duration: Some(51), // ended_at - started_at in seconds
-            concentration_score: Some(3),
-            notes: Some("notes".to_string()),
+            Some(category_id),
+            Some(task_id),
+            FocusSessionType::Work,
+            Some(51),
+            Some(3),
+            Some("note".to_string()),
             started_at,
-            ended_at: Some(ended_at),
-            created_at: started_at,
-        };
+            Some(ended_at),
+            started_at,
+        );
 
         mock_session_persistence
             .expect_create_session()
@@ -172,8 +172,8 @@ mod focus_session_use_cases_tests {
         let result = use_cases.create_session(cmd).await;
         assert!(result.is_ok());
         let session = result.unwrap();
-        assert_eq!(session.id, id);
-        assert_eq!(session.actual_duration, Some(51));
+        assert_eq!(session.id(), id);
+        assert_eq!(session.actual_duration(), Some(51));
     }
 
     #[tokio::test]
@@ -216,18 +216,18 @@ mod focus_session_use_cases_tests {
         let ended_at = DateTime::from_timestamp(1761118714, 0).unwrap();
         let duration = ended_at.timestamp() - started_at.timestamp();
 
-        let focus_session = FocusSession {
+        let focus_session = FocusSession::new_with_id(
             id,
-            category_id: Some(category_id),
-            task_id: Some(task_id),
-            session_type: FocusSessionType::Work,
-            actual_duration: Some(duration),
-            concentration_score: Some(4),
-            notes: Some("manual session notes".to_string()),
+            Some(category_id),
+            Some(task_id),
+            FocusSessionType::Work,
+            Some(duration),
+            Some(4),
+            Some("manual session notes".to_string()),
             started_at,
-            ended_at: Some(ended_at),
-            created_at: started_at,
-        };
+            Some(ended_at),
+            started_at,
+        );
 
         mock_session_persistence
             .expect_create_manual_session()
@@ -248,8 +248,8 @@ mod focus_session_use_cases_tests {
         let result = use_cases.create_manual_session(cmd).await;
         assert!(result.is_ok());
         let session = result.unwrap();
-        assert_eq!(session.actual_duration, Some(duration));
-        assert_eq!(session.concentration_score, Some(4));
+        assert_eq!(session.actual_duration(), Some(duration));
+        assert_eq!(session.concentration_score(), Some(4));
     }
 
     #[tokio::test]
@@ -290,18 +290,18 @@ mod focus_session_use_cases_tests {
         let started_at = DateTime::from_timestamp(1761118663, 0).unwrap();
         let ended_at = DateTime::from_timestamp(1761118714, 0).unwrap();
 
-        let focus_session = FocusSession {
-            id: session_id,
-            category_id: Some(category_id),
-            task_id: Some(task_id),
-            session_type: FocusSessionType::Work,
-            actual_duration: Some(51),
-            concentration_score: Some(5),
-            notes: Some("filtered session".to_string()),
+        let focus_session = FocusSession::new_with_id(
+            session_id,
+            Some(category_id),
+            Some(task_id),
+            FocusSessionType::Work,
+            Some(51),
+            Some(5),
+            Some("note".to_string()),
             started_at,
-            ended_at: Some(ended_at),
-            created_at: started_at,
-        };
+            Some(ended_at),
+            started_at,
+        );
 
         mock_session_persistence
             .expect_find_by_filters()
@@ -323,8 +323,8 @@ mod focus_session_use_cases_tests {
         assert!(result.is_ok());
         let sessions = result.unwrap();
         assert_eq!(sessions.len(), 1);
-        assert_eq!(sessions[0].id, session_id);
-        assert_eq!(sessions[0].concentration_score, Some(5));
+        assert_eq!(sessions[0].id(), session_id);
+        assert_eq!(sessions[0].concentration_score(), Some(5));
     }
 
     #[tokio::test]

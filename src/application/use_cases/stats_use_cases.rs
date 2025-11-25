@@ -65,16 +65,19 @@ impl StatsUseCases {
 
         let (work_sessions, break_sessions): (Vec<_>, Vec<_>) = sessions
             .iter()
-            .partition(|s| s.session_type == FocusSessionType::Work);
+            .partition(|s| s.session_type() == FocusSessionType::Work);
 
         let total_sessions = work_sessions.len();
         let total_breaks = break_sessions.len();
 
-        let total_focus_time: i64 = work_sessions.iter().filter_map(|s| s.actual_duration).sum();
+        let total_focus_time: i64 = work_sessions
+            .iter()
+            .filter_map(|s| s.actual_duration())
+            .sum();
 
         let total_break_time: i64 = break_sessions
             .iter()
-            .filter_map(|s| s.actual_duration)
+            .filter_map(|s| s.actual_duration())
             .sum();
 
         let daily_activity = if is_multi_day {
@@ -83,19 +86,18 @@ impl StatsUseCases {
             Vec::new()
         };
 
-        Ok(Stats {
+        Ok(Stats::new(
             total_sessions,
             total_breaks,
             total_focus_time,
             total_break_time,
-            most_concentrated_period: Self::calculate_most_concentrated_period(&sessions),
-            less_concentrated_period: Self::calculate_least_concentrated_period(&sessions),
-            concentration_distribution: Self::calculate_concentration_distribution(&sessions)
-                .into(),
-            category_distribution: self.calculate_category_distribution(&sessions).await?,
-            task_distribution: self.calculate_task_distribution(&sessions).await?,
+            Self::calculate_most_concentrated_period(&sessions),
+            Self::calculate_least_concentrated_period(&sessions),
+            Self::calculate_concentration_distribution(&sessions),
+            self.calculate_category_distribution(&sessions).await?,
+            self.calculate_task_distribution(&sessions).await?,
             daily_activity,
-        })
+        ))
     }
 
     fn is_multi_day_period(
@@ -114,8 +116,8 @@ impl StatsUseCases {
     fn calculate_most_concentrated_period(sessions: &[FocusSession]) -> ConcentrationPeriod {
         let (morning_total, morning_count, afternoon_total, afternoon_count) =
             sessions.iter().fold((0, 0, 0, 0), |acc, session| {
-                if let Some(score) = session.concentration_score {
-                    let hour = session.started_at.hour();
+                if let Some(score) = session.concentration_score() {
+                    let hour = session.started_at().hour();
                     if hour < 12 {
                         (acc.0 + score, acc.1 + 1, acc.2, acc.3)
                     } else {
@@ -148,8 +150,8 @@ impl StatsUseCases {
     fn calculate_least_concentrated_period(sessions: &[FocusSession]) -> ConcentrationPeriod {
         let (morning_total, morning_count, afternoon_total, afternoon_count) =
             sessions.iter().fold((0, 0, 0, 0), |acc, session| {
-                if let Some(score) = session.concentration_score {
-                    let hour = session.started_at.hour();
+                if let Some(score) = session.concentration_score() {
+                    let hour = session.started_at().hour();
                     if hour < 12 {
                         (acc.0 + score, acc.1 + 1, acc.2, acc.3)
                     } else {
@@ -183,7 +185,7 @@ impl StatsUseCases {
         let mut distribution = [0u32; 5];
 
         for session in sessions {
-            if let Some(score) = session.concentration_score {
+            if let Some(score) = session.concentration_score() {
                 if (1..=5).contains(&score) {
                     distribution[score as usize] += 1;
                 }
@@ -202,7 +204,7 @@ impl StatsUseCases {
 
         for session in sessions {
             if let (Some(category_id), Some(duration)) =
-                (session.category_id, session.actual_duration)
+                (session.category_id(), session.actual_duration())
             {
                 *category_times.entry(category_id).or_insert(0) += duration;
                 total_time += duration;
@@ -229,18 +231,18 @@ impl StatsUseCases {
                             0.0
                         };
 
-                        CategoryDistributionItem {
-                            category_name: category.name,
-                            category_id: category.id,
+                        CategoryDistributionItem::new(
+                            category.name().to_string(),
+                            category.id(),
                             total_focus_time,
                             percentage,
-                        }
+                        )
                     })
                 })
             })
             .collect();
 
-        distribution.sort_by(|a, b| b.total_focus_time.cmp(&a.total_focus_time));
+        distribution.sort_by(|a, b| b.total_focus_time().cmp(&a.total_focus_time()));
 
         Ok(distribution)
     }
@@ -253,7 +255,8 @@ impl StatsUseCases {
         let mut total_time: i64 = 0;
 
         for session in sessions {
-            if let (Some(task_id), Some(duration)) = (session.task_id, session.actual_duration) {
+            if let (Some(task_id), Some(duration)) = (session.task_id(), session.actual_duration())
+            {
                 *task_times.entry(task_id).or_insert(0) += duration;
                 total_time += duration;
             }
@@ -263,12 +266,14 @@ impl StatsUseCases {
             .keys()
             .map(|task_id| async move {
                 let task = self.task_persistence.find_by_id(*task_id).await?;
-                let category_name = if let Some(category_id) = task.category_id {
+
+                let category_name = if let Some(category_id) = task.category_id() {
                     let category = self.category_persistence.find_by_id(category_id).await?;
-                    Some(category.name)
+                    Some(category.name().to_string())
                 } else {
                     None
                 };
+
                 Ok::<_, crate::application::app_error::AppError>((task, category_name))
             })
             .collect();
@@ -286,18 +291,18 @@ impl StatsUseCases {
                         0.0
                     };
 
-                    TaskDistributionItem {
+                    TaskDistributionItem::new(
                         category_name,
-                        category_id: task.category_id,
-                        task_name: task.name,
+                        task.category_id(),
+                        task.name().to_string(),
                         total_focus_time,
                         percentage,
-                    }
+                    )
                 })
             })
             .collect();
 
-        distribution.sort_by(|a, b| b.total_focus_time.cmp(&a.total_focus_time));
+        distribution.sort_by(|a, b| b.total_focus_time().cmp(&a.total_focus_time()));
 
         Ok(distribution)
     }
@@ -310,9 +315,9 @@ impl StatsUseCases {
 
         for session in sessions {
             if let (Some(category_id), Some(duration)) =
-                (session.category_id, session.actual_duration)
+                (session.category_id(), session.actual_duration())
             {
-                let date = session.started_at.date_naive();
+                let date = session.started_at().date_naive();
                 daily_data
                     .entry(date)
                     .or_default()
@@ -339,7 +344,7 @@ impl StatsUseCases {
         let category_names: HashMap<Uuid, String> = unique_category_ids
             .into_iter()
             .zip(categories)
-            .filter_map(|(id, result)| result.ok().map(|cat| (id, cat.name)))
+            .filter_map(|(id, result)| result.ok().map(|cat| (id, cat.name().to_string())))
             .collect();
 
         let mut daily_activity: Vec<DailyActivityItem> = daily_data
@@ -348,26 +353,24 @@ impl StatsUseCases {
                 let mut category_distribution: Vec<DailyActivityDistributionItem> = categories
                     .into_iter()
                     .filter_map(|(category_id, total_focus_time)| {
-                        category_names
-                            .get(&category_id)
-                            .map(|name| DailyActivityDistributionItem {
-                                category_name: name.clone(),
+                        category_names.get(&category_id).map(|name| {
+                            DailyActivityDistributionItem::new(
+                                name.clone(),
                                 category_id,
                                 total_focus_time,
-                            })
+                            )
+                        })
                     })
                     .collect();
 
-                category_distribution.sort_by(|a, b| b.total_focus_time.cmp(&a.total_focus_time));
+                category_distribution
+                    .sort_by(|a, b| b.total_focus_time().cmp(&a.total_focus_time()));
 
-                DailyActivityItem {
-                    date,
-                    category_distribution,
-                }
+                DailyActivityItem::new(date, category_distribution)
             })
             .collect();
 
-        daily_activity.sort_by(|a, b| a.date.cmp(&b.date));
+        daily_activity.sort_by(|a, b| a.date().cmp(&b.date()));
 
         Ok(daily_activity)
     }

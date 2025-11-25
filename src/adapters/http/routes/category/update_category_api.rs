@@ -54,10 +54,10 @@ pub async fn update_category_api(
 
     Ok(Json(UpdateCategoryResponseDto {
         updated_category: CategoryDto {
-            id: category.id.to_string(),
-            name: category.name,
-            description: category.description,
-            color: category.color,
+            id: category.id().to_string(),
+            name: category.name().to_string(),
+            description: category.description().map(|s| s.to_string()),
+            color: category.color().to_string(),
             tasks: Vec::new(), //TODO should return tasks?
         },
     }))

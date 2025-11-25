@@ -54,13 +54,13 @@ impl From<CreateTaskData> for NewDbTask {
 impl From<Task> for DbTask {
     fn from(value: Task) -> Self {
         Self {
-            id: value.id,
-            category_id: value.category_id,
-            name: value.name,
-            description: value.description,
-            scheduled_date: value.scheduled_date,
+            id: value.id(),
+            category_id: value.category_id(),
+            name: value.name().to_string(),
+            description: value.description().map(|s| s.to_string()),
+            scheduled_date: value.scheduled_date(),
             created_at: Default::default(),
-            completed_at: value.completed_at,
+            completed_at: value.completed_at(),
             deleted_at: None,
         }
     }
@@ -69,25 +69,25 @@ impl From<Task> for DbTask {
 impl From<Task> for UpdateDbTask {
     fn from(value: Task) -> Self {
         Self {
-            category_id: value.category_id,
-            name: Some(value.name),
-            description: value.description,
-            scheduled_date: value.scheduled_date,
-            completed_at: value.completed_at,
+            category_id: value.category_id(),
+            name: Some(value.name().to_string()),
+            description: value.description().map(|s| s.to_string()),
+            scheduled_date: value.scheduled_date(),
+            completed_at: value.completed_at(),
         }
     }
 }
 
 impl From<DbTask> for Task {
     fn from(value: DbTask) -> Self {
-        Self {
-            id: value.id,
-            category_id: value.category_id,
-            name: value.name,
-            description: value.description,
-            scheduled_date: value.scheduled_date,
-            completed_at: value.completed_at,
-        }
+        Self::new(
+            value.id,
+            value.category_id,
+            value.name,
+            value.description,
+            value.scheduled_date,
+            value.completed_at,
+        )
     }
 }
 

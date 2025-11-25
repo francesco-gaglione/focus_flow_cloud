@@ -48,7 +48,7 @@ impl CategoryUseCases {
         let mut categories_with_tasks: Vec<CategoryWithTasks> = Vec::new();
 
         for c in &mut categories {
-            let tasks = self.task_persistence.find_by_category_id(c.id).await?;
+            let tasks = self.task_persistence.find_by_category_id(c.id()).await?;
             categories_with_tasks.push(CategoryWithTasks {
                 category: c.clone(),
                 tasks,
@@ -203,21 +203,21 @@ mod category_use_cases_tests {
         let mut mock_task_persistence = MockTaskPersistence::new();
 
         let category_id = Uuid::new_v4();
-        let category = Category {
-            id: category_id,
-            name: "Work".to_string(),
-            description: Some("Work related tasks".to_string()),
-            color: "#FF5733".to_string(),
-        };
+        let category = Category::new(
+            category_id,
+            "Work".to_string(),
+            Some("Work related tasks".to_string()),
+            "#FF5733".to_string(),
+        );
 
-        let task1 = Task {
-            id: Uuid::new_v4(),
-            name: "Task 1".to_string(),
-            description: Some("First task".to_string()),
-            category_id: Some(category_id),
-            scheduled_date: NaiveDate::from_ymd_opt(2025, 12, 20),
-            completed_at: None,
-        };
+        let task1 = Task::new(
+            Uuid::new_v4(),
+            Some(category_id),
+            "Task 1".to_string(),
+            Some("First task".to_string()),
+            NaiveDate::from_ymd_opt(2025, 12, 20),
+            Some(chrono::Utc::now()),
+        );
 
         mock_category_persistence
             .expect_find_all()
@@ -248,21 +248,21 @@ mod category_use_cases_tests {
         let mut mock_task_persistence = MockTaskPersistence::new();
 
         let category_id = Uuid::new_v4();
-        let category = Category {
-            id: category_id,
-            name: "Work".to_string(),
-            description: Some("Work related tasks".to_string()),
-            color: "#FF5733".to_string(),
-        };
+        let category = Category::new(
+            category_id,
+            "Work".to_string(),
+            Some("Work related tasks".to_string()),
+            "#FF5733".to_string(),
+        );
 
-        let orphan_task = Task {
-            id: Uuid::new_v4(),
-            name: "Orphan Task".to_string(),
-            description: Some("Task without category".to_string()),
-            category_id: None,
-            scheduled_date: NaiveDate::from_ymd_opt(2025, 12, 20),
-            completed_at: Some(chrono::Utc::now()),
-        };
+        let orphan_task = Task::new(
+            Uuid::new_v4(),
+            None,
+            "Orphan Task".to_string(),
+            Some("Task without category".to_string()),
+            NaiveDate::from_ymd_opt(2025, 12, 20),
+            Some(chrono::Utc::now()),
+        );
 
         mock_category_persistence
             .expect_find_all()
@@ -293,12 +293,12 @@ mod category_use_cases_tests {
         let mock_task_persistence = MockTaskPersistence::new();
 
         let category_id = Uuid::new_v4();
-        let updated_category = Category {
-            id: category_id,
-            name: "Updated Work".to_string(),
-            description: Some("Updated description".to_string()),
-            color: "#000000".to_string(),
-        };
+        let updated_category = Category::new(
+            category_id,
+            "Updated Work".to_string(),
+            Some("Updated description".to_string()),
+            "#000000".to_string(),
+        );
 
         mock_category_persistence
             .expect_update_category()
@@ -321,7 +321,7 @@ mod category_use_cases_tests {
         };
 
         let result = use_case.update_category(cmd).await.unwrap();
-        assert_eq!(result.name, "Updated Work");
+        assert_eq!(result.name(), "Updated Work");
     }
 
     #[tokio::test]

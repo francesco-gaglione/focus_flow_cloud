@@ -3,16 +3,85 @@ use uuid::Uuid;
 
 #[derive(Debug, Clone)]
 pub struct Stats {
-    pub total_sessions: usize,
-    pub total_breaks: usize,
-    pub total_focus_time: i64,
-    pub total_break_time: i64,
-    pub most_concentrated_period: ConcentrationPeriod,
-    pub less_concentrated_period: ConcentrationPeriod,
-    pub concentration_distribution: [u32; 5], // vec of 5 elements rapresenting the number of session of each 5 rating
-    pub category_distribution: Vec<CategoryDistributionItem>,
-    pub task_distribution: Vec<TaskDistributionItem>,
-    pub daily_activity: Vec<DailyActivityItem>,
+    total_sessions: usize,
+    total_breaks: usize,
+    total_focus_time: i64,
+    total_break_time: i64,
+    most_concentrated_period: ConcentrationPeriod,
+    less_concentrated_period: ConcentrationPeriod,
+    concentration_distribution: [u32; 5],
+    category_distribution: Vec<CategoryDistributionItem>,
+    task_distribution: Vec<TaskDistributionItem>,
+    daily_activity: Vec<DailyActivityItem>,
+}
+
+impl Stats {
+    #[allow(clippy::too_many_arguments)]
+    pub fn new(
+        total_sessions: usize,
+        total_breaks: usize,
+        total_focus_time: i64,
+        total_break_time: i64,
+        most_concentrated_period: ConcentrationPeriod,
+        less_concentrated_period: ConcentrationPeriod,
+        concentration_distribution: [u32; 5],
+        category_distribution: Vec<CategoryDistributionItem>,
+        task_distribution: Vec<TaskDistributionItem>,
+        daily_activity: Vec<DailyActivityItem>,
+    ) -> Self {
+        Self {
+            total_sessions,
+            total_breaks,
+            total_focus_time,
+            total_break_time,
+            most_concentrated_period,
+            less_concentrated_period,
+            concentration_distribution,
+            category_distribution,
+            task_distribution,
+            daily_activity,
+        }
+    }
+
+    pub fn total_sessions(&self) -> usize {
+        self.total_sessions
+    }
+
+    pub fn total_breaks(&self) -> usize {
+        self.total_breaks
+    }
+
+    pub fn total_focus_time(&self) -> i64 {
+        self.total_focus_time
+    }
+
+    pub fn total_break_time(&self) -> i64 {
+        self.total_break_time
+    }
+
+    pub fn most_concentrated_period(&self) -> &ConcentrationPeriod {
+        &self.most_concentrated_period
+    }
+
+    pub fn less_concentrated_period(&self) -> &ConcentrationPeriod {
+        &self.less_concentrated_period
+    }
+
+    pub fn concentration_distribution(&self) -> &[u32; 5] {
+        &self.concentration_distribution
+    }
+
+    pub fn category_distribution(&self) -> &[CategoryDistributionItem] {
+        &self.category_distribution
+    }
+
+    pub fn task_distribution(&self) -> &[TaskDistributionItem] {
+        &self.task_distribution
+    }
+
+    pub fn daily_activity(&self) -> &[DailyActivityItem] {
+        &self.daily_activity
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -23,30 +92,139 @@ pub enum ConcentrationPeriod {
 
 #[derive(Debug, Clone)]
 pub struct CategoryDistributionItem {
-    pub category_name: String,
-    pub category_id: Uuid,
-    pub total_focus_time: i64,
-    pub percentage: f32,
+    category_name: String,
+    category_id: Uuid,
+    total_focus_time: i64,
+    percentage: f32,
+}
+
+impl CategoryDistributionItem {
+    pub fn new(
+        category_name: String,
+        category_id: Uuid,
+        total_focus_time: i64,
+        percentage: f32,
+    ) -> Self {
+        Self {
+            category_name,
+            category_id,
+            total_focus_time,
+            percentage,
+        }
+    }
+
+    pub fn category_name(&self) -> &str {
+        &self.category_name
+    }
+
+    pub fn category_id(&self) -> Uuid {
+        self.category_id
+    }
+
+    pub fn total_focus_time(&self) -> i64 {
+        self.total_focus_time
+    }
+
+    pub fn percentage(&self) -> f32 {
+        self.percentage
+    }
 }
 
 #[derive(Debug, Clone)]
 pub struct TaskDistributionItem {
-    pub category_name: Option<String>,
-    pub category_id: Option<Uuid>,
-    pub task_name: String,
-    pub total_focus_time: i64,
-    pub percentage: f32,
+    category_name: Option<String>,
+    category_id: Option<Uuid>,
+    task_name: String,
+    total_focus_time: i64,
+    percentage: f32,
+}
+
+impl TaskDistributionItem {
+    pub fn new(
+        category_name: Option<String>,
+        category_id: Option<Uuid>,
+        task_name: String,
+        total_focus_time: i64,
+        percentage: f32,
+    ) -> Self {
+        Self {
+            category_name,
+            category_id,
+            task_name,
+            total_focus_time,
+            percentage,
+        }
+    }
+
+    pub fn category_name(&self) -> Option<&str> {
+        self.category_name.as_deref()
+    }
+
+    pub fn category_id(&self) -> Option<Uuid> {
+        self.category_id
+    }
+
+    pub fn task_name(&self) -> &str {
+        &self.task_name
+    }
+
+    pub fn total_focus_time(&self) -> i64 {
+        self.total_focus_time
+    }
+
+    pub fn percentage(&self) -> f32 {
+        self.percentage
+    }
 }
 
 #[derive(Debug, Clone)]
 pub struct DailyActivityItem {
-    pub date: NaiveDate,
-    pub category_distribution: Vec<DailyActivityDistributionItem>,
+    date: NaiveDate,
+    category_distribution: Vec<DailyActivityDistributionItem>,
+}
+
+impl DailyActivityItem {
+    pub fn new(date: NaiveDate, category_distribution: Vec<DailyActivityDistributionItem>) -> Self {
+        Self {
+            date,
+            category_distribution,
+        }
+    }
+
+    pub fn date(&self) -> NaiveDate {
+        self.date
+    }
+
+    pub fn category_distribution(&self) -> &[DailyActivityDistributionItem] {
+        &self.category_distribution
+    }
 }
 
 #[derive(Debug, Clone)]
 pub struct DailyActivityDistributionItem {
-    pub category_name: String,
-    pub category_id: Uuid,
-    pub total_focus_time: i64,
+    category_name: String,
+    category_id: Uuid,
+    total_focus_time: i64,
+}
+
+impl DailyActivityDistributionItem {
+    pub fn new(category_name: String, category_id: Uuid, total_focus_time: i64) -> Self {
+        Self {
+            category_name,
+            category_id,
+            total_focus_time,
+        }
+    }
+
+    pub fn category_name(&self) -> &str {
+        &self.category_name
+    }
+
+    pub fn category_id(&self) -> Uuid {
+        self.category_id
+    }
+
+    pub fn total_focus_time(&self) -> i64 {
+        self.total_focus_time
+    }
 }

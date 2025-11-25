@@ -59,12 +59,12 @@ impl TaskMapper {
     /// Convert domain Task entity to TaskDto for HTTP responses
     pub fn entity_to_dto(task: Task) -> TaskDto {
         TaskDto {
-            id: task.id.to_string(),
-            category_id: task.category_id.map(|id| id.to_string()),
-            name: task.name,
-            description: task.description,
-            scheduled_date: Self::naive_date_to_timestamp(task.scheduled_date),
-            completed_at: task.completed_at.map(|dt| dt.timestamp()),
+            id: task.id().to_string(),
+            category_id: task.category_id().map(|id| id.to_string()),
+            name: task.name().to_string(),
+            description: task.description().map(|s| s.to_string()),
+            scheduled_date: Self::naive_date_to_timestamp(task.scheduled_date()),
+            completed_at: task.completed_at().map(|dt| dt.timestamp()),
         }
     }
 

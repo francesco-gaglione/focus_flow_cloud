@@ -38,6 +38,6 @@ pub async fn create_manual_session_api(
         .await?;
 
     Ok(Json(CreateManualSessionResponseDto {
-        id: res.id.to_string(),
+        id: res.id().to_string(),
     }))
 }

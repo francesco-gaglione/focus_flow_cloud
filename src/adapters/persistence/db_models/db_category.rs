@@ -60,11 +60,6 @@ impl From<UpdateCategoryData> for UpdateDbCategory {
 
 impl From<DbCategory> for Category {
     fn from(value: DbCategory) -> Self {
-        Self {
-            id: value.id,
-            name: value.name,
-            description: value.description,
-            color: value.color,
-        }
+        Self::new(value.id, value.name, value.description, value.color)
     }
 }

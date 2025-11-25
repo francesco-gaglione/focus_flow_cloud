@@ -30,10 +30,10 @@ pub async fn get_categories_and_tasks_api(
             .category_with_tasks
             .into_iter()
             .map(|c| CategoryDto {
-                id: c.category.id.to_string(),
-                name: c.category.name,
-                description: c.category.description,
-                color: c.category.color,
+                id: c.category.id().to_string(),
+                name: c.category.name().to_string(),
+                description: c.category.description().map(|s| s.to_string()),
+                color: c.category.color().to_string(),
                 tasks: TaskMapper::entities_to_dtos(c.tasks),
             })
             .collect(),

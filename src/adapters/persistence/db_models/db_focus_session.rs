@@ -50,18 +50,18 @@ pub struct UpdateDbFocusSession {
 
 impl From<DbFocusSession> for FocusSession {
     fn from(value: DbFocusSession) -> Self {
-        Self {
-            id: value.id,
-            category_id: value.category_id,
-            task_id: value.task_id,
-            session_type: FocusSessionType::from_str(&value.session_type).unwrap(),
-            actual_duration: value.actual_duration,
-            concentration_score: value.concentration_score,
-            notes: value.notes,
-            started_at: value.started_at,
-            ended_at: value.ended_at,
-            created_at: value.created_at,
-        }
+        Self::new_with_id(
+            value.id,
+            value.category_id,
+            value.task_id,
+            FocusSessionType::from_str(&value.session_type).unwrap(),
+            value.actual_duration,
+            value.concentration_score,
+            value.notes,
+            value.started_at,
+            value.ended_at,
+            value.created_at,
+        )
     }
 }
 

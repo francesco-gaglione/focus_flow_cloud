@@ -73,25 +73,28 @@ pub struct DailyActivityDistributionDto {
 impl From<Stats> for GetStatsByPeriodResponseDto {
     fn from(stats: Stats) -> Self {
         Self {
-            total_sessions: stats.total_sessions,
-            total_breaks: stats.total_breaks,
-            total_focus_time: stats.total_focus_time,
-            total_break_time: stats.total_break_time,
-            most_concentrated_period: stats.most_concentrated_period.into(),
-            less_concentrated_period: stats.less_concentrated_period.into(),
-            concentration_distribution: stats.concentration_distribution,
+            total_sessions: stats.total_sessions(),
+            total_breaks: stats.total_breaks(),
+            total_focus_time: stats.total_focus_time(),
+            total_break_time: stats.total_break_time(),
+            most_concentrated_period: stats.most_concentrated_period().clone().into(),
+            less_concentrated_period: stats.less_concentrated_period().clone().into(),
+            concentration_distribution: *stats.concentration_distribution(),
             category_distribution: stats
-                .category_distribution
+                .category_distribution()
+                .to_vec()
                 .into_iter()
                 .map(|item| item.into())
                 .collect(),
             task_distribution: stats
-                .task_distribution
+                .task_distribution()
+                .to_vec()
                 .into_iter()
                 .map(|item| item.into())
                 .collect(),
             daily_activity: stats
-                .daily_activity
+                .daily_activity()
+                .to_vec()
                 .into_iter()
                 .map(|item| item.into())
                 .collect(),
@@ -111,10 +114,10 @@ impl From<ConcentrationPeriod> for ConcentrationPeriodDto {
 impl From<CategoryDistributionItem> for CategoryDistributionDto {
     fn from(item: CategoryDistributionItem) -> Self {
         Self {
-            category_name: item.category_name,
-            category_id: item.category_id.to_string(),
-            total_focus_time: item.total_focus_time,
-            percentage: item.percentage,
+            category_name: item.category_name().to_string(),
+            category_id: item.category_id().to_string(),
+            total_focus_time: item.total_focus_time(),
+            percentage: item.percentage(),
         }
     }
 }
@@ -122,11 +125,11 @@ impl From<CategoryDistributionItem> for CategoryDistributionDto {
 impl From<TaskDistributionItem> for TaskDistributionDto {
     fn from(item: TaskDistributionItem) -> Self {
         Self {
-            category_name: item.category_name,
-            category_id: item.category_id.map(|id| id.to_string()),
-            task_name: item.task_name,
-            total_focus_time: item.total_focus_time,
-            percentage: item.percentage,
+            category_name: item.category_name().map(|s| s.to_string()),
+            category_id: item.category_id().map(|id| id.to_string()),
+            task_name: item.task_name().to_string(),
+            total_focus_time: item.total_focus_time(),
+            percentage: item.percentage(),
         }
     }
 }
@@ -135,13 +138,14 @@ impl From<DailyActivityItem> for DailyActivityDto {
     fn from(item: DailyActivityItem) -> Self {
         Self {
             date: item
-                .date
+                .date()
                 .and_hms_opt(0, 0, 0)
                 .unwrap()
                 .and_utc()
                 .timestamp(),
             category_distribution: item
-                .category_distribution
+                .category_distribution()
+                .to_vec()
                 .into_iter()
                 .map(|dist| dist.into())
                 .collect(),
@@ -152,9 +156,9 @@ impl From<DailyActivityItem> for DailyActivityDto {
 impl From<DailyActivityDistributionItem> for DailyActivityDistributionDto {
     fn from(item: DailyActivityDistributionItem) -> Self {
         Self {
-            category_name: item.category_name,
-            category_id: item.category_id.to_string(),
-            total_focus_time: item.total_focus_time,
+            category_name: item.category_name().to_string(),
+            category_id: item.category_id().to_string(),
+            total_focus_time: item.total_focus_time(),
         }
     }
 }
