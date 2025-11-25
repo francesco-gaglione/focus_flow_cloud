@@ -1,8 +1,8 @@
 use crate::adapters::http::app_state::AppState;
 use crate::adapters::http::dto::category_api::get_category::GetCategoryResponseDto;
 use crate::adapters::http::dto::common::category_dto::CategoryDto;
+use crate::adapters::http_error::{HttpError, HttpResult};
 use crate::adapters::openapi::CATEGORY_TAG;
-use crate::application::app_error::{AppError, AppResult};
 use axum::extract::{Path, State};
 use axum::Json;
 
@@ -22,10 +22,10 @@ use axum::Json;
 pub async fn get_category(
     State(state): State<AppState>,
     Path(id): Path<String>,
-) -> AppResult<Json<GetCategoryResponseDto>> {
+) -> HttpResult<Json<GetCategoryResponseDto>> {
     let id = id
         .parse()
-        .map_err(|_| AppError::Database("Invalid id".to_string()))?;
+        .map_err(|_| HttpError::BadRequest("Invalid id".to_string()))?;
     let category = state.category_use_cases.get_category(id).await?;
 
     let response = GetCategoryResponseDto {

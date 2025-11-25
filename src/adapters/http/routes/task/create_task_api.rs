@@ -1,8 +1,8 @@
 use crate::adapters::http::app_state::AppState;
 use crate::adapters::http::dto::task_api::create_task::{CreateTaskDto, CreateTaskResponseDto};
+use crate::adapters::http_error::{HttpError, HttpResult};
 use crate::adapters::mappers::task_mapper::TaskMapper;
 use crate::adapters::openapi::TASK_TAG;
-use crate::application::app_error::{AppError, AppResult};
 use axum::extract::State;
 use axum::Json;
 use validator::Validate;
@@ -23,10 +23,10 @@ use validator::Validate;
 pub async fn create_task_api(
     State(state): State<AppState>,
     Json(payload): Json<CreateTaskDto>,
-) -> AppResult<Json<CreateTaskResponseDto>> {
+) -> HttpResult<Json<CreateTaskResponseDto>> {
     payload
         .validate()
-        .map_err(|e| AppError::BadRequest(e.to_string()))?;
+        .map_err(|e| HttpError::BadRequest(e.to_string()))?;
 
     let command = TaskMapper::create_dto_to_command(payload)?;
 

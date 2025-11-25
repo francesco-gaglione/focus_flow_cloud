@@ -20,7 +20,7 @@ pub async fn handle_start_event(state: &AppState) -> Result<UpdatePomodoroState,
     match session_state.current_session() {
         Some(current_session) => match current_session.session_type() {
             SessionTypeEnum::Work => {
-                return Err("Work session already running cannot start a new session".to_string());
+                Err("Work session already running cannot start a new session".to_string())
             }
             _ => {
                 session_state.close_current_session(Utc::now().timestamp())?;
@@ -55,7 +55,7 @@ pub async fn handle_start_event(state: &AppState) -> Result<UpdatePomodoroState,
                     task_id,
                 );
 
-                return Ok(UpdatePomodoroState::from(session_state.clone()));
+                Ok(UpdatePomodoroState::from(session_state.clone()))
             }
         },
         None => {
@@ -68,7 +68,7 @@ pub async fn handle_start_event(state: &AppState) -> Result<UpdatePomodoroState,
                 category_id,
                 task_id,
             );
-            return Ok(UpdatePomodoroState::from(session_state.clone()));
+            Ok(UpdatePomodoroState::from(session_state.clone()))
         }
     }
 }

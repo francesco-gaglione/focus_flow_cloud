@@ -1,8 +1,8 @@
 use crate::adapters::http::app_state::AppState;
 use crate::adapters::http::dto::task_api::orphan_tasks::OrphanTasksResponseDto;
+use crate::adapters::http_error::HttpResult;
 use crate::adapters::mappers::task_mapper::TaskMapper;
 use crate::adapters::openapi::TASK_TAG;
-use crate::application::app_error::AppResult;
 use axum::extract::State;
 use axum::Json;
 
@@ -18,7 +18,7 @@ use axum::Json;
 )]
 pub async fn fetch_orphan_tasks_api(
     State(state): State<AppState>,
-) -> AppResult<Json<OrphanTasksResponseDto>> {
+) -> HttpResult<Json<OrphanTasksResponseDto>> {
     let res = state.task_use_cases.orphan_tasks().await?;
     Ok(Json(OrphanTasksResponseDto {
         orphan_tasks: res

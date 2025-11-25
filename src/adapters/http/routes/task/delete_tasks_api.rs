@@ -1,7 +1,7 @@
 use crate::adapters::http::app_state::AppState;
 use crate::adapters::http::dto::task_api::delete_task::{DeleteTasksDto, DeleteTasksResponseDto};
+use crate::adapters::http_error::{HttpError, HttpResult};
 use crate::adapters::openapi::TASK_TAG;
-use crate::application::app_error::{AppError, AppResult};
 use axum::extract::State;
 use axum::Json;
 use validator::Validate;
@@ -21,10 +21,10 @@ use validator::Validate;
 pub async fn delete_tasks_api(
     State(state): State<AppState>,
     Json(payload): Json<DeleteTasksDto>,
-) -> AppResult<Json<DeleteTasksResponseDto>> {
+) -> HttpResult<Json<DeleteTasksResponseDto>> {
     payload
         .validate()
-        .map_err(|e| AppError::BadRequest(e.to_string()))?;
+        .map_err(|e| HttpError::BadRequest(e.to_string()))?;
 
     let res = state
         .task_use_cases
@@ -37,10 +37,10 @@ pub async fn delete_tasks_api(
         )
         .await?;
 
-    match res.len() > 0 {
+    match !res.is_empty() {
         true => Ok(Json(DeleteTasksResponseDto {
             deleted_ids: res.iter().map(|id| id.to_string()).collect(),
         })),
-        false => Err(AppError::GenericError("Tasks not delted".to_string())),
+        false => Err(HttpError::GenericError("Tasks not delted".to_string())),
     }
 }

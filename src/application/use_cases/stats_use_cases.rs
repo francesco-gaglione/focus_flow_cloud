@@ -370,7 +370,7 @@ impl StatsUseCases {
             })
             .collect();
 
-        daily_activity.sort_by(|a, b| a.date().cmp(&b.date()));
+        daily_activity.sort_by_key(|a| a.date());
 
         Ok(daily_activity)
     }

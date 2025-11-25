@@ -2,8 +2,8 @@ use crate::adapters::http::app_state::AppState;
 use crate::adapters::http::dto::category_api::delete_categories::{
     DeleteCategoriesDto, DeleteCategoriesResponseDto,
 };
+use crate::adapters::http_error::{HttpError, HttpResult};
 use crate::adapters::openapi::CATEGORY_TAG;
-use crate::application::app_error::{AppError, AppResult};
 use axum::extract::{Path, State};
 use axum::Json;
 use tracing::{debug, error};
@@ -28,14 +28,14 @@ use validator::Validate;
 pub async fn delete_categories_api(
     State(state): State<AppState>,
     Path(payload): Path<DeleteCategoriesDto>,
-) -> AppResult<Json<DeleteCategoriesResponseDto>> {
+) -> HttpResult<Json<DeleteCategoriesResponseDto>> {
     payload
         .validate()
-        .map_err(|e| AppError::BadRequest(e.to_string()))?;
+        .map_err(|e| HttpError::BadRequest(e.to_string()))?;
 
     let category_id = Uuid::parse_str(&payload.id).map_err(|e| {
         error!("Invalid category ID: {}", e);
-        AppError::BadRequest("Invalid id".to_string())
+        HttpError::BadRequest("Invalid id".to_string())
     })?;
 
     let category_ids = vec![category_id];

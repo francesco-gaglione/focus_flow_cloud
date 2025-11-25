@@ -3,8 +3,8 @@ use crate::adapters::http::dto::category_api::update_category::{
     UpdateCategoryDto, UpdateCategoryPathDto, UpdateCategoryResponseDto,
 };
 use crate::adapters::http::dto::common::category_dto::CategoryDto;
+use crate::adapters::http_error::{HttpError, HttpResult};
 use crate::adapters::openapi::CATEGORY_TAG;
-use crate::application::app_error::{AppError, AppResult};
 use crate::application::use_cases::commands::update_category::UpdateCategoryCommand;
 use axum::extract::{Path, State};
 use axum::Json;
@@ -31,16 +31,16 @@ pub async fn update_category_api(
     State(state): State<AppState>,
     Path(path): Path<UpdateCategoryPathDto>,
     Json(payload): Json<UpdateCategoryDto>,
-) -> AppResult<Json<UpdateCategoryResponseDto>> {
+) -> HttpResult<Json<UpdateCategoryResponseDto>> {
     path.validate()
-        .map_err(|e| AppError::BadRequest(e.to_string()))?;
+        .map_err(|e| HttpError::BadRequest(e.to_string()))?;
 
     payload
         .validate()
-        .map_err(|e| AppError::BadRequest(e.to_string()))?;
+        .map_err(|e| HttpError::BadRequest(e.to_string()))?;
 
     let category_id = Uuid::parse_str(&path.id)
-        .map_err(|_| AppError::BadRequest("Category id malformed".to_string()))?;
+        .map_err(|_| HttpError::BadRequest("Category id malformed".to_string()))?;
 
     let category = state
         .category_use_cases

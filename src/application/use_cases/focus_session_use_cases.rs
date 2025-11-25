@@ -30,8 +30,7 @@ impl FocusSessionUseCases {
         let start_date = match filters.date_range.as_ref() {
             Some(r) => Some(
                 DateTime::from_timestamp_secs(r.start_date)
-                    .ok_or_else(|| AppError::BadRequest("Invalid start date".to_string()))?
-                    .into(),
+                    .ok_or_else(|| AppError::BadRequest("Invalid start date".to_string()))?,
             ),
             None => None,
         };
@@ -39,8 +38,7 @@ impl FocusSessionUseCases {
         let end_date = match filters.date_range.as_ref() {
             Some(r) => Some(
                 DateTime::from_timestamp_secs(r.end_date)
-                    .ok_or_else(|| AppError::BadRequest("Invalid end date".to_string()))?
-                    .into(),
+                    .ok_or_else(|| AppError::BadRequest("Invalid end date".to_string()))?,
             ),
             None => None,
         };
@@ -73,7 +71,7 @@ impl FocusSessionUseCases {
         let manual_session_data = CreateManualSessionData {
             task_id: session.task_id,
             category_id: session.category_id,
-            session_type: session.session_type.clone(),
+            session_type: session.session_type,
             concentration_score: session.concentration_score,
             notes: session.notes.clone(),
             actual_duration: duration,
@@ -93,7 +91,7 @@ impl FocusSessionUseCases {
         let session_data = CreateSessionData {
             task_id: session.task_id,
             category_id: session.category_id,
-            session_type: session.session_type.clone(),
+            session_type: session.session_type,
             concentration_score: session.concentration_score,
             notes: session.notes.clone(),
             actual_duration: session.actual_duration,

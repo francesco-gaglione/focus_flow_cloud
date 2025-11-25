@@ -21,7 +21,7 @@ impl FocusSessionMapper {
             id: session.id().to_string(),
             category_id: session.category_id().map(|id| id.to_string()),
             task_id: session.task_id().map(|id| id.to_string()),
-            session_type: SessionTypeEnum::from(session.session_type().clone()),
+            session_type: SessionTypeEnum::from(session.session_type()),
             actual_duration: session.actual_duration(),
             concentration_score: session.concentration_score(),
             notes: session.notes().clone(),

@@ -1,9 +1,9 @@
 use crate::adapters::http::app_state::AppState;
 use crate::adapters::http::dto::category_api::get_categories::GetCategoriesResponseDto;
 use crate::adapters::http::dto::common::category_dto::CategoryDto;
+use crate::adapters::http_error::HttpResult;
 use crate::adapters::mappers::task_mapper::TaskMapper;
 use crate::adapters::openapi::CATEGORY_TAG;
-use crate::application::app_error::AppResult;
 use axum::extract::State;
 use axum::Json;
 
@@ -19,7 +19,7 @@ use axum::Json;
 )]
 pub async fn get_categories_and_tasks_api(
     State(state): State<AppState>,
-) -> AppResult<Json<GetCategoriesResponseDto>> {
+) -> HttpResult<Json<GetCategoriesResponseDto>> {
     let categories_and_tasks = state
         .category_use_cases
         .get_all_category_and_tasks()

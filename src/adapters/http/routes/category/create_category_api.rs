@@ -2,8 +2,8 @@ use crate::adapters::http::app_state::AppState;
 use crate::adapters::http::dto::category_api::create_category::{
     CreateCategoryDto, CreateCategoryResponseDto,
 };
+use crate::adapters::http_error::{HttpError, HttpResult};
 use crate::adapters::openapi::CATEGORY_TAG;
-use crate::application::app_error::{AppError, AppResult};
 use crate::application::use_cases::commands::create_category::CreateCategoryCommand;
 use axum::extract::State;
 use axum::Json;
@@ -26,11 +26,11 @@ use validator::Validate;
 pub async fn create_category_api(
     State(state): State<AppState>,
     Json(payload): Json<CreateCategoryDto>,
-) -> AppResult<Json<CreateCategoryResponseDto>> {
+) -> HttpResult<Json<CreateCategoryResponseDto>> {
     debug!("{:?}", payload);
     payload
         .validate()
-        .map_err(|e| AppError::BadRequest(e.to_string()))?;
+        .map_err(|e| HttpError::BadRequest(e.to_string()))?;
 
     state
         .category_use_cases

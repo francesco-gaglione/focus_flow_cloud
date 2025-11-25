@@ -15,7 +15,7 @@ pub async fn update_pomodoro_context(
     let pomodoro_state = state.pomodoro_state.clone();
     let mut state = pomodoro_state.write().await;
 
-    if let Some(ref current_session) = state.current_session() {
+    if let Some(current_session) = state.current_session() {
         if current_session.is_work_session() {
             return Err("Cannot change workspace if session is running".to_string());
         }

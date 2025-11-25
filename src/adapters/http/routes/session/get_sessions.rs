@@ -2,9 +2,9 @@ use crate::adapters::http::app_state::AppState;
 use crate::adapters::http::dto::session_api::get_sessions::{
     GetSessionFiltersDto, GetSessionFiltersResponseDto,
 };
+use crate::adapters::http_error::{HttpError, HttpResult};
 use crate::adapters::mappers::focus_session_mapper::FocusSessionMapper;
 use crate::adapters::openapi::SESSION_TAG;
-use crate::application::app_error::{AppError, AppResult};
 use crate::application::use_cases::commands::find_session_filters::{
     ConcentrationScoreFilter, FindSessionFiltersCommand, FocusSessionDateFilter,
 };
@@ -30,13 +30,13 @@ use tracing::debug;
 pub async fn get_sessions(
     State(state): State<AppState>,
     query: Query<GetSessionFiltersDto>,
-) -> AppResult<Json<GetSessionFiltersResponseDto>> {
+) -> HttpResult<Json<GetSessionFiltersResponseDto>> {
     debug!("query: {:?}", query);
 
     if (query.start_date.is_some() && query.end_date.is_none())
         || (query.start_date.is_none() && query.end_date.is_some())
     {
-        return Err(AppError::BadRequest(
+        return Err(HttpError::BadRequest(
             "Both start and end date should be set, or none of them".to_string(),
         ));
     }
@@ -44,7 +44,7 @@ pub async fn get_sessions(
     if (query.min_concentration_score.is_some() && query.max_concentration_score.is_none())
         || (query.min_concentration_score.is_none() && query.max_concentration_score.is_some())
     {
-        return Err(AppError::BadRequest(
+        return Err(HttpError::BadRequest(
             "Both min and max concentration score should be set, or none of them".to_string(),
         ));
     }
@@ -55,7 +55,7 @@ pub async fn get_sessions(
             end_date: end,
         }),
         (None, None) => None,
-        _ => return Err(AppError::GenericError("Invalid state error".to_string())),
+        _ => return Err(HttpError::GenericError("Invalid state error".to_string())),
     };
 
     let concentration_score_range =
@@ -68,7 +68,7 @@ pub async fn get_sessions(
     let session_type = match &query.session_type {
         Some(t) => Some(
             FocusSessionType::from_str(t.as_str())
-                .ok_or_else(|| AppError::BadRequest("Invalid session type".to_string()))?,
+                .ok_or_else(|| HttpError::BadRequest("Invalid session type".to_string()))?,
         ),
         None => None,
     };

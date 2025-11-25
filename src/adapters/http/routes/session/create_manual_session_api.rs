@@ -2,9 +2,9 @@ use crate::adapters::http::app_state::AppState;
 use crate::adapters::http::dto::session_api::create_manual_session::{
     CreateManualSessionDto, CreateManualSessionResponseDto,
 };
+use crate::adapters::http_error::{HttpError, HttpResult};
 use crate::adapters::mappers::focus_session_mapper::FocusSessionMapper;
 use crate::adapters::openapi::SESSION_TAG;
-use crate::application::app_error::{AppError, AppResult};
 use axum::extract::State;
 use axum::Json;
 use tracing::debug;
@@ -26,11 +26,11 @@ use validator::Validate;
 pub async fn create_manual_session_api(
     State(state): State<AppState>,
     Json(payload): Json<CreateManualSessionDto>,
-) -> AppResult<Json<CreateManualSessionResponseDto>> {
+) -> HttpResult<Json<CreateManualSessionResponseDto>> {
     debug!("{:?}", payload);
     payload
         .validate()
-        .map_err(|e| AppError::BadRequest(e.to_string()))?;
+        .map_err(|e| HttpError::BadRequest(e.to_string()))?;
 
     let res = state
         .focus_session_use_cases

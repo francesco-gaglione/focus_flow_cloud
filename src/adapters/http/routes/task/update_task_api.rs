@@ -2,9 +2,9 @@ use crate::adapters::http::app_state::AppState;
 use crate::adapters::http::dto::task_api::update_task::{
     UpdateTaskDto, UpdateTaskPathDto, UpdateTaskResponseDto,
 };
+use crate::adapters::http_error::{HttpError, HttpResult};
 use crate::adapters::mappers::task_mapper::TaskMapper;
 use crate::adapters::openapi::TASK_TAG;
-use crate::application::app_error::{AppError, AppResult};
 use axum::extract::{Path, State};
 use axum::Json;
 use uuid::Uuid;
@@ -30,16 +30,16 @@ pub async fn update_task_api(
     State(state): State<AppState>,
     Path(path): Path<UpdateTaskPathDto>,
     Json(payload): Json<UpdateTaskDto>,
-) -> AppResult<Json<UpdateTaskResponseDto>> {
+) -> HttpResult<Json<UpdateTaskResponseDto>> {
     path.validate()
-        .map_err(|e| AppError::BadRequest(e.to_string()))?;
+        .map_err(|e| HttpError::BadRequest(e.to_string()))?;
 
     payload
         .validate()
-        .map_err(|e| AppError::BadRequest(e.to_string()))?;
+        .map_err(|e| HttpError::BadRequest(e.to_string()))?;
 
     let task_id = Uuid::parse_str(&path.id)
-        .map_err(|_| AppError::BadRequest("Task id malformed".to_string()))?;
+        .map_err(|_| HttpError::BadRequest("Task id malformed".to_string()))?;
 
     let command = TaskMapper::update_dto_to_command(task_id, payload)?;
 
