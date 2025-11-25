@@ -1,8 +1,8 @@
-use crate::adapters::persistence::PostgresPersistence;
 use crate::adapters::persistence::db_models::db_task::{DbTask, NewDbTask, UpdateDbTask};
+use crate::adapters::persistence::PostgresPersistence;
 use crate::adapters::schema;
 use crate::application::app_error::{AppError, AppResult};
-use crate::application::traits::TaskPersistence;
+use crate::application::traits::task_persistence::TaskPersistence;
 use crate::application::use_cases::persistance_command::create_task_data::CreateTaskData;
 use crate::application::use_cases::persistance_command::update_task_data::UpdateTaskData;
 use crate::domain::entities::task::Task;

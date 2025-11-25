@@ -1,10 +1,10 @@
-use crate::adapters::persistence::PostgresPersistence;
 use crate::adapters::persistence::db_models::db_category::{
     DbCategory, NewDbCategory, UpdateDbCategory,
 };
+use crate::adapters::persistence::PostgresPersistence;
 use crate::adapters::schema;
 use crate::application::app_error::{AppError, AppResult};
-use crate::application::traits::CategoryPersistence;
+use crate::application::traits::category_persistence::CategoryPersistence;
 use crate::application::use_cases::persistance_command::create_category_data::CreateCategoryData;
 use crate::application::use_cases::persistance_command::update_category_data::UpdateCategoryData;
 use crate::domain::entities::category::Category;

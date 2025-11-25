@@ -1,10 +1,10 @@
-use crate::adapters::persistence::PostgresPersistence;
 use crate::adapters::persistence::db_models::db_focus_session::{
     DbFocusSession, NewDbFocusSession,
 };
+use crate::adapters::persistence::PostgresPersistence;
 use crate::adapters::schema;
 use crate::application::app_error::{AppError, AppResult};
-use crate::application::traits::FocusSessionPersistence;
+use crate::application::traits::focus_session_persistence::FocusSessionPersistence;
 use crate::application::use_cases::persistance_command::create_focus_session_data::CreateSessionData;
 use crate::application::use_cases::persistance_command::create_manual_session_data::CreateManualSessionData;
 use crate::application::use_cases::persistance_command::find_session_by_filters_data::FindSessionByFiltersData;

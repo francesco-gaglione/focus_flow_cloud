@@ -1,5 +1,6 @@
 use crate::application::app_error::AppResult;
-use crate::application::traits::{CategoryPersistence, TaskPersistence};
+use crate::application::traits::category_persistence::CategoryPersistence;
+use crate::application::traits::task_persistence::TaskPersistence;
 use crate::application::use_cases::commands::category_with_tasks::{
     CategoryAndTasks, CategoryWithTasks,
 };
@@ -105,7 +106,10 @@ mod category_use_cases_tests {
     use crate::{
         application::{
             app_error::AppError,
-            traits::{MockCategoryPersistence, MockTaskPersistence},
+            traits::{
+                category_persistence::MockCategoryPersistence,
+                task_persistence::MockTaskPersistence,
+            },
             use_cases::{
                 category_use_cases::CategoryUseCases,
                 commands::{

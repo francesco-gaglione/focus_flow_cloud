@@ -2,7 +2,7 @@ use chrono::DateTime;
 use uuid::Uuid;
 
 use crate::application::app_error::{AppError, AppResult};
-use crate::application::traits::FocusSessionPersistence;
+use crate::application::traits::focus_session_persistence::FocusSessionPersistence;
 use crate::application::use_cases::commands::create_foucs_session::CreateFocusSessionCommand;
 use crate::application::use_cases::commands::create_manual_session::CreateManualFocusSessionCommand;
 use crate::application::use_cases::commands::find_session_filters::FindSessionFiltersCommand;
@@ -112,7 +112,7 @@ mod focus_session_use_cases_tests {
     use crate::{
         application::{
             app_error::AppError,
-            traits::MockFocusSessionPersistence,
+            traits::focus_session_persistence::MockFocusSessionPersistence,
             use_cases::{
                 commands::{
                     create_foucs_session::CreateFocusSessionCommand,

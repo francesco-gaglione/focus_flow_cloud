@@ -1,5 +1,5 @@
 use crate::application::app_error::AppResult;
-use crate::application::traits::TaskPersistence;
+use crate::application::traits::task_persistence::TaskPersistence;
 use crate::application::use_cases::commands::create_task::CreateTaskCommand;
 use crate::application::use_cases::commands::update_task::UpdateTaskCommand;
 use crate::application::use_cases::persistance_command::create_task_data::CreateTaskData;

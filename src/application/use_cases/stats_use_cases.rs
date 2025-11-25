@@ -7,7 +7,10 @@ use uuid::Uuid;
 use crate::{
     application::{
         app_error::AppResult,
-        traits::{CategoryPersistence, FocusSessionPersistence, TaskPersistence},
+        traits::{
+            category_persistence::CategoryPersistence,
+            focus_session_persistence::FocusSessionPersistence, task_persistence::TaskPersistence,
+        },
         use_cases::{
             commands::calculate_stats_by_period::StatsPeriod,
             persistance_command::find_session_by_filters_data::FindSessionByFiltersData,
