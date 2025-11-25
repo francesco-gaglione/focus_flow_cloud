@@ -1,21 +1,47 @@
-name: Build and Push Docker Image
+name: Release
 
 on:
   push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
-  workflow_dispatch:
+    tags:
+      - '*'
+
+env:
+  CARGO_TERM_COLOR: always
 
 jobs:
-  build:
+  build-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+      - uses: swatinem/rust-cache@v2
+      - name: Build Release
+        run: cargo build --release
+
+  create-release-branch:
+    needs: build-release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Create Release Branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          BRANCH_NAME="release/$TAG_NAME"
+          git checkout -b $BRANCH_NAME
+          git push origin $BRANCH_NAME
+
+  docker-build-push:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -30,7 +56,6 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Login to GitHub Container Registry
-        if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -44,25 +69,17 @@ jobs:
           images: ghcr.io/${{ github.repository_owner }}/focusflowcloud
           tags: |
             type=raw,value=${{ steps.crate-version.outputs.version }}
-            type=raw,value=latest,enable={{is_default_branch}}
-            type=ref,event=branch
-            type=ref,event=pr
-            type=sha,prefix={{branch}}-
+            type=ref,event=tag
 
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile
-          push: ${{ github.event_name != 'pull_request' }}
+          push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             APP_VERSION=${{ steps.crate-version.outputs.version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
-      - name: Print image tags
-        run: |
-          echo "Image built with tags:"
-          echo "${{ steps.meta.outputs.tags }}"
