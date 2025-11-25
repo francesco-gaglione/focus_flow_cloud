@@ -4,7 +4,7 @@ use crate::adapters::http::dto::category_api::create_category::{
 };
 use crate::adapters::http_error::{HttpError, HttpResult};
 use crate::adapters::openapi::CATEGORY_TAG;
-use crate::application::use_cases::commands::create_category::CreateCategoryCommand;
+use crate::application::use_cases::category::command::create_category::CreateCategoryCommand;
 use axum::extract::State;
 use axum::Json;
 use tracing::debug;
@@ -33,8 +33,8 @@ pub async fn create_category_api(
         .map_err(|e| HttpError::BadRequest(e.to_string()))?;
 
     state
-        .category_use_cases
-        .create_category(CreateCategoryCommand {
+        .create_category_usecase
+        .execute(CreateCategoryCommand {
             name: payload.name,
             description: payload.description,
             color: payload.color,

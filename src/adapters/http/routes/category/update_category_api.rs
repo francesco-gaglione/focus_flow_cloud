@@ -5,7 +5,7 @@ use crate::adapters::http::dto::category_api::update_category::{
 use crate::adapters::http::dto::common::category_dto::CategoryDto;
 use crate::adapters::http_error::{HttpError, HttpResult};
 use crate::adapters::openapi::CATEGORY_TAG;
-use crate::application::use_cases::commands::update_category::UpdateCategoryCommand;
+use crate::application::use_cases::category::command::update_category::UpdateCategoryCommand;
 use axum::extract::{Path, State};
 use axum::Json;
 use uuid::Uuid;
@@ -43,8 +43,8 @@ pub async fn update_category_api(
         .map_err(|_| HttpError::BadRequest("Category id malformed".to_string()))?;
 
     let category = state
-        .category_use_cases
-        .update_category(UpdateCategoryCommand {
+        .update_category_usecase
+        .execute(UpdateCategoryCommand {
             id: category_id,
             name: payload.name,
             description: payload.description,

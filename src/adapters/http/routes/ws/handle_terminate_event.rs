@@ -6,7 +6,7 @@ use crate::{
     adapters::http::{
         app_state::AppState, dto::ws_msg::update_pomodoro_state::UpdatePomodoroState,
     },
-    application::use_cases::commands::create_foucs_session::CreateFocusSessionCommand,
+    application::use_cases::focus_session::command::create_foucs_session::CreateFocusSessionCommand,
 };
 
 pub async fn handle_terminate_event(state: &AppState) -> Result<UpdatePomodoroState, String> {
@@ -32,8 +32,8 @@ pub async fn handle_terminate_event(state: &AppState) -> Result<UpdatePomodoroSt
             .transpose()?;
 
         let _ = state
-            .focus_session_use_cases
-            .create_session(CreateFocusSessionCommand {
+            .create_session_usecase
+            .execute(CreateFocusSessionCommand {
                 task_id,
                 category_id,
                 session_type: old_session_state.session_type().clone().into(),

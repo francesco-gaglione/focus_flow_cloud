@@ -1,11 +1,24 @@
 use crate::adapters::http::pomodoro_state::PomodoroState;
-use crate::application::use_cases::category_use_cases::CategoryUseCases;
-use crate::application::use_cases::focus_session_use_cases::FocusSessionUseCases;
-use crate::application::use_cases::stats_use_cases::StatsUseCases;
-use crate::application::use_cases::task_use_cases::TaskUseCases;
+use crate::application::use_cases::{
+    category::{
+        create_category_usecase::CreateCategoryUseCases,
+        delete_categories_usecase::DeleteCategoriesUseCases,
+        delete_category_usecase::DeleteCategoryUseCases,
+        get_category_and_task_usecase::GetCategoryAndTaskUseCases,
+        get_category_usecase::GetCategoryUseCases, update_category_usecase::UpdateCategoryUseCases,
+    },
+    focus_session::{
+        create_manual_session::CreateManualSessionUseCase, create_session::CreateSessionUseCase,
+        find_sessions_by_filters::FindSessionsByFiltersUseCase,
+    },
+    stats::calculate_stats_by_period::CalculateStatsByPeriodUseCase,
+    task::{
+        create_task::CreateTaskUseCase, delete_tasks::DeleteTasksUseCase,
+        orphan_tasks::OrphanTasksUseCase, update_task::UpdateTaskUseCase,
+    },
+};
 use crate::infra::config::AppConfig;
 use axum::extract::ws::Message;
-use axum::extract::FromRef;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::mpsc::UnboundedSender;
@@ -18,20 +31,26 @@ pub struct AppState {
     pub ws_clients: Clients,
     pub pomodoro_state: Arc<RwLock<PomodoroState>>,
     pub config: AppConfig,
-    pub category_use_cases: Arc<CategoryUseCases>,
-    pub task_use_cases: Arc<TaskUseCases>,
-    pub focus_session_use_cases: Arc<FocusSessionUseCases>,
-    pub stats_use_cases: Arc<StatsUseCases>,
-}
 
-impl FromRef<AppState> for Arc<CategoryUseCases> {
-    fn from_ref(app_state: &AppState) -> Self {
-        app_state.category_use_cases.clone()
-    }
-}
+    // Category Use Cases
+    pub create_category_usecase: Arc<CreateCategoryUseCases>,
+    pub delete_categories_usecase: Arc<DeleteCategoriesUseCases>,
+    pub delete_category_usecase: Arc<DeleteCategoryUseCases>,
+    pub get_category_and_task_usecase: Arc<GetCategoryAndTaskUseCases>,
+    pub get_category_usecase: Arc<GetCategoryUseCases>,
+    pub update_category_usecase: Arc<UpdateCategoryUseCases>,
 
-impl FromRef<AppState> for Arc<TaskUseCases> {
-    fn from_ref(app_state: &AppState) -> Self {
-        app_state.task_use_cases.clone()
-    }
+    // Task Use Cases
+    pub create_task_usecase: Arc<CreateTaskUseCase>,
+    pub delete_tasks_usecase: Arc<DeleteTasksUseCase>,
+    pub orphan_tasks_usecase: Arc<OrphanTasksUseCase>,
+    pub update_task_usecase: Arc<UpdateTaskUseCase>,
+
+    // Focus Session Use Cases
+    pub create_manual_session_usecase: Arc<CreateManualSessionUseCase>,
+    pub create_session_usecase: Arc<CreateSessionUseCase>,
+    pub find_sessions_by_filters_usecase: Arc<FindSessionsByFiltersUseCase>,
+
+    // Stats Use Cases
+    pub calculate_stats_by_period_usecase: Arc<CalculateStatsByPeriodUseCase>,
 }

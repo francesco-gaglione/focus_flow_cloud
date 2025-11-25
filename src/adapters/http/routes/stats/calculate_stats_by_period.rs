@@ -2,7 +2,7 @@ use crate::adapters::http::app_state::AppState;
 use crate::adapters::http::dto::stats_api::{GetStatsByPeriodDto, GetStatsByPeriodResponseDto};
 use crate::adapters::http_error::HttpResult;
 use crate::adapters::openapi::STATS_TAG;
-use crate::application::use_cases::commands::calculate_stats_by_period::StatsPeriod;
+use crate::application::use_cases::stats::command::calculate_stats_by_period::StatsPeriod;
 use axum::extract::{Query, State};
 use axum::Json;
 use tracing::debug;
@@ -33,8 +33,8 @@ pub async fn calculate_stats_by_period_api(
     };
 
     let stats = state
-        .stats_use_cases
-        .calculate_stats_by_period(stats_period)
+        .calculate_stats_by_period_usecase
+        .execute(stats_period)
         .await?;
 
     Ok(Json(stats.into()))

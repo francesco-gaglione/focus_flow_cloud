@@ -19,7 +19,7 @@ use axum::Json;
 pub async fn fetch_orphan_tasks_api(
     State(state): State<AppState>,
 ) -> HttpResult<Json<OrphanTasksResponseDto>> {
-    let res = state.task_use_cases.orphan_tasks().await?;
+    let res = state.orphan_tasks_usecase.execute().await?;
     Ok(Json(OrphanTasksResponseDto {
         orphan_tasks: res
             .iter()

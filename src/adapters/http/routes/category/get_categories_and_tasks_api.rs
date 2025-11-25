@@ -20,10 +20,7 @@ use axum::Json;
 pub async fn get_categories_and_tasks_api(
     State(state): State<AppState>,
 ) -> HttpResult<Json<GetCategoriesResponseDto>> {
-    let categories_and_tasks = state
-        .category_use_cases
-        .get_all_category_and_tasks()
-        .await?;
+    let categories_and_tasks = state.get_category_and_task_usecase.execute().await?;
 
     let response = GetCategoriesResponseDto {
         categories: categories_and_tasks

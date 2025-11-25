@@ -9,7 +9,7 @@ use crate::{
             ws_msg::update_pomodoro_state::UpdatePomodoroState,
         },
     },
-    application::use_cases::commands::create_foucs_session::CreateFocusSessionCommand,
+    application::use_cases::focus_session::command::create_foucs_session::CreateFocusSessionCommand,
 };
 
 pub async fn handle_start_event(state: &AppState) -> Result<UpdatePomodoroState, String> {
@@ -27,8 +27,8 @@ pub async fn handle_start_event(state: &AppState) -> Result<UpdatePomodoroState,
 
                 if let Some(last_session) = session_state.last_session() {
                     let _ = state
-                        .focus_session_use_cases
-                        .create_session(CreateFocusSessionCommand {
+                        .create_session_usecase
+                        .execute(CreateFocusSessionCommand {
                             // Break session should not have a task or category
                             task_id: None,
                             category_id: None,

@@ -27,8 +27,8 @@ pub async fn delete_tasks_api(
         .map_err(|e| HttpError::BadRequest(e.to_string()))?;
 
     let res = state
-        .task_use_cases
-        .delete_tasks(
+        .delete_tasks_usecase
+        .execute(
             payload
                 .task_ids
                 .iter()

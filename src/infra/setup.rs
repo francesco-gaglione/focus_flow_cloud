@@ -1,9 +1,23 @@
 use crate::adapters::http::app_state::AppState;
 use crate::adapters::http::pomodoro_state::PomodoroState;
-use crate::application::use_cases::category_use_cases::CategoryUseCases;
-use crate::application::use_cases::focus_session_use_cases::FocusSessionUseCases;
-use crate::application::use_cases::stats_use_cases::StatsUseCases;
-use crate::application::use_cases::task_use_cases::TaskUseCases;
+use crate::application::use_cases::{
+    category::{
+        create_category_usecase::CreateCategoryUseCases,
+        delete_categories_usecase::DeleteCategoriesUseCases,
+        delete_category_usecase::DeleteCategoryUseCases,
+        get_category_and_task_usecase::GetCategoryAndTaskUseCases,
+        get_category_usecase::GetCategoryUseCases, update_category_usecase::UpdateCategoryUseCases,
+    },
+    focus_session::{
+        create_manual_session::CreateManualSessionUseCase, create_session::CreateSessionUseCase,
+        find_sessions_by_filters::FindSessionsByFiltersUseCase,
+    },
+    stats::calculate_stats_by_period::CalculateStatsByPeriodUseCase,
+    task::{
+        create_task::CreateTaskUseCase, delete_tasks::DeleteTasksUseCase,
+        orphan_tasks::OrphanTasksUseCase, update_task::UpdateTaskUseCase,
+    },
+};
 use crate::infra::config::AppConfig;
 use crate::infra::database::persistence::postgres_persistence;
 use std::collections::HashMap;
@@ -19,23 +33,55 @@ pub async fn init_app_state() -> Result<AppState, Box<dyn std::error::Error>> {
 
     let postgres_arc = Arc::new(postgres_persistence().await);
 
-    let category_use_cases = CategoryUseCases::new(postgres_arc.clone(), postgres_arc.clone());
-    let task_use_cases = TaskUseCases::new(postgres_arc.clone());
-    let focus_session_use_cases = FocusSessionUseCases::new(postgres_arc.clone());
-    let stats_use_cases = StatsUseCases::new(
+    // Category Use Cases
+    let create_category_usecase = Arc::new(CreateCategoryUseCases::new(postgres_arc.clone()));
+    let delete_categories_usecase = Arc::new(DeleteCategoriesUseCases::new(postgres_arc.clone()));
+    let delete_category_usecase = Arc::new(DeleteCategoryUseCases::new(postgres_arc.clone()));
+    let get_category_and_task_usecase = Arc::new(GetCategoryAndTaskUseCases::new(
+        postgres_arc.clone(),
+        postgres_arc.clone(),
+    ));
+    let get_category_usecase = Arc::new(GetCategoryUseCases::new(postgres_arc.clone()));
+    let update_category_usecase = Arc::new(UpdateCategoryUseCases::new(postgres_arc.clone()));
+
+    // Task Use Cases
+    let create_task_usecase = Arc::new(CreateTaskUseCase::new(postgres_arc.clone()));
+    let delete_tasks_usecase = Arc::new(DeleteTasksUseCase::new(postgres_arc.clone()));
+    let orphan_tasks_usecase = Arc::new(OrphanTasksUseCase::new(postgres_arc.clone()));
+    let update_task_usecase = Arc::new(UpdateTaskUseCase::new(postgres_arc.clone()));
+
+    // Focus Session Use Cases
+    let create_manual_session_usecase =
+        Arc::new(CreateManualSessionUseCase::new(postgres_arc.clone()));
+    let create_session_usecase = Arc::new(CreateSessionUseCase::new(postgres_arc.clone()));
+    let find_sessions_by_filters_usecase =
+        Arc::new(FindSessionsByFiltersUseCase::new(postgres_arc.clone()));
+
+    // Stats Use Cases
+    let calculate_stats_by_period_usecase = Arc::new(CalculateStatsByPeriodUseCase::new(
         postgres_arc.clone(),
         postgres_arc.clone(),
         postgres_arc.clone(),
-    );
+    ));
 
     Ok(AppState {
         ws_clients: Arc::new(RwLock::new(HashMap::new())),
         pomodoro_state: Arc::new(RwLock::new(PomodoroState::default())),
         config,
-        category_use_cases: Arc::new(category_use_cases),
-        task_use_cases: Arc::new(task_use_cases),
-        focus_session_use_cases: Arc::new(focus_session_use_cases),
-        stats_use_cases: Arc::new(stats_use_cases),
+        create_category_usecase,
+        delete_categories_usecase,
+        delete_category_usecase,
+        get_category_and_task_usecase,
+        get_category_usecase,
+        update_category_usecase,
+        create_task_usecase,
+        delete_tasks_usecase,
+        orphan_tasks_usecase,
+        update_task_usecase,
+        create_manual_session_usecase,
+        create_session_usecase,
+        find_sessions_by_filters_usecase,
+        calculate_stats_by_period_usecase,
     })
 }
 

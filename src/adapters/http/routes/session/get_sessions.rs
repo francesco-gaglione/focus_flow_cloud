@@ -5,7 +5,7 @@ use crate::adapters::http::dto::session_api::get_sessions::{
 use crate::adapters::http_error::{HttpError, HttpResult};
 use crate::adapters::mappers::focus_session_mapper::FocusSessionMapper;
 use crate::adapters::openapi::SESSION_TAG;
-use crate::application::use_cases::commands::find_session_filters::{
+use crate::application::use_cases::focus_session::command::find_session_filters::{
     ConcentrationScoreFilter, FindSessionFiltersCommand, FocusSessionDateFilter,
 };
 use crate::domain::entities::focus_session_type::FocusSessionType;
@@ -81,8 +81,8 @@ pub async fn get_sessions(
     };
 
     let sessions = state
-        .focus_session_use_cases
-        .find_sessions_by_filters(filters)
+        .find_sessions_by_filters_usecase
+        .execute(filters)
         .await?;
 
     let response_dto = GetSessionFiltersResponseDto {

@@ -41,8 +41,8 @@ pub async fn delete_categories_api(
     let category_ids = vec![category_id];
 
     let res = state
-        .category_use_cases
-        .delete_categories(category_ids)
+        .delete_categories_usecase
+        .execute(category_ids)
         .await?;
 
     debug!("Deleted {} categories", res.len());

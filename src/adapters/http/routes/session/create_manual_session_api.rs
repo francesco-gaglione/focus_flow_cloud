@@ -33,8 +33,8 @@ pub async fn create_manual_session_api(
         .map_err(|e| HttpError::BadRequest(e.to_string()))?;
 
     let res = state
-        .focus_session_use_cases
-        .create_manual_session(FocusSessionMapper::manual_create_dto_to_command(&payload)?)
+        .create_manual_session_usecase
+        .execute(FocusSessionMapper::manual_create_dto_to_command(&payload)?)
         .await?;
 
     Ok(Json(CreateManualSessionResponseDto {

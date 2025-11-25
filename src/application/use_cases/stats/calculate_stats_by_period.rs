@@ -12,8 +12,8 @@ use crate::{
             focus_session_persistence::FocusSessionPersistence, task_persistence::TaskPersistence,
         },
         use_cases::{
-            commands::calculate_stats_by_period::StatsPeriod,
             persistance_command::find_session_by_filters_data::FindSessionByFiltersData,
+            stats::command::calculate_stats_by_period::StatsPeriod,
         },
     },
     domain::entities::{
@@ -26,14 +26,13 @@ use crate::{
     },
 };
 
-#[derive(Clone)]
-pub struct StatsUseCases {
+pub struct CalculateStatsByPeriodUseCase {
     category_persistence: Arc<dyn CategoryPersistence>,
     task_persistence: Arc<dyn TaskPersistence>,
     focus_session_persistence: Arc<dyn FocusSessionPersistence>,
 }
 
-impl StatsUseCases {
+impl CalculateStatsByPeriodUseCase {
     pub fn new(
         category_persistence: Arc<dyn CategoryPersistence>,
         task_persistence: Arc<dyn TaskPersistence>,
@@ -46,7 +45,7 @@ impl StatsUseCases {
         }
     }
 
-    pub async fn calculate_stats_by_period(&self, period: StatsPeriod) -> AppResult<Stats> {
+    pub async fn execute(&self, period: StatsPeriod) -> AppResult<Stats> {
         let start_date: Option<DateTime<Utc>> = DateTime::from_timestamp(period.start_date, 0);
         let end_date: Option<DateTime<Utc>> = period
             .end_date
@@ -64,7 +63,7 @@ impl StatsUseCases {
             })
             .await?;
 
-        let is_multi_day = Self::is_multi_day_period(start_date, end_date);
+        let is_multi_day = self.is_multi_day_period(start_date, end_date);
 
         let (work_sessions, break_sessions): (Vec<_>, Vec<_>) = sessions
             .iter()
@@ -94,9 +93,9 @@ impl StatsUseCases {
             total_breaks,
             total_focus_time,
             total_break_time,
-            Self::calculate_most_concentrated_period(&sessions),
-            Self::calculate_least_concentrated_period(&sessions),
-            Self::calculate_concentration_distribution(&sessions),
+            self.calculate_most_concentrated_period(&sessions),
+            self.calculate_least_concentrated_period(&sessions),
+            self.calculate_concentration_distribution(&sessions),
             self.calculate_category_distribution(&sessions).await?,
             self.calculate_task_distribution(&sessions).await?,
             daily_activity,
@@ -104,6 +103,7 @@ impl StatsUseCases {
     }
 
     fn is_multi_day_period(
+        &self,
         start_date: Option<DateTime<Utc>>,
         end_date: Option<DateTime<Utc>>,
     ) -> bool {
@@ -116,7 +116,7 @@ impl StatsUseCases {
         }
     }
 
-    fn calculate_most_concentrated_period(sessions: &[FocusSession]) -> ConcentrationPeriod {
+    fn calculate_most_concentrated_period(&self, sessions: &[FocusSession]) -> ConcentrationPeriod {
         let (morning_total, morning_count, afternoon_total, afternoon_count) =
             sessions.iter().fold((0, 0, 0, 0), |acc, session| {
                 if let Some(score) = session.concentration_score() {
@@ -150,7 +150,10 @@ impl StatsUseCases {
         }
     }
 
-    fn calculate_least_concentrated_period(sessions: &[FocusSession]) -> ConcentrationPeriod {
+    fn calculate_least_concentrated_period(
+        &self,
+        sessions: &[FocusSession],
+    ) -> ConcentrationPeriod {
         let (morning_total, morning_count, afternoon_total, afternoon_count) =
             sessions.iter().fold((0, 0, 0, 0), |acc, session| {
                 if let Some(score) = session.concentration_score() {
@@ -184,7 +187,7 @@ impl StatsUseCases {
         }
     }
 
-    fn calculate_concentration_distribution(sessions: &[FocusSession]) -> [u32; 5] {
+    fn calculate_concentration_distribution(&self, sessions: &[FocusSession]) -> [u32; 5] {
         let mut distribution = [0u32; 5];
 
         for session in sessions {
