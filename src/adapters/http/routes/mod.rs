@@ -2,6 +2,7 @@ pub mod category;
 pub mod session;
 pub mod stats;
 pub mod task;
+pub mod user_setting;
 pub mod ws;
 
 use crate::adapters::http::app_state::AppState;
@@ -13,6 +14,7 @@ pub fn api_routes() -> Router<AppState> {
         .nest("/tasks", task::routes::router())
         .nest("/focus-sessions", session::routes::router())
         .nest("/stats", stats::routes::router())
+        .nest("/user-settings", user_setting::routes::router())
 }
 
 pub fn ws_routes() -> Router<AppState> {

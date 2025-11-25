@@ -14,12 +14,15 @@ use crate::adapters::http::dto::task_api::create_task::CreateTaskResponseDto;
 use crate::adapters::http::dto::task_api::delete_task::DeleteTasksDto;
 use crate::adapters::http::dto::task_api::orphan_tasks::OrphanTasksResponseDto;
 use crate::adapters::http::dto::task_api::update_task::UpdateTaskDto;
+use crate::adapters::http::dto::user_setting_api::get_user_settings::UserSettingsResponseDto;
+use crate::adapters::http::dto::user_setting_api::update_setting::UpdateUserSettingDto;
 use utoipa::OpenApi;
 
 pub const CATEGORY_TAG: &str = "Category";
 pub const TASK_TAG: &str = "Task";
 pub const SESSION_TAG: &str = "Session";
 pub const STATS_TAG: &str = "Statistics";
+pub const SETTING_TAG: &str = "User Settings";
 
 #[derive(OpenApi)]
 #[openapi(
@@ -31,7 +34,8 @@ pub const STATS_TAG: &str = "Statistics";
         (name = CATEGORY_TAG, description = "Endpoints for managing categories and their tasks"),
         (name = TASK_TAG, description = "Endpoints for managing tasks"),
         (name = SESSION_TAG, description = "Endpoints for managing focus sessions"),
-        (name = STATS_TAG, description = "Endpoints for retrieving statistics")
+        (name = STATS_TAG, description = "Endpoints for retrieving statistics"),
+        (name = SETTING_TAG, description = "Endpoints for managing user settings")
     ),
     paths(
         crate::adapters::http::routes::category::create_category_api::create_category_api,
@@ -45,7 +49,10 @@ pub const STATS_TAG: &str = "Statistics";
         crate::adapters::http::routes::task::delete_tasks_api::delete_tasks_api,
         crate::adapters::http::routes::session::create_manual_session_api::create_manual_session_api,
         crate::adapters::http::routes::session::get_sessions::get_sessions,
-        crate::adapters::http::routes::stats::calculate_stats_by_period::calculate_stats_by_period_api
+        crate::adapters::http::routes::stats::calculate_stats_by_period::calculate_stats_by_period_api,
+        crate::adapters::http::routes::user_setting::get_setting_api::get_settings_api,
+        crate::adapters::http::routes::user_setting::update_setting_api::update_setting_api
+
     ),
     components(
         schemas(CreateCategoryDto, CreateCategoryDto),
@@ -60,6 +67,9 @@ pub const STATS_TAG: &str = "Statistics";
         schemas(CreateManualSessionDto, CreateManualSessionResponseDto),
         schemas(GetSessionFiltersDto, GetSessionFiltersResponseDto),
         schemas(GetStatsByPeriodDto, GetStatsByPeriodResponseDto),
+        schemas(UserSettingsResponseDto),
+        schemas(UpdateUserSettingDto),
+
     ),
     servers(
         (url = "/api", description = "API server")

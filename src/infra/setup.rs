@@ -1,5 +1,7 @@
 use crate::adapters::http::app_state::AppState;
 use crate::adapters::http::pomodoro_state::PomodoroState;
+use crate::application::use_cases::user_settings::get_settings::GetSettingsUseCase;
+use crate::application::use_cases::user_settings::update_setting::UpdateSettingUseCase;
 use crate::application::use_cases::{
     category::{
         create_category_usecase::CreateCategoryUseCases,
@@ -64,6 +66,10 @@ pub async fn init_app_state() -> Result<AppState, Box<dyn std::error::Error>> {
         postgres_arc.clone(),
     ));
 
+    // User Setting Use Cases
+    let get_user_settings_usecase = Arc::new(GetSettingsUseCase::new(postgres_arc.clone()));
+    let update_user_setting_usecase = Arc::new(UpdateSettingUseCase::new(postgres_arc.clone()));
+
     Ok(AppState {
         ws_clients: Arc::new(RwLock::new(HashMap::new())),
         pomodoro_state: Arc::new(RwLock::new(PomodoroState::default())),
@@ -82,6 +88,8 @@ pub async fn init_app_state() -> Result<AppState, Box<dyn std::error::Error>> {
         create_session_usecase,
         find_sessions_by_filters_usecase,
         calculate_stats_by_period_usecase,
+        update_user_setting_usecase,
+        get_user_settings_usecase,
     })
 }
 

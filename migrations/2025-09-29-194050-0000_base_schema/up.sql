@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS focus_session
     category_id              UUID,
     session_type             VARCHAR(20) NOT NULL DEFAULT 'work'
         CHECK (session_type IN ('work', 'short_break', 'long_break')),
-    actual_duration  BIGINT CHECK (actual_duration > 0),
+    actual_duration          BIGINT CHECK (actual_duration > 0),
     concentration_score      INTEGER CHECK (concentration_score >= 0 AND concentration_score <= 5),
     notes                    TEXT,
     started_at               TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -45,6 +45,15 @@ CREATE TABLE IF NOT EXISTS focus_session
     created_at               TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     FOREIGN KEY (task_id) REFERENCES tasks (id) ON DELETE CASCADE,
     FOREIGN KEY (category_id) REFERENCES categories (id) ON DELETE CASCADE
+);
+
+-- User settings key-value (global app-level), no jsonb since it is not a multiuser service
+CREATE TABLE IF NOT EXISTS user_settings (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    key VARCHAR(255) NOT NULL UNIQUE,
+    value TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -62,6 +71,12 @@ CREATE TRIGGER update_categories_updated_at
     ON categories
     FOR EACH ROW
     WHEN (OLD.deleted_at IS NULL)
+EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_user_settings_updated_at
+    BEFORE UPDATE
+    ON user_settings
+    FOR EACH ROW
 EXECUTE FUNCTION update_updated_at_column();
 
 -- Performance-optimized indexes
@@ -86,9 +101,5 @@ CREATE INDEX IF NOT EXISTS idx_sessions_started_at
 CREATE INDEX IF NOT EXISTS idx_sessions_concentration
     ON focus_session (concentration_score) WHERE concentration_score IS NOT NULL;
 
--- User preferences table
-CREATE TABLE IF NOT EXISTS user_preferences (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL UNIQUE,
-    preferences JSONB NOT NULL
-);
+CREATE INDEX IF NOT EXISTS idx_user_settings_active
+    ON user_settings (key);

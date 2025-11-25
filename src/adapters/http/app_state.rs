@@ -1,4 +1,6 @@
 use crate::adapters::http::pomodoro_state::PomodoroState;
+use crate::application::use_cases::user_settings::get_settings::GetSettingsUseCase;
+use crate::application::use_cases::user_settings::update_setting::UpdateSettingUseCase;
 use crate::application::use_cases::{
     category::{
         create_category_usecase::CreateCategoryUseCases,
@@ -53,4 +55,8 @@ pub struct AppState {
 
     // Stats Use Cases
     pub calculate_stats_by_period_usecase: Arc<CalculateStatsByPeriodUseCase>,
+
+    // User Setting Use Cases
+    pub update_user_setting_usecase: Arc<UpdateSettingUseCase>,
+    pub get_user_settings_usecase: Arc<GetSettingsUseCase>,
 }
