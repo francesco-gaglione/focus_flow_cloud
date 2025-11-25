@@ -1,7 +1,6 @@
 # FocusFlow Cloud
 
-[![Build Status](https://github.com/your-username/focusflow-cloud/actions/workflows/docker-build.yml/badge.svg)](https://github.com/your-username/focusflow-cloud/actions)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Build Status](https://github.com/francesco-gaglione/focusflow-cloud/actions/workflows/docker-build.yml/badge.svg)](https://github.com/francesco-gaglione/focusflow-cloud/actions)
 
 A Pomodoro technique tracking backend service built with Rust. I created this application for my personal use to track my focus sessions and productivity, and decided to share it in case others might find it useful.
 
@@ -78,7 +77,7 @@ src/
 ### Development Setup (without Docker)
 
 1.  **Set up environment variables**:
-    Copy `.env.example` to `.env` and update `DATABASE_URL` to point to your local PostgreSQL instance.
+    Copy `.env.example` to `.env` and update `DATABASE_URL` to point to your local PostgreSQL instance.  
     ```bash
     cp .env.example .env
     # nano .env
@@ -110,11 +109,8 @@ Once the server is running, visit:
 ## 🧪 Testing
 
 ```bash
-# Run unit tests
+# Run all tests
 cargo test
-
-# Run integration tests
-cargo test --test websocket_e2e
 ```
 
 ## 📖 Key Components
@@ -139,7 +135,7 @@ I'm happy to accept suggestions and improvements from the community! Feel free t
 
 ## 📝 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License.
 
 ## 🙏 Acknowledgments
 
