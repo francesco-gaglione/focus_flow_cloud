@@ -41,3 +41,60 @@ impl GetCategoryAndTaskUseCases {
         })
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::sync::Arc;
+
+    use uuid::Uuid;
+
+    use crate::{
+        application::{
+            traits::{
+                category_persistence::MockCategoryPersistence,
+                task_persistence::MockTaskPersistence,
+            },
+            use_cases::category::get_category_and_task_usecase::GetCategoryAndTaskUseCases,
+        },
+        domain::entities::{category::Category, task::Task},
+    };
+
+    #[tokio::test]
+    async fn test_get_category_and_task_usecase() {
+        let mut category_persistence = MockCategoryPersistence::new();
+        let mut task_persistence = MockTaskPersistence::new();
+        let category_id = Uuid::new_v4();
+        category_persistence.expect_find_all().returning(move || {
+            Ok(vec![Category::new(
+                category_id.clone(),
+                "Test Category".to_string(),
+                None,
+                "".to_string(),
+            )])
+        });
+        task_persistence
+            .expect_find_by_category_id()
+            .returning(move |_| {
+                Ok(vec![Task::new(
+                    Uuid::new_v4(),
+                    Some(category_id),
+                    "task".to_string(),
+                    Some("description".to_string()),
+                    None,
+                    None,
+                )])
+            });
+        task_persistence
+            .expect_find_orphan_tasks()
+            .returning(|| Ok(vec![]));
+
+        let usecase = GetCategoryAndTaskUseCases::new(
+            Arc::new(category_persistence),
+            Arc::new(task_persistence),
+        );
+
+        let result = usecase.execute().await;
+
+        assert!(result.is_ok());
+    }
+}

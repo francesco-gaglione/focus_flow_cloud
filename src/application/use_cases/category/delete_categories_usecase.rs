@@ -25,3 +25,27 @@ impl DeleteCategoriesUseCases {
         Ok(deleted_ids)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::sync::Arc;
+
+    use crate::application::{
+        traits::category_persistence::MockCategoryPersistence,
+        use_cases::category::delete_categories_usecase::DeleteCategoriesUseCases,
+    };
+
+    #[tokio::test]
+    async fn test_delete_categories_usecase() {
+        let mut category_persistence = MockCategoryPersistence::new();
+        category_persistence
+            .expect_delete_category_by_id()
+            .returning(|_| Ok(()));
+        let usecase = DeleteCategoriesUseCases::new(Arc::new(category_persistence));
+
+        let category_ids = vec![uuid::Uuid::new_v4(), uuid::Uuid::new_v4()];
+        let result = usecase.execute(category_ids.clone()).await;
+
+        assert_eq!(result, Ok(category_ids));
+    }
+}
