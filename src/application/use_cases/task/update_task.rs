@@ -18,13 +18,13 @@ impl UpdateTaskUseCase {
         self.task_persistence
             .update_task(
                 task.id,
-                UpdateTaskData {
-                    category_id: task.category_id,
-                    name: task.name.clone(),
-                    description: task.description.clone(),
-                    scheduled_date: task.scheduled_date,
-                    completed_at: task.completed_at,
-                },
+                UpdateTaskData::new(
+                    task.category_id,
+                    task.name,
+                    task.description,
+                    task.scheduled_date,
+                    task.completed_at,
+                ),
             )
             .await
     }

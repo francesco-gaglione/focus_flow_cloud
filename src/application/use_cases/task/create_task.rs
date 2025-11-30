@@ -16,12 +16,12 @@ impl CreateTaskUseCase {
 
     pub async fn execute(&self, task: CreateTaskCommand) -> AppResult<Uuid> {
         self.task_persistence
-            .create_task(CreateTaskData {
-                name: task.name,
-                description: task.description,
-                category_id: task.category_id,
-                scheduled_date: task.scheduled_date,
-            })
+            .create_task(CreateTaskData::new(
+                task.name,
+                task.description,
+                task.category_id,
+                task.scheduled_date,
+            ))
             .await
     }
 }

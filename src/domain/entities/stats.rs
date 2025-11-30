@@ -228,3 +228,37 @@ impl DailyActivityDistributionItem {
         self.total_focus_time
     }
 }
+
+#[cfg(test)]
+mod stats_tests {
+    use super::*;
+
+    #[test]
+    fn test_daily_activity_distribution_item_new() {
+        let category_name = "Category 1".to_string();
+        let category_id = Uuid::new_v4();
+        let total_focus_time = 10;
+        let item = DailyActivityDistributionItem::new(
+            category_name.clone(),
+            category_id,
+            total_focus_time,
+        );
+
+        assert_eq!(item.category_name(), category_name);
+        assert_eq!(item.category_id(), category_id);
+        assert_eq!(item.total_focus_time(), total_focus_time);
+    }
+
+    #[test]
+    fn test_daily_activity_item_new() {
+        let date = NaiveDate::from_ymd(2023, 1, 1);
+        let category_distribution = vec![
+            DailyActivityDistributionItem::new("Category 1".to_string(), Uuid::new_v4(), 10),
+            DailyActivityDistributionItem::new("Category 2".to_string(), Uuid::new_v4(), 20),
+        ];
+        let item = DailyActivityItem::new(date, category_distribution);
+
+        assert_eq!(item.date(), date);
+        assert_eq!(item.category_distribution().len(), 2);
+    }
+}

@@ -43,10 +43,10 @@ pub struct UpdateDbTask {
 impl From<CreateTaskData> for NewDbTask {
     fn from(value: CreateTaskData) -> Self {
         Self {
-            category_id: value.category_id,
-            name: value.name,
-            description: value.description,
-            scheduled_date: value.scheduled_date,
+            category_id: value.category_id().cloned(),
+            name: value.name().to_string(),
+            description: value.description().map(|s| s.to_string()),
+            scheduled_date: value.scheduled_date().cloned(),
         }
     }
 }
@@ -94,11 +94,11 @@ impl From<DbTask> for Task {
 impl From<UpdateTaskData> for UpdateDbTask {
     fn from(value: UpdateTaskData) -> Self {
         Self {
-            category_id: value.category_id,
-            name: value.name,
-            description: value.description,
-            scheduled_date: value.scheduled_date,
-            completed_at: value.completed_at,
+            category_id: value.category_id(),
+            name: value.name(),
+            description: value.description(),
+            scheduled_date: value.scheduled_date(),
+            completed_at: value.completed_at(),
         }
     }
 }

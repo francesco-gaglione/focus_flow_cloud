@@ -22,3 +22,29 @@ pub enum AppError {
 }
 
 pub type AppResult<T> = Result<T, AppError>;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_app_error_display() {
+        let error = AppError::NotFound("test".to_string());
+        assert_eq!(error.to_string(), "Resource not found: test");
+
+        let error = AppError::ResourceAlreadyExist("test".to_string());
+        assert_eq!(error.to_string(), "Resource already exist: test");
+
+        let error = AppError::GenericError("test".to_string());
+        assert_eq!(error.to_string(), "Generic error: test");
+
+        let error = AppError::BadRequest("test".to_string());
+        assert_eq!(error.to_string(), "Bad request: test");
+
+        let error = AppError::Forbidden;
+        assert_eq!(error.to_string(), "Forbidden");
+
+        let error = AppError::Database("test".to_string());
+        assert_eq!(error.to_string(), "Database error: test");
+    }
+}

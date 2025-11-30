@@ -51,6 +51,10 @@ docker-logs:
 test:
     cargo test
 
+# Test a specific module, e.g., `just test-module domain::entities`
+test-module module:
+    cargo test {{ module }}
+
 # ============================================================================
 # CODE QUALITY
 # ============================================================================
