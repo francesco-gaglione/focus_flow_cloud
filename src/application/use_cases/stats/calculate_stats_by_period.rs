@@ -2,7 +2,6 @@ use std::{collections::HashMap, sync::Arc};
 
 use chrono::{DateTime, NaiveDate, Timelike, Utc};
 use futures_util::future::join_all;
-use tracing::debug;
 use uuid::Uuid;
 
 use crate::{
