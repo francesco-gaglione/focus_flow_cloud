@@ -2,6 +2,7 @@ use std::{collections::HashMap, sync::Arc};
 
 use chrono::{DateTime, NaiveDate, Timelike, Utc};
 use futures_util::future::join_all;
+use tracing::debug;
 use uuid::Uuid;
 
 use crate::{
@@ -193,7 +194,7 @@ impl CalculateStatsByPeriodUseCase {
         for session in sessions {
             if let Some(score) = session.concentration_score() {
                 if (1..=5).contains(&score) {
-                    distribution[score as usize] += 1;
+                    distribution[score as usize - 1] += 1;
                 }
             }
         }
