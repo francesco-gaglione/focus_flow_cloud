@@ -8,6 +8,8 @@ use crate::adapters::http::dto::session_api::create_manual_session::CreateManual
 use crate::adapters::http::dto::session_api::create_manual_session::CreateManualSessionResponseDto;
 use crate::adapters::http::dto::session_api::get_sessions::GetSessionFiltersDto;
 use crate::adapters::http::dto::session_api::get_sessions::GetSessionFiltersResponseDto;
+use crate::adapters::http::dto::session_api::update_session::UpdateFocusSessionDto;
+use crate::adapters::http::dto::session_api::update_session::UpdateFocusSessionResponseDto;
 use crate::adapters::http::dto::stats_api::GetStatsByPeriodDto;
 use crate::adapters::http::dto::stats_api::GetStatsByPeriodResponseDto;
 use crate::adapters::http::dto::task_api::create_task::CreateTaskResponseDto;
@@ -48,6 +50,7 @@ pub const SETTING_TAG: &str = "User Settings";
         crate::adapters::http::routes::task::update_task_api::update_task_api,
         crate::adapters::http::routes::task::delete_tasks_api::delete_tasks_api,
         crate::adapters::http::routes::session::create_manual_session_api::create_manual_session_api,
+        crate::adapters::http::routes::session::update_session_api::update_session_api,
         crate::adapters::http::routes::session::get_sessions::get_sessions,
         crate::adapters::http::routes::stats::calculate_stats_by_period::calculate_stats_by_period_api,
         crate::adapters::http::routes::user_setting::get_setting_api::get_settings_api,
@@ -65,6 +68,7 @@ pub const SETTING_TAG: &str = "User Settings";
         schemas(UpdateTaskDto, CreateTaskResponseDto),
         schemas(DeleteTasksDto, CreateTaskResponseDto),
         schemas(CreateManualSessionDto, CreateManualSessionResponseDto),
+        schemas(UpdateFocusSessionDto, UpdateFocusSessionResponseDto),
         schemas(GetSessionFiltersDto, GetSessionFiltersResponseDto),
         schemas(GetStatsByPeriodDto, GetStatsByPeriodResponseDto),
         schemas(UserSettingsResponseDto),
@@ -72,7 +76,7 @@ pub const SETTING_TAG: &str = "User Settings";
 
     ),
     servers(
-        (url = "/api", description = "API server")
+        (url = "/", description = "API server")
     )
 )]
 pub struct ApiDoc;

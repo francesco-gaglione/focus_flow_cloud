@@ -1,5 +1,5 @@
 use crate::adapters::persistence::db_models::db_focus_session::{
-    DbFocusSession, NewDbFocusSession,
+    DbFocusSession, NewDbFocusSession, UpdateDbFocusSession,
 };
 use crate::adapters::persistence::PostgresPersistence;
 use crate::adapters::schema;
@@ -8,6 +8,7 @@ use crate::application::traits::focus_session_persistence::FocusSessionPersisten
 use crate::application::use_cases::persistance_command::create_focus_session_data::CreateSessionData;
 use crate::application::use_cases::persistance_command::create_manual_session_data::CreateManualSessionData;
 use crate::application::use_cases::persistance_command::find_session_by_filters_data::FindSessionByFiltersData;
+use crate::application::use_cases::persistance_command::update_focus_session_data::UpdateFocusSessionData;
 use crate::domain::entities::focus_session::FocusSession;
 use async_trait::async_trait;
 use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper};
@@ -115,5 +116,28 @@ impl FocusSessionPersistence for PostgresPersistence {
             .map_err(|e| AppError::Database(e.to_string()))??;
 
         Ok(result.into_iter().map(|s| s.into()).collect())
+    }
+
+    async fn update_session(&self, data: UpdateFocusSessionData) -> AppResult<()> {
+        let conn = self
+            .pool
+            .get()
+            .await
+            .map_err(|e| AppError::Database(e.to_string()))?;
+
+        let session_id = data.session_id;
+        let changeset = UpdateDbFocusSession::from(data);
+
+        let _ = conn
+            .interact(move |conn| {
+                use schema::focus_session::dsl::*;
+                diesel::update(focus_session.filter(id.eq(session_id)))
+                    .set(changeset)
+                    .get_result::<DbFocusSession>(conn)
+            })
+            .await
+            .map_err(|e| AppError::Database(e.to_string()))??;
+
+        Ok(())
     }
 }

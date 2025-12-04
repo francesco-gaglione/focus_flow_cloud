@@ -1,5 +1,6 @@
 use crate::adapters::http::app_state::AppState;
 use crate::adapters::http::pomodoro_state::PomodoroState;
+use crate::application::use_cases::focus_session::update_focus_session::UpdateFocusSessionUseCase;
 use crate::application::use_cases::user_settings::get_settings::GetSettingsUseCase;
 use crate::application::use_cases::user_settings::update_setting::UpdateSettingUseCase;
 use crate::application::use_cases::{
@@ -56,6 +57,8 @@ pub async fn init_app_state() -> Result<AppState, Box<dyn std::error::Error>> {
     let create_manual_session_usecase =
         Arc::new(CreateManualSessionUseCase::new(postgres_arc.clone()));
     let create_session_usecase = Arc::new(CreateSessionUseCase::new(postgres_arc.clone()));
+    let update_focus_session_usecase =
+        Arc::new(UpdateFocusSessionUseCase::new(postgres_arc.clone()));
     let find_sessions_by_filters_usecase =
         Arc::new(FindSessionsByFiltersUseCase::new(postgres_arc.clone()));
 
@@ -85,6 +88,7 @@ pub async fn init_app_state() -> Result<AppState, Box<dyn std::error::Error>> {
         orphan_tasks_usecase,
         update_task_usecase,
         create_manual_session_usecase,
+        update_focus_session_usecase,
         create_session_usecase,
         find_sessions_by_filters_usecase,
         calculate_stats_by_period_usecase,

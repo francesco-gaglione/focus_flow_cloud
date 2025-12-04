@@ -4,11 +4,16 @@ use uuid::Uuid;
 use crate::{
     adapters::http::dto::{
         common::{focus_session::FocusSessionDto, session_type_enum::SessionTypeEnum},
-        session_api::create_manual_session::CreateManualSessionDto,
+        session_api::{
+            create_manual_session::CreateManualSessionDto, update_session::UpdateFocusSessionDto,
+        },
     },
     application::{
         app_error::{AppError, AppResult},
-        use_cases::focus_session::command::create_manual_session::CreateManualFocusSessionCommand,
+        use_cases::focus_session::command::{
+            create_manual_session::CreateManualFocusSessionCommand,
+            update_focus_session::UpdateFocusSessionCommand,
+        },
     },
     domain::entities::{focus_session::FocusSession, focus_session_type::FocusSessionType},
 };
@@ -49,6 +54,40 @@ impl FocusSessionMapper {
             notes: dto.notes.clone(),
             started_at: Self::timestamp_to_datetime(dto.started_at)?,
             ended_at: Self::timestamp_to_datetime(dto.ended_at)?,
+        })
+    }
+
+    pub fn session_update_dto_to_command(
+        id: String,
+        dto: &UpdateFocusSessionDto,
+    ) -> AppResult<UpdateFocusSessionCommand> {
+        Ok(UpdateFocusSessionCommand {
+            session_id: Uuid::parse_str(id.as_str()).unwrap(), // should be safe due to validation
+            category_id: dto
+                .category_id
+                .clone()
+                .map(|id| Uuid::parse_str(id.as_str()).unwrap()), // should be safe due to validation
+            task_id: dto
+                .task_id
+                .clone()
+                .map(|id| Uuid::parse_str(id.as_str()).unwrap()), // should be safe due to validation
+            concentration_score: dto.concentration_score,
+            notes: dto.notes.clone(),
+            started_at: dto
+                .started_at
+                .map(|d| {
+                    Self::timestamp_to_datetime(d).map_err(|_| {
+                        AppError::BadRequest("Start time has a bad format".to_string())
+                    })
+                })
+                .transpose()?,
+            ended_at: dto
+                .ended_at
+                .map(|d| {
+                    Self::timestamp_to_datetime(d)
+                        .map_err(|_| AppError::BadRequest("End time has bad format".to_string()))
+                })
+                .transpose()?,
         })
     }
 
