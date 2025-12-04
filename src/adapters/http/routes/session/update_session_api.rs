@@ -37,7 +37,7 @@ pub async fn update_session_api(
         .validate()
         .map_err(|e| HttpError::BadRequest(e.to_string()))?;
 
-    let _ = state
+    state
         .update_focus_session_usecase
         .execute(FocusSessionMapper::session_update_dto_to_command(
             path.id, &payload,
