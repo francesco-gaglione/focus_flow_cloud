@@ -192,8 +192,11 @@ impl CalculateStatsByPeriodUseCase {
 
         for session in sessions {
             if let Some(score) = session.concentration_score() {
-                if (1..=5).contains(&score) {
-                    distribution[score as usize - 1] += 1;
+                if score > 0 {
+                    let index = (score - 1) as usize;
+                    if let Some(count) = distribution.get_mut(index) {
+                        *count += 1;
+                    }
                 }
             }
         }
