@@ -42,10 +42,27 @@ pub struct NewDbFocusSession {
 #[derive(Debug, Clone, AsChangeset, Serialize, Deserialize)]
 #[diesel(table_name = schema::focus_session)]
 pub struct UpdateDbFocusSession {
+    pub task_id: Option<Uuid>,
+    pub category_id: Option<Uuid>,
     pub actual_duration: Option<i64>,
     pub concentration_score: Option<i32>,
     pub notes: Option<String>,
+    pub started_at: Option<DateTime<Utc>>,
     pub ended_at: Option<DateTime<Utc>>,
+}
+
+impl From<crate::application::use_cases::persistance_command::update_focus_session_data::UpdateFocusSessionData> for UpdateDbFocusSession {
+    fn from(value: crate::application::use_cases::persistance_command::update_focus_session_data::UpdateFocusSessionData) -> Self {
+        Self {
+            task_id: value.task_id,
+            category_id: value.category_id,
+            actual_duration: None, // Not updateable via this DTO
+            concentration_score: value.concentration_score,
+            notes: value.notes,
+            started_at: value.started_at,
+            ended_at: value.ended_at,
+        }
+    }
 }
 
 impl From<DbFocusSession> for FocusSession {
