@@ -164,10 +164,8 @@ async fn update_task_test() {
         .expect("Failed to create task");
 
     assert_eq!(create_res.status(), 200);
-    let create_body: CreateTaskResponseDto = create_res
-        .json()
-        .await
-        .expect("Failed to deserialize");
+    let create_body: CreateTaskResponseDto =
+        create_res.json().await.expect("Failed to deserialize");
     let task_id = create_body.id;
 
     // Update Task
@@ -221,10 +219,8 @@ async fn delete_tasks_test() {
         .expect("Failed to create task");
 
     assert_eq!(create_res.status(), 200);
-    let create_body: CreateTaskResponseDto = create_res
-        .json()
-        .await
-        .expect("Failed to deserialize");
+    let create_body: CreateTaskResponseDto =
+        create_res.json().await.expect("Failed to deserialize");
     let task_id = create_body.id;
 
     // Delete Task
@@ -253,9 +249,6 @@ async fn delete_tasks_test() {
         .await
         .expect("Failed to list tasks");
 
-    let list_body: TasksResponseDto = list_res
-        .json()
-        .await
-        .expect("Failed to deserialize list");
+    let list_body: TasksResponseDto = list_res.json().await.expect("Failed to deserialize list");
     assert!(!list_body.tasks.iter().any(|t| t.id == task_id));
 }

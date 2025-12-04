@@ -3,10 +3,10 @@ use focus_flow_cloud::infra::{
     config::AppConfig,
     setup::{init_app_state, init_tracing},
 };
+use std::sync::Once;
 use testcontainers::runners::AsyncRunner;
 use testcontainers_modules::postgres::Postgres;
 use tokio::net::TcpListener;
-use std::sync::Once;
 
 static TRACING: Once = Once::new();
 
@@ -30,21 +30,21 @@ pub async fn setup() -> TestContext {
 
     // Setup AppConfig
     let config = AppConfig {
-        server_port: 0, 
+        server_port: 0,
         cors_origin: "*".to_string(),
         database_url: db_url,
     };
 
     // Initialize App State (this runs migrations)
     let app_state = init_app_state(config).await.unwrap();
-    
+
     // Create App Router
     let app = create_app(app_state);
 
     // Start Server
     let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
     let port = listener.local_addr().unwrap().port();
-    
+
     tokio::spawn(async move {
         axum::serve(listener, app).await.unwrap();
     });
