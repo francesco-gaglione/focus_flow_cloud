@@ -31,10 +31,8 @@ use tracing_subscriber::util::SubscriberInitExt;
 use tracing_subscriber::EnvFilter;
 use tracing_tree::HierarchicalLayer;
 
-pub async fn init_app_state() -> Result<AppState, Box<dyn std::error::Error>> {
-    let config = AppConfig::from_env();
-
-    let postgres_arc = Arc::new(postgres_persistence().await);
+pub async fn init_app_state(config: AppConfig) -> Result<AppState, Box<dyn std::error::Error>> {
+    let postgres_arc = Arc::new(postgres_persistence(&config.database_url).await);
 
     // Category Use Cases
     let create_category_usecase = Arc::new(CreateCategoryUseCases::new(postgres_arc.clone()));

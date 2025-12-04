@@ -14,7 +14,7 @@ use crate::{
 #[cfg_attr(test, mockall::automock)]
 #[async_trait]
 pub trait CategoryPersistence: Send + Sync {
-    async fn create_category(&self, category: CreateCategoryData) -> AppResult<()>;
+    async fn create_category(&self, category: CreateCategoryData) -> AppResult<Uuid>;
     async fn find_all(&self) -> AppResult<Vec<Category>>;
     async fn find_by_id(&self, category_id: Uuid) -> AppResult<Category>;
     async fn update_category(

@@ -1,5 +1,7 @@
 use std::sync::Arc;
 
+use uuid::Uuid;
+
 use crate::application::{
     app_error::AppResult,
     helpers::random_hex_color,
@@ -22,7 +24,7 @@ impl CreateCategoryUseCases {
         }
     }
 
-    pub async fn execute(&self, category: CreateCategoryCommand) -> AppResult<()> {
+    pub async fn execute(&self, category: CreateCategoryCommand) -> AppResult<Uuid> {
         self.category_persistence
             .create_category(CreateCategoryData {
                 name: category.name.clone(),
@@ -59,13 +61,14 @@ mod tests {
             None,
             "#FF0000".to_string(),
         );
+        let id = Uuid::new_v4();
         mock.expect_create_category()
             .with(predicate::eq(CreateCategoryData {
                 name: category.name().to_string(),
                 description: category.description().map(|d| d.to_string()),
                 color: category.color().to_string(),
             }))
-            .returning(move |_| Ok(()));
+            .returning(move |_| Ok(id.clone()));
         let use_cases = CreateCategoryUseCases::new(Arc::new(mock));
         let result = use_cases
             .execute(CreateCategoryCommand {
@@ -74,6 +77,6 @@ mod tests {
                 color: Some(category.color().to_string()),
             })
             .await;
-        assert_eq!(result, Ok(()));
+        assert_eq!(result, Ok(id));
     }
 }

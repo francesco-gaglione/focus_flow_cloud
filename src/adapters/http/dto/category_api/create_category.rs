@@ -21,5 +21,5 @@ pub struct CreateCategoryDto {
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct CreateCategoryResponseDto {
-    pub created: bool,
+    pub category_id: String,
 }

@@ -16,7 +16,7 @@ use uuid::Uuid;
 
 #[async_trait]
 impl CategoryPersistence for PostgresPersistence {
-    async fn create_category(&self, create_data: CreateCategoryData) -> AppResult<()> {
+    async fn create_category(&self, create_data: CreateCategoryData) -> AppResult<Uuid> {
         let conn = self
             .pool
             .get()
@@ -38,7 +38,7 @@ impl CategoryPersistence for PostgresPersistence {
 
         info!("Created category with id: {}", result.id);
 
-        Ok(())
+        Ok(result.id)
     }
 
     async fn find_all(&self) -> AppResult<Vec<Category>> {

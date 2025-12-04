@@ -47,13 +47,20 @@ docker-logs:
 # TESTING
 # ============================================================================
 
-# Run all tests
-test:
-    cargo test
+# Run all unit tests (within src/)
+test-unit:
+    cargo test --lib --bins
 
-# Test a specific module, e.g., `just test-module domain::entities`
-test-module module:
-    cargo test {{ module }}
+# Run all integration tests (within tests/ directory)
+test-integration:
+    cargo test --test "*"
+
+# Run all tests (unit and integration)
+test-all: test-unit test-integration
+
+# Run a specific test (unit or integration), e.g., `just test-single my_function_test` or `just test-single category_e2e`
+test-single test_name:
+    cargo test {{ test_name }}
 
 # ============================================================================
 # CODE QUALITY
@@ -72,7 +79,7 @@ lint:
     cargo clippy -- -D warnings
 
 # Run all quality checks (fmt + clippy + tests)
-check: fmt-check lint test
+check: fmt-check lint test-all
     @echo "All checks passed!"
 
 # Fix common clippy warnings automatically
