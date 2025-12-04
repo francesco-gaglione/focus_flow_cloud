@@ -1,6 +1,7 @@
 use crate::adapters::http::app_state::AppState;
 use crate::adapters::http::pomodoro_state::PomodoroState;
 use crate::application::use_cases::focus_session::update_focus_session::UpdateFocusSessionUseCase;
+use crate::application::use_cases::task::get_tasks::GetTasksUseCase;
 use crate::application::use_cases::user_settings::get_settings::GetSettingsUseCase;
 use crate::application::use_cases::user_settings::update_setting::UpdateSettingUseCase;
 use crate::application::use_cases::{
@@ -47,6 +48,7 @@ pub async fn init_app_state(config: AppConfig) -> Result<AppState, Box<dyn std::
 
     // Task Use Cases
     let create_task_usecase = Arc::new(CreateTaskUseCase::new(postgres_arc.clone()));
+    let get_tasks_usecase = Arc::new(GetTasksUseCase::new(postgres_arc.clone()));
     let delete_tasks_usecase = Arc::new(DeleteTasksUseCase::new(postgres_arc.clone()));
     let orphan_tasks_usecase = Arc::new(OrphanTasksUseCase::new(postgres_arc.clone()));
     let update_task_usecase = Arc::new(UpdateTaskUseCase::new(postgres_arc.clone()));
@@ -81,6 +83,7 @@ pub async fn init_app_state(config: AppConfig) -> Result<AppState, Box<dyn std::
         get_category_and_task_usecase,
         get_category_usecase,
         update_category_usecase,
+        get_tasks_usecase,
         create_task_usecase,
         delete_tasks_usecase,
         orphan_tasks_usecase,
