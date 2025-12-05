@@ -1,7 +1,8 @@
 use std::sync::Arc;
 
-use crate::{app_error::AppResult, traits::category_persistence::CategoryPersistence};
+use crate::app_error::AppResult;
 use domain::entities::category::Category;
+use domain::traits::category_persistence::CategoryPersistence;
 
 #[derive(Clone)]
 pub struct GetCategoryUseCases {
@@ -16,7 +17,7 @@ impl GetCategoryUseCases {
     }
 
     pub async fn execute(&self, category_id: uuid::Uuid) -> AppResult<Category> {
-        self.category_persistence.find_by_id(category_id).await
+        Ok(self.category_persistence.find_by_id(category_id).await?)
     }
 }
 
@@ -27,7 +28,7 @@ mod tests {
     use uuid::Uuid;
 
     use crate::{
-        traits::category_persistence::MockCategoryPersistence,
+        mocks::MockCategoryPersistence,
         use_cases::category::get_category_usecase::GetCategoryUseCases,
     };
     use domain::entities::category::Category;
@@ -35,12 +36,13 @@ mod tests {
     #[tokio::test]
     async fn test_get_category_usecase() {
         let category_id = Uuid::new_v4();
-        let category = Category::new(
+        let category = Category::reconstitute(
             category_id,
             "Test Category".to_string(),
             None,
             "#FFFFFF".to_string(),
-        );
+        )
+        .unwrap();
 
         let mut mock_persistence = MockCategoryPersistence::new();
         let category_to_return = category.clone();

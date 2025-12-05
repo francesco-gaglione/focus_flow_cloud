@@ -1,6 +1,4 @@
 use crate::adapters::schema;
-use application::use_cases::persistance_command::create_task_data::CreateTaskData;
-use application::use_cases::persistance_command::update_task_data::UpdateTaskData;
 use chrono::{DateTime, NaiveDate, Utc};
 use diesel::{AsChangeset, Insertable, Queryable, Selectable};
 use domain::entities::task::Task;
@@ -40,13 +38,13 @@ pub struct UpdateDbTask {
     pub completed_at: Option<DateTime<Utc>>,
 }
 
-impl From<CreateTaskData> for NewDbTask {
-    fn from(value: CreateTaskData) -> Self {
+impl From<Task> for NewDbTask {
+    fn from(value: Task) -> Self {
         Self {
-            category_id: value.category_id().cloned(),
+            category_id: value.category_id(),
             name: value.name().to_string(),
             description: value.description().map(|s| s.to_string()),
-            scheduled_date: value.scheduled_date().cloned(),
+            scheduled_date: value.scheduled_date(),
         }
     }
 }
@@ -80,7 +78,7 @@ impl From<Task> for UpdateDbTask {
 
 impl From<DbTask> for Task {
     fn from(value: DbTask) -> Self {
-        Self::new(
+        Self::reconstitute(
             value.id,
             value.category_id,
             value.name,
@@ -88,17 +86,5 @@ impl From<DbTask> for Task {
             value.scheduled_date,
             value.completed_at,
         )
-    }
-}
-
-impl From<UpdateTaskData> for UpdateDbTask {
-    fn from(value: UpdateTaskData) -> Self {
-        Self {
-            category_id: value.category_id(),
-            name: value.name(),
-            description: value.description(),
-            scheduled_date: value.scheduled_date(),
-            completed_at: value.completed_at(),
-        }
     }
 }

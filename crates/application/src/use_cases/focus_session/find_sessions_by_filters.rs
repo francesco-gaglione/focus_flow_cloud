@@ -1,9 +1,8 @@
 use crate::app_error::{AppError, AppResult};
-use crate::traits::focus_session_persistence::FocusSessionPersistence;
 use crate::use_cases::focus_session::command::find_session_filters::FindSessionFiltersCommand;
-use crate::use_cases::persistance_command::find_session_by_filters_data::FindSessionByFiltersData;
 use chrono::DateTime;
-use domain::entities::focus_session::FocusSession;
+use domain::entities::focus_session::{FocusSession, SessionFilter};
+use domain::traits::focus_session_persistence::FocusSessionPersistence;
 use std::sync::Arc;
 use uuid::Uuid;
 
@@ -22,46 +21,51 @@ impl FindSessionsByFiltersUseCase {
         &self,
         filters: FindSessionFiltersCommand,
     ) -> AppResult<Vec<FocusSession>> {
-        let start_date = match filters.date_range.as_ref() {
-            Some(r) => Some(
-                DateTime::from_timestamp(r.start_date, 0)
-                    .ok_or_else(|| AppError::BadRequest("Invalid start date".to_string()))?,
-            ),
-            None => None,
-        };
-
-        let end_date = match filters.date_range.as_ref() {
-            Some(r) => Some(
-                DateTime::from_timestamp(r.end_date, 0)
-                    .ok_or_else(|| AppError::BadRequest("Invalid end date".to_string()))?,
-            ),
-            None => None,
-        };
+        let (start_date, end_date) = filters
+            .date_range
+            .as_ref()
+            .map(|r| {
+                let start = DateTime::from_timestamp(r.start_date, 0)
+                    .ok_or_else(|| AppError::InvalidDateRange(r.start_date.to_string()));
+                let end = DateTime::from_timestamp(r.end_date, 0)
+                    .ok_or_else(|| AppError::InvalidDateRange(r.end_date.to_string()));
+                start.and_then(|s| end.map(|e| (Some(s), Some(e))))
+            })
+            .transpose()?
+            .unwrap_or((None, None));
 
         let category_ids = filters
             .category_ids
-            .map(|ids| ids.iter().map(|id| Uuid::parse_str(id).unwrap()).collect());
-
-        let min_concentration_score = filters.concentration_score_range.clone().map(|s| s.min);
-        let max_concentration_score = filters.concentration_score_range.clone().map(|s| s.max);
-
-        self.session_persistence
-            .find_by_filters(FindSessionByFiltersData {
-                start_date,
-                end_date,
-                category_ids,
-                session_type: filters.session_type,
-                min_concentration_score,
-                max_concentration_score,
+            .map(|ids| {
+                ids.iter()
+                    .map(|id| Uuid::parse_str(id))
+                    .collect::<Result<Vec<_>, _>>()
+                    .map_err(|_| AppError::InvalidId("Category category id".to_string()))
             })
-            .await
+            .transpose()?;
+
+        let (min_concentration_score, max_concentration_score) = filters
+            .concentration_score_range
+            .map(|s| (s.min, s.max))
+            .unzip();
+
+        let filter = SessionFilter {
+            start_date,
+            end_date,
+            category_ids,
+            session_type: filters.session_type,
+            min_concentration_score,
+            max_concentration_score,
+        };
+
+        Ok(self.session_persistence.find_by_filters(filter).await?)
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::traits::focus_session_persistence::MockFocusSessionPersistence;
+    use crate::mocks::MockFocusSessionPersistence;
     use crate::use_cases::focus_session::command::find_session_filters::{
         ConcentrationScoreFilter, FocusSessionDateFilter,
     };
@@ -80,7 +84,7 @@ mod tests {
         let started_at = DateTime::from_timestamp(1761118663, 0).unwrap();
         let ended_at = DateTime::from_timestamp(1761118714, 0).unwrap();
 
-        let focus_session = FocusSession::new_with_id(
+        let focus_session = FocusSession::reconstitute(
             session_id,
             Some(category_id),
             Some(task_id),
@@ -159,9 +163,6 @@ mod tests {
 
         let result = use_case.execute(filters).await;
         assert!(result.is_err());
-        match result.unwrap_err() {
-            AppError::BadRequest(msg) => assert_eq!(msg, "Invalid start date"),
-            _ => panic!("Expected BadRequest for invalid start date"),
-        }
+        matches!(result.unwrap_err(), AppError::InvalidDateRange(_));
     }
 }

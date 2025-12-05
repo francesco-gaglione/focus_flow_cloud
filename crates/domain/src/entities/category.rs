@@ -1,5 +1,10 @@
 use uuid::Uuid;
 
+use crate::{
+    error::domain_error::{DomainError, DomainResult},
+    helpers::validate_hex_color,
+};
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct Category {
     id: Uuid,
@@ -9,13 +14,35 @@ pub struct Category {
 }
 
 impl Category {
-    pub fn new(id: Uuid, name: String, description: Option<String>, color: String) -> Self {
-        Category {
+    pub fn create(name: String, description: Option<String>, color: String) -> DomainResult<Self> {
+        if !validate_hex_color(&color) {
+            return Err(DomainError::InvalidColor(color));
+        }
+
+        Ok(Category {
+            id: Uuid::new_v4(),
+            name,
+            description,
+            color,
+        })
+    }
+
+    pub fn reconstitute(
+        id: Uuid,
+        name: String,
+        description: Option<String>,
+        color: String,
+    ) -> DomainResult<Self> {
+        if !validate_hex_color(&color) {
+            return Err(DomainError::InvalidColor(color));
+        }
+
+        Ok(Category {
             id,
             name,
             description,
             color,
-        }
+        })
     }
 
     pub fn id(&self) -> Uuid {
@@ -33,6 +60,18 @@ impl Category {
     pub fn color(&self) -> &str {
         &self.color
     }
+
+    pub fn update_name(&mut self, name: String) {
+        self.name = name;
+    }
+
+    pub fn update_description(&mut self, description: Option<String>) {
+        self.description = description;
+    }
+
+    pub fn update_color(&mut self, color: String) {
+        self.color = color;
+    }
 }
 
 #[cfg(test)]
@@ -46,7 +85,7 @@ mod category_tests {
         let description = Some("This is a test category".to_string());
         let color = "#FF0000".to_string();
 
-        let category = Category::new(id, name, description, color);
+        let category = Category::reconstitute(id, name, description, color).unwrap();
 
         assert_eq!(category.id(), id);
         assert_eq!(category.name(), "Test Category");

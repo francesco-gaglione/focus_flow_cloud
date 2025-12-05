@@ -11,7 +11,6 @@ tracing.workspace = true
 uuid = { workspace = true, features = ["v4", "serde"] }
 chrono = { workspace = true, features = ["serde"] }
 serde = { workspace = true, features = ["derive"] }
-rand.workspace = true
 futures-util.workspace = true
 
 [dev-dependencies]

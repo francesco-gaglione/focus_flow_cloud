@@ -1,14 +1,10 @@
 use std::sync::Arc;
 
 use crate::{
-    app_error::AppResult,
-    traits::category_persistence::CategoryPersistence,
-    use_cases::{
-        category::command::update_category::UpdateCategoryCommand,
-        persistance_command::update_category_data::UpdateCategoryData,
-    },
+    app_error::AppResult, use_cases::category::command::update_category::UpdateCategoryCommand,
 };
 use domain::entities::category::Category;
+use domain::traits::category_persistence::CategoryPersistence;
 
 #[derive(Clone)]
 pub struct UpdateCategoryUseCases {
@@ -22,17 +18,20 @@ impl UpdateCategoryUseCases {
         }
     }
 
-    pub async fn execute(&self, category: UpdateCategoryCommand) -> AppResult<Category> {
-        self.category_persistence
-            .update_category(
-                category.id,
-                UpdateCategoryData {
-                    name: category.name,
-                    description: category.description,
-                    color: category.color,
-                },
-            )
-            .await
+    pub async fn execute(&self, command: UpdateCategoryCommand) -> AppResult<Category> {
+        let mut category = self.category_persistence.find_by_id(command.id).await?;
+
+        if let Some(name) = command.name {
+            category.update_name(name);
+        }
+        if let Some(description) = command.description {
+            category.update_description(Some(description));
+        }
+        if let Some(color) = command.color {
+            category.update_color(color);
+        }
+
+        Ok(self.category_persistence.update_category(category).await?)
     }
 }
 
@@ -41,7 +40,7 @@ mod tests {
     use std::sync::Arc;
 
     use crate::{
-        traits::category_persistence::MockCategoryPersistence,
+        mocks::MockCategoryPersistence,
         use_cases::category::{
             command::update_category::UpdateCategoryCommand,
             update_category_usecase::UpdateCategoryUseCases,
@@ -59,19 +58,36 @@ mod tests {
         let mut category_persistence = MockCategoryPersistence::new();
 
         // Clone variables for the closure
-        let name_clone = category_name.clone();
-        let description_clone = category_description.clone();
-        let color_clone = category_color.clone();
+        let name_clone_update = category_name.clone();
+        let description_clone_update = category_description.clone();
+        let color_clone_update = category_color.clone();
+
+        let name_clone_find = category_name.clone();
+        let description_clone_find = category_description.clone();
+        let color_clone_find = category_color.clone();
 
         category_persistence
             .expect_update_category()
-            .returning(move |_, _| {
-                Ok(Category::new(
+            .returning(move |_| {
+                Ok(Category::reconstitute(
                     category_id,
-                    name_clone.clone(),
-                    Some(description_clone.clone()),
-                    color_clone.clone(),
-                ))
+                    name_clone_update.clone(),
+                    Some(description_clone_update.clone()),
+                    color_clone_update.clone(),
+                )
+                .unwrap())
+            });
+
+        category_persistence
+            .expect_find_by_id()
+            .returning(move |_| {
+                Ok(Category::reconstitute(
+                    category_id,
+                    name_clone_find.clone(),
+                    Some(description_clone_find.clone()),
+                    color_clone_find.clone(),
+                )
+                .unwrap())
             });
         let use_case = UpdateCategoryUseCases::new(Arc::new(category_persistence));
 

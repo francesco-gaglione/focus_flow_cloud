@@ -86,7 +86,6 @@ dependencies = [
  "domain",
  "futures-util",
  "mockall",
- "rand 0.8.5",
  "serde",
  "thiserror",
  "tokio",
@@ -664,8 +663,12 @@ dependencies = [
 name = "domain"
 version = "0.1.0"
 dependencies = [
+ "async-trait",
  "chrono",
+ "mockall",
+ "rand 0.8.5",
  "thiserror",
+ "tokio",
  "uuid",
 ]
 

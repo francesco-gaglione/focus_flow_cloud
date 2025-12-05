@@ -9,20 +9,18 @@ use crate::adapters::{
     },
     schema,
 };
-use application::{
-    app_error::{AppError, AppResult},
-    traits::user_setting_persistence::UserSettingPersistence,
-};
 use domain::entities::user_setting::UserSetting;
+use domain::error::persistence_error::{PersistenceError, PersistenceResult};
+use domain::traits::user_setting_persistence::UserSettingPersistence;
 
 #[async_trait]
 impl UserSettingPersistence for PostgresPersistence {
-    async fn find_all(&self) -> AppResult<Vec<UserSetting>> {
+    async fn find_all(&self) -> PersistenceResult<Vec<UserSetting>> {
         let conn = self
             .pool
             .get()
             .await
-            .map_err(|e| AppError::Database(e.to_string()))?;
+            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?;
 
         let result = conn
             .interact(move |conn| {
@@ -32,19 +30,19 @@ impl UserSettingPersistence for PostgresPersistence {
                     .load(conn)
             })
             .await
-            .map_err(|e| AppError::Database(e.to_string()))?
-            .map_err(|e| AppError::Database(e.to_string()))?;
+            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?
+            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?;
 
         let tasks: Vec<UserSetting> = result.into_iter().map(|c| c.into()).collect();
         Ok(tasks)
     }
 
-    async fn update_setting(&self, key: String, value: String) -> AppResult<()> {
+    async fn update_setting(&self, key: String, value: String) -> PersistenceResult<()> {
         let conn = self
             .pool
             .get()
             .await
-            .map_err(|e| AppError::Database(e.to_string()))?;
+            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?;
         let result = conn
             .interact(move |conn| {
                 diesel::update(schema::user_settings::table)
@@ -55,23 +53,23 @@ impl UserSettingPersistence for PostgresPersistence {
                     .optional()
             })
             .await
-            .map_err(|e| AppError::Database(e.to_string()))?
-            .map_err(|e| AppError::Database(e.to_string()))?;
+            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?
+            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?;
 
         match result {
-            None => Err(AppError::GenericError(
+            None => Err(PersistenceError::Unexpected(
                 "UserSetting not updated".to_string(),
             )),
             Some(_) => Ok(()),
         }
     }
 
-    async fn create_setting(&self, key: String, value: String) -> AppResult<()> {
+    async fn create_setting(&self, key: String, value: String) -> PersistenceResult<()> {
         let conn = self
             .pool
             .get()
             .await
-            .map_err(|e| AppError::Database(e.to_string()))?;
+            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?;
 
         let _ = conn
             .interact(move |conn| {
@@ -81,8 +79,8 @@ impl UserSettingPersistence for PostgresPersistence {
                     .get_result(conn)
             })
             .await
-            .map_err(|e| AppError::Database(e.to_string()))?
-            .map_err(|e| AppError::Database(e.to_string()))?;
+            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?
+            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?;
 
         Ok(())
     }

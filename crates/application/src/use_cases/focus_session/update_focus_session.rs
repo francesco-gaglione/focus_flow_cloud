@@ -2,12 +2,9 @@ use std::sync::Arc;
 
 use crate::{
     app_error::AppResult,
-    traits::focus_session_persistence::FocusSessionPersistence,
-    use_cases::{
-        focus_session::command::update_focus_session::UpdateFocusSessionCommand,
-        persistance_command::update_focus_session_data::UpdateFocusSessionData,
-    },
+    use_cases::focus_session::command::update_focus_session::UpdateFocusSessionCommand,
 };
+use domain::traits::focus_session_persistence::FocusSessionPersistence;
 
 pub struct UpdateFocusSessionUseCase {
     session_persistence: Arc<dyn FocusSessionPersistence>,
@@ -49,18 +46,7 @@ impl UpdateFocusSessionUseCase {
             )?;
         }
 
-        let session_data = UpdateFocusSessionData {
-            session_id: session.id(),
-            task_id: session.task_id(),
-            category_id: session.category_id(),
-            concentration_score: session.concentration_score(),
-            notes: session.notes().clone(),
-            actual_duration: session.actual_duration(),
-            started_at: Some(session.started_at()),
-            ended_at: session.ended_at(),
-        };
-
-        self.session_persistence.update_session(session_data).await
+        Ok(self.session_persistence.update_session(session).await?)
     }
 }
 
@@ -68,14 +54,10 @@ impl UpdateFocusSessionUseCase {
 mod tests {
     use std::sync::Arc;
 
-    use chrono::Duration;
-
-    use crate::{
-        traits::focus_session_persistence::MockFocusSessionPersistence,
-        use_cases::focus_session::{
-            command::update_focus_session::UpdateFocusSessionCommand,
-            update_focus_session::UpdateFocusSessionUseCase,
-        },
+    use crate::mocks::MockFocusSessionPersistence;
+    use crate::use_cases::focus_session::{
+        command::update_focus_session::UpdateFocusSessionCommand,
+        update_focus_session::UpdateFocusSessionUseCase,
     };
     use domain::entities::{focus_session::FocusSession, focus_session_type::FocusSessionType};
 
@@ -101,12 +83,11 @@ mod tests {
                     Some(task_id.clone()),
                     FocusSessionType::Work,
                     Some(3600),
-                    Some(concentration_score),
                     Some("Test notes".to_string()),
                     started_at,
                     Some(ended_at),
-                    chrono::Utc::now(),
-                ))
+                )
+                .unwrap())
             });
         let use_case = UpdateFocusSessionUseCase::new(Arc::new(session_persistence));
 

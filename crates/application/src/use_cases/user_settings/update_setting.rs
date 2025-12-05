@@ -1,5 +1,5 @@
 use crate::app_error::AppResult;
-use crate::traits::user_setting_persistence::UserSettingPersistence;
+use domain::traits::user_setting_persistence::UserSettingPersistence;
 use std::sync::Arc;
 
 pub struct UpdateSettingUseCase {
@@ -17,9 +17,11 @@ impl UpdateSettingUseCase {
         let settings = self.setting_persistence.find_all().await?;
 
         if settings.iter().any(|s| s.key() == key) {
-            self.setting_persistence.update_setting(key, value).await
+            self.setting_persistence.update_setting(key, value).await?;
         } else {
-            self.setting_persistence.create_setting(key, value).await
+            self.setting_persistence.create_setting(key, value).await?;
         }
+
+        Ok(())
     }
 }

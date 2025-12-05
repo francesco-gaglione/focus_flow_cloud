@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
-use crate::{app_error::AppResult, traits::category_persistence::CategoryPersistence};
+use crate::app_error::AppResult;
+use domain::traits::category_persistence::CategoryPersistence;
 
 #[derive(Clone)]
 pub struct DeleteCategoriesUseCases {
@@ -31,7 +32,7 @@ mod tests {
     use std::sync::Arc;
 
     use crate::{
-        traits::category_persistence::MockCategoryPersistence,
+        mocks::MockCategoryPersistence,
         use_cases::category::delete_categories_usecase::DeleteCategoriesUseCases,
     };
 

@@ -1,9 +1,7 @@
 use crate::adapters::schema;
-use application::use_cases::persistance_command::create_category_data::CreateCategoryData;
-use application::use_cases::persistance_command::update_category_data::UpdateCategoryData;
 use chrono::{DateTime, Utc};
 use diesel::{AsChangeset, Insertable, Queryable, Selectable};
-use domain::entities::category::Category;
+use domain::{entities::category::Category, error::persistence_error::PersistenceError};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -23,6 +21,7 @@ pub struct DbCategory {
 #[derive(Debug, Clone, Insertable, Serialize, Deserialize)]
 #[diesel(table_name = schema::categories)]
 pub struct NewDbCategory {
+    pub id: Uuid,
     pub name: String,
     pub description: Option<String>,
     pub color: String,
@@ -36,28 +35,32 @@ pub struct UpdateDbCategory {
     pub color: Option<String>,
 }
 
-impl From<CreateCategoryData> for NewDbCategory {
-    fn from(value: CreateCategoryData) -> Self {
+impl From<Category> for NewDbCategory {
+    fn from(value: Category) -> Self {
         Self {
-            name: value.name,
-            description: value.description,
-            color: value.color,
+            id: value.id(),
+            name: value.name().to_string(),
+            description: value.description().map(|s| s.to_string()),
+            color: value.color().to_string(),
         }
     }
 }
 
-impl From<UpdateCategoryData> for UpdateDbCategory {
-    fn from(value: UpdateCategoryData) -> Self {
+impl From<Category> for UpdateDbCategory {
+    fn from(value: Category) -> Self {
         Self {
-            name: value.name,
-            description: value.description,
-            color: value.color,
+            name: Some(value.name().to_string()),
+            description: value.description().map(|s| s.to_string()),
+            color: Some(value.color().to_string()),
         }
     }
 }
 
-impl From<DbCategory> for Category {
-    fn from(value: DbCategory) -> Self {
-        Self::new(value.id, value.name, value.description, value.color)
+impl TryFrom<DbCategory> for Category {
+    type Error = PersistenceError;
+
+    fn try_from(value: DbCategory) -> Result<Self, Self::Error> {
+        Self::reconstitute(value.id, value.name, value.description, value.color)
+            .map_err(|e| PersistenceError::Unexpected(format!("{}", e)))
     }
 }

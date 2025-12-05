@@ -1,8 +1,7 @@
 use crate::app_error::AppResult;
-use crate::traits::focus_session_persistence::FocusSessionPersistence;
 use crate::use_cases::focus_session::command::create_manual_session::CreateManualFocusSessionCommand;
-use crate::use_cases::persistance_command::create_manual_session_data::CreateManualSessionData;
 use domain::entities::focus_session::FocusSession;
+use domain::traits::focus_session_persistence::FocusSessionPersistence;
 use std::sync::Arc;
 
 #[derive(Clone)]
@@ -19,24 +18,22 @@ impl CreateManualSessionUseCase {
 
     pub async fn execute(
         &self,
-        session: CreateManualFocusSessionCommand,
+        session_cmd: CreateManualFocusSessionCommand,
     ) -> AppResult<FocusSession> {
-        let duration = session.ended_at.timestamp() - session.started_at.timestamp();
+        let session = FocusSession::new(
+            session_cmd.category_id,
+            session_cmd.task_id,
+            session_cmd.session_type,
+            session_cmd.concentration_score,
+            session_cmd.notes,
+            session_cmd.started_at,
+            Some(session_cmd.ended_at),
+        )?;
 
-        let manual_session_data = CreateManualSessionData {
-            task_id: session.task_id,
-            category_id: session.category_id,
-            session_type: session.session_type,
-            concentration_score: session.concentration_score,
-            notes: session.notes.clone(),
-            actual_duration: duration,
-            started_at: session.started_at,
-            ended_at: session.ended_at,
-        };
-
-        self.session_persistence
-            .create_manual_session(&manual_session_data)
-            .await
+        Ok(self
+            .session_persistence
+            .create_manual_session(session)
+            .await?)
     }
 }
 
@@ -44,7 +41,7 @@ impl CreateManualSessionUseCase {
 mod tests {
     use super::*;
     use crate::app_error::AppError;
-    use crate::traits::focus_session_persistence::MockFocusSessionPersistence;
+    use crate::mocks::MockFocusSessionPersistence;
     use chrono::DateTime;
     use domain::entities::focus_session_type::FocusSessionType;
     use std::sync::Arc;
@@ -61,7 +58,7 @@ mod tests {
         let ended_at = DateTime::from_timestamp(1761118714, 0).unwrap();
         let duration = ended_at.timestamp() - started_at.timestamp();
 
-        let focus_session = FocusSession::new_with_id(
+        let focus_session = FocusSession::reconstitute(
             id,
             Some(category_id),
             Some(task_id),
@@ -103,7 +100,13 @@ mod tests {
 
         mock_session_persistence
             .expect_create_manual_session()
-            .returning(|_| Err(AppError::BadRequest("Invalid session data".to_string())));
+            .returning(|_| {
+                Err(
+                    domain::error::persistence_error::PersistenceError::Unexpected(
+                        "Invalid session data".to_string(),
+                    ),
+                )
+            });
 
         let cmd = CreateManualFocusSessionCommand {
             category_id: Some(Uuid::new_v4()),
@@ -120,8 +123,8 @@ mod tests {
 
         assert!(result.is_err());
         match result.unwrap_err() {
-            AppError::BadRequest(msg) => assert_eq!(msg, "Invalid session data"),
-            _ => panic!("Expected BadRequest"),
+            AppError::Database(msg) => assert_eq!(msg, "Invalid session data"),
+            _ => panic!("Expected Database error"),
         }
     }
 }

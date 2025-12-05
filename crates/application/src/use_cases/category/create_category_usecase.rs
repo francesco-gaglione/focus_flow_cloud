@@ -3,13 +3,11 @@ use std::sync::Arc;
 use uuid::Uuid;
 
 use crate::{
-    app_error::AppResult,
-    helpers::random_hex_color,
+    app_error::AppResult, use_cases::category::command::create_category::CreateCategoryCommand,
+};
+use domain::{
+    entities::category::Category, helpers::random_hex_color,
     traits::category_persistence::CategoryPersistence,
-    use_cases::{
-        category::command::create_category::CreateCategoryCommand,
-        persistance_command::create_category_data::CreateCategoryData,
-    },
 };
 
 #[derive(Clone)]
@@ -24,14 +22,18 @@ impl CreateCategoryUseCases {
         }
     }
 
-    pub async fn execute(&self, category: CreateCategoryCommand) -> AppResult<Uuid> {
+    pub async fn execute(&self, category_cmd: CreateCategoryCommand) -> AppResult<Uuid> {
+        let category = Category::create(
+            category_cmd.name,
+            category_cmd.description,
+            category_cmd.color.unwrap_or_else(random_hex_color),
+        )?;
+
         self.category_persistence
-            .create_category(CreateCategoryData {
-                name: category.name.clone(),
-                description: category.description.clone(),
-                color: category.color.clone().unwrap_or(random_hex_color()),
-            })
-            .await
+            .create_category(category.clone())
+            .await?;
+
+        Ok(category.id())
     }
 }
 
@@ -39,42 +41,35 @@ impl CreateCategoryUseCases {
 mod tests {
     use std::sync::Arc;
 
-    use mockall::predicate;
     use uuid::Uuid;
 
     use crate::{
-        traits::category_persistence::MockCategoryPersistence,
+        mocks::MockCategoryPersistence,
         use_cases::category::command::create_category::CreateCategoryCommand,
         use_cases::category::create_category_usecase::CreateCategoryUseCases,
-        use_cases::persistance_command::create_category_data::CreateCategoryData,
     };
-    use domain::entities::category::Category;
 
     #[tokio::test]
     async fn test_create_category() {
         let mut mock = MockCategoryPersistence::new();
-        let category = Category::new(
-            Uuid::new_v4(),
-            "Test Category".to_string(),
-            None,
-            "#FF0000".to_string(),
-        );
+        let name = "Test Category".to_string();
+        let description: Option<String> = None;
+        let color = "#FF0000".to_string();
+
         let id = Uuid::new_v4();
+
         mock.expect_create_category()
-            .with(predicate::eq(CreateCategoryData {
-                name: category.name().to_string(),
-                description: category.description().map(|d| d.to_string()),
-                color: category.color().to_string(),
-            }))
-            .returning(move |_| Ok(id.clone()));
+            .withf(move |c| c.name() == "Test Category" && c.color() == "#FF0000")
+            .returning(move |_| Ok(id));
+
         let use_cases = CreateCategoryUseCases::new(Arc::new(mock));
         let result = use_cases
             .execute(CreateCategoryCommand {
-                name: category.name().to_string(),
-                description: category.description().map(|d| d.to_string()),
-                color: Some(category.color().to_string()),
+                name: name.to_string(),
+                description: description.map(|d| d.to_string()),
+                color: Some(color.to_string()),
             })
             .await;
-        assert_eq!(result, Ok(id));
+        assert!(result.is_ok());
     }
 }

@@ -1,6 +1,6 @@
 use crate::{
     entities::focus_session_type::FocusSessionType,
-    error::{DomainError, DomainResult},
+    error::domain_error::{DomainError, DomainResult},
 };
 use chrono::{DateTime, Utc};
 use uuid::Uuid;
@@ -25,14 +25,24 @@ impl FocusSession {
         category_id: Option<Uuid>,
         task_id: Option<Uuid>,
         session_type: FocusSessionType,
-        actual_duration: Option<i64>,
         concentration_score: Option<i32>,
         notes: Option<String>,
         started_at: DateTime<Utc>,
         ended_at: Option<DateTime<Utc>>,
-        created_at: DateTime<Utc>,
-    ) -> Self {
-        FocusSession {
+    ) -> DomainResult<Self> {
+        if matches!(
+            session_type,
+            FocusSessionType::ShortBreak | FocusSessionType::LongBreak
+        ) && concentration_score.is_some()
+        {
+            return Err(DomainError::InvalidFocusSessionParam(
+                "concentration_score".to_string(),
+            ));
+        }
+
+        let actual_duration = ended_at.map(|ended_at| (ended_at - started_at).num_seconds());
+
+        Ok(FocusSession {
             id: Uuid::new_v4(),
             category_id,
             task_id,
@@ -42,12 +52,12 @@ impl FocusSession {
             notes,
             started_at,
             ended_at,
-            created_at,
-        }
+            created_at: Utc::now(),
+        })
     }
 
     #[allow(clippy::too_many_arguments)]
-    pub fn new_with_id(
+    pub fn reconstitute(
         id: Uuid,
         category_id: Option<Uuid>,
         task_id: Option<Uuid>,
@@ -150,4 +160,14 @@ impl FocusSession {
     pub fn created_at(&self) -> DateTime<Utc> {
         self.created_at
     }
+}
+
+#[derive(Debug, Clone)]
+pub struct SessionFilter {
+    pub start_date: Option<DateTime<Utc>>,
+    pub end_date: Option<DateTime<Utc>>,
+    pub category_ids: Option<Vec<Uuid>>,
+    pub session_type: Option<FocusSessionType>,
+    pub min_concentration_score: Option<i32>,
+    pub max_concentration_score: Option<i32>,
 }

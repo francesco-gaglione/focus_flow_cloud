@@ -1,8 +1,7 @@
 use crate::app_error::AppResult;
-use crate::traits::focus_session_persistence::FocusSessionPersistence;
 use crate::use_cases::focus_session::command::create_foucs_session::CreateFocusSessionCommand;
-use crate::use_cases::persistance_command::create_focus_session_data::CreateSessionData;
 use domain::entities::focus_session::FocusSession;
+use domain::traits::focus_session_persistence::FocusSessionPersistence;
 use std::sync::Arc;
 
 pub struct CreateSessionUseCase {
@@ -16,19 +15,18 @@ impl CreateSessionUseCase {
         }
     }
 
-    pub async fn execute(&self, session: CreateFocusSessionCommand) -> AppResult<FocusSession> {
-        let session_data = CreateSessionData {
-            task_id: session.task_id,
-            category_id: session.category_id,
-            session_type: session.session_type,
-            concentration_score: session.concentration_score,
-            notes: session.notes.clone(),
-            actual_duration: session.actual_duration,
-            started_at: session.started_at,
-            ended_at: session.ended_at,
-        };
+    pub async fn execute(&self, session_cmd: CreateFocusSessionCommand) -> AppResult<FocusSession> {
+        let session = FocusSession::new(
+            session_cmd.category_id,
+            session_cmd.task_id,
+            session_cmd.session_type,
+            session_cmd.concentration_score,
+            session_cmd.notes,
+            session_cmd.started_at,
+            Some(session_cmd.ended_at),
+        )?;
 
-        self.session_persistence.create_session(session_data).await
+        Ok(self.session_persistence.create_session(session).await?)
     }
 }
 
@@ -36,7 +34,7 @@ impl CreateSessionUseCase {
 mod tests {
     use super::*;
     use crate::app_error::AppError;
-    use crate::traits::focus_session_persistence::MockFocusSessionPersistence;
+    use crate::mocks::MockFocusSessionPersistence;
     use chrono::DateTime;
     use domain::entities::focus_session_type::FocusSessionType;
     use std::sync::Arc;
@@ -52,7 +50,7 @@ mod tests {
         let started_at = DateTime::from_timestamp(1761118663, 0).unwrap();
         let ended_at = DateTime::from_timestamp(1761118714, 0).unwrap();
 
-        let focus_session = FocusSession::new_with_id(
+        let focus_session = FocusSession::reconstitute(
             id,
             Some(category_id),
             Some(task_id),
@@ -95,7 +93,13 @@ mod tests {
 
         mock_session_persistence
             .expect_create_session()
-            .returning(|_| Err(AppError::Database("Database error".to_string())));
+            .returning(|_| {
+                Err(
+                    domain::error::persistence_error::PersistenceError::Unexpected(
+                        "Database error".to_string(),
+                    ),
+                )
+            });
 
         let cmd = CreateFocusSessionCommand {
             category_id: Some(Uuid::new_v4()),

@@ -2,8 +2,10 @@ use std::sync::Arc;
 
 use crate::{
     app_error::AppResult,
-    traits::{category_persistence::CategoryPersistence, task_persistence::TaskPersistence},
     use_cases::category::command::category_with_tasks::{CategoryAndTasks, CategoryWithTasks},
+};
+use domain::traits::{
+    category_persistence::CategoryPersistence, task_persistence::TaskPersistence,
 };
 
 #[derive(Clone)]
@@ -49,9 +51,7 @@ mod tests {
     use uuid::Uuid;
 
     use crate::{
-        traits::{
-            category_persistence::MockCategoryPersistence, task_persistence::MockTaskPersistence,
-        },
+        mocks::{MockCategoryPersistence, MockTaskPersistence},
         use_cases::category::get_category_and_task_usecase::GetCategoryAndTaskUseCases,
     };
     use domain::entities::{category::Category, task::Task};
@@ -62,17 +62,18 @@ mod tests {
         let mut task_persistence = MockTaskPersistence::new();
         let category_id = Uuid::new_v4();
         category_persistence.expect_find_all().returning(move || {
-            Ok(vec![Category::new(
+            Ok(vec![Category::reconstitute(
                 category_id.clone(),
                 "Test Category".to_string(),
                 None,
-                "".to_string(),
-            )])
+                "#FF0000".to_string(),
+            )
+            .unwrap()])
         });
         task_persistence
             .expect_find_by_category_id()
             .returning(move |_| {
-                Ok(vec![Task::new(
+                Ok(vec![Task::reconstitute(
                     Uuid::new_v4(),
                     Some(category_id),
                     "task".to_string(),

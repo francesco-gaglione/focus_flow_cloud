@@ -1,6 +1,6 @@
 use crate::app_error::AppResult;
-use crate::traits::task_persistence::TaskPersistence;
 use domain::entities::task::Task;
+use domain::traits::task_persistence::TaskPersistence;
 use std::sync::Arc;
 
 pub struct OrphanTasksUseCase {
@@ -13,6 +13,6 @@ impl OrphanTasksUseCase {
     }
 
     pub async fn execute(&self) -> AppResult<Vec<Task>> {
-        self.task_persistence.find_orphan_tasks().await
+        Ok(self.task_persistence.find_orphan_tasks().await?)
     }
 }

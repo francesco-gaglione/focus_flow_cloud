@@ -1,6 +1,6 @@
 use crate::app_error::AppResult;
-use crate::traits::user_setting_persistence::UserSettingPersistence;
 use domain::entities::user_setting::UserSetting;
+use domain::traits::user_setting_persistence::UserSettingPersistence;
 use std::sync::Arc;
 
 pub struct GetSettingsUseCase {
@@ -15,6 +15,6 @@ impl GetSettingsUseCase {
     }
 
     pub async fn execute(&self) -> AppResult<Vec<UserSetting>> {
-        self.setting_persistence.find_all().await
+        Ok(self.setting_persistence.find_all().await?)
     }
 }

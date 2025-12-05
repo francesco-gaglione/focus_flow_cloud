@@ -1,6 +1,6 @@
 use crate::app_error::AppResult;
-use crate::traits::task_persistence::TaskPersistence;
 use domain::entities::task::Task;
+use domain::traits::task_persistence::TaskPersistence;
 use std::sync::Arc;
 
 pub struct GetTasksUseCase {
@@ -13,6 +13,6 @@ impl GetTasksUseCase {
     }
 
     pub async fn execute(&self) -> AppResult<Vec<Task>> {
-        self.task_persistence.find_all().await
+        Ok(self.task_persistence.find_all().await?)
     }
 }

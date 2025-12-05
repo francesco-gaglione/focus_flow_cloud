@@ -12,7 +12,7 @@ pub struct Task {
 }
 
 impl Task {
-    pub fn new(
+    pub fn reconstitute(
         id: Uuid,
         category_id: Option<Uuid>,
         name: String,
@@ -80,5 +80,25 @@ impl Task {
 
     pub fn uncomplete(&mut self) {
         self.completed_at = None;
+    }
+
+    pub fn update_name(&mut self, name: String) {
+        self.name = name;
+    }
+
+    pub fn update_description(&mut self, description: Option<String>) {
+        self.description = description;
+    }
+
+    pub fn update_category(&mut self, category_id: Option<Uuid>) {
+        self.category_id = category_id;
+    }
+
+    pub fn update_scheduled_date(&mut self, date: Option<NaiveDate>) {
+        self.scheduled_date = date;
+    }
+
+    pub fn update_completed_at(&mut self, date: Option<DateTime<Utc>>) {
+        self.completed_at = date;
     }
 }

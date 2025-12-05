@@ -81,6 +81,12 @@ impl From<AppError> for HttpError {
             AppError::InvalidFocusSessionDuration => {
                 HttpError::BadRequest("Invalid date range".to_string())
             }
+            AppError::Persistence(msg) => HttpError::GenericError(msg),
+            AppError::InvalidColor(msg) => HttpError::GenericError(msg),
+            AppError::InvalidFocusSessionParam(msg) => HttpError::BadRequest(msg),
+            AppError::InvalidDateRange(msg) => HttpError::BadRequest(msg),
+            AppError::InvalidId(msg) => HttpError::BadRequest(msg),
+            AppError::InvalidStatsParam(msg) => HttpError::BadRequest(msg),
         }
     }
 }

@@ -1,7 +1,4 @@
 use crate::adapters::schema;
-use application::use_cases::persistance_command::create_focus_session_data::CreateSessionData;
-use application::use_cases::persistance_command::create_manual_session_data::CreateManualSessionData;
-use application::use_cases::persistance_command::update_focus_session_data::UpdateFocusSessionData;
 use chrono::{DateTime, Utc};
 use diesel::{AsChangeset, Insertable, Queryable, Selectable};
 use domain::entities::focus_session::FocusSession;
@@ -50,23 +47,9 @@ pub struct UpdateDbFocusSession {
     pub ended_at: Option<DateTime<Utc>>,
 }
 
-impl From<UpdateFocusSessionData> for UpdateDbFocusSession {
-    fn from(value: UpdateFocusSessionData) -> Self {
-        Self {
-            task_id: value.task_id,
-            category_id: value.category_id,
-            actual_duration: value.actual_duration,
-            concentration_score: value.concentration_score,
-            notes: value.notes,
-            started_at: value.started_at,
-            ended_at: value.ended_at,
-        }
-    }
-}
-
 impl From<DbFocusSession> for FocusSession {
     fn from(value: DbFocusSession) -> Self {
-        Self::new_with_id(
+        Self::reconstitute(
             value.id,
             value.category_id,
             value.task_id,
@@ -81,32 +64,31 @@ impl From<DbFocusSession> for FocusSession {
     }
 }
 
-impl From<CreateManualSessionData> for NewDbFocusSession {
-    fn from(value: CreateManualSessionData) -> Self {
+impl From<FocusSession> for NewDbFocusSession {
+    fn from(value: FocusSession) -> Self {
         Self {
-            task_id: value.task_id,
-            category_id: value.category_id,
-            session_type: value.session_type.to_string(),
-            concentration_score: value.concentration_score,
-            notes: value.notes,
-            actual_duration: Some(value.actual_duration),
-            started_at: value.started_at,
-            ended_at: Some(value.ended_at),
+            task_id: value.task_id(),
+            category_id: value.category_id(),
+            session_type: value.session_type().to_string(),
+            concentration_score: value.concentration_score(),
+            notes: value.notes(),
+            actual_duration: value.actual_duration(),
+            started_at: value.started_at(),
+            ended_at: value.ended_at(),
         }
     }
 }
 
-impl From<CreateSessionData> for NewDbFocusSession {
-    fn from(value: CreateSessionData) -> Self {
+impl From<FocusSession> for UpdateDbFocusSession {
+    fn from(value: FocusSession) -> Self {
         Self {
-            task_id: value.task_id,
-            category_id: value.category_id,
-            session_type: value.session_type.to_string(),
-            concentration_score: value.concentration_score,
-            notes: value.notes,
-            actual_duration: Some(value.actual_duration),
-            started_at: value.started_at,
-            ended_at: Some(value.ended_at),
+            task_id: value.task_id(),
+            category_id: value.category_id(),
+            actual_duration: value.actual_duration(),
+            concentration_score: value.concentration_score(),
+            notes: value.notes(),
+            started_at: Some(value.started_at()),
+            ended_at: value.ended_at(),
         }
     }
 }

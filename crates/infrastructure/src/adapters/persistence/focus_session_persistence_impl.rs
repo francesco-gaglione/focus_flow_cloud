@@ -3,15 +3,11 @@ use crate::adapters::persistence::db_models::db_focus_session::{
 };
 use crate::adapters::persistence::PostgresPersistence;
 use crate::adapters::schema;
-use application::app_error::{AppError, AppResult};
-use application::traits::focus_session_persistence::FocusSessionPersistence;
-use application::use_cases::persistance_command::create_focus_session_data::CreateSessionData;
-use application::use_cases::persistance_command::create_manual_session_data::CreateManualSessionData;
-use application::use_cases::persistance_command::find_session_by_filters_data::FindSessionByFiltersData;
-use application::use_cases::persistance_command::update_focus_session_data::UpdateFocusSessionData;
 use async_trait::async_trait;
 use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper};
-use domain::entities::focus_session::FocusSession;
+use domain::entities::focus_session::{FocusSession, SessionFilter};
+use domain::error::persistence_error::{PersistenceError, PersistenceResult};
+use domain::traits::focus_session_persistence::FocusSessionPersistence;
 use tracing::{error, info};
 use uuid::Uuid;
 
@@ -19,14 +15,14 @@ use uuid::Uuid;
 impl FocusSessionPersistence for PostgresPersistence {
     async fn create_manual_session(
         &self,
-        session: &CreateManualSessionData,
-    ) -> AppResult<FocusSession> {
+        session: FocusSession,
+    ) -> PersistenceResult<FocusSession> {
         let session = session.clone();
         let conn = self
             .pool
             .get()
             .await
-            .map_err(|e| AppError::Database(e.to_string()))?;
+            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?;
 
         let result = conn
             .interact(move |conn| {
@@ -38,22 +34,22 @@ impl FocusSessionPersistence for PostgresPersistence {
             .await
             .map_err(|e| {
                 error!("Error creating manual session: {}", e);
-                AppError::Database("Focus session not created".to_string())
+                PersistenceError::Unexpected("Focus session not created".to_string())
             })?
-            .map_err(|e| AppError::Database(e.to_string()))?;
+            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?;
 
         info!("Created focus session with id: {}", result.id);
 
         Ok(result.into())
     }
 
-    async fn create_session(&self, session: CreateSessionData) -> AppResult<FocusSession> {
+    async fn create_session(&self, session: FocusSession) -> PersistenceResult<FocusSession> {
         let session = session.clone();
         let conn = self
             .pool
             .get()
             .await
-            .map_err(|e| AppError::Database(e.to_string()))?;
+            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?;
 
         let result = conn
             .interact(move |conn| {
@@ -65,21 +61,21 @@ impl FocusSessionPersistence for PostgresPersistence {
             .await
             .map_err(|e| {
                 error!("Error creating manual session: {}", e);
-                AppError::Database("Focus session not created".to_string())
+                PersistenceError::Unexpected("Focus session not created".to_string())
             })?
-            .map_err(|e| AppError::Database(e.to_string()))?;
+            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?;
 
         info!("Created focus session with id: {}", result.id);
 
         Ok(result.into())
     }
 
-    async fn find_session_by_id(&self, session_id: Uuid) -> AppResult<FocusSession> {
+    async fn find_session_by_id(&self, session_id: Uuid) -> PersistenceResult<FocusSession> {
         let conn = self
             .pool
             .get()
             .await
-            .map_err(|e| AppError::Database(e.to_string()))?;
+            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?;
 
         let result: DbFocusSession = conn
             .interact(move |conn| {
@@ -89,22 +85,22 @@ impl FocusSessionPersistence for PostgresPersistence {
             .await
             .map_err(|e| {
                 error!("Error finding focus session by id: {}", e);
-                AppError::Database(e.to_string())
+                PersistenceError::Unexpected(e.to_string())
             })?
-            .map_err(|e| AppError::Database(e.to_string()))?;
+            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?;
 
         Ok(result.into())
     }
 
     async fn find_by_filters(
         &self,
-        filters: FindSessionByFiltersData,
-    ) -> AppResult<Vec<FocusSession>> {
+        filters: SessionFilter,
+    ) -> PersistenceResult<Vec<FocusSession>> {
         let conn = self
             .pool
             .get()
             .await
-            .map_err(|e| AppError::Database(e.to_string()))?;
+            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?;
 
         let result = conn
             .interact(move |conn| {
@@ -123,8 +119,8 @@ impl FocusSessionPersistence for PostgresPersistence {
                     query = query.filter(category_id.eq_any(cat_ids));
                 }
 
-                if let Some(session_t) = filters.session_type {
-                    query = query.filter(session_type.eq(session_t.to_string()));
+                if let Some(s_type) = filters.session_type {
+                    query = query.filter(session_type.eq(s_type.to_string()));
                 }
 
                 if let Some(min_score) = filters.min_concentration_score {
@@ -138,21 +134,21 @@ impl FocusSessionPersistence for PostgresPersistence {
                 query.load::<DbFocusSession>(conn)
             })
             .await
-            .map_err(|e| AppError::Database(e.to_string()))?
-            .map_err(|e| AppError::Database(e.to_string()))?;
+            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?
+            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?;
 
         Ok(result.into_iter().map(|s| s.into()).collect())
     }
 
-    async fn update_session(&self, data: UpdateFocusSessionData) -> AppResult<()> {
+    async fn update_session(&self, session: FocusSession) -> PersistenceResult<()> {
         let conn = self
             .pool
             .get()
             .await
-            .map_err(|e| AppError::Database(e.to_string()))?;
+            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?;
 
-        let session_id = data.session_id;
-        let changeset = UpdateDbFocusSession::from(data);
+        let session_id = session.id();
+        let changeset = UpdateDbFocusSession::from(session);
 
         let _ = conn
             .interact(move |conn| {
@@ -162,8 +158,8 @@ impl FocusSessionPersistence for PostgresPersistence {
                     .get_result::<DbFocusSession>(conn)
             })
             .await
-            .map_err(|e| AppError::Database(e.to_string()))?
-            .map_err(|e| AppError::Database(e.to_string()))?;
+            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?
+            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?;
 
         Ok(())
     }

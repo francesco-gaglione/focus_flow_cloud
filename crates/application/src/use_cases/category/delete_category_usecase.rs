@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
-use crate::{app_error::AppResult, traits::category_persistence::CategoryPersistence};
+use crate::app_error::{AppError, AppResult};
+use domain::traits::category_persistence::CategoryPersistence;
 
 #[derive(Clone)]
 pub struct DeleteCategoryUseCases {
@@ -18,13 +19,14 @@ impl DeleteCategoryUseCases {
         self.category_persistence
             .delete_category_by_id(category_id)
             .await
+            .map_err(AppError::from)
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::traits::category_persistence::MockCategoryPersistence;
+    use crate::mocks::MockCategoryPersistence;
     use mockall::predicate::*;
 
     #[tokio::test]

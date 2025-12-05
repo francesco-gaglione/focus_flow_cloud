@@ -1,5 +1,5 @@
 use crate::app_error::AppResult;
-use crate::traits::task_persistence::TaskPersistence;
+use domain::traits::task_persistence::TaskPersistence;
 use std::sync::Arc;
 use uuid::Uuid;
 
