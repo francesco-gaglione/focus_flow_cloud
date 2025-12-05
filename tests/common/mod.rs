@@ -2,6 +2,9 @@ use focus_flow_cloud::adapters::http::dto::{
     category_api::create_category::{CreateCategoryDto, CreateCategoryResponseDto},
     session_api::create_manual_session::{CreateManualSessionDto, CreateManualSessionResponseDto},
     task_api::create_task::{CreateTaskDto, CreateTaskResponseDto},
+    user_setting_api::{
+        get_user_settings::UserSettingsResponseDto, update_setting::UpdateUserSettingDto,
+    },
 };
 use focus_flow_cloud::infra::{
     app::create_app,
@@ -78,6 +81,35 @@ impl TestContext {
         println!("Response Body: {}", response_text);
 
         serde_json::from_str(&response_text).expect("Failed to deserialize response from text")
+    }
+
+    #[allow(dead_code)]
+    pub async fn update_user_setting(&self, dto: &UpdateUserSettingDto) {
+        let response = self
+            .client
+            .patch(format!("{}/api/user-settings", self.base_url))
+            .json(dto)
+            .send()
+            .await
+            .expect("Failed to execute request");
+
+        assert_eq!(response.status(), 200);
+    }
+
+    #[allow(dead_code)]
+    pub async fn get_user_settings(&self) -> UserSettingsResponseDto {
+        let response = self
+            .client
+            .get(format!("{}/api/user-settings", self.base_url))
+            .send()
+            .await
+            .expect("Failed to execute request");
+
+        assert_eq!(response.status(), 200);
+        response
+            .json()
+            .await
+            .expect("Failed to deserialize response")
     }
 }
 
