@@ -1,9 +1,7 @@
 mod common;
 
 use crate::common::setup;
-use focus_flow_cloud::adapters::http::dto::category_api::create_category::{
-    CreateCategoryDto, CreateCategoryResponseDto,
-};
+use focus_flow_cloud::adapters::http::dto::category_api::create_category::CreateCategoryDto;
 use focus_flow_cloud::adapters::http::dto::category_api::get_categories::GetCategoriesResponseDto;
 use focus_flow_cloud::adapters::http::dto::category_api::get_category::GetCategoryResponseDto;
 use focus_flow_cloud::adapters::http::dto::category_api::update_category::{
@@ -13,7 +11,6 @@ use focus_flow_cloud::adapters::http::dto::category_api::update_category::{
 #[tokio::test]
 async fn create_and_list_category() {
     let context = setup().await;
-    let client = reqwest::Client::new();
 
     let create_dto = CreateCategoryDto {
         name: "Work".to_string(),
@@ -22,22 +19,11 @@ async fn create_and_list_category() {
     };
 
     // Create Category
-    let response = client
-        .post(format!("{}/api/categories", context.base_url))
-        .json(&create_dto)
-        .send()
-        .await
-        .expect("Failed to execute request");
-
-    assert_eq!(response.status(), 200);
-    let body: CreateCategoryResponseDto = response
-        .json()
-        .await
-        .expect("Failed to deserialize response");
-    assert!(body.category_id.len() > 0);
+    let _ = context.create_category(&create_dto).await;
 
     // List Categories
-    let response = client
+    let response = context
+        .client
         .get(format!("{}/api/categories", context.base_url))
         .send()
         .await
@@ -62,7 +48,6 @@ async fn create_and_list_category() {
 #[tokio::test]
 async fn create_category_only_mandatory_fields_and_list_categories() {
     let context = setup().await;
-    let client = reqwest::Client::new();
 
     let create_dto = CreateCategoryDto {
         name: "Mandatory fields".to_string(),
@@ -70,21 +55,10 @@ async fn create_category_only_mandatory_fields_and_list_categories() {
         color: Some("#FF5733".to_string()),
     };
 
-    let response = client
-        .post(format!("{}/api/categories", context.base_url))
-        .json(&create_dto)
-        .send()
-        .await
-        .expect("Failed to execute request");
+    let _ = context.create_category(&create_dto).await;
 
-    assert_eq!(response.status(), 200);
-    let body_response: CreateCategoryResponseDto = response
-        .json()
-        .await
-        .expect("Failed to deserialize message");
-
-    assert!(body_response.category_id.len() > 0);
-    let response = client
+    let response = context
+        .client
         .get(format!("{}/api/categories", context.base_url))
         .send()
         .await
@@ -109,7 +83,6 @@ async fn create_category_only_mandatory_fields_and_list_categories() {
 #[tokio::test]
 async fn update_category_and_get_by_id() {
     let context = setup().await;
-    let client = reqwest::Client::new();
 
     // Create category and check it is created
     let create_dto = CreateCategoryDto {
@@ -117,18 +90,7 @@ async fn update_category_and_get_by_id() {
         description: None,
         color: Some("#FF5733".to_string()),
     };
-    let response = client
-        .post(format!("{}/api/categories", context.base_url))
-        .json(&create_dto)
-        .send()
-        .await
-        .expect("Failed to execute request");
-
-    assert_eq!(response.status(), 200);
-    let body_response: CreateCategoryResponseDto = response
-        .json()
-        .await
-        .expect("Failed to deserialize message");
+    let body_response = context.create_category(&create_dto).await;
 
     assert!(body_response.category_id.len() > 0);
 
@@ -138,7 +100,8 @@ async fn update_category_and_get_by_id() {
         description: Some("Updated description".to_string()),
         color: Some("#00FF00".to_string()),
     };
-    let response = client
+    let response = context
+        .client
         .put(format!(
             "{}/api/categories/{}",
             context.base_url, body_response.category_id
@@ -165,7 +128,8 @@ async fn update_category_and_get_by_id() {
     assert_eq!(body_response.updated_category.color, "#00FF00".to_string());
 
     // Get category by id and check the response
-    let response = client
+    let response = context
+        .client
         .get(format!(
             "{}/api/categories/{}",
             context.base_url, body_response.updated_category.id
@@ -191,7 +155,6 @@ async fn update_category_and_get_by_id() {
 #[tokio::test]
 async fn delete_category() {
     let context = setup().await;
-    let client = reqwest::Client::new();
 
     // Create a new category
     let create_dto = CreateCategoryDto {
@@ -199,21 +162,11 @@ async fn delete_category() {
         description: Some("Test description".to_string()),
         color: Some("#FF0000".to_string()),
     };
-    let response = client
-        .post(format!("{}/api/categories", context.base_url))
-        .json(&create_dto)
-        .send()
-        .await
-        .expect("Failed to execute request");
-
-    assert_eq!(response.status(), 200);
-    let body_response: CreateCategoryResponseDto = response
-        .json()
-        .await
-        .expect("Failed to deserialize message");
+    let body_response = context.create_category(&create_dto).await;
 
     // Delete the category
-    let response = client
+    let response = context
+        .client
         .delete(format!(
             "{}/api/categories/{}",
             context.base_url, body_response.category_id
@@ -225,7 +178,8 @@ async fn delete_category() {
     assert_eq!(response.status(), 200);
 
     // Verify that the category was deleted
-    let response = client
+    let response = context
+        .client
         .get(format!(
             "{}/api/categories/{}",
             context.base_url, body_response.category_id

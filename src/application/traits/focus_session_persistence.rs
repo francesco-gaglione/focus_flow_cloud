@@ -5,6 +5,7 @@ use crate::application::use_cases::persistance_command::find_session_by_filters_
 use crate::application::use_cases::persistance_command::update_focus_session_data::UpdateFocusSessionData;
 use crate::domain::entities::focus_session::FocusSession;
 use async_trait::async_trait;
+use uuid::Uuid;
 
 #[cfg_attr(test, mockall::automock)]
 #[async_trait]
@@ -22,4 +23,6 @@ pub trait FocusSessionPersistence: Send + Sync {
     async fn create_session(&self, session: CreateSessionData) -> AppResult<FocusSession>;
 
     async fn update_session(&self, session: UpdateFocusSessionData) -> AppResult<()>;
+
+    async fn find_session_by_id(&self, session_id: Uuid) -> AppResult<FocusSession>;
 }

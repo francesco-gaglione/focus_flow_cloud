@@ -1,8 +1,8 @@
 mod common;
 use focus_flow_cloud::adapters::http::dto::{
-    category_api::create_category::{CreateCategoryDto, CreateCategoryResponseDto},
+    category_api::create_category::CreateCategoryDto,
     task_api::{
-        create_task::{CreateTaskDto, CreateTaskResponseDto},
+        create_task::CreateTaskDto,
         delete_task::{DeleteTasksDto, DeleteTasksResponseDto},
         get_tasks::TasksResponseDto,
         orphan_tasks::OrphanTasksResponseDto,
@@ -15,7 +15,6 @@ use crate::common::setup;
 #[tokio::test]
 async fn create_new_task_and_list() {
     let context = setup().await;
-    let client = reqwest::Client::new();
 
     // Create Category to link to the task
     let create_category_dto = CreateCategoryDto {
@@ -23,44 +22,21 @@ async fn create_new_task_and_list() {
         description: Some("Work related tasks".to_string()),
         color: Some("#FF5733".to_string()),
     };
-    let response = client
-        .post(format!("{}/api/categories", context.base_url))
-        .json(&create_category_dto)
-        .send()
-        .await
-        .expect("Failed to execute request");
-
-    assert_eq!(response.status(), 200);
-    let body: CreateCategoryResponseDto = response
-        .json()
-        .await
-        .expect("Failed to deserialize response");
-    assert!(body.category_id.len() > 0);
+    let category_body = context.create_category(&create_category_dto).await;
 
     // Create Task
     let create_task_dto = CreateTaskDto {
         name: "Task".to_string(),
         description: Some("Work related tasks".to_string()),
-        category_id: Some(body.category_id),
+        category_id: Some(category_body.category_id),
         scheduled_date: Some(chrono::Utc::now().timestamp()),
     };
 
-    let response = client
-        .post(format!("{}/api/tasks", context.base_url))
-        .json(&create_task_dto)
-        .send()
-        .await
-        .expect("Failed to execute request");
-
-    assert_eq!(response.status(), 200);
-    let create_task_body: CreateTaskResponseDto = response
-        .json()
-        .await
-        .expect("Failed to deserialize response");
-    assert!(create_task_body.id.len() > 0);
+    let create_task_body = context.create_task(&create_task_dto).await;
 
     // Fetch tasks and check if the task was created
-    let response = client
+    let response = context
+        .client
         .get(format!("{}/api/tasks", context.base_url))
         .send()
         .await
@@ -79,7 +55,6 @@ async fn create_new_task_and_list() {
 #[tokio::test]
 async fn create_new_orphan_and_list() {
     let context = setup().await;
-    let client = reqwest::Client::new();
 
     // Create Category to link to the task
     let create_category_dto = CreateCategoryDto {
@@ -87,19 +62,8 @@ async fn create_new_orphan_and_list() {
         description: Some("Work related tasks".to_string()),
         color: Some("#FF5733".to_string()),
     };
-    let response = client
-        .post(format!("{}/api/categories", context.base_url))
-        .json(&create_category_dto)
-        .send()
-        .await
-        .expect("Failed to execute request");
-
-    assert_eq!(response.status(), 200);
-    let body: CreateCategoryResponseDto = response
-        .json()
-        .await
-        .expect("Failed to deserialize response");
-    assert!(body.category_id.len() > 0);
+    let category_body = context.create_category(&create_category_dto).await;
+    assert!(category_body.category_id.len() > 0);
 
     // Create Task
     let create_task_dto = CreateTaskDto {
@@ -109,22 +73,11 @@ async fn create_new_orphan_and_list() {
         scheduled_date: Some(chrono::Utc::now().timestamp()),
     };
 
-    let response = client
-        .post(format!("{}/api/tasks", context.base_url))
-        .json(&create_task_dto)
-        .send()
-        .await
-        .expect("Failed to execute request");
-
-    assert_eq!(response.status(), 200);
-    let create_task_body: CreateTaskResponseDto = response
-        .json()
-        .await
-        .expect("Failed to deserialize response");
-    assert!(create_task_body.id.len() > 0);
+    let create_task_body = context.create_task(&create_task_dto).await;
 
     // Fetch tasks and check if the task was created
-    let response = client
+    let response = context
+        .client
         .get(format!("{}/api/tasks/orphans", context.base_url))
         .send()
         .await
@@ -146,7 +99,6 @@ async fn create_new_orphan_and_list() {
 #[tokio::test]
 async fn update_task_test() {
     let context = setup().await;
-    let client = reqwest::Client::new();
 
     // Create Task
     let create_task_dto = CreateTaskDto {
@@ -156,16 +108,7 @@ async fn update_task_test() {
         scheduled_date: Some(chrono::Utc::now().timestamp()),
     };
 
-    let create_res = client
-        .post(format!("{}/api/tasks", context.base_url))
-        .json(&create_task_dto)
-        .send()
-        .await
-        .expect("Failed to create task");
-
-    assert_eq!(create_res.status(), 200);
-    let create_body: CreateTaskResponseDto =
-        create_res.json().await.expect("Failed to deserialize");
+    let create_body = context.create_task(&create_task_dto).await;
     let task_id = create_body.id;
 
     // Update Task
@@ -177,7 +120,8 @@ async fn update_task_test() {
         completed_at: Some(chrono::Utc::now().timestamp()),
     };
 
-    let update_res = client
+    let update_res = context
+        .client
         .put(format!("{}/api/tasks/{}", context.base_url, task_id))
         .json(&update_dto)
         .send()
@@ -201,7 +145,6 @@ async fn update_task_test() {
 #[tokio::test]
 async fn delete_tasks_test() {
     let context = setup().await;
-    let client = reqwest::Client::new();
 
     // Create Task
     let create_task_dto = CreateTaskDto {
@@ -211,16 +154,7 @@ async fn delete_tasks_test() {
         scheduled_date: Some(chrono::Utc::now().timestamp()),
     };
 
-    let create_res = client
-        .post(format!("{}/api/tasks", context.base_url))
-        .json(&create_task_dto)
-        .send()
-        .await
-        .expect("Failed to create task");
-
-    assert_eq!(create_res.status(), 200);
-    let create_body: CreateTaskResponseDto =
-        create_res.json().await.expect("Failed to deserialize");
+    let create_body = context.create_task(&create_task_dto).await;
     let task_id = create_body.id;
 
     // Delete Task
@@ -228,7 +162,8 @@ async fn delete_tasks_test() {
         task_ids: vec![task_id.clone()],
     };
 
-    let delete_res = client
+    let delete_res = context
+        .client
         .delete(format!("{}/api/tasks", context.base_url))
         .json(&delete_dto)
         .send()
@@ -243,7 +178,8 @@ async fn delete_tasks_test() {
     assert!(delete_body.deleted_ids.contains(&task_id));
 
     // Verify it's gone
-    let list_res = client
+    let list_res = context
+        .client
         .get(format!("{}/api/tasks", context.base_url))
         .send()
         .await

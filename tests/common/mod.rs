@@ -1,3 +1,8 @@
+use focus_flow_cloud::adapters::http::dto::{
+    category_api::create_category::{CreateCategoryDto, CreateCategoryResponseDto},
+    session_api::create_manual_session::{CreateManualSessionDto, CreateManualSessionResponseDto},
+    task_api::create_task::{CreateTaskDto, CreateTaskResponseDto},
+};
 use focus_flow_cloud::infra::{
     app::create_app,
     config::AppConfig,
@@ -7,13 +12,73 @@ use std::sync::Once;
 use testcontainers::runners::AsyncRunner;
 use testcontainers_modules::postgres::Postgres;
 use tokio::net::TcpListener;
+use tracing::info;
 
 static TRACING: Once = Once::new();
 
 pub struct TestContext {
     pub base_url: String,
+    pub client: reqwest::Client,
     #[allow(dead_code)] // Keep container alive
     pub container: testcontainers::ContainerAsync<Postgres>,
+}
+
+impl TestContext {
+    #[allow(dead_code)]
+    pub async fn create_category(&self, dto: &CreateCategoryDto) -> CreateCategoryResponseDto {
+        let response = self
+            .client
+            .post(format!("{}/api/categories", self.base_url))
+            .json(dto)
+            .send()
+            .await
+            .expect("Failed to execute request");
+
+        assert_eq!(response.status(), 200);
+        response
+            .json()
+            .await
+            .expect("Failed to deserialize response")
+    }
+
+    #[allow(dead_code)]
+    pub async fn create_task(&self, dto: &CreateTaskDto) -> CreateTaskResponseDto {
+        let response = self
+            .client
+            .post(format!("{}/api/tasks", self.base_url))
+            .json(dto)
+            .send()
+            .await
+            .expect("Failed to execute request");
+
+        assert_eq!(response.status(), 200);
+        response
+            .json()
+            .await
+            .expect("Failed to deserialize response")
+    }
+
+    #[allow(dead_code)]
+    pub async fn create_manual_session(
+        &self,
+        dto: &CreateManualSessionDto,
+    ) -> CreateManualSessionResponseDto {
+        let response = self
+            .client
+            .post(format!("{}/api/focus-sessions/manual", self.base_url))
+            .json(dto)
+            .send()
+            .await
+            .expect("Failed to execute request");
+
+        assert_eq!(response.status(), 200);
+
+        let response_text = response.text().await.expect("Failed to get response text");
+
+        println!("Response Body: {}", response_text);
+
+        serde_json::from_str(&response_text).expect("Failed to deserialize response from text")
+    }
 }
 
 pub async fn setup() -> TestContext {
@@ -51,6 +116,7 @@ pub async fn setup() -> TestContext {
 
     TestContext {
         base_url: format!("http://127.0.0.1:{}", port),
+        client: reqwest::Client::new(),
         container,
     }
 }
