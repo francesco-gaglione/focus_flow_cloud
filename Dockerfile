@@ -16,6 +16,7 @@ COPY Cargo.toml Cargo.lock ./
 
 COPY crates ./crates
 COPY src ./src
+COPY migrations ./migrations
 
 # Build the actual binary
 RUN cargo build --release --bin focus_flow_cloud
