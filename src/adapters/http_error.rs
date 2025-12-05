@@ -6,6 +6,8 @@ use http::StatusCode;
 use serde_json::json;
 use thiserror::Error;
 
+use crate::application::app_error::AppError;
+
 #[derive(Error, Debug, Clone)]
 pub enum HttpError {
     #[error("Resource not found: {0}")]
@@ -67,8 +69,6 @@ impl HttpError {
     }
 }
 
-use crate::application::app_error::AppError;
-
 impl From<AppError> for HttpError {
     fn from(err: AppError) -> Self {
         match err {
@@ -78,6 +78,9 @@ impl From<AppError> for HttpError {
             AppError::BadRequest(msg) => HttpError::BadRequest(msg),
             AppError::Forbidden => HttpError::Forbidden,
             AppError::Database(msg) => HttpError::GenericError(msg),
+            AppError::InvalidFocusSessionDuration => {
+                HttpError::BadRequest("Invalid date range".to_string())
+            }
         }
     }
 }

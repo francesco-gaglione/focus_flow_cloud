@@ -1,4 +1,7 @@
-use crate::domain::entities::focus_session_type::FocusSessionType;
+use crate::{
+    application::app_error::{AppError, AppResult},
+    domain::entities::focus_session_type::FocusSessionType,
+};
 use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
@@ -68,6 +71,44 @@ impl FocusSession {
             ended_at,
             created_at,
         }
+    }
+
+    pub fn update_category_id(&mut self, category_id: Option<Uuid>) {
+        self.category_id = category_id;
+    }
+
+    pub fn update_task_id(&mut self, task_id: Option<Uuid>) {
+        self.task_id = task_id;
+    }
+
+    pub fn update_session_type(&mut self, session_type: FocusSessionType) {
+        self.session_type = session_type;
+    }
+
+    pub fn update_concentration_score(&mut self, concentration_score: Option<i32>) {
+        self.concentration_score = concentration_score;
+    }
+
+    pub fn update_notes(&mut self, notes: Option<String>) {
+        self.notes = notes;
+    }
+
+    pub fn update_date_range(
+        &mut self,
+        started_at: DateTime<Utc>,
+        ended_at: Option<DateTime<Utc>>,
+    ) -> AppResult<()> {
+        if let Some(ended_at) = ended_at {
+            if ended_at < started_at {
+                return Err(AppError::InvalidFocusSessionDuration);
+            }
+        }
+        self.started_at = started_at;
+        self.ended_at = ended_at;
+        self.actual_duration = ended_at
+            .map(|ended_at| ended_at - started_at)
+            .map(|duration| duration.num_seconds());
+        Ok(())
     }
 
     pub fn id(&self) -> Uuid {

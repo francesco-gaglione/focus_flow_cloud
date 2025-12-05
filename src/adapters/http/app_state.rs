@@ -1,5 +1,6 @@
 use crate::adapters::http::pomodoro_state::PomodoroState;
 use crate::application::use_cases::focus_session::update_focus_session::UpdateFocusSessionUseCase;
+use crate::application::use_cases::task::get_tasks::GetTasksUseCase;
 use crate::application::use_cases::user_settings::get_settings::GetSettingsUseCase;
 use crate::application::use_cases::user_settings::update_setting::UpdateSettingUseCase;
 use crate::application::use_cases::{
@@ -47,6 +48,7 @@ pub struct AppState {
     pub create_task_usecase: Arc<CreateTaskUseCase>,
     pub delete_tasks_usecase: Arc<DeleteTasksUseCase>,
     pub orphan_tasks_usecase: Arc<OrphanTasksUseCase>,
+    pub get_tasks_usecase: Arc<GetTasksUseCase>,
     pub update_task_usecase: Arc<UpdateTaskUseCase>,
 
     // Focus Session Use Cases

@@ -32,7 +32,7 @@ pub async fn create_category_api(
         .validate()
         .map_err(|e| HttpError::BadRequest(e.to_string()))?;
 
-    state
+    let category_id = state
         .create_category_usecase
         .execute(CreateCategoryCommand {
             name: payload.name,
@@ -41,5 +41,7 @@ pub async fn create_category_api(
         })
         .await?;
 
-    Ok(Json(CreateCategoryResponseDto { created: true }))
+    Ok(Json(CreateCategoryResponseDto {
+        category_id: category_id.to_string(),
+    }))
 }

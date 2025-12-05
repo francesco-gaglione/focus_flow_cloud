@@ -20,15 +20,44 @@ impl UpdateFocusSessionUseCase {
         }
     }
 
-    pub async fn execute(&self, session: UpdateFocusSessionCommand) -> AppResult<()> {
+    pub async fn execute(&self, update_session: UpdateFocusSessionCommand) -> AppResult<()> {
+        let mut session = self
+            .session_persistence
+            .find_session_by_id(update_session.session_id)
+            .await?;
+
+        if let Some(category_id) = update_session.category_id {
+            session.update_category_id(Some(category_id));
+        }
+
+        if let Some(task_id) = update_session.task_id {
+            session.update_task_id(Some(task_id));
+        }
+
+        if let Some(concentration_score) = update_session.concentration_score {
+            session.update_concentration_score(Some(concentration_score));
+        }
+
+        if let Some(notes) = update_session.notes {
+            session.update_notes(Some(notes));
+        }
+
+        if update_session.started_at.is_some() && update_session.ended_at.is_some() {
+            session.update_date_range(
+                update_session.started_at.unwrap(),
+                Some(update_session.ended_at.unwrap()),
+            )?;
+        }
+
         let session_data = UpdateFocusSessionData {
-            session_id: session.session_id,
-            task_id: session.task_id,
-            category_id: session.category_id,
-            concentration_score: session.concentration_score,
-            notes: session.notes.clone(),
-            started_at: session.started_at,
-            ended_at: session.ended_at,
+            session_id: session.id(),
+            task_id: session.task_id(),
+            category_id: session.category_id(),
+            concentration_score: session.concentration_score(),
+            notes: session.notes().clone(),
+            actual_duration: session.actual_duration(),
+            started_at: Some(session.started_at()),
+            ended_at: session.ended_at(),
         };
 
         self.session_persistence.update_session(session_data).await
@@ -39,12 +68,17 @@ impl UpdateFocusSessionUseCase {
 mod tests {
     use std::sync::Arc;
 
-    use crate::application::{
-        traits::focus_session_persistence::MockFocusSessionPersistence,
-        use_cases::focus_session::{
-            command::update_focus_session::UpdateFocusSessionCommand,
-            update_focus_session::UpdateFocusSessionUseCase,
+    use chrono::Duration;
+
+    use crate::{
+        application::{
+            traits::focus_session_persistence::MockFocusSessionPersistence,
+            use_cases::focus_session::{
+                command::update_focus_session::UpdateFocusSessionCommand,
+                update_focus_session::UpdateFocusSessionUseCase,
+            },
         },
+        domain::entities::{focus_session::FocusSession, focus_session_type::FocusSessionType},
     };
 
     #[tokio::test]
@@ -61,6 +95,21 @@ mod tests {
         session_persistence
             .expect_update_session()
             .returning(|_| Ok(()));
+        session_persistence
+            .expect_find_session_by_id()
+            .returning(move |_| {
+                Ok(FocusSession::new(
+                    Some(category_id.clone()),
+                    Some(task_id.clone()),
+                    FocusSessionType::Work,
+                    Some(3600),
+                    Some(concentration_score),
+                    Some("Test notes".to_string()),
+                    started_at,
+                    Some(ended_at),
+                    chrono::Utc::now(),
+                ))
+            });
         let use_case = UpdateFocusSessionUseCase::new(Arc::new(session_persistence));
 
         let result = use_case

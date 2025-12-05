@@ -14,6 +14,7 @@ use crate::adapters::http::dto::stats_api::GetStatsByPeriodDto;
 use crate::adapters::http::dto::stats_api::GetStatsByPeriodResponseDto;
 use crate::adapters::http::dto::task_api::create_task::CreateTaskResponseDto;
 use crate::adapters::http::dto::task_api::delete_task::DeleteTasksDto;
+use crate::adapters::http::dto::task_api::get_tasks::TasksResponseDto;
 use crate::adapters::http::dto::task_api::orphan_tasks::OrphanTasksResponseDto;
 use crate::adapters::http::dto::task_api::update_task::UpdateTaskDto;
 use crate::adapters::http::dto::user_setting_api::get_user_settings::UserSettingsResponseDto;
@@ -47,6 +48,7 @@ pub const SETTING_TAG: &str = "User Settings";
         crate::adapters::http::routes::category::delete_categories_api::delete_categories_api,
         crate::adapters::http::routes::task::orphan_tasks_api::fetch_orphan_tasks_api,
         crate::adapters::http::routes::task::create_task_api::create_task_api,
+        crate::adapters::http::routes::task::get_tasks_api::get_tasks_api,
         crate::adapters::http::routes::task::update_task_api::update_task_api,
         crate::adapters::http::routes::task::delete_tasks_api::delete_tasks_api,
         crate::adapters::http::routes::session::create_manual_session_api::create_manual_session_api,
@@ -65,6 +67,7 @@ pub const SETTING_TAG: &str = "User Settings";
         schemas(GetCategoryResponseDto),
         schemas(GetCategoriesResponseDto),
         schemas(OrphanTasksResponseDto),
+        schemas(TasksResponseDto),
         schemas(UpdateTaskDto, CreateTaskResponseDto),
         schemas(DeleteTasksDto, CreateTaskResponseDto),
         schemas(CreateManualSessionDto, CreateManualSessionResponseDto),

@@ -13,6 +13,7 @@ use crate::domain::entities::focus_session::FocusSession;
 use async_trait::async_trait;
 use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper};
 use tracing::{error, info};
+use uuid::Uuid;
 
 #[async_trait]
 impl FocusSessionPersistence for PostgresPersistence {
@@ -67,6 +68,27 @@ impl FocusSessionPersistence for PostgresPersistence {
             })??;
 
         info!("Created focus session with id: {}", result.id);
+
+        Ok(result.into())
+    }
+
+    async fn find_session_by_id(&self, session_id: Uuid) -> AppResult<FocusSession> {
+        let conn = self
+            .pool
+            .get()
+            .await
+            .map_err(|e| AppError::Database(e.to_string()))?;
+
+        let result: DbFocusSession = conn
+            .interact(move |conn| {
+                use schema::focus_session::dsl::*;
+                focus_session.find(session_id).get_result(conn)
+            })
+            .await
+            .map_err(|e| {
+                error!("Error finding focus session by id: {}", e);
+                AppError::Database(e.to_string())
+            })??;
 
         Ok(result.into())
     }

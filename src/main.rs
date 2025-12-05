@@ -1,5 +1,6 @@
 use focus_flow_cloud::infra::{
     app::create_app,
+    config::AppConfig,
     setup::{init_app_state, init_tracing},
 };
 use tracing::info;
@@ -9,7 +10,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenvy::dotenv().ok();
     init_tracing();
 
-    let app_state = init_app_state().await?;
+    let config = AppConfig::from_env();
+    let app_state = init_app_state(config).await?;
 
     let app = create_app(app_state.clone());
 

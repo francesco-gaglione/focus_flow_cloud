@@ -19,6 +19,9 @@ pub enum AppError {
 
     #[error("Database error: {0}")]
     Database(String),
+
+    #[error("Invalid focus session duration")]
+    InvalidFocusSessionDuration,
 }
 
 pub type AppResult<T> = Result<T, AppError>;

@@ -1,4 +1,5 @@
 use crate::application::use_cases::persistance_command::create_focus_session_data::CreateSessionData;
+use crate::application::use_cases::persistance_command::update_focus_session_data::UpdateFocusSessionData;
 use crate::domain::entities::focus_session::FocusSession;
 use crate::domain::entities::focus_session_type::FocusSessionType;
 use crate::{
@@ -51,12 +52,12 @@ pub struct UpdateDbFocusSession {
     pub ended_at: Option<DateTime<Utc>>,
 }
 
-impl From<crate::application::use_cases::persistance_command::update_focus_session_data::UpdateFocusSessionData> for UpdateDbFocusSession {
-    fn from(value: crate::application::use_cases::persistance_command::update_focus_session_data::UpdateFocusSessionData) -> Self {
+impl From<UpdateFocusSessionData> for UpdateDbFocusSession {
+    fn from(value: UpdateFocusSessionData) -> Self {
         Self {
             task_id: value.task_id,
             category_id: value.category_id,
-            actual_duration: None, // Not updateable via this DTO
+            actual_duration: value.actual_duration,
             concentration_score: value.concentration_score,
             notes: value.notes,
             started_at: value.started_at,
