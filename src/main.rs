@@ -1,8 +1,8 @@
-use focus_flow_cloud::infra::{
+use api::{
     app::create_app,
-    config::AppConfig,
     setup::{init_app_state, init_tracing},
 };
+use infrastructure::config::AppConfig;
 use tracing::info;
 
 #[tokio::main]

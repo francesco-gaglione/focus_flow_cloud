@@ -1,10 +1,10 @@
 mod common;
 
 use crate::common::setup;
-use focus_flow_cloud::adapters::http::dto::category_api::create_category::CreateCategoryDto;
-use focus_flow_cloud::adapters::http::dto::category_api::get_categories::GetCategoriesResponseDto;
-use focus_flow_cloud::adapters::http::dto::category_api::get_category::GetCategoryResponseDto;
-use focus_flow_cloud::adapters::http::dto::category_api::update_category::{
+use api::adapters::http::dto::category_api::create_category::CreateCategoryDto;
+use api::adapters::http::dto::category_api::get_categories::GetCategoriesResponseDto;
+use api::adapters::http::dto::category_api::get_category::GetCategoryResponseDto;
+use api::adapters::http::dto::category_api::update_category::{
     UpdateCategoryDto, UpdateCategoryResponseDto,
 };
 

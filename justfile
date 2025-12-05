@@ -19,13 +19,15 @@ build-release:
 
 # Run the server locally
 run:
-    cargo run
+    cargo run --bin focus_flow_cloud
 
+# Run the server locally in debug mode
 run-debug:
-    RUST_LOG=debug cargo run
+    RUST_LOG=debug cargo run --bin focus_flow_cloud
 
+# Run the server locally in trace mode
 run-trace:
-    RUST_LOG=trace cargo run
+    RUST_LOG=trace cargo run --bin focus_flow_cloud
 
 # Build Docker image
 docker-build:
@@ -49,7 +51,7 @@ docker-logs:
 
 # Run all unit tests (within src/)
 test-unit:
-    cargo test --lib --bins
+    cargo test --workspace --lib --bins
 
 # Run all integration tests (within tests/ directory)
 test-integration:
@@ -68,15 +70,15 @@ test-single test_name:
 
 # Format code with rustfmt
 fmt:
-    cargo fmt
+    cargo fmt --all
 
 # Check formatting
 fmt-check:
-    cargo fmt -- --check
+    cargo fmt --all -- --check
 
 # Lint with clippy
 lint:
-    cargo clippy -- -D warnings
+    cargo clippy --workspace -- -D warnings
 
 # Run all quality checks (fmt + clippy + tests)
 check: fmt-check lint test-all
@@ -97,10 +99,6 @@ watch:
 # Watch and run tests on changes
 watch-test:
     cargo watch -x test
-
-# Generate OpenAPI documentation
-openapi:
-    cargo doc --no-deps --open
 
 # Print all available recipes
 help:

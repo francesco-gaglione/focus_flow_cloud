@@ -1,5 +1,5 @@
+use api::adapters::http::dto::user_setting_api::update_setting::UpdateUserSettingDto;
 use common::setup;
-use focus_flow_cloud::adapters::http::dto::user_setting_api::update_setting::UpdateUserSettingDto;
 
 mod common;
 
