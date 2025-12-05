@@ -1,0 +1,23 @@
+[package]
+name = "infrastructure"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+domain = { path = "../domain" }
+application = { path = "../application" }
+deadpool-diesel.workspace = true
+diesel = { workspace = true, features = ["postgres", "uuid", "chrono", "r2d2"] }
+diesel_migrations.workspace = true
+tracing.workspace = true
+async-trait.workspace = true
+config.workspace = true
+dotenvy.workspace = true
+serde = { workspace = true, features = ["derive"] }
+uuid = { workspace = true, features = ["v4", "serde"] }
+chrono = { workspace = true, features = ["serde"] }
+
+[dev-dependencies]
+testcontainers = "0.23"
+testcontainers-modules = { version = "0.11", features = ["postgres"] }
+tokio = { version = "1", features = ["full"] }

@@ -1,12 +1,12 @@
-use chrono::{Duration, TimeZone, Utc};
-use common::setup;
-use focus_flow_cloud::adapters::http::dto::{
+use api::adapters::http::dto::{
     category_api::create_category::CreateCategoryDto,
     common::session_type_enum::SessionTypeEnum,
     session_api::create_manual_session::CreateManualSessionDto,
     stats_api::{ConcentrationPeriodDto, GetStatsByPeriodResponseDto},
     task_api::create_task::CreateTaskDto,
 };
+use chrono::{Duration, TimeZone, Utc};
+use common::setup;
 
 mod common;
 

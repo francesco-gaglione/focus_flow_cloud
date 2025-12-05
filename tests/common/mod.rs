@@ -1,4 +1,4 @@
-use focus_flow_cloud::adapters::http::dto::{
+use api::adapters::http::dto::{
     category_api::create_category::{CreateCategoryDto, CreateCategoryResponseDto},
     session_api::create_manual_session::{CreateManualSessionDto, CreateManualSessionResponseDto},
     task_api::create_task::{CreateTaskDto, CreateTaskResponseDto},
@@ -6,16 +6,15 @@ use focus_flow_cloud::adapters::http::dto::{
         get_user_settings::UserSettingsResponseDto, update_setting::UpdateUserSettingDto,
     },
 };
-use focus_flow_cloud::infra::{
+use api::{
     app::create_app,
-    config::AppConfig,
     setup::{init_app_state, init_tracing},
 };
+use infrastructure::config::AppConfig;
 use std::sync::Once;
 use testcontainers::runners::AsyncRunner;
 use testcontainers_modules::postgres::Postgres;
 use tokio::net::TcpListener;
-use tracing::info;
 
 static TRACING: Once = Once::new();
 
