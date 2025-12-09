@@ -2,3 +2,4 @@
 .idea
 .zed
 .env
+.k8s
