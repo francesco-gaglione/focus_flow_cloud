@@ -37,30 +37,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
-      - name: Install cross
-        uses: taiki-e/install-action@v2
-        with:
-          tool: cross
 
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: x86_64-unknown-linux-gnu,aarch64-unknown-linux-gnu
+          targets: x86_64-unknown-linux-gnu
 
       - uses: swatinem/rust-cache@v2
 
       - name: Build binaries
         run: |
           cargo build --release --target x86_64-unknown-linux-gnu
-          cross build --release --target aarch64-unknown-linux-gnu
-
+      
       - name: Prepare binaries
         run: |
           cp target/x86_64-unknown-linux-gnu/release/focus_flow_cloud ./focus_flow_cloud-amd64
-          cp target/aarch64-unknown-linux-gnu/release/focus_flow_cloud ./focus_flow_cloud-arm64
 
       - name: Extract version from Cargo.toml
         id: crate-version
@@ -97,5 +88,5 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           cache-to: type=gha,mode=max
