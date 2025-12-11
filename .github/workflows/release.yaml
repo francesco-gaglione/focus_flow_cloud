@@ -13,10 +13,6 @@ jobs:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
-      - name: Install build dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential libssl-dev pkg-config
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
       - uses: swatinem/rust-cache@v2
