@@ -1,0 +1,26 @@
+FROM debian:bullseye-slim
+
+ARG TARGETARCH
+
+# Install runtime dependencies matching the build environment (libpq)
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+    libpq5 \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && update-ca-certificates
+
+WORKDIR /app
+
+# Copy the pre-compiled binary matching the target architecture
+COPY focus_flow_cloud-${TARGETARCH} /app/focus_flow_cloud
+
+EXPOSE 8080
+
+# Install wget for healthcheck
+RUN apt-get update && apt-get install -y wget && rm -rf /var/lib/apt/lists/*
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD wget --quiet --tries=1 --spider http://localhost:${SERVER_PORT:-8080}/api-docs/openapi.json || exit 1
+
+CMD ["/app/focus_flow_cloud"]
