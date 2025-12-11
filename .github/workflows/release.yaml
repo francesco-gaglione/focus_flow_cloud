@@ -10,7 +10,7 @@ env:
 
 jobs:
   build-release:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
       - name: Set up Rust
@@ -21,7 +21,7 @@ jobs:
 
   create-release-branch:
     needs: build-release
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     permissions:
       contents: write
     steps:
@@ -38,7 +38,7 @@ jobs:
           git push origin $BRANCH_NAME
 
   docker-build-push:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     permissions:
       contents: read
       packages: write
