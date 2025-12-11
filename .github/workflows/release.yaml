@@ -3,14 +3,14 @@ name: Release
 on:
   push:
     tags:
-      - '*'
+      - "*"
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build-release:
-    runs-on: self-hosted
+  build-release :
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Set up Rust
@@ -20,8 +20,8 @@ jobs:
         run: cargo build --release
 
   create-release-branch:
+    runs-on: ubuntu-latest
     needs: build-release
-    runs-on: self-hosted
     permissions:
       contents: write
     steps:
@@ -38,7 +38,7 @@ jobs:
           git push origin $BRANCH_NAME
 
   docker-build-push:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
