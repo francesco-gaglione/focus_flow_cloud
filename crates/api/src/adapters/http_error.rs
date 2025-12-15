@@ -24,6 +24,9 @@ pub enum HttpError {
 
     #[error("Forbidden")]
     Forbidden,
+
+    #[error("Unauthorized: {0}")]
+    Unauthorized(String),
 }
 
 pub type HttpResult<T> = Result<T, HttpError>;
@@ -55,6 +58,7 @@ impl HttpError {
             HttpError::BadRequest(_) => StatusCode::BAD_REQUEST,
             HttpError::Forbidden => StatusCode::FORBIDDEN,
             HttpError::GenericError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            HttpError::Unauthorized(_) => StatusCode::UNAUTHORIZED,
         }
     }
 
@@ -65,6 +69,7 @@ impl HttpError {
             HttpError::BadRequest(_) => "BAD_REQUEST",
             HttpError::Forbidden => "FORBIDDEN",
             HttpError::GenericError(_) => "INTERNAL_ERROR",
+            HttpError::Unauthorized(_) => "UNAUTHORIZED",
         }
     }
 }
@@ -91,6 +96,9 @@ impl From<AppError> for HttpError {
             AppError::InvalidPasswordPolicy(msg) => HttpError::BadRequest(msg),
             AppError::PasswordHashingError(msg) => HttpError::GenericError(msg),
             AppError::UserNotFound(msg) => HttpError::NotFound(msg),
+            AppError::TokenError(msg) => HttpError::GenericError(msg),
+            AppError::Validation(msg) => HttpError::BadRequest(msg),
+            AppError::Unauthorized(msg) => HttpError::Unauthorized(msg),
         }
     }
 }

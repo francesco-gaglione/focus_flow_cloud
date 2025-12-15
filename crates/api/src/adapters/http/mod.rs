@@ -1,4 +1,5 @@
 pub mod app_state;
+pub mod auth;
 pub mod category;
 pub mod dto;
 pub mod pomodoro_state;

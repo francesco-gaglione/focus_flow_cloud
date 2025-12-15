@@ -53,6 +53,15 @@ pub enum AppError {
 
     #[error("Persistance error: {0}")]
     Persistence(String),
+
+    #[error("Token error: {0}")]
+    TokenError(String),
+
+    #[error("Validation error: {0}")]
+    Validation(String),
+
+    #[error("Unauthorized: {0}")]
+    Unauthorized(String),
 }
 
 impl From<DomainError> for AppError {
@@ -64,6 +73,7 @@ impl From<DomainError> for AppError {
             DomainError::InvalidStatsParam(msg) => AppError::InvalidStatsParam(msg),
             DomainError::InvalidPasswordPolicy(msg) => AppError::InvalidPasswordPolicy(msg),
             DomainError::PasswordHashingError(msg) => AppError::PasswordHashingError(msg),
+            DomainError::TokenGenerationError(msg) => AppError::TokenError(msg),
         }
     }
 }

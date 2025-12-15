@@ -27,7 +27,10 @@ use crate::adapters::http::task::update_task::UpdateTaskDto;
 use crate::adapters::http::user_setting::get_user_settings::UserSettingsResponseDto;
 use crate::adapters::http::user_setting::update_setting::UpdateUserSettingDto;
 use crate::adapters::http::users::create_user::CreateUserDto;
+use crate::adapters::http::auth::login::{LoginDto, LoginResponseDto};
 use utoipa::OpenApi;
+
+pub const AUTH_TAG: &str = "Auth";
 
 pub const CATEGORY_TAG: &str = "Category";
 pub const TASK_TAG: &str = "Task";
@@ -48,7 +51,8 @@ pub const USERS_TAG: &str = "Users";
         (name = SESSION_TAG, description = "Endpoints for managing focus sessions"),
         (name = STATS_TAG, description = "Endpoints for retrieving statistics"),
         (name = SETTING_TAG, description = "Endpoints for managing user settings"),
-        (name = USERS_TAG, description = "Endpoints for managing user")
+        (name = USERS_TAG, description = "Endpoints for managing user"),
+        (name = AUTH_TAG, description = "Endpoints for authentication")
     ),
     paths(
         crate::adapters::http::category::create_category::create_category_api,
@@ -59,6 +63,7 @@ pub const USERS_TAG: &str = "Users";
         crate::adapters::http::task::orphan_tasks::fetch_orphan_tasks_api,
         crate::adapters::http::task::create_task::create_task_api,
         crate::adapters::http::users::create_user::create_user_api,
+        crate::adapters::http::auth::login::login_api,
         crate::adapters::http::task::get_tasks::get_tasks_api,
         crate::adapters::http::task::update_task::update_task_api,
         crate::adapters::http::task::delete_tasks::delete_tasks_api,
@@ -87,6 +92,7 @@ pub const USERS_TAG: &str = "Users";
         schemas(UserSettingsResponseDto),
         schemas(UpdateUserSettingDto),
         schemas(CreateUserDto),
+        schemas(LoginDto, LoginResponseDto),
     ),
     servers(
         (url = "/", description = "API server")

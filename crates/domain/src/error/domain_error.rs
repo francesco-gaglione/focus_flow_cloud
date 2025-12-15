@@ -19,6 +19,9 @@ pub enum DomainError {
 
     #[error("Password hashing error: {0}")]
     PasswordHashingError(String),
+
+    #[error("Token generation error: {0}")]
+    TokenGenerationError(String),
 }
 
 pub type DomainResult<T> = Result<T, DomainError>;

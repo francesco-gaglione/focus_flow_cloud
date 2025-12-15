@@ -3,6 +3,7 @@ pub struct AppConfig {
     pub server_port: u16,
     pub cors_origin: String,
     pub database_url: String,
+    pub jwt_secret: String,
 }
 
 impl AppConfig {
@@ -15,6 +16,7 @@ impl AppConfig {
         let postgres_password =
             std::env::var("POSTGRES_PASSWORD").expect("POSTGRES_PASSWORD must be set");
         let postgres_db = std::env::var("POSTGRES_DB").expect("POSTGRES_DB must be set");
+        let jwt_secret = std::env::var("JWT_SECRET").expect("JWT_SECRET must be set");
 
         let database_url = format!(
             "postgres://{}:{}@{}/{}",
@@ -25,6 +27,7 @@ impl AppConfig {
             server_port: server_port.parse().expect("SERVER_PORT must be a number"),
             cors_origin,
             database_url,
+            jwt_secret,
         }
     }
 }

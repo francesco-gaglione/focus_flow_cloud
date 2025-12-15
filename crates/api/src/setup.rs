@@ -22,11 +22,13 @@ use application::use_cases::{
         create_task::CreateTaskUseCase, delete_tasks::DeleteTasksUseCase,
         orphan_tasks::OrphanTasksUseCase, update_task::UpdateTaskUseCase,
     },
+    user::login_user::LoginUseCase,
 };
 use infrastructure::config::AppConfig;
 use infrastructure::crypto::password_hasher::Argon2Hasher;
 use infrastructure::database::persistence::postgres_persistence;
 use infrastructure::policy::password_policy_impl::PasswordPolicyImpl;
+use infrastructure::services::jwt_service::JwtService;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
@@ -82,11 +84,20 @@ pub async fn init_app_state(config: AppConfig) -> Result<AppState, Box<dyn std::
     let get_user_settings_usecase = Arc::new(GetSettingsUseCase::new(postgres_arc.clone()));
     let update_user_setting_usecase = Arc::new(UpdateSettingUseCase::new(postgres_arc.clone()));
 
+    // Token Service
+    let token_service = Arc::new(JwtService::new(config.jwt_secret.clone()));
+
     // User Use Cases
     let register_user_usecase = Arc::new(RegisterUserUseCase::new(
-        argon_hasher,
+        argon_hasher.clone(),
         postgres_arc.clone(),
         password_policy,
+    ));
+
+    let login_usecase = Arc::new(LoginUseCase::new(
+        postgres_arc.clone(),
+        argon_hasher,
+        token_service,
     ));
 
     Ok(AppState {
@@ -112,6 +123,7 @@ pub async fn init_app_state(config: AppConfig) -> Result<AppState, Box<dyn std::
         update_user_setting_usecase,
         get_user_settings_usecase,
         register_user_usecase,
+        login_usecase,
     })
 }
 

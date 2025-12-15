@@ -1,4 +1,5 @@
 pub mod delete_user;
+pub mod login_user;
 pub mod register_user;
 pub mod update_password;
 pub mod update_user_username;
