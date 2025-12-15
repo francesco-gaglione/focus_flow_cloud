@@ -1,6 +1,6 @@
 use crate::adapters::http::dto::common::task_dto::TaskDto;
-use crate::adapters::http::dto::task_api::create_task::CreateTaskDto;
-use crate::adapters::http::dto::task_api::update_task::UpdateTaskDto;
+use crate::adapters::http::task::create_task::CreateTaskDto;
+use crate::adapters::http::task::update_task::UpdateTaskDto;
 use application::app_error::{AppError, AppResult};
 use application::use_cases::task::command::create_task::CreateTaskCommand;
 use application::use_cases::task::command::update_task::UpdateTaskCommand;

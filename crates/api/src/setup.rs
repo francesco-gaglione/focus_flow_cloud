@@ -2,6 +2,7 @@ use crate::adapters::http::app_state::AppState;
 use crate::adapters::http::pomodoro_state::PomodoroState;
 use application::use_cases::focus_session::update_focus_session::UpdateFocusSessionUseCase;
 use application::use_cases::task::get_tasks::GetTasksUseCase;
+use application::use_cases::user::register_user::RegisterUserUseCase;
 use application::use_cases::user_settings::get_settings::GetSettingsUseCase;
 use application::use_cases::user_settings::update_setting::UpdateSettingUseCase;
 use application::use_cases::{
@@ -23,7 +24,9 @@ use application::use_cases::{
     },
 };
 use infrastructure::config::AppConfig;
+use infrastructure::crypto::password_hasher::Argon2Hasher;
 use infrastructure::database::persistence::postgres_persistence;
+use infrastructure::policy::password_policy_impl::PasswordPolicyImpl;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
@@ -34,6 +37,12 @@ use tracing_tree::HierarchicalLayer;
 
 pub async fn init_app_state(config: AppConfig) -> Result<AppState, Box<dyn std::error::Error>> {
     let postgres_arc = Arc::new(postgres_persistence(&config.database_url).await);
+
+    // Password Hasher
+    let argon_hasher = Arc::new(Argon2Hasher::new());
+
+    // Policy
+    let password_policy = Arc::new(PasswordPolicyImpl::new());
 
     // Category Use Cases
     let create_category_usecase = Arc::new(CreateCategoryUseCases::new(postgres_arc.clone()));
@@ -73,6 +82,13 @@ pub async fn init_app_state(config: AppConfig) -> Result<AppState, Box<dyn std::
     let get_user_settings_usecase = Arc::new(GetSettingsUseCase::new(postgres_arc.clone()));
     let update_user_setting_usecase = Arc::new(UpdateSettingUseCase::new(postgres_arc.clone()));
 
+    // User Use Cases
+    let register_user_usecase = Arc::new(RegisterUserUseCase::new(
+        argon_hasher,
+        postgres_arc.clone(),
+        password_policy,
+    ));
+
     Ok(AppState {
         ws_clients: Arc::new(RwLock::new(HashMap::new())),
         pomodoro_state: Arc::new(RwLock::new(PomodoroState::default())),
@@ -95,6 +111,7 @@ pub async fn init_app_state(config: AppConfig) -> Result<AppState, Box<dyn std::
         calculate_stats_by_period_usecase,
         update_user_setting_usecase,
         get_user_settings_usecase,
+        register_user_usecase,
     })
 }
 

@@ -1,16 +1,25 @@
 #[cfg(test)]
-use domain::entities::{
-    category::Category,
-    focus_session::{FocusSession, SessionFilter},
-    task::Task,
-    user_setting::UserSetting,
-};
-#[cfg(test)]
 use domain::error::persistence_error::PersistenceResult;
+#[cfg(test)]
+use domain::traits::password_hasher::PasswordHasher;
+#[cfg(test)]
+use domain::traits::password_policy::PasswordPolicy;
 #[cfg(test)]
 use domain::traits::{
     category_persistence::CategoryPersistence, focus_session_persistence::FocusSessionPersistence,
-    task_persistence::TaskPersistence, user_setting_persistence::UserSettingPersistence,
+    task_persistence::TaskPersistence, user_persistence::UserPersistence,
+    user_setting_persistence::UserSettingPersistence,
+};
+#[cfg(test)]
+use domain::{
+    entities::{
+        category::Category,
+        focus_session::{FocusSession, SessionFilter},
+        task::Task,
+        user::User,
+        user_setting::UserSetting,
+    },
+    error::domain_error::DomainResult,
 };
 #[cfg(test)]
 use mockall::mock;
@@ -66,5 +75,36 @@ mock! {
          async fn find_all(&self) -> PersistenceResult<Vec<UserSetting>>;
          async fn update_setting(&self, key: String, value: String) -> PersistenceResult<()>;
          async fn create_setting(&self, key: String, value: String) -> PersistenceResult<()>;
+    }
+}
+
+#[cfg(test)]
+mock! {
+    pub UserPersistence {}
+    #[async_trait::async_trait]
+    impl UserPersistence for UserPersistence {
+        async fn find_user_by_id(&self, user_id: Uuid) -> PersistenceResult<User>;
+        async fn find_user_by_username(&self, username: &str) -> PersistenceResult<User>;
+        async fn create_user(&self, user: User) -> PersistenceResult<Uuid>;
+        async fn update_user(&self, user: User) -> PersistenceResult<()>;
+        async fn delete_user(&self, user_id: Uuid) -> PersistenceResult<()>;
+        async fn is_user_admin(&self, user_id: Uuid) -> PersistenceResult<bool>;
+    }
+}
+
+#[cfg(test)]
+mock! {
+    pub PasswordPolicy {}
+    impl PasswordPolicy for PasswordPolicy {
+        fn validate(&self, password: &str) -> DomainResult<()>;
+    }
+}
+
+#[cfg(test)]
+mock! {
+    pub PasswordHasher {}
+    impl PasswordHasher for PasswordHasher {
+        fn hash_password(&self, password: &str) -> DomainResult<String>;
+        fn verify_password(&self, password: &str, hashed_password: &str) -> DomainResult<bool>;
     }
 }

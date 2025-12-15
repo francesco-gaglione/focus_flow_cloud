@@ -1,22 +1,17 @@
-pub mod category;
-pub mod session;
-pub mod stats;
-pub mod task;
-pub mod user_setting;
-pub mod ws;
 
 use crate::adapters::http::app_state::AppState;
 use axum::Router;
 
 pub fn api_routes() -> Router<AppState> {
     Router::new()
-        .nest("/categories", category::routes::router())
-        .nest("/tasks", task::routes::router())
-        .nest("/focus-sessions", session::routes::router())
-        .nest("/stats", stats::routes::router())
-        .nest("/user-settings", user_setting::routes::router())
+        .nest("/categories", crate::adapters::http::category::routes::router())
+        .nest("/tasks", crate::adapters::http::task::routes::router())
+        .nest("/focus-sessions", crate::adapters::http::session::routes::router())
+        .nest("/stats", crate::adapters::http::stats::routes::router())
+        .nest("/user-settings", crate::adapters::http::user_setting::routes::router())
+        .nest("/users", crate::adapters::http::users::routes::router())
 }
 
 pub fn ws_routes() -> Router<AppState> {
-    Router::new().nest("/workspace", ws::routes::router())
+    Router::new().nest("/ws", crate::adapters::http::ws::routes::router())
 }

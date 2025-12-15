@@ -87,6 +87,10 @@ impl From<AppError> for HttpError {
             AppError::InvalidDateRange(msg) => HttpError::BadRequest(msg),
             AppError::InvalidId(msg) => HttpError::BadRequest(msg),
             AppError::InvalidStatsParam(msg) => HttpError::BadRequest(msg),
+            AppError::InvalidUserParam(msg) => HttpError::BadRequest(msg),
+            AppError::InvalidPasswordPolicy(msg) => HttpError::BadRequest(msg),
+            AppError::PasswordHashingError(msg) => HttpError::GenericError(msg),
+            AppError::UserNotFound(msg) => HttpError::NotFound(msg),
         }
     }
 }

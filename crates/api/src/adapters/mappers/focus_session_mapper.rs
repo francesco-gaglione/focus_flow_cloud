@@ -3,9 +3,9 @@ use uuid::Uuid;
 
 use crate::adapters::http::dto::{
     common::{focus_session::FocusSessionDto, session_type_enum::SessionTypeEnum},
-    session_api::{
-        create_manual_session::CreateManualSessionDto, update_session::UpdateFocusSessionDto,
-    },
+};
+use crate::adapters::http::session::{
+    create_manual_session::CreateManualSessionDto, update_session::UpdateFocusSessionDto,
 };
 use application::{
     app_error::{AppError, AppResult},

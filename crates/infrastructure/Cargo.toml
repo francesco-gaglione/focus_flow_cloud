@@ -16,6 +16,9 @@ dotenvy.workspace = true
 serde = { workspace = true, features = ["derive"] }
 uuid = { workspace = true, features = ["v4", "serde"] }
 chrono = { workspace = true, features = ["serde"] }
+argon2 = "0.5"
+rand_core = { version = "0.6", features = ["std"] }
+thiserror.workspace = true
 
 [dev-dependencies]
 testcontainers = "0.23"
