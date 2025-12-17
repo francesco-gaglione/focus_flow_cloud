@@ -2,6 +2,7 @@ pub mod app_state;
 pub mod auth;
 pub mod category;
 pub mod dto;
+pub mod model;
 pub mod pomodoro_state;
 pub mod request_id;
 pub mod routes;

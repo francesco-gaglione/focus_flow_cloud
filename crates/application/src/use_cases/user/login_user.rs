@@ -16,6 +16,12 @@ pub struct LoginCommand {
     pub password: String,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct LoginOutput {
+    pub token: String,
+    pub user_id: uuid::Uuid,
+}
+
 pub struct LoginUseCase {
     user_persistence: Arc<dyn UserPersistence>,
     password_hasher: Arc<dyn PasswordHasher>,
@@ -35,7 +41,7 @@ impl LoginUseCase {
         }
     }
 
-    pub async fn execute(&self, cmd: LoginCommand) -> AppResult<String> {
+    pub async fn execute(&self, cmd: LoginCommand) -> AppResult<LoginOutput> {
         // Validate input
         cmd.validate()
             .map_err(|e| AppError::Validation(e.to_string()))?;
@@ -64,6 +70,9 @@ impl LoginUseCase {
             .generate_token(&user)
             .map_err(|e| AppError::GenericError(e.to_string()))?;
 
-        Ok(token)
+        Ok(LoginOutput {
+            token,
+            user_id: user.id(),
+        })
     }
 }

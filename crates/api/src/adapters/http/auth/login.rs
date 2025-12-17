@@ -1,10 +1,12 @@
-use crate::adapters::http::app_state::AppState;
+use crate::adapters::http::model::session_model::{UserSession, SESSION_KEY};
 use crate::adapters::http_error::HttpResult;
 use crate::adapters::openapi::AUTH_TAG;
-use application::use_cases::user::login_user::LoginCommand;
+use crate::adapters::{http::app_state::AppState, http_error::HttpError};
+use application::{app_error::AppError, use_cases::user::login_user::LoginCommand};
 use axum::extract::State;
 use axum::Json;
 use serde::{Deserialize, Serialize};
+use tower_sessions::Session;
 use utoipa::ToSchema;
 use validator::Validate;
 
@@ -36,6 +38,7 @@ pub struct LoginResponseDto {
 )]
 pub async fn login_api(
     State(state): State<AppState>,
+    session: Session,
     Json(payload): Json<LoginDto>,
 ) -> HttpResult<Json<LoginResponseDto>> {
     let cmd = LoginCommand {
@@ -43,7 +46,18 @@ pub async fn login_api(
         password: payload.password,
     };
 
-    let token = state.login_usecase.execute(cmd).await?;
+    let result = state.login_usecase.execute(cmd).await?;
 
-    Ok(Json(LoginResponseDto { token }))
+    let session_data = UserSession {
+        user_id: result.user_id,
+    };
+
+    session
+        .insert(SESSION_KEY, session_data)
+        .await
+        .map_err(|e| HttpError::GenericError(format!("Session error: {}", e)))?;
+
+    Ok(Json(LoginResponseDto {
+        token: result.token,
+    }))
 }

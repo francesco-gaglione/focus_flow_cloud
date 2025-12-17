@@ -35,7 +35,7 @@ use tokio::sync::RwLock;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
 use tracing_subscriber::EnvFilter;
-use tracing_tree::HierarchicalLayer;
+
 
 pub async fn init_app_state(config: AppConfig) -> Result<AppState, Box<dyn std::error::Error>> {
     let postgres_arc = Arc::new(postgres_persistence(&config.database_url).await);
@@ -96,9 +96,44 @@ pub async fn init_app_state(config: AppConfig) -> Result<AppState, Box<dyn std::
 
     let login_usecase = Arc::new(LoginUseCase::new(
         postgres_arc.clone(),
-        argon_hasher,
+        argon_hasher.clone(),
         token_service,
     ));
+
+    // Seed Admin User
+    if let (Some(username), Some(password)) = (&config.admin_username, &config.admin_password) {
+        use domain::entities::{user::User, user_role::UserRole};
+        use domain::traits::{
+            password_hasher::PasswordHasher, user_persistence::UserPersistence,
+        };
+        use tracing::{error, info};
+
+        info!("Checking for admin user: {}", username);
+
+        match postgres_arc.find_user_by_username(username).await {
+            Ok(_) => {
+                info!("Admin user '{}' already exists. Skipping creation.", username);
+            }
+            Err(_) => {
+                info!("Admin user '{}' not found. Creating...", username);
+                match argon_hasher.hash_password(password) {
+                    Ok(hashed_password) => {
+                        let admin_user = User::new(
+                            username.clone(),
+                            hashed_password,
+                            UserRole::Admin,
+                        );
+
+                        match postgres_arc.create_user(admin_user).await {
+                            Ok(id) => info!("Successfully created admin user '{}' with ID: {}", username, id),
+                            Err(e) => error!("Failed to create admin user: {:?}", e),
+                        }
+                    }
+                    Err(e) => error!("Failed to hash admin password: {:?}", e),
+                }
+            }
+        }
+    }
 
     Ok(AppState {
         ws_clients: Arc::new(RwLock::new(HashMap::new())),
@@ -128,16 +163,28 @@ pub async fn init_app_state(config: AppConfig) -> Result<AppState, Box<dyn std::
 }
 
 pub fn init_tracing() {
-    let filter =
-        EnvFilter::try_from_default_env().unwrap_or_else(|_| "api=info,tower_http=info".into());
+    let filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| {
+        // Default to info, but enable debug for our app
+        // tower_http=info reduces noise from every single request detail if needed, but debug is good for dev
+        "focus_flow_cloud=debug,api=debug,domain=debug,infrastructure=debug,application=debug,tower_http=info,axum=info,info".into()
+    });
 
-    let tree_layer = HierarchicalLayer::new(2)
-        .with_targets(true)
-        .with_bracketed_fields(true);
+    let registry = tracing_subscriber::registry().with(filter);
 
-    tracing_subscriber::registry()
-        .with(filter)
-        .with(tree_layer)
-        .try_init()
-        .ok();
+    let app_env = std::env::var("APP_ENV").unwrap_or_else(|_| "development".to_string());
+
+    if app_env == "production" {
+        registry.with(tracing_subscriber::fmt::layer().json()).init();
+    } else {
+        registry
+            .with(
+                tracing_subscriber::fmt::layer()
+                    .pretty()
+                    .with_target(true)
+                    .with_thread_ids(true)
+                    .with_file(false)
+                    .with_line_number(false),
+            )
+            .init();
+    }
 }
