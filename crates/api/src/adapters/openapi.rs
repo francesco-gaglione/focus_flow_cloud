@@ -1,3 +1,4 @@
+use crate::adapters::http::auth::login::{LoginDto, LoginResponseDto};
 use crate::adapters::http::category::create_category::{
     CreateCategoryDto, CreateCategoryResponseDto,
 };
@@ -27,7 +28,6 @@ use crate::adapters::http::task::update_task::UpdateTaskDto;
 use crate::adapters::http::user_setting::get_user_settings::UserSettingsResponseDto;
 use crate::adapters::http::user_setting::update_setting::UpdateUserSettingDto;
 use crate::adapters::http::users::create_user::CreateUserDto;
-use crate::adapters::http::auth::login::{LoginDto, LoginResponseDto};
 use utoipa::OpenApi;
 
 pub const AUTH_TAG: &str = "Auth";

@@ -1,7 +1,4 @@
-use crate::adapters::http::{
-    app_state::AppState,
-    ws::update_pomodoro_state::UpdatePomodoroState,
-};
+use crate::adapters::http::{app_state::AppState, ws::update_pomodoro_state::UpdatePomodoroState};
 use serde::{Deserialize, Serialize};
 use tracing::debug;
 use validator::Validate;

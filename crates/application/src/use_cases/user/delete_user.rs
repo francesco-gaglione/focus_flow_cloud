@@ -117,9 +117,7 @@ mod tests {
             .times(1)
             .returning(|_| Ok(false));
 
-        mock_user_persistence
-            .expect_delete_user()
-            .times(0);
+        mock_user_persistence.expect_delete_user().times(0);
 
         let use_case = DeleteUserUseCase::new(Arc::new(mock_user_persistence));
         let result = use_case

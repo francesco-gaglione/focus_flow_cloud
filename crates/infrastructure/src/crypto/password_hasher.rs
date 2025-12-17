@@ -7,6 +7,7 @@ use argon2::{
 use domain::{error::domain_error::DomainError, traits::password_hasher::PasswordHasher};
 use tracing::{debug, error};
 
+#[derive(Default)]
 pub struct Argon2Hasher;
 
 impl Argon2Hasher {
@@ -29,7 +30,10 @@ impl PasswordHasher for Argon2Hasher {
     }
 
     fn verify_password(&self, password: &str, stored_hash: &str) -> Result<bool, DomainError> {
-        debug!("Attempting to verify password against hash: {}", stored_hash);
+        debug!(
+            "Attempting to verify password against hash: {}",
+            stored_hash
+        );
         let parsed_hash = PasswordHash::new(stored_hash).map_err(|e| {
             error!("Failed to parse hash: {}", e);
             DomainError::PasswordHashingError(e.to_string())

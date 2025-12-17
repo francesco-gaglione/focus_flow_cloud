@@ -2,7 +2,7 @@ use crate::adapters::http::model::session_model::{UserSession, SESSION_KEY};
 use crate::adapters::http_error::HttpResult;
 use crate::adapters::openapi::AUTH_TAG;
 use crate::adapters::{http::app_state::AppState, http_error::HttpError};
-use application::{app_error::AppError, use_cases::user::login_user::LoginCommand};
+use application::use_cases::user::login_user::LoginCommand;
 use axum::extract::State;
 use axum::Json;
 use serde::{Deserialize, Serialize};

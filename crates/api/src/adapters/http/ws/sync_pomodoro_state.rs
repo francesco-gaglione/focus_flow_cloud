@@ -1,8 +1,6 @@
 use crate::adapters::http::{
     app_state::AppState,
-    ws::update_pomodoro_state::{
-        UpdateCurrentSession, UpdatePomodoroState, UpdateWorkContext,
-    },
+    ws::update_pomodoro_state::{UpdateCurrentSession, UpdatePomodoroState, UpdateWorkContext},
 };
 
 pub async fn sync_pomodoro_state(state: &AppState) -> Result<UpdatePomodoroState, String> {

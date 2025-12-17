@@ -36,7 +36,6 @@ use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
 use tracing_subscriber::EnvFilter;
 
-
 pub async fn init_app_state(config: AppConfig) -> Result<AppState, Box<dyn std::error::Error>> {
     let postgres_arc = Arc::new(postgres_persistence(&config.database_url).await);
 
@@ -103,29 +102,30 @@ pub async fn init_app_state(config: AppConfig) -> Result<AppState, Box<dyn std::
     // Seed Admin User
     if let (Some(username), Some(password)) = (&config.admin_username, &config.admin_password) {
         use domain::entities::{user::User, user_role::UserRole};
-        use domain::traits::{
-            password_hasher::PasswordHasher, user_persistence::UserPersistence,
-        };
+        use domain::traits::{password_hasher::PasswordHasher, user_persistence::UserPersistence};
         use tracing::{error, info};
 
         info!("Checking for admin user: {}", username);
 
         match postgres_arc.find_user_by_username(username).await {
             Ok(_) => {
-                info!("Admin user '{}' already exists. Skipping creation.", username);
+                info!(
+                    "Admin user '{}' already exists. Skipping creation.",
+                    username
+                );
             }
             Err(_) => {
                 info!("Admin user '{}' not found. Creating...", username);
                 match argon_hasher.hash_password(password) {
                     Ok(hashed_password) => {
-                        let admin_user = User::new(
-                            username.clone(),
-                            hashed_password,
-                            UserRole::Admin,
-                        );
+                        let admin_user =
+                            User::new(username.clone(), hashed_password, UserRole::Admin);
 
                         match postgres_arc.create_user(admin_user).await {
-                            Ok(id) => info!("Successfully created admin user '{}' with ID: {}", username, id),
+                            Ok(id) => info!(
+                                "Successfully created admin user '{}' with ID: {}",
+                                username, id
+                            ),
                             Err(e) => error!("Failed to create admin user: {:?}", e),
                         }
                     }
@@ -174,7 +174,9 @@ pub fn init_tracing() {
     let app_env = std::env::var("APP_ENV").unwrap_or_else(|_| "development".to_string());
 
     if app_env == "production" {
-        registry.with(tracing_subscriber::fmt::layer().json()).init();
+        registry
+            .with(tracing_subscriber::fmt::layer().json())
+            .init();
     } else {
         registry
             .with(

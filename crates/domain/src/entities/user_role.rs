@@ -1,14 +1,16 @@
+use std::fmt::Display;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum UserRole {
     Admin,
     User,
 }
 
-impl ToString for UserRole {
-    fn to_string(&self) -> String {
+impl Display for UserRole {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match &self {
-            UserRole::Admin => "admin".to_string(),
-            UserRole::User => "user".to_string(),
+            UserRole::Admin => write!(f, "admin"),
+            UserRole::User => write!(f, "user"),
         }
     }
 }

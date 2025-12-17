@@ -70,8 +70,8 @@ impl RegisterUserUseCase {
 mod tests {
     use std::sync::Arc;
 
-    use domain::error::{domain_error::DomainError, persistence_error::PersistenceError};
     use domain::entities::{user::User, user_role::UserRole};
+    use domain::error::{domain_error::DomainError, persistence_error::PersistenceError};
     use uuid::Uuid;
 
     use crate::{
@@ -95,11 +95,7 @@ mod tests {
             .expect_find_user_by_id()
             .times(1)
             .returning(|_| {
-                let user = User::new(
-                    "admin".to_string(),
-                    "hash".to_string(),
-                    UserRole::Admin
-                );
+                let user = User::new("admin".to_string(), "hash".to_string(), UserRole::Admin);
                 Ok(user)
             });
 
@@ -252,11 +248,7 @@ mod tests {
             .expect_find_user_by_id()
             .times(1)
             .returning(|_| {
-                let user = User::new(
-                    "admin".to_string(),
-                    "hash".to_string(),
-                    UserRole::Admin
-                );
+                let user = User::new("admin".to_string(), "hash".to_string(), UserRole::Admin);
                 Ok(user)
             });
 
@@ -288,7 +280,6 @@ mod tests {
         assert!(matches!(result, Err(AppError::Database(_))));
     }
 
-
     #[tokio::test]
     async fn test_register_user_fails_if_requester_is_not_admin() {
         let mut mock_user_persistence = MockUserPersistence::default();
@@ -306,7 +297,7 @@ mod tests {
                 let user = User::new(
                     "regular_user".to_string(),
                     "hash".to_string(),
-                    UserRole::User
+                    UserRole::User,
                 );
                 Ok(user)
             });

@@ -6,6 +6,7 @@ use crate::adapters::{
 use crate::middleware::RequestIdLayer;
 use axum::Router;
 use http::{header, Method};
+use time::Duration;
 use tower::ServiceBuilder;
 use tower_http::cors::{AllowOrigin, CorsLayer};
 use tower_http::trace::TraceLayer;
@@ -13,16 +14,13 @@ use tower_sessions::{MemoryStore, SessionManagerLayer};
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 use uuid::Uuid;
-use time::Duration;
 
 pub fn create_app(app_state: AppState) -> Router {
     let session_store = MemoryStore::default();
 
     let session_layer = SessionManagerLayer::new(session_store)
         .with_secure(false)
-        .with_expiry(tower_sessions::Expiry::OnInactivity(
-            Duration::hours(24)
-        )); // 24 hours
+        .with_expiry(tower_sessions::Expiry::OnInactivity(Duration::hours(24))); // 24 hours
 
     Router::new()
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))

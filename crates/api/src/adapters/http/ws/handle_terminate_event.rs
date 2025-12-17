@@ -2,9 +2,7 @@ use chrono::{DateTime, Utc};
 use tracing::debug;
 use uuid::Uuid;
 
-use crate::adapters::http::{
-    app_state::AppState, ws::update_pomodoro_state::UpdatePomodoroState,
-};
+use crate::adapters::http::{app_state::AppState, ws::update_pomodoro_state::UpdatePomodoroState};
 use application::use_cases::focus_session::command::create_foucs_session::CreateFocusSessionCommand;
 
 pub async fn handle_terminate_event(state: &AppState) -> Result<UpdatePomodoroState, String> {

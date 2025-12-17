@@ -2,8 +2,7 @@ use chrono::{DateTime, Utc};
 use tracing::debug;
 
 use crate::adapters::http::{
-    app_state::AppState,
-    dto::common::session_type_enum::SessionTypeEnum,
+    app_state::AppState, dto::common::session_type_enum::SessionTypeEnum,
     ws::update_pomodoro_state::UpdatePomodoroState,
 };
 use application::use_cases::focus_session::command::create_foucs_session::CreateFocusSessionCommand;

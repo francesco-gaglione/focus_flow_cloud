@@ -1,8 +1,8 @@
 use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
-use crate::adapters::http::dto::{
-    common::{focus_session::FocusSessionDto, session_type_enum::SessionTypeEnum},
+use crate::adapters::http::dto::common::{
+    focus_session::FocusSessionDto, session_type_enum::SessionTypeEnum,
 };
 use crate::adapters::http::session::{
     create_manual_session::CreateManualSessionDto, update_session::UpdateFocusSessionDto,
