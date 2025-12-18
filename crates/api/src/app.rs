@@ -1,22 +1,30 @@
 use crate::adapters::http::{app_state::AppState, request_id::RequestId};
+use crate::adapters::middleware::request_id_middleware::RequestIdLayer;
 use crate::adapters::{
     http::routes::{api_routes, ws_routes},
     openapi::ApiDoc,
 };
-use crate::middleware::RequestIdLayer;
 use axum::Router;
 use http::{header, Method};
+use time::Duration;
 use tower::ServiceBuilder;
 use tower_http::cors::{AllowOrigin, CorsLayer};
 use tower_http::trace::TraceLayer;
+use tower_sessions::{MemoryStore, SessionManagerLayer};
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 use uuid::Uuid;
 
 pub fn create_app(app_state: AppState) -> Router {
+    let session_store = MemoryStore::default();
+
+    let session_layer = SessionManagerLayer::new(session_store)
+        .with_secure(false)
+        .with_expiry(tower_sessions::Expiry::OnInactivity(Duration::hours(24))); // 24 hours
+
     Router::new()
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
-        .nest("/api", api_routes())
+        .nest("/api", api_routes(app_state.clone()))
         .nest("/ws", ws_routes())
         .with_state(app_state.clone())
         .layer(
@@ -51,4 +59,5 @@ pub fn create_app(app_state: AppState) -> Router {
                 .allow_headers([header::AUTHORIZATION, header::ACCEPT, header::CONTENT_TYPE])
                 .allow_credentials(true),
         )
+        .layer(session_layer)
 }

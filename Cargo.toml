@@ -52,6 +52,8 @@ validator = { version = "0.20.0", features = ["derive"] }
 rand = "0.8"
 config = "0.13"
 matchit = "0.8.4"
+tower-sessions = { version = "0.14.0", features = ["memory-store"] }
+
 
 # Dev dependencies
 [dev-dependencies]

@@ -1,6 +1,8 @@
 use crate::adapters::http::pomodoro_state::PomodoroState;
 use application::use_cases::focus_session::update_focus_session::UpdateFocusSessionUseCase;
 use application::use_cases::task::get_tasks::GetTasksUseCase;
+use application::use_cases::user::login_user::LoginUseCase;
+use application::use_cases::user::register_user::RegisterUserUseCase;
 use application::use_cases::user_settings::get_settings::GetSettingsUseCase;
 use application::use_cases::user_settings::update_setting::UpdateSettingUseCase;
 use application::use_cases::{
@@ -22,6 +24,7 @@ use application::use_cases::{
     },
 };
 use axum::extract::ws::Message;
+use domain::services::token_service::TokenService;
 use infrastructure::config::AppConfig;
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -63,4 +66,11 @@ pub struct AppState {
     // User Setting Use Cases
     pub update_user_setting_usecase: Arc<UpdateSettingUseCase>,
     pub get_user_settings_usecase: Arc<GetSettingsUseCase>,
+
+    // User Use Cases
+    pub register_user_usecase: Arc<RegisterUserUseCase>,
+    pub login_usecase: Arc<LoginUseCase>,
+
+    // Services
+    pub token_service: Arc<dyn TokenService>,
 }

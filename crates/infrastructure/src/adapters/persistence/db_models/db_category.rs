@@ -10,6 +10,7 @@ use uuid::Uuid;
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct DbCategory {
     pub id: Uuid,
+    pub user_id: Uuid,
     pub name: String,
     pub description: Option<String>,
     pub color: String,

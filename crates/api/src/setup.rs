@@ -2,6 +2,7 @@ use crate::adapters::http::app_state::AppState;
 use crate::adapters::http::pomodoro_state::PomodoroState;
 use application::use_cases::focus_session::update_focus_session::UpdateFocusSessionUseCase;
 use application::use_cases::task::get_tasks::GetTasksUseCase;
+use application::use_cases::user::register_user::RegisterUserUseCase;
 use application::use_cases::user_settings::get_settings::GetSettingsUseCase;
 use application::use_cases::user_settings::update_setting::UpdateSettingUseCase;
 use application::use_cases::{
@@ -21,19 +22,28 @@ use application::use_cases::{
         create_task::CreateTaskUseCase, delete_tasks::DeleteTasksUseCase,
         orphan_tasks::OrphanTasksUseCase, update_task::UpdateTaskUseCase,
     },
+    user::login_user::LoginUseCase,
 };
 use infrastructure::config::AppConfig;
+use infrastructure::crypto::password_hasher::Argon2Hasher;
 use infrastructure::database::persistence::postgres_persistence;
+use infrastructure::policy::password_policy_impl::PasswordPolicyImpl;
+use infrastructure::services::jwt_service::JwtService;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
 use tracing_subscriber::EnvFilter;
-use tracing_tree::HierarchicalLayer;
 
 pub async fn init_app_state(config: AppConfig) -> Result<AppState, Box<dyn std::error::Error>> {
     let postgres_arc = Arc::new(postgres_persistence(&config.database_url).await);
+
+    // Password Hasher
+    let argon_hasher = Arc::new(Argon2Hasher::new());
+
+    // Policy
+    let password_policy = Arc::new(PasswordPolicyImpl::new());
 
     // Category Use Cases
     let create_category_usecase = Arc::new(CreateCategoryUseCases::new(postgres_arc.clone()));
@@ -73,6 +83,58 @@ pub async fn init_app_state(config: AppConfig) -> Result<AppState, Box<dyn std::
     let get_user_settings_usecase = Arc::new(GetSettingsUseCase::new(postgres_arc.clone()));
     let update_user_setting_usecase = Arc::new(UpdateSettingUseCase::new(postgres_arc.clone()));
 
+    // Token Service
+    let token_service = Arc::new(JwtService::new(config.jwt_secret.clone()));
+
+    // User Use Cases
+    let register_user_usecase = Arc::new(RegisterUserUseCase::new(
+        argon_hasher.clone(),
+        postgres_arc.clone(),
+        password_policy,
+    ));
+
+    let login_usecase = Arc::new(LoginUseCase::new(
+        postgres_arc.clone(),
+        argon_hasher.clone(),
+        token_service.clone(),
+    ));
+
+    // Seed Admin User
+    if let (Some(username), Some(password)) = (&config.admin_username, &config.admin_password) {
+        use domain::entities::{user::User, user_role::UserRole};
+        use domain::traits::{password_hasher::PasswordHasher, user_persistence::UserPersistence};
+        use tracing::{error, info};
+
+        info!("Checking for admin user: {}", username);
+
+        match postgres_arc.find_user_by_username(username).await {
+            Ok(_) => {
+                info!(
+                    "Admin user '{}' already exists. Skipping creation.",
+                    username
+                );
+            }
+            Err(_) => {
+                info!("Admin user '{}' not found. Creating...", username);
+                match argon_hasher.hash_password(password) {
+                    Ok(hashed_password) => {
+                        let admin_user =
+                            User::new(username.clone(), hashed_password, UserRole::Admin);
+
+                        match postgres_arc.create_user(admin_user).await {
+                            Ok(id) => info!(
+                                "Successfully created admin user '{}' with ID: {}",
+                                username, id
+                            ),
+                            Err(e) => error!("Failed to create admin user: {:?}", e),
+                        }
+                    }
+                    Err(e) => error!("Failed to hash admin password: {:?}", e),
+                }
+            }
+        }
+    }
+
     Ok(AppState {
         ws_clients: Arc::new(RwLock::new(HashMap::new())),
         pomodoro_state: Arc::new(RwLock::new(PomodoroState::default())),
@@ -95,20 +157,37 @@ pub async fn init_app_state(config: AppConfig) -> Result<AppState, Box<dyn std::
         calculate_stats_by_period_usecase,
         update_user_setting_usecase,
         get_user_settings_usecase,
+        register_user_usecase,
+        login_usecase,
+        token_service,
     })
 }
 
 pub fn init_tracing() {
-    let filter =
-        EnvFilter::try_from_default_env().unwrap_or_else(|_| "api=info,tower_http=info".into());
+    let filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| {
+        // Default to info, but enable debug for our app
+        // tower_http=info reduces noise from every single request detail if needed, but debug is good for dev
+        "focus_flow_cloud=debug,api=debug,domain=debug,infrastructure=debug,application=debug,tower_http=info,axum=info,info".into()
+    });
 
-    let tree_layer = HierarchicalLayer::new(2)
-        .with_targets(true)
-        .with_bracketed_fields(true);
+    let registry = tracing_subscriber::registry().with(filter);
 
-    tracing_subscriber::registry()
-        .with(filter)
-        .with(tree_layer)
-        .try_init()
-        .ok();
+    let app_env = std::env::var("APP_ENV").unwrap_or_else(|_| "development".to_string());
+
+    if app_env == "production" {
+        registry
+            .with(tracing_subscriber::fmt::layer().json())
+            .init();
+    } else {
+        registry
+            .with(
+                tracing_subscriber::fmt::layer()
+                    .pretty()
+                    .with_target(true)
+                    .with_thread_ids(true)
+                    .with_file(false)
+                    .with_line_number(false),
+            )
+            .init();
+    }
 }

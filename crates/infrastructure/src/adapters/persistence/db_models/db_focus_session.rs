@@ -11,6 +11,7 @@ use uuid::Uuid;
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct DbFocusSession {
     pub id: Uuid,
+    pub user_id: Uuid,
     pub task_id: Option<Uuid>,
     pub category_id: Option<Uuid>,
     pub session_type: String,

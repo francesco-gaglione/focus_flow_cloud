@@ -2,7 +2,7 @@ version: "3"
 
 services:
   db:
-    image: postgres:16
+    image: postgres:17
     container_name: focusflow_db
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
