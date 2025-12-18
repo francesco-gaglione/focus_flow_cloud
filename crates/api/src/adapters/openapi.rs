@@ -28,9 +28,30 @@ use crate::adapters::http::task::update_task::UpdateTaskDto;
 use crate::adapters::http::user_setting::get_user_settings::UserSettingsResponseDto;
 use crate::adapters::http::user_setting::update_setting::UpdateUserSettingDto;
 use crate::adapters::http::users::create_user::CreateUserDto;
-use utoipa::OpenApi;
+use utoipa::openapi::security::{HttpAuthScheme, HttpBuilder, SecurityScheme};
+use utoipa::{Modify, OpenApi};
 
 pub const AUTH_TAG: &str = "Auth";
+
+// ... existing tags ...
+
+pub struct SecurityAddon;
+
+impl Modify for SecurityAddon {
+    fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
+        if let Some(components) = openapi.components.as_mut() {
+            components.add_security_scheme(
+                "jwt",
+                SecurityScheme::Http(
+                    HttpBuilder::new()
+                        .scheme(HttpAuthScheme::Bearer)
+                        .bearer_format("JWT")
+                        .build(),
+                ),
+            );
+        }
+    }
+}
 
 pub const CATEGORY_TAG: &str = "Category";
 pub const TASK_TAG: &str = "Task";
@@ -45,6 +66,7 @@ pub const USERS_TAG: &str = "Users";
         title = "Focus flow app API",
         version = "0.1.0"
     ),
+    modifiers(&SecurityAddon),
     tags(
         (name = CATEGORY_TAG, description = "Endpoints for managing categories and their tasks"),
         (name = TASK_TAG, description = "Endpoints for managing tasks"),

@@ -33,15 +33,19 @@ pub struct CreateCategoryResponseDto {
 
 #[utoipa::path(
     post,
-    path = "/api/categories",
+    path = "/api/category",
     tag = CATEGORY_TAG,
     summary = "Create a new category",
     request_body = CreateCategoryDto,
     responses(
         (status = 200, description = "Category created successfully", body = CreateCategoryResponseDto),
         (status = 400, description = "Bad request - validation error"),
+        (status = 401, description = "Unauthorized"),
         (status = 409, description = "Category already exists"),
         (status = 500, description = "Internal server error")
+    ),
+    security(
+        ("jwt" = [])
     )
 )]
 pub async fn create_category_api(

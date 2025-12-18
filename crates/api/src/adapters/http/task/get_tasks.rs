@@ -21,7 +21,11 @@ pub struct TasksResponseDto {
     summary = "Get all tasks",
     responses(
         (status = 200, description = "Tasks fetched successfully", body = TasksResponseDto),
+        (status = 401, description = "Unauthorized"),
         (status = 500, description = "Internal server error")
+    ),
+    security(
+        ("jwt" = [])
     )
 )]
 pub async fn get_tasks_api(State(state): State<AppState>) -> HttpResult<Json<TasksResponseDto>> {

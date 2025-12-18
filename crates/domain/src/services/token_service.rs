@@ -6,4 +6,5 @@ use async_trait::async_trait;
 #[async_trait]
 pub trait TokenService: Send + Sync {
     fn generate_token(&self, user: &User) -> DomainResult<String>;
+    fn verify_token(&self, token: &str) -> DomainResult<String>;
 }

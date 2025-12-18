@@ -1,12 +1,10 @@
-use crate::adapters::http::model::session_model::{UserSession, SESSION_KEY};
+use crate::adapters::http::model::session_model::UserSession;
 use crate::adapters::http_error::HttpResult;
 use crate::adapters::openapi::USERS_TAG;
-use crate::adapters::{http::app_state::AppState, http_error::HttpError};
+use crate::adapters::http::app_state::AppState;
 use application::use_cases::user::register_user::RegisterUserCommand;
-use axum::extract::State;
-use axum::Json;
+use axum::{extract::State, Extension, Json};
 use serde::{Deserialize, Serialize};
-use tower_sessions::Session;
 use utoipa::ToSchema;
 use validator::Validate;
 
@@ -22,26 +20,22 @@ pub struct CreateUserDto {
     tag = USERS_TAG,
     summary = "Create a new user",
     request_body = CreateUserDto,
+    security(
+        ("jwt" = [])
+    ),
     responses(
         (status = 200, description = "User created successfully"),
+        (status = 401, description = "Unauthorized - invalid credentials or not admin"),
         (status = 400, description = "Bad request - validation error"),
         (status = 500, description = "Internal server error")
     )
 )]
 pub async fn create_user_api(
     State(state): State<AppState>,
-    session: Session,
+    Extension(session_data): Extension<UserSession>,
     Json(payload): Json<CreateUserDto>,
 ) -> HttpResult<()> {
-    let session_data: Option<UserSession> = session
-        .get(SESSION_KEY)
-        .await
-        .map_err(|e| HttpError::GenericError(format!("Session error: {}", e)))?;
-
-    let requester_id = match session_data {
-        Some(s) => s.user_id,
-        None => return Err(HttpError::Unauthorized("Missing session".to_string())),
-    };
+    let requester_id = session_data.user_id;
 
     let cmd = RegisterUserCommand {
         username: payload.username,

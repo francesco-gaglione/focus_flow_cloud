@@ -22,6 +22,9 @@ pub enum DomainError {
 
     #[error("Token generation error: {0}")]
     TokenGenerationError(String),
+
+    #[error("Token verification error: {0}")]
+    TokenVerificationError(String),
 }
 
 pub type DomainResult<T> = Result<T, DomainError>;

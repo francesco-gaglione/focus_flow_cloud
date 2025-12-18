@@ -15,14 +15,16 @@ pub struct UserSettingsResponseDto {
 
 #[utoipa::path(
     get,
-    path = "/api/user-settings",
+    path = "/api/setting",
     tag = SETTING_TAG,
     summary = "Fetch user settings",
     responses(
-        (status = 200, description = "Settings updated successfully"),
-        (status = 400, description = "Bad request - validation error"),
-        (status = 404, description = "Task not found"),
+        (status = 200, description = "Settings fetched successfully", body = UserSettingsResponseDto),
+        (status = 401, description = "Unauthorized"),
         (status = 500, description = "Internal server error")
+    ),
+    security(
+        ("jwt" = [])
     )
 )]
 pub async fn get_settings_api(

@@ -23,7 +23,7 @@ pub struct DeleteCategoriesResponseDto {
 
 #[utoipa::path(
     delete,
-    path = "/api/categories/{id}",
+    path = "/api/category/{id}",
     tag = CATEGORY_TAG,
     summary = "Delete a category by id",
     description = "Delete a category and all its tasks by id",
@@ -33,7 +33,11 @@ pub struct DeleteCategoriesResponseDto {
     responses(
         (status = 200, description = "Category deleted successfully", body = DeleteCategoriesResponseDto),
         (status = 400, description = "Bad request - validation error"),
+        (status = 401, description = "Unauthorized"),
         (status = 500, description = "Internal server error")
+    ),
+    security(
+        ("jwt" = [])
     )
 )]
 pub async fn delete_categories_api(

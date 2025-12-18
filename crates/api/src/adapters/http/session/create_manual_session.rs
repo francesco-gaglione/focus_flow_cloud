@@ -49,8 +49,12 @@ pub struct CreateManualSessionResponseDto {
     responses(
         (status = 201, description = "Session created successfully", body = CreateManualSessionResponseDto),
         (status = 400, description = "Bad request - validation error"),
+        (status = 401, description = "Unauthorized"),
         (status = 409, description = "Session already exists"),
         (status = 500, description = "Internal server error")
+    ),
+    security(
+        ("jwt" = [])
     )
 )]
 pub async fn create_manual_session_api(

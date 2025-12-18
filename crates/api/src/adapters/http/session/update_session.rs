@@ -48,8 +48,12 @@ pub struct UpdateFocusSessionResponseDto {}
     responses(
         (status = 204, description = "Session updated successfully"),
         (status = 400, description = "Bad request - validation error"),
+        (status = 401, description = "Unauthorized"),
         (status = 409, description = "Session already exists"),
         (status = 500, description = "Internal server error")
+    ),
+    security(
+        ("jwt" = [])
     )
 )]
 pub async fn update_session_api(

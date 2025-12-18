@@ -1,0 +1,170 @@
+warning: variable does not need to be mutable
+  --> crates/infrastructure/src/services/jwt_service.rs:49:13
+   |
+49 |         let mut validation = jsonwebtoken::Validation::default();
+   |             ----^^^^^^^^^^
+   |             |
+   |             help: remove this `mut`
+   |
+   = note: `#[warn(unused_mut)]` on by default
+
+warning: `infrastructure` (lib) generated 1 warning (run `cargo fix --lib -p infrastructure` to apply 1 suggestion)
+    Checking api v0.1.0 (/Users/francescopiogaglione/projects/personal/focus_flow_workspace/focus_flow_cloud/crates/api)
+error: unexpected attribute. expected one of: schemas, responses
+  --> crates/api/src/adapters/openapi.rs:98:9
+   |
+98 |         security_schemes(
+   |         ^^^^^^^^^^^^^^^^
+
+warning: unused import: `http_error::HttpError`
+ --> crates/api/src/adapters/http/users/create_user.rs:4:50
+  |
+4 | use crate::adapters::{http::app_state::AppState, http_error::HttpError};
+  |                                                  ^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default
+
+warning: unused imports: `LoginDto` and `LoginResponseDto`
+ --> crates/api/src/adapters/openapi.rs:1:42
+  |
+1 | use crate::adapters::http::auth::login::{LoginDto, LoginResponseDto};
+  |                                          ^^^^^^^^  ^^^^^^^^^^^^^^^^
+
+warning: unused imports: `CreateCategoryDto` and `CreateCategoryResponseDto`
+ --> crates/api/src/adapters/openapi.rs:3:5
+  |
+3 |     CreateCategoryDto, CreateCategoryResponseDto,
+  |     ^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::adapters::http::category::delete_categories::DeleteCategoriesDto`
+ --> crates/api/src/adapters/openapi.rs:5:5
+  |
+5 | use crate::adapters::http::category::delete_categories::DeleteCategoriesDto;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::adapters::http::category::get_categories_and_tasks::GetCategoriesResponseDto`
+ --> crates/api/src/adapters/openapi.rs:6:5
+  |
+6 | use crate::adapters::http::category::get_categories_and_tasks::GetCategoriesResponseDto;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::adapters::http::category::get_category::GetCategoryResponseDto`
+ --> crates/api/src/adapters/openapi.rs:7:5
+  |
+7 | use crate::adapters::http::category::get_category::GetCategoryResponseDto;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `UpdateCategoryDto` and `UpdateCategoryResponseDto`
+ --> crates/api/src/adapters/openapi.rs:9:5
+  |
+9 |     UpdateCategoryDto, UpdateCategoryResponseDto,
+  |     ^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `CreateManualSessionDto` and `CreateManualSessionResponseDto`
+  --> crates/api/src/adapters/openapi.rs:12:5
+   |
+12 |     CreateManualSessionDto, CreateManualSessionResponseDto,
+   |     ^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `GetSessionFiltersDto` and `GetSessionFiltersResponseDto`
+  --> crates/api/src/adapters/openapi.rs:15:5
+   |
+15 |     GetSessionFiltersDto, GetSessionFiltersResponseDto,
+   |     ^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `UpdateFocusSessionDto` and `UpdateFocusSessionResponseDto`
+  --> crates/api/src/adapters/openapi.rs:18:5
+   |
+18 |     UpdateFocusSessionDto, UpdateFocusSessionResponseDto,
+   |     ^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `GetStatsByPeriodDto` and `GetStatsByPeriodResponseDto`
+  --> crates/api/src/adapters/openapi.rs:21:5
+   |
+21 |     GetStatsByPeriodDto, GetStatsByPeriodResponseDto,
+   |     ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::adapters::http::task::create_task::CreateTaskResponseDto`
+  --> crates/api/src/adapters/openapi.rs:23:5
+   |
+23 | use crate::adapters::http::task::create_task::CreateTaskResponseDto;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::adapters::http::task::delete_tasks::DeleteTasksDto`
+  --> crates/api/src/adapters/openapi.rs:24:5
+   |
+24 | use crate::adapters::http::task::delete_tasks::DeleteTasksDto;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::adapters::http::task::get_tasks::TasksResponseDto`
+  --> crates/api/src/adapters/openapi.rs:25:5
+   |
+25 | use crate::adapters::http::task::get_tasks::TasksResponseDto;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::adapters::http::task::orphan_tasks::OrphanTasksResponseDto`
+  --> crates/api/src/adapters/openapi.rs:26:5
+   |
+26 | use crate::adapters::http::task::orphan_tasks::OrphanTasksResponseDto;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::adapters::http::task::update_task::UpdateTaskDto`
+  --> crates/api/src/adapters/openapi.rs:27:5
+   |
+27 | use crate::adapters::http::task::update_task::UpdateTaskDto;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::adapters::http::user_setting::get_user_settings::UserSettingsResponseDto`
+  --> crates/api/src/adapters/openapi.rs:28:5
+   |
+28 | use crate::adapters::http::user_setting::get_user_settings::UserSettingsResponseDto;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::adapters::http::user_setting::update_setting::UpdateUserSettingDto`
+  --> crates/api/src/adapters/openapi.rs:29:5
+   |
+29 | use crate::adapters::http::user_setting::update_setting::UpdateUserSettingDto;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::adapters::http::users::create_user::CreateUserDto`
+  --> crates/api/src/adapters/openapi.rs:30:5
+   |
+30 | use crate::adapters::http::users::create_user::CreateUserDto;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `HttpAuthScheme` and `Http`
+  --> crates/api/src/adapters/openapi.rs:31:33
+   |
+31 | use utoipa::openapi::security::{Http, HttpAuthScheme};
+   |                                 ^^^^  ^^^^^^^^^^^^^^
+
+error[E0599]: the function or associated item `openapi` exists for struct `ApiDoc`, but its trait bounds were not satisfied
+    --> crates/api/src/app.rs:26:84
+     |
+  26 |         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
+     |                                                                                    ^^^^^^^ function or associated item cannot be called on `ApiDoc` due to unsatisfied trait bounds
+     |
+    ::: crates/api/src/adapters/openapi.rs:106:1
+     |
+ 106 | pub struct ApiDoc;
+     | ----------------- function or associated item `openapi` not found for this struct because it doesn't satisfy `ApiDoc: NestedApiConfig` or `ApiDoc: utoipa::OpenApi`
+     |
+     = note: the following trait bounds were not satisfied:
+             `ApiDoc: NestedApiConfig`
+             which is required by `ApiDoc: utoipa::OpenApi`
+             `&ApiDoc: NestedApiConfig`
+             which is required by `&ApiDoc: utoipa::OpenApi`
+             `&mut ApiDoc: NestedApiConfig`
+             which is required by `&mut ApiDoc: utoipa::OpenApi`
+note: the trait `NestedApiConfig` must be implemented
+    --> /Users/francescopiogaglione/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/utoipa-5.4.0/src/lib.rs:1300:5
+     |
+1300 |     pub trait NestedApiConfig {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+     = help: items from traits can only be used if the trait is implemented and in scope
+     = note: the following trait defines an item `openapi`, perhaps you need to implement it:
+             candidate #1: `utoipa::OpenApi`
+
+For more information about this error, try `rustc --explain E0599`.
+warning: `api` (lib) generated 20 warnings
+error: could not compile `api` (lib) due to 2 previous errors; 20 warnings emitted

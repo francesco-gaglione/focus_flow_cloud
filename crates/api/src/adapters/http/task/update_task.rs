@@ -56,8 +56,12 @@ pub struct UpdateTaskResponseDto {
     responses(
         (status = 200, description = "Task updated successfully", body = UpdateTaskResponseDto),
         (status = 400, description = "Bad request - validation error"),
+        (status = 401, description = "Unauthorized"),
         (status = 404, description = "Task not found"),
         (status = 500, description = "Internal server error")
+    ),
+    security(
+        ("jwt" = [])
     )
 )]
 pub async fn update_task_api(

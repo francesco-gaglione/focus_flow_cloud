@@ -42,8 +42,12 @@ pub struct CreateTaskResponseDto {
     responses(
         (status = 201, description = "Task created successfully", body = CreateTaskResponseDto),
         (status = 400, description = "Bad request - validation error"),
+        (status = 401, description = "Unauthorized"),
         (status = 409, description = "Task already exists"),
         (status = 500, description = "Internal server error")
+    ),
+    security(
+        ("jwt" = [])
     )
 )]
 pub async fn create_task_api(

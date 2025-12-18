@@ -16,7 +16,7 @@ pub struct GetCategoryResponseDto {
 
 #[utoipa::path(
     get,
-    path = "/api/categories/{id}",
+    path = "/api/category/{id}",
     tag = CATEGORY_TAG,
     summary = "Get a category by id",
     params(
@@ -24,7 +24,12 @@ pub struct GetCategoryResponseDto {
     ),
     responses(
         (status = 200, description = "Category", body = GetCategoryResponseDto),
+        (status = 401, description = "Unauthorized"),
+        (status = 404, description = "Category not found"),
         (status = 500, description = "Internal server error")
+    ),
+    security(
+        ("jwt" = [])
     )
 )]
 pub async fn get_category(

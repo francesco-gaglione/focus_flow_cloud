@@ -16,12 +16,16 @@ pub struct GetCategoriesResponseDto {
 
 #[utoipa::path(
     get,
-    path = "/api/categories",
+    path = "/api/category",
     tag = CATEGORY_TAG,
     summary = "Get all categories and their tasks",
     responses(
         (status = 200, description = "Category list", body = GetCategoriesResponseDto),
+        (status = 401, description = "Unauthorized"),
         (status = 500, description = "Internal server error")
+    ),
+    security(
+        ("jwt" = [])
     )
 )]
 pub async fn get_categories_and_tasks_api(

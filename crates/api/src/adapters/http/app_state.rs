@@ -24,6 +24,7 @@ use application::use_cases::{
     },
 };
 use axum::extract::ws::Message;
+use domain::services::token_service::TokenService;
 use infrastructure::config::AppConfig;
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -69,4 +70,7 @@ pub struct AppState {
     // User Use Cases
     pub register_user_usecase: Arc<RegisterUserUseCase>,
     pub login_usecase: Arc<LoginUseCase>,
+
+    // Services
+    pub token_service: Arc<dyn TokenService>,
 }

@@ -44,4 +44,17 @@ impl TokenService for JwtService {
         )
         .map_err(|e| DomainError::TokenGenerationError(e.to_string()))
     }
+
+    fn verify_token(&self, token: &str) -> DomainResult<String> {
+        let mut validation = jsonwebtoken::Validation::default();
+        // validation.validate_exp = true; // Default is true
+
+        jsonwebtoken::decode::<Claims>(
+            token,
+            &jsonwebtoken::DecodingKey::from_secret(self.secret.as_bytes()),
+            &validation,
+        )
+        .map(|data| data.claims.sub)
+        .map_err(|e| DomainError::TokenVerificationError(format!("Invalid token: {}", e)))
+    }
 }

@@ -48,16 +48,20 @@ pub struct UpdateCategoryResponseDto {
 
 #[utoipa::path(
     put,
-    path = "/api/categories/{id}",
+    path = "/api/category/{id}",
     tag = CATEGORY_TAG,
     summary = "Update a category",
     params(
         ("id" = String, Path, description = "Category ID to update")
     ),
     request_body = UpdateCategoryDto,
+    security(
+        ("jwt" = [])
+    ),
     responses(
         (status = 200, description = "Category updated successfully", body = UpdateCategoryResponseDto),
         (status = 400, description = "Bad request - validation error"),
+        (status = 401, description = "Unauthorized"),
         (status = 404, description = "Category not found"),
         (status = 500, description = "Internal server error")
     )

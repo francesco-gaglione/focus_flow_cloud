@@ -74,6 +74,7 @@ impl From<DomainError> for AppError {
             DomainError::InvalidPasswordPolicy(msg) => AppError::InvalidPasswordPolicy(msg),
             DomainError::PasswordHashingError(msg) => AppError::PasswordHashingError(msg),
             DomainError::TokenGenerationError(msg) => AppError::TokenError(msg),
+            DomainError::TokenVerificationError(msg) => AppError::TokenError(msg),
         }
     }
 }

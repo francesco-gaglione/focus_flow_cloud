@@ -15,14 +15,18 @@ pub struct UpdateUserSettingDto {
 
 #[utoipa::path(
     patch,
-    path = "/api/user-settings",
+    path = "/api/setting",
     tag = SETTING_TAG,
     summary = "Update a user setting",
     request_body = UpdateUserSettingDto,
     responses(
         (status = 200, description = "User setting updated successfully"),
         (status = 400, description = "Bad request - validation error"),
+        (status = 401, description = "Unauthorized"),
         (status = 500, description = "Internal server error")
+    ),
+    security(
+        ("jwt" = [])
     )
 )]
 pub async fn update_setting_api(

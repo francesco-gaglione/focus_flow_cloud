@@ -29,7 +29,11 @@ pub struct DeleteTasksResponseDto {
     responses(
         (status = 200, description = "Tasks deleted successfully", body = DeleteTasksResponseDto),
         (status = 400, description = "Bad request - validation error"),
+        (status = 401, description = "Unauthorized"),
         (status = 500, description = "Internal server error")
+    ),
+    security(
+        ("jwt" = [])
     )
 )]
 pub async fn delete_tasks_api(

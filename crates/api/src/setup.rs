@@ -96,7 +96,7 @@ pub async fn init_app_state(config: AppConfig) -> Result<AppState, Box<dyn std::
     let login_usecase = Arc::new(LoginUseCase::new(
         postgres_arc.clone(),
         argon_hasher.clone(),
-        token_service,
+        token_service.clone(),
     ));
 
     // Seed Admin User
@@ -159,6 +159,7 @@ pub async fn init_app_state(config: AppConfig) -> Result<AppState, Box<dyn std::
         get_user_settings_usecase,
         register_user_usecase,
         login_usecase,
+        token_service,
     })
 }
 

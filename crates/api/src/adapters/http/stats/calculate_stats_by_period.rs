@@ -180,7 +180,11 @@ impl From<DailyActivityDistributionItem> for DailyActivityDistributionDto {
     responses(
         (status = 200, description = "Stats fetched successfully", body = GetStatsByPeriodResponseDto),
         (status = 400, description = "Bad request - validation error"),
+        (status = 401, description = "Unauthorized"),
         (status = 500, description = "Internal server error")
+    ),
+    security(
+        ("jwt" = [])
     )
 )]
 pub async fn calculate_stats_by_period_api(

@@ -21,7 +21,11 @@ pub struct OrphanTasksResponseDto {
     summary = "Get all orphan tasks (tasks without a category)",
     responses(
         (status = 200, description = "Orphan tasks fetched successfully", body = OrphanTasksResponseDto),
+        (status = 401, description = "Unauthorized"),
         (status = 500, description = "Internal server error")
+    ),
+    security(
+        ("jwt" = [])
     )
 )]
 pub async fn fetch_orphan_tasks_api(
