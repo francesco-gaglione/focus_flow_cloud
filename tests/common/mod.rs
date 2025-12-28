@@ -108,6 +108,19 @@ impl TestContext {
             .await
             .expect("Failed to deserialize response")
     }
+
+    #[allow(dead_code)]
+    pub async fn create_user(&self, dto: &adapters::http::users::create_user::CreateUserDto) {
+        let response = self
+            .client
+            .post(format!("{}/api/users", self.base_url))
+            .json(dto)
+            .send()
+            .await
+            .expect("Failed to execute request");
+
+        assert_eq!(response.status(), 200);
+    }
 }
 
 pub async fn setup() -> TestContext {

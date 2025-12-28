@@ -1,6 +1,10 @@
 use application::use_cases::focus_session::update_focus_session::UpdateFocusSessionUseCase;
 use application::use_cases::task::get_tasks::GetTasksUseCase;
+use application::use_cases::user::get_user_info::GetUserInfoUseCase;
+use application::use_cases::user::refresh_token::RefreshTokenUseCase;
 use application::use_cases::user::register_user::RegisterUserUseCase;
+use application::use_cases::user::update_password::UpdateUserPasswordUseCase;
+use application::use_cases::user::update_user_username::UpdateUserUsernameUseCase;
 use application::use_cases::user_settings::get_settings::GetSettingsUseCase;
 use application::use_cases::user_settings::update_setting::UpdateSettingUseCase;
 use application::use_cases::{
@@ -92,7 +96,7 @@ pub async fn init_app_state(config: AppConfig) -> Result<AppState, Box<dyn std::
     let register_user_usecase = Arc::new(RegisterUserUseCase::new(
         argon_hasher.clone(),
         postgres_arc.clone(),
-        password_policy,
+        password_policy.clone(),
     ));
 
     let login_usecase = Arc::new(LoginUseCase::new(
@@ -100,6 +104,22 @@ pub async fn init_app_state(config: AppConfig) -> Result<AppState, Box<dyn std::
         argon_hasher.clone(),
         token_service.clone(),
     ));
+
+    let refresh_token_usecase = Arc::new(RefreshTokenUseCase::new(
+        postgres_arc.clone(),
+        token_service.clone(),
+    ));
+
+    let update_password_usecase = Arc::new(UpdateUserPasswordUseCase::new(
+        argon_hasher.clone(),
+        postgres_arc.clone(),
+        password_policy.clone(),
+    ));
+
+    let update_user_username_usecase =
+        Arc::new(UpdateUserUsernameUseCase::new(postgres_arc.clone()));
+
+    let get_user_info_usecase = Arc::new(GetUserInfoUseCase::new(postgres_arc.clone()));
 
     // Seed Admin User
     if let (Some(username), Some(password)) = (&config.admin_username, &config.admin_password) {
@@ -161,6 +181,10 @@ pub async fn init_app_state(config: AppConfig) -> Result<AppState, Box<dyn std::
         get_user_settings_usecase,
         register_user_usecase,
         login_usecase,
+        refresh_token_usecase,
+        update_password_usecase,
+        update_user_username_usecase,
+        get_user_info_usecase,
         token_service,
     })
 }

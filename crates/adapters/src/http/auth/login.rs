@@ -21,6 +21,7 @@ pub struct LoginDto {
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct LoginResponseDto {
     pub token: String,
+    pub refresh_token: String,
 }
 
 #[utoipa::path(
@@ -59,5 +60,6 @@ pub async fn login_api(
 
     Ok(Json(LoginResponseDto {
         token: result.token,
+        refresh_token: result.refresh_token,
     }))
 }

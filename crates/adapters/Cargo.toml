@@ -8,7 +8,7 @@ domain = { path = "../domain" }
 application = { path = "../application" }
 axum = { workspace = true, features=["ws"]}
 tokio = { workspace = true, features = ["full"] }
-utoipa = { workspace = true, features = ["axum_extras", "chrono"] }
+utoipa = { workspace = true, features = ["axum_extras", "chrono", "uuid"] }
 utoipa-axum.workspace = true
 utoipa-swagger-ui = { workspace = true, features = ["axum"] }
 tower-http = { workspace = true, features = ["trace", "cors"] }

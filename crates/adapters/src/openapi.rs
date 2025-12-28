@@ -1,4 +1,6 @@
 use crate::http::auth::login::{LoginDto, LoginResponseDto};
+use crate::http::auth::logout::LogoutResponseDto;
+use crate::http::auth::refresh::{RefreshDto, RefreshResponseDto};
 use crate::http::category::create_category::{CreateCategoryDto, CreateCategoryResponseDto};
 use crate::http::category::delete_categories::DeleteCategoriesDto;
 use crate::http::category::get_categories_and_tasks::GetCategoriesResponseDto;
@@ -20,6 +22,9 @@ use crate::http::task::update_task::UpdateTaskDto;
 use crate::http::user_setting::get_user_settings::UserSettingsResponseDto;
 use crate::http::user_setting::update_setting::UpdateUserSettingDto;
 use crate::http::users::create_user::CreateUserDto;
+use crate::http::users::get_info::UserInfoResponseDto;
+use crate::http::users::update_password::UpdatePasswordDto;
+use crate::http::users::update_username::UpdateUsernameDto;
 use utoipa::openapi::security::{HttpAuthScheme, HttpBuilder, SecurityScheme};
 use utoipa::{Modify, OpenApi};
 
@@ -77,7 +82,12 @@ pub const USERS_TAG: &str = "Users";
         crate::http::task::orphan_tasks::fetch_orphan_tasks_api,
         crate::http::task::create_task::create_task_api,
         crate::http::users::create_user::create_user_api,
+        crate::http::users::update_password::update_password_api,
+        crate::http::users::update_username::update_username_api,
+        crate::http::users::get_info::get_user_info_api,
         crate::http::auth::login::login_api,
+        crate::http::auth::refresh::refresh_api,
+        crate::http::auth::logout::logout_api,
         crate::http::task::get_tasks::get_tasks_api,
         crate::http::task::update_task::update_task_api,
         crate::http::task::delete_tasks::delete_tasks_api,
@@ -106,7 +116,12 @@ pub const USERS_TAG: &str = "Users";
         schemas(UserSettingsResponseDto),
         schemas(UpdateUserSettingDto),
         schemas(CreateUserDto),
+        schemas(UpdatePasswordDto),
+        schemas(UpdateUsernameDto),
+        schemas(UserInfoResponseDto),
         schemas(LoginDto, LoginResponseDto),
+        schemas(RefreshDto, RefreshResponseDto),
+        schemas(LogoutResponseDto),
     ),
     servers(
         (url = "/", description = "API server")
