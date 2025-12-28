@@ -76,7 +76,7 @@ src/
     -   **API**: `http://localhost:8080`
     -   **Swagger UI**: `http://localhost:8080/swagger-ui`
 
-5.  **Initial Admin Setup (Optional)**:
+5.  **Initial Admin Setup**:
     To automatically create an admin user on startup, add the following variables to your `.env` file (or docker-compose environment):
     ```bash
     ADMIN_USERNAME=admin

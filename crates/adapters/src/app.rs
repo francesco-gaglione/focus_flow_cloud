@@ -25,7 +25,7 @@ pub fn create_app(app_state: AppState) -> Router {
     Router::new()
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
         .nest("/api", api_routes(app_state.clone()))
-        .nest("/ws", ws_routes())
+        .nest("/ws", ws_routes(app_state.clone()))
         .with_state(app_state.clone())
         .layer(
             TraceLayer::new_for_http().make_span_with(|request: &http::Request<_>| {
