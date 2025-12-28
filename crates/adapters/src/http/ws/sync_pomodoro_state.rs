@@ -1,10 +1,13 @@
-use uuid::Uuid;
 use crate::http::{
     app_state::AppState,
     ws::update_pomodoro_state::{UpdateCurrentSession, UpdatePomodoroState, UpdateWorkContext},
 };
+use uuid::Uuid;
 
-pub async fn sync_pomodoro_state(state: &AppState, user_id: Uuid) -> Result<UpdatePomodoroState, String> {
+pub async fn sync_pomodoro_state(
+    state: &AppState,
+    user_id: Uuid,
+) -> Result<UpdatePomodoroState, String> {
     let states_map = state.pomodoro_states.read().await;
     let user_state = states_map
         .get(&user_id)

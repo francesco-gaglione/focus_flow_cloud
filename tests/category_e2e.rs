@@ -4,9 +4,7 @@ use crate::common::setup;
 use adapters::http::category::create_category::CreateCategoryDto;
 use adapters::http::category::get_categories_and_tasks::GetCategoriesResponseDto;
 use adapters::http::category::get_category::GetCategoryResponseDto;
-use adapters::http::category::update_category::{
-    UpdateCategoryDto, UpdateCategoryResponseDto,
-};
+use adapters::http::category::update_category::{UpdateCategoryDto, UpdateCategoryResponseDto};
 
 #[tokio::test]
 async fn create_and_list_category() {

@@ -4,8 +4,7 @@ use adapters::http::{
     category::create_category::CreateCategoryDto,
     dto::common::session_type_enum::SessionTypeEnum,
     session::{
-        create_manual_session::CreateManualSessionDto,
-        get_sessions::GetSessionFiltersResponseDto,
+        create_manual_session::CreateManualSessionDto, get_sessions::GetSessionFiltersResponseDto,
         update_session::UpdateFocusSessionDto,
     },
     task::{create_task::CreateTaskDto, get_tasks::TasksResponseDto},

@@ -5,16 +5,10 @@ pub fn api_routes(state: AppState) -> Router<AppState> {
     let auth_routes = Router::new().nest("/auth", crate::http::auth::routes::routes());
 
     let protected_routes = Router::new()
-        .nest(
-            "/category",
-            crate::http::category::routes::router(),
-        )
+        .nest("/category", crate::http::category::routes::router())
         .nest("/task", crate::http::task::routes::router())
         .nest("/session", crate::http::session::routes::router())
-        .nest(
-            "/setting",
-            crate::http::user_setting::routes::router(),
-        )
+        .nest("/setting", crate::http::user_setting::routes::router())
         .nest("/users", crate::http::users::routes::router())
         .nest("/stats", crate::http::stats::routes::router())
         .layer(axum::middleware::from_fn_with_state(state, auth_middleware));

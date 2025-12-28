@@ -1,6 +1,6 @@
 use crate::persistence::db_models::db_task::{DbTask, NewDbTask, UpdateDbTask};
-use crate::persistence::PostgresPersistence;
 use crate::persistence::schema;
+use crate::persistence::PostgresPersistence;
 use async_trait::async_trait;
 use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, SelectableHelper};
 use domain::entities::task::Task;

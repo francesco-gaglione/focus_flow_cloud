@@ -1,20 +1,14 @@
+use adapters::app::create_app;
+use adapters::config::AppConfig;
 use adapters::http::{
-    category::{
-        create_category::{CreateCategoryDto, CreateCategoryResponseDto},
-    },
-    session::{
-        create_manual_session::{CreateManualSessionDto, CreateManualSessionResponseDto},
-    },
-    task::{
-        create_task::{CreateTaskDto, CreateTaskResponseDto},
-    },
+    category::create_category::{CreateCategoryDto, CreateCategoryResponseDto},
+    session::create_manual_session::{CreateManualSessionDto, CreateManualSessionResponseDto},
+    task::create_task::{CreateTaskDto, CreateTaskResponseDto},
     user_setting::{
         get_user_settings::UserSettingsResponseDto, update_setting::UpdateUserSettingDto,
     },
 };
-use adapters::app::create_app;
 use infrastructure::setup::{init_app_state, init_tracing};
-use adapters::config::AppConfig;
 use std::sync::Once;
 use testcontainers::runners::AsyncRunner;
 use testcontainers_modules::postgres::Postgres;

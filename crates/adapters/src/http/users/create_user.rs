@@ -1,7 +1,7 @@
+use crate::http::app_state::AppState;
 use crate::http::model::session_model::UserSession;
 use crate::http_error::HttpResult;
 use crate::openapi::USERS_TAG;
-use crate::http::app_state::AppState;
 use application::use_cases::user::register_user::RegisterUserCommand;
 use axum::{extract::State, Extension, Json};
 use serde::{Deserialize, Serialize};

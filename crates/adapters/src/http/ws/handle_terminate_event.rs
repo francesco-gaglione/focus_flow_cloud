@@ -5,7 +5,10 @@ use uuid::Uuid;
 use crate::http::{app_state::AppState, ws::update_pomodoro_state::UpdatePomodoroState};
 use application::use_cases::focus_session::command::create_foucs_session::CreateFocusSessionCommand;
 
-pub async fn handle_terminate_event(state: &AppState, user_id: Uuid) -> Result<UpdatePomodoroState, String> {
+pub async fn handle_terminate_event(
+    state: &AppState,
+    user_id: Uuid,
+) -> Result<UpdatePomodoroState, String> {
     debug!("Handling terminate event for user {}", user_id);
 
     let states_map = state.pomodoro_states.read().await;
@@ -37,7 +40,7 @@ pub async fn handle_terminate_event(state: &AppState, user_id: Uuid) -> Result<U
         let _ = state
             .create_session_usecase
             .execute(CreateFocusSessionCommand {
-                user_id: old_session_state.user_id().clone(),
+                user_id: *old_session_state.user_id(),
                 task_id,
                 category_id,
                 session_type: old_session_state.session_type().clone().into(),

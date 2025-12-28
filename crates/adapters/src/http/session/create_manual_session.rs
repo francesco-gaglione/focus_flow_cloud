@@ -71,7 +71,7 @@ pub async fn create_manual_session_api(
         .create_manual_session_usecase
         .execute(FocusSessionMapper::manual_create_dto_to_command(
             user.user_id,
-            &payload
+            &payload,
         )?)
         .await?;
 

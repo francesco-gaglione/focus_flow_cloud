@@ -8,11 +8,11 @@ use domain::{
 use uuid::Uuid;
 
 use crate::{
+    persistence::schema,
     persistence::{
         db_models::db_user::{DbUser, NewDbUser, UpdateDbUser},
         PostgresPersistence,
     },
-    persistence::schema,
 };
 
 #[async_trait]

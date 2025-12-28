@@ -9,6 +9,5 @@ pub async fn postgres_persistence(db_url: &str) -> PostgresPersistence {
         .build()
         .expect("Failed to create database pool");
 
-
     PostgresPersistence::new(pool)
 }

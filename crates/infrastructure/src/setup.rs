@@ -27,13 +27,13 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
-use adapters::config::AppConfig;
-use adapters::http::app_state::AppState;
-use adapters::persistence::persistence_impl::persistence::postgres_persistence;
 use crate::crypto::password_hasher::Argon2Hasher;
 use crate::database::run_migrations;
 use crate::policy::password_policy_impl::PasswordPolicyImpl;
 use crate::services::jwt_service::JwtService;
+use adapters::config::AppConfig;
+use adapters::http::app_state::AppState;
+use adapters::persistence::persistence_impl::persistence::postgres_persistence;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 
 pub async fn init_app_state(config: AppConfig) -> Result<AppState, Box<dyn std::error::Error>> {

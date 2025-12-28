@@ -1,8 +1,8 @@
 use crate::persistence::db_models::db_focus_session::{
     DbFocusSession, NewDbFocusSession, UpdateDbFocusSession,
 };
-use crate::persistence::PostgresPersistence;
 use crate::persistence::schema;
+use crate::persistence::PostgresPersistence;
 use async_trait::async_trait;
 use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper};
 use domain::entities::focus_session::{FocusSession, SessionFilter};

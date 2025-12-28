@@ -63,7 +63,13 @@ impl TryFrom<DbCategory> for Category {
     type Error = PersistenceError;
 
     fn try_from(value: DbCategory) -> Result<Self, Self::Error> {
-        Self::reconstitute(value.id, value.user_id, value.name, value.description, value.color)
-            .map_err(|e| PersistenceError::Unexpected(format!("{}", e)))
+        Self::reconstitute(
+            value.id,
+            value.user_id,
+            value.name,
+            value.description,
+            value.color,
+        )
+        .map_err(|e| PersistenceError::Unexpected(format!("{}", e)))
     }
 }

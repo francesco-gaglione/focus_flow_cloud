@@ -1,8 +1,6 @@
-use crate::persistence::db_models::db_category::{
-    DbCategory, NewDbCategory, UpdateDbCategory,
-};
-use crate::persistence::PostgresPersistence;
+use crate::persistence::db_models::db_category::{DbCategory, NewDbCategory, UpdateDbCategory};
 use crate::persistence::schema;
+use crate::persistence::PostgresPersistence;
 use async_trait::async_trait;
 use chrono::Utc;
 use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, SelectableHelper};

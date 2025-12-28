@@ -1,8 +1,8 @@
 use crate::http::{app_state::AppState, ws::update_pomodoro_state::UpdatePomodoroState};
 use serde::{Deserialize, Serialize};
 use tracing::debug;
-use validator::Validate;
 use uuid::Uuid;
+use validator::Validate;
 
 #[derive(Debug, Serialize, Deserialize, Validate, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -34,7 +34,7 @@ pub async fn update_pomodoro_context(
     user_id: Uuid,
 ) -> Result<UpdatePomodoroState, String> {
     debug!("Updating pomodoro context for user {}", user_id);
-    
+
     let states_map = state.pomodoro_states.read().await;
     let user_state = states_map
         .get(&user_id)

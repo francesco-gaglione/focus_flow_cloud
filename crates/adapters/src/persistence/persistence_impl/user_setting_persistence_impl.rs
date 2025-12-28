@@ -34,7 +34,12 @@ impl UserSettingPersistence for PostgresPersistence {
         Ok(tasks)
     }
 
-    async fn update_setting(&self, user_id: uuid::Uuid, key: String, value: String) -> PersistenceResult<()> {
+    async fn update_setting(
+        &self,
+        user_id: uuid::Uuid,
+        key: String,
+        value: String,
+    ) -> PersistenceResult<()> {
         let conn = self
             .pool
             .get()
@@ -62,7 +67,12 @@ impl UserSettingPersistence for PostgresPersistence {
         }
     }
 
-    async fn create_setting(&self, user_id: uuid::Uuid, key: String, value: String) -> PersistenceResult<()> {
+    async fn create_setting(
+        &self,
+        user_id: uuid::Uuid,
+        key: String,
+        value: String,
+    ) -> PersistenceResult<()> {
         let conn = self
             .pool
             .get()
@@ -72,7 +82,11 @@ impl UserSettingPersistence for PostgresPersistence {
         let _ = conn
             .interact(move |conn| {
                 diesel::insert_into(schema::user_settings::table)
-                    .values(&NewDbUserSetting { user_id, key, value })
+                    .values(&NewDbUserSetting {
+                        user_id,
+                        key,
+                        value,
+                    })
                     .returning(DbUserSetting::as_returning())
                     .get_result(conn)
             })

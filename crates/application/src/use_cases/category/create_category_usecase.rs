@@ -61,7 +61,9 @@ mod tests {
         let user_id = Uuid::new_v4();
 
         mock.expect_create_category()
-            .withf(move |c| c.name() == "Test Category" && c.color() == "#FF0000" && c.user_id() == user_id)
+            .withf(move |c| {
+                c.name() == "Test Category" && c.color() == "#FF0000" && c.user_id() == user_id
+            })
             .returning(move |_| Ok(id));
 
         let use_cases = CreateCategoryUseCases::new(Arc::new(mock));

@@ -8,7 +8,10 @@ use crate::http::{
 };
 use application::use_cases::focus_session::command::create_foucs_session::CreateFocusSessionCommand;
 
-pub async fn handle_start_event(state: &AppState, user_id: Uuid) -> Result<UpdatePomodoroState, String> {
+pub async fn handle_start_event(
+    state: &AppState,
+    user_id: Uuid,
+) -> Result<UpdatePomodoroState, String> {
     debug!("Handling start session event for user {}", user_id);
 
     // Acquire user-specific state

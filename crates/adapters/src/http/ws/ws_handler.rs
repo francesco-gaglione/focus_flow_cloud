@@ -1,3 +1,4 @@
+use crate::http::model::session_model::UserSession;
 use crate::http::request_id::RequestId;
 use axum::{
     extract::{
@@ -10,10 +11,10 @@ use futures_util::{SinkExt, StreamExt};
 use serde_json;
 use tokio::sync::Mutex;
 use tracing::{debug, error, warn, Instrument};
-use validator::Validate;
 use uuid::Uuid;
-use crate::http::model::session_model::UserSession;
+use validator::Validate;
 
+use crate::http::pomodoro_state::PomodoroState;
 use crate::http::{
     app_state::{AppState, Clients},
     ws::{
@@ -28,7 +29,6 @@ use crate::http::{
         ws_message::{BroadcastEvent, ClientMessage, ServerResponse, WsClientRequest},
     },
 };
-use crate::http::pomodoro_state::PomodoroState;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
@@ -52,15 +52,16 @@ async fn handle_socket(ws: WebSocket, state: AppState, request_id: RequestId, us
         id
     };
 
-    let span =
-        tracing::info_span!("websocket-connection", request_id = %request_id, client_id = my_id, user_id = %user_id);
+    let span = tracing::info_span!("websocket-connection", request_id = %request_id, client_id = my_id, user_id = %user_id);
     async move {
         debug!("Client connected");
 
         // Ensure user has a state
         {
             let mut states = state.pomodoro_states.write().await;
-            states.entry(user_id).or_insert_with(|| Arc::new(RwLock::new(PomodoroState::default())));
+            states
+                .entry(user_id)
+                .or_insert_with(|| Arc::new(RwLock::new(PomodoroState::default())));
         }
 
         let (mut sender_ws, mut receiver_ws) = ws.split();
@@ -274,7 +275,9 @@ async fn handle_message(
             }
         }
         ClientMessage::UpdateConcentrationScore(update_concentration_score) => {
-            match handle_update_concentration_score(&update_concentration_score, state, user_id).await {
+            match handle_update_concentration_score(&update_concentration_score, state, user_id)
+                .await
+            {
                 Ok(msg) => {
                     debug!("Concentration score updated");
                     send_success_to_client(tx, "Concentration score updated", request_id.clone())

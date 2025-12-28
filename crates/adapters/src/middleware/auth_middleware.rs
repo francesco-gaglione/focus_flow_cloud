@@ -23,8 +23,8 @@ pub async fn auth_middleware(
             "Missing Authorization header".to_string(),
         ))?;
 
-    let token = if auth_header.starts_with("Bearer ") {
-        &auth_header[7..]
+    let token = if let Some(stripped) = auth_header.strip_prefix("Bearer ") {
+        stripped
     } else {
         return Err(HttpError::Unauthorized(
             "Invalid Authorization header format".to_string(),

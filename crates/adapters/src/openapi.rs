@@ -1,22 +1,14 @@
 use crate::http::auth::login::{LoginDto, LoginResponseDto};
-use crate::http::category::create_category::{
-    CreateCategoryDto, CreateCategoryResponseDto,
-};
+use crate::http::category::create_category::{CreateCategoryDto, CreateCategoryResponseDto};
 use crate::http::category::delete_categories::DeleteCategoriesDto;
 use crate::http::category::get_categories_and_tasks::GetCategoriesResponseDto;
 use crate::http::category::get_category::GetCategoryResponseDto;
-use crate::http::category::update_category::{
-    UpdateCategoryDto, UpdateCategoryResponseDto,
-};
+use crate::http::category::update_category::{UpdateCategoryDto, UpdateCategoryResponseDto};
 use crate::http::session::create_manual_session::{
     CreateManualSessionDto, CreateManualSessionResponseDto,
 };
-use crate::http::session::get_sessions::{
-    GetSessionFiltersDto, GetSessionFiltersResponseDto,
-};
-use crate::http::session::update_session::{
-    UpdateFocusSessionDto, UpdateFocusSessionResponseDto,
-};
+use crate::http::session::get_sessions::{GetSessionFiltersDto, GetSessionFiltersResponseDto};
+use crate::http::session::update_session::{UpdateFocusSessionDto, UpdateFocusSessionResponseDto};
 use crate::http::stats::calculate_stats_by_period::{
     GetStatsByPeriodDto, GetStatsByPeriodResponseDto,
 };

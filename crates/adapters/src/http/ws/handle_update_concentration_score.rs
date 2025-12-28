@@ -2,8 +2,8 @@ use crate::http::{app_state::AppState, ws::update_pomodoro_state::UpdatePomodoro
 use serde::{Deserialize, Serialize};
 use tracing::debug;
 use utoipa::ToSchema;
-use validator::Validate;
 use uuid::Uuid;
+use validator::Validate;
 
 #[derive(Debug, Serialize, Deserialize, Validate, ToSchema, Clone)]
 #[serde(rename_all = "camelCase")]

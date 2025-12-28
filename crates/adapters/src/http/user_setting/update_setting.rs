@@ -1,9 +1,9 @@
-use crate::http::model::session_model::UserSession;
-use axum::Extension;
 use crate::http::app_state::AppState;
+use crate::http::model::session_model::UserSession;
 use crate::http_error::HttpResult;
 use crate::openapi::SETTING_TAG;
 use axum::extract::State;
+use axum::Extension;
 use axum::Json;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;

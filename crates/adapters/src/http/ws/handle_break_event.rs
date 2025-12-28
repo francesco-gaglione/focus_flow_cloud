@@ -8,7 +8,10 @@ use crate::http::{
 };
 use application::use_cases::focus_session::command::create_foucs_session::CreateFocusSessionCommand;
 
-pub async fn handle_break_event(state: &AppState, user_id: Uuid) -> Result<UpdatePomodoroState, String> {
+pub async fn handle_break_event(
+    state: &AppState,
+    user_id: Uuid,
+) -> Result<UpdatePomodoroState, String> {
     debug!("Handling break session event for user {}", user_id);
 
     let states_map = state.pomodoro_states.read().await;
