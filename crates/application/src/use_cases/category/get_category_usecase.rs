@@ -38,6 +38,7 @@ mod tests {
         let category_id = Uuid::new_v4();
         let category = Category::reconstitute(
             category_id,
+            Uuid::new_v4(),
             "Test Category".to_string(),
             None,
             "#FFFFFF".to_string(),

@@ -8,19 +8,26 @@ use crate::{
 #[derive(Debug, Clone, PartialEq)]
 pub struct Category {
     id: Uuid,
+    user_id: Uuid,
     name: String,
     description: Option<String>,
     color: String,
 }
 
 impl Category {
-    pub fn create(name: String, description: Option<String>, color: String) -> DomainResult<Self> {
+    pub fn create(
+        user_id: Uuid,
+        name: String,
+        description: Option<String>,
+        color: String,
+    ) -> DomainResult<Self> {
         if !validate_hex_color(&color) {
             return Err(DomainError::InvalidColor(color));
         }
 
         Ok(Category {
             id: Uuid::new_v4(),
+            user_id,
             name,
             description,
             color,
@@ -29,6 +36,7 @@ impl Category {
 
     pub fn reconstitute(
         id: Uuid,
+        user_id: Uuid,
         name: String,
         description: Option<String>,
         color: String,
@@ -39,6 +47,7 @@ impl Category {
 
         Ok(Category {
             id,
+            user_id,
             name,
             description,
             color,
@@ -47,6 +56,10 @@ impl Category {
 
     pub fn id(&self) -> Uuid {
         self.id
+    }
+
+    pub fn user_id(&self) -> Uuid {
+        self.user_id
     }
 
     pub fn name(&self) -> &str {
@@ -81,13 +94,15 @@ mod category_tests {
     #[test]
     fn test_new_category() {
         let id = Uuid::new_v4();
+        let user_id = Uuid::new_v4();
         let name = "Test Category".to_string();
         let description = Some("This is a test category".to_string());
         let color = "#FF0000".to_string();
 
-        let category = Category::reconstitute(id, name, description, color).unwrap();
+        let category = Category::reconstitute(id, user_id, name, description, color).unwrap();
 
         assert_eq!(category.id(), id);
+        assert_eq!(category.user_id(), user_id);
         assert_eq!(category.name(), "Test Category");
         assert_eq!(category.description(), Some("This is a test category"));
         assert_eq!(category.color(), "#FF0000");

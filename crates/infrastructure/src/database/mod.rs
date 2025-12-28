@@ -1,5 +1,4 @@
 pub mod migrations;
-pub mod persistence;
 
 use crate::database::migrations::MIGRATIONS;
 use deadpool_diesel::postgres::Pool;

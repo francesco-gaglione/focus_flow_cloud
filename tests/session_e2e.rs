@@ -1,13 +1,14 @@
 mod common;
 
-use api::adapters::http::dto::{
-    category_api::create_category::CreateCategoryDto,
-    common::session_type_enum::SessionTypeEnum,
-    session_api::{
-        create_manual_session::CreateManualSessionDto, get_sessions::GetSessionFiltersResponseDto,
+use adapters::http::{
+    category::create_category::CreateCategoryDto,
+    dto::common::session_type_enum::SessionTypeEnum,
+    session::{
+        create_manual_session::CreateManualSessionDto,
+        get_sessions::GetSessionFiltersResponseDto,
         update_session::UpdateFocusSessionDto,
     },
-    task_api::{create_task::CreateTaskDto, get_tasks::TasksResponseDto},
+    task::{create_task::CreateTaskDto, get_tasks::TasksResponseDto},
 };
 use chrono::Utc;
 use tracing::info;
@@ -39,7 +40,7 @@ async fn create_new_session_and_list() {
     // Fetch tasks and check if the task was created
     let response = context
         .client
-        .get(format!("{}/api/tasks", context.base_url))
+        .get(format!("{}/api/task", context.base_url))
         .send()
         .await
         .expect("Failed to execute request");
@@ -75,7 +76,7 @@ async fn create_new_session_and_list() {
     // Fetch sessions and check if the session was created
     let response = context
         .client
-        .get(format!("{}/api/focus-sessions", context.base_url))
+        .get(format!("{}/api/session", context.base_url))
         .send()
         .await
         .expect("Failed to execute request");
@@ -187,7 +188,7 @@ async fn update_session_and_list() {
     let response = context
         .client
         .put(format!(
-            "{}/api/focus-sessions/{}",
+            "{}/api/session/{}",
             context.base_url, create_manual_session_response.id
         ))
         .json(&update_manual_session_dto)
@@ -200,7 +201,7 @@ async fn update_session_and_list() {
     // Fetch session and verify updated
     let response = context
         .client
-        .get(format!("{}/api/focus-sessions", context.base_url))
+        .get(format!("{}/api/session", context.base_url))
         .send()
         .await
         .expect("Failed to execute request");

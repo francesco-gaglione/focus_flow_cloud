@@ -79,6 +79,7 @@ mod tests {
             .expect_find_session_by_id()
             .returning(move |_| {
                 Ok(FocusSession::new(
+                    uuid::Uuid::new_v4(),
                     Some(category_id.clone()),
                     Some(task_id.clone()),
                     FocusSessionType::Work,

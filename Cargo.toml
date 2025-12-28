@@ -8,12 +8,12 @@ members = [
     "crates/domain",
     "crates/application",
     "crates/infrastructure",
-    "crates/api",
+    "crates/adapters",
 ]
 resolver = "2"
 
 [dependencies]
-api = { path = "crates/api" }
+adapters = { path = "crates/adapters" }
 infrastructure = { path = "crates/infrastructure" }
 domain = { path = "crates/domain" }
 application = { path = "crates/application" }

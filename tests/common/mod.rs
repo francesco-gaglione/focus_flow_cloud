@@ -1,16 +1,20 @@
-use api::adapters::http::dto::{
-    category_api::create_category::{CreateCategoryDto, CreateCategoryResponseDto},
-    session_api::create_manual_session::{CreateManualSessionDto, CreateManualSessionResponseDto},
-    task_api::create_task::{CreateTaskDto, CreateTaskResponseDto},
-    user_setting_api::{
+use adapters::http::{
+    category::{
+        create_category::{CreateCategoryDto, CreateCategoryResponseDto},
+    },
+    session::{
+        create_manual_session::{CreateManualSessionDto, CreateManualSessionResponseDto},
+    },
+    task::{
+        create_task::{CreateTaskDto, CreateTaskResponseDto},
+    },
+    user_setting::{
         get_user_settings::UserSettingsResponseDto, update_setting::UpdateUserSettingDto,
     },
 };
-use api::{
-    app::create_app,
-    setup::{init_app_state, init_tracing},
-};
-use infrastructure::config::AppConfig;
+use adapters::app::create_app;
+use infrastructure::setup::{init_app_state, init_tracing};
+use adapters::config::AppConfig;
 use std::sync::Once;
 use testcontainers::runners::AsyncRunner;
 use testcontainers_modules::postgres::Postgres;
@@ -30,7 +34,7 @@ impl TestContext {
     pub async fn create_category(&self, dto: &CreateCategoryDto) -> CreateCategoryResponseDto {
         let response = self
             .client
-            .post(format!("{}/api/categories", self.base_url))
+            .post(format!("{}/api/category", self.base_url))
             .json(dto)
             .send()
             .await
@@ -47,7 +51,7 @@ impl TestContext {
     pub async fn create_task(&self, dto: &CreateTaskDto) -> CreateTaskResponseDto {
         let response = self
             .client
-            .post(format!("{}/api/tasks", self.base_url))
+            .post(format!("{}/api/task", self.base_url))
             .json(dto)
             .send()
             .await
@@ -67,7 +71,7 @@ impl TestContext {
     ) -> CreateManualSessionResponseDto {
         let response = self
             .client
-            .post(format!("{}/api/focus-sessions/manual", self.base_url))
+            .post(format!("{}/api/session/manual", self.base_url))
             .json(dto)
             .send()
             .await
@@ -86,7 +90,7 @@ impl TestContext {
     pub async fn update_user_setting(&self, dto: &UpdateUserSettingDto) {
         let response = self
             .client
-            .patch(format!("{}/api/user-settings", self.base_url))
+            .patch(format!("{}/api/setting", self.base_url))
             .json(dto)
             .send()
             .await
@@ -99,7 +103,7 @@ impl TestContext {
     pub async fn get_user_settings(&self) -> UserSettingsResponseDto {
         let response = self
             .client
-            .get(format!("{}/api/user-settings", self.base_url))
+            .get(format!("{}/api/setting", self.base_url))
             .send()
             .await
             .expect("Failed to execute request");
@@ -129,6 +133,9 @@ pub async fn setup() -> TestContext {
         server_port: 0,
         cors_origin: "*".to_string(),
         database_url: db_url,
+        jwt_secret: "test_secret".to_string(),
+        admin_username: Some("admin".to_string()),
+        admin_password: Some("admin".to_string()),
     };
 
     // Initialize App State (this runs migrations)
@@ -145,9 +152,41 @@ pub async fn setup() -> TestContext {
         axum::serve(listener, app).await.unwrap();
     });
 
+    let client = reqwest::Client::new();
+    let base_url = format!("http://127.0.0.1:{}", port);
+
+    // Login as admin
+    let login_body = serde_json::json!({
+        "username": "admin",
+        "password": "admin"
+    });
+
+    let response = client
+        .post(format!("{}/api/auth/login", base_url))
+        .json(&login_body)
+        .send()
+        .await
+        .expect("Failed to login");
+
+    assert_eq!(response.status(), 200, "Failed to login as admin");
+
+    let login_response: serde_json::Value = response.json().await.unwrap();
+    let token = login_response["token"].as_str().unwrap();
+
+    // Create client with Authorization header
+    let mut headers = reqwest::header::HeaderMap::new();
+    headers.insert(
+        reqwest::header::AUTHORIZATION,
+        reqwest::header::HeaderValue::from_str(&format!("Bearer {}", token)).unwrap(),
+    );
+    let client = reqwest::Client::builder()
+        .default_headers(headers)
+        .build()
+        .unwrap();
+
     TestContext {
-        base_url: format!("http://127.0.0.1:{}", port),
-        client: reqwest::Client::new(),
+        base_url,
+        client,
         container,
     }
 }

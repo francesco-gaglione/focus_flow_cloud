@@ -46,7 +46,7 @@ impl TokenService for JwtService {
     }
 
     fn verify_token(&self, token: &str) -> DomainResult<String> {
-        let mut validation = jsonwebtoken::Validation::default();
+        let validation = jsonwebtoken::Validation::default();
         // validation.validate_exp = true; // Default is true
 
         jsonwebtoken::decode::<Claims>(

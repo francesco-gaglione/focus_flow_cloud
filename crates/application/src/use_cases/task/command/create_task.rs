@@ -3,6 +3,7 @@ use uuid::Uuid;
 
 #[derive(Debug, Clone)]
 pub struct CreateTaskCommand {
+    pub user_id: Uuid,
     pub name: String,
     pub description: Option<String>,
     pub category_id: Option<Uuid>,

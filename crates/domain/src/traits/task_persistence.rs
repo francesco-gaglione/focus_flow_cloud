@@ -32,7 +32,7 @@ mod tests {
         mock.expect_create_task()
             .times(1)
             .returning(|_| Ok(Uuid::new_v4()));
-        let task = Task::create(None, "Test Task".to_string(), None, None);
+        let task = Task::create(Uuid::new_v4(), None, "Test Task".to_string(), None, None);
         let result = mock.create_task(task).await;
         assert!(result.is_ok());
     }
@@ -71,6 +71,7 @@ mod tests {
         mock.expect_find_by_id().times(1).returning(|_| {
             Ok(Task::reconstitute(
                 Uuid::new_v4(),
+                Uuid::new_v4(),
                 None,
                 "name".to_string(),
                 None,
@@ -88,6 +89,7 @@ mod tests {
         mock.expect_update_task().times(1).returning(|_| {
             Ok(Task::reconstitute(
                 Uuid::new_v4(),
+                Uuid::new_v4(),
                 None,
                 "name".to_string(),
                 None,
@@ -95,7 +97,7 @@ mod tests {
                 None,
             ))
         });
-        let task = Task::create(None, "Updated".to_string(), None, None);
+        let task = Task::create(Uuid::new_v4(), None, "Updated".to_string(), None, None);
         let result = mock.update_task(task).await;
         assert!(result.is_ok());
     }

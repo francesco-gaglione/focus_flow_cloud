@@ -3,6 +3,42 @@
 version = 4
 
 [[package]]
+name = "adapters"
+version = "0.1.0"
+dependencies = [
+ "application",
+ "async-trait",
+ "axum",
+ "chrono",
+ "deadpool-diesel",
+ "diesel",
+ "diesel_migrations",
+ "domain",
+ "dotenvy",
+ "futures-util",
+ "http",
+ "lazy_static",
+ "matchit",
+ "regex",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "time",
+ "tokio",
+ "tower",
+ "tower-http",
+ "tower-sessions",
+ "tracing",
+ "tracing-subscriber",
+ "tracing-tree",
+ "utoipa",
+ "utoipa-axum",
+ "utoipa-swagger-ui",
+ "uuid",
+ "validator",
+]
+
+[[package]]
 name = "addr2line"
 version = "0.25.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -44,39 +80,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "819e7219dbd41043ac279b19830f2efc897156490d7fd6ea916720117ee66311"
 dependencies = [
  "libc",
-]
-
-[[package]]
-name = "api"
-version = "0.1.0"
-dependencies = [
- "application",
- "axum",
- "chrono",
- "domain",
- "dotenvy",
- "futures-util",
- "http",
- "infrastructure",
- "lazy_static",
- "matchit",
- "regex",
- "serde",
- "serde_json",
- "thiserror",
- "time",
- "tokio",
- "tower",
- "tower-http",
- "tower-sessions",
- "tracing",
- "tracing-subscriber",
- "tracing-tree",
- "utoipa",
- "utoipa-axum",
- "utoipa-swagger-ui",
- "uuid",
- "validator",
 ]
 
 [[package]]
@@ -986,7 +989,7 @@ checksum = "3f9eec918d3f24069decb9af1554cad7c880e2da24a9afd88aca000531ab82c1"
 name = "focus_flow_cloud"
 version = "0.1.10"
 dependencies = [
- "api",
+ "adapters",
  "application",
  "axum",
  "chrono",
@@ -1575,6 +1578,7 @@ dependencies = [
 name = "infrastructure"
 version = "0.1.0"
 dependencies = [
+ "adapters",
  "application",
  "argon2",
  "async-trait",
@@ -1593,6 +1597,7 @@ dependencies = [
  "thiserror",
  "tokio",
  "tracing",
+ "tracing-subscriber",
  "uuid",
 ]
 

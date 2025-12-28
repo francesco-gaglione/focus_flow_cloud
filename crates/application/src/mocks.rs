@@ -73,8 +73,8 @@ mock! {
     #[async_trait::async_trait]
     impl UserSettingPersistence for UserSettingPersistence {
          async fn find_all(&self) -> PersistenceResult<Vec<UserSetting>>;
-         async fn update_setting(&self, key: String, value: String) -> PersistenceResult<()>;
-         async fn create_setting(&self, key: String, value: String) -> PersistenceResult<()>;
+         async fn update_setting(&self, user_id: Uuid, key: String, value: String) -> PersistenceResult<()>;
+         async fn create_setting(&self, user_id: Uuid, key: String, value: String) -> PersistenceResult<()>;
     }
 }
 
