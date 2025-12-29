@@ -1,12 +1,10 @@
 mod common;
 
 use crate::common::setup;
-use api::adapters::http::dto::category_api::create_category::CreateCategoryDto;
-use api::adapters::http::dto::category_api::get_categories::GetCategoriesResponseDto;
-use api::adapters::http::dto::category_api::get_category::GetCategoryResponseDto;
-use api::adapters::http::dto::category_api::update_category::{
-    UpdateCategoryDto, UpdateCategoryResponseDto,
-};
+use adapters::http::category::create_category::CreateCategoryDto;
+use adapters::http::category::get_categories_and_tasks::GetCategoriesResponseDto;
+use adapters::http::category::get_category::GetCategoryResponseDto;
+use adapters::http::category::update_category::{UpdateCategoryDto, UpdateCategoryResponseDto};
 
 #[tokio::test]
 async fn create_and_list_category() {
@@ -24,7 +22,7 @@ async fn create_and_list_category() {
     // List Categories
     let response = context
         .client
-        .get(format!("{}/api/categories", context.base_url))
+        .get(format!("{}/api/category", context.base_url))
         .send()
         .await
         .expect("Failed to execute request");
@@ -59,7 +57,7 @@ async fn create_category_only_mandatory_fields_and_list_categories() {
 
     let response = context
         .client
-        .get(format!("{}/api/categories", context.base_url))
+        .get(format!("{}/api/category", context.base_url))
         .send()
         .await
         .expect("Failed to execute request");
@@ -103,7 +101,7 @@ async fn update_category_and_get_by_id() {
     let response = context
         .client
         .put(format!(
-            "{}/api/categories/{}",
+            "{}/api/category/{}",
             context.base_url, body_response.category_id
         ))
         .json(&update_dto)
@@ -131,7 +129,7 @@ async fn update_category_and_get_by_id() {
     let response = context
         .client
         .get(format!(
-            "{}/api/categories/{}",
+            "{}/api/category/{}",
             context.base_url, body_response.updated_category.id
         ))
         .send()
@@ -168,7 +166,7 @@ async fn delete_category() {
     let response = context
         .client
         .delete(format!(
-            "{}/api/categories/{}",
+            "{}/api/category/{}",
             context.base_url, body_response.category_id
         ))
         .send()
@@ -181,7 +179,7 @@ async fn delete_category() {
     let response = context
         .client
         .get(format!(
-            "{}/api/categories/{}",
+            "{}/api/category/{}",
             context.base_url, body_response.category_id
         ))
         .send()

@@ -1,4 +1,4 @@
-use api::adapters::http::dto::user_setting_api::update_setting::UpdateUserSettingDto;
+use adapters::http::user_setting::update_setting::UpdateUserSettingDto;
 use common::setup;
 
 mod common;

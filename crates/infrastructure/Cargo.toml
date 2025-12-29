@@ -6,16 +6,23 @@ edition = "2021"
 [dependencies]
 domain = { path = "../domain" }
 application = { path = "../application" }
+adapters = { path = "../adapters" }
 deadpool-diesel.workspace = true
 diesel = { workspace = true, features = ["postgres", "uuid", "chrono", "r2d2"] }
 diesel_migrations.workspace = true
 tracing.workspace = true
+tracing-subscriber.workspace = true
 async-trait.workspace = true
+tokio = { workspace = true, features = ["sync"] }
 config.workspace = true
 dotenvy.workspace = true
 serde = { workspace = true, features = ["derive"] }
 uuid = { workspace = true, features = ["v4", "serde"] }
 chrono = { workspace = true, features = ["serde"] }
+argon2 = "0.5"
+rand_core = { version = "0.6", features = ["std"] }
+thiserror.workspace = true
+jsonwebtoken = { version = "10.2.0", features = ["rust_crypto"] }
 
 [dev-dependencies]
 testcontainers = "0.23"

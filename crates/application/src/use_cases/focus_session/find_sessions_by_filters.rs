@@ -86,6 +86,7 @@ mod tests {
 
         let focus_session = FocusSession::reconstitute(
             session_id,
+            Uuid::new_v4(),
             Some(category_id),
             Some(task_id),
             FocusSessionType::Work,

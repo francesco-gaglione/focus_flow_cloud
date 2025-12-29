@@ -24,6 +24,7 @@ impl CreateCategoryUseCases {
 
     pub async fn execute(&self, category_cmd: CreateCategoryCommand) -> AppResult<Uuid> {
         let category = Category::create(
+            category_cmd.user_id,
             category_cmd.name,
             category_cmd.description,
             category_cmd.color.unwrap_or_else(random_hex_color),
@@ -57,14 +58,18 @@ mod tests {
         let color = "#FF0000".to_string();
 
         let id = Uuid::new_v4();
+        let user_id = Uuid::new_v4();
 
         mock.expect_create_category()
-            .withf(move |c| c.name() == "Test Category" && c.color() == "#FF0000")
+            .withf(move |c| {
+                c.name() == "Test Category" && c.color() == "#FF0000" && c.user_id() == user_id
+            })
             .returning(move |_| Ok(id));
 
         let use_cases = CreateCategoryUseCases::new(Arc::new(mock));
         let result = use_cases
             .execute(CreateCategoryCommand {
+                user_id,
                 name: name.to_string(),
                 description: description.map(|d| d.to_string()),
                 color: Some(color.to_string()),

@@ -1,9 +1,9 @@
 mod common;
-use api::adapters::http::dto::{
-    category_api::create_category::CreateCategoryDto,
-    task_api::{
+use adapters::http::{
+    category::create_category::CreateCategoryDto,
+    task::{
         create_task::CreateTaskDto,
-        delete_task::{DeleteTasksDto, DeleteTasksResponseDto},
+        delete_tasks::{DeleteTasksDto, DeleteTasksResponseDto},
         get_tasks::TasksResponseDto,
         orphan_tasks::OrphanTasksResponseDto,
         update_task::{UpdateTaskDto, UpdateTaskResponseDto},
@@ -37,7 +37,7 @@ async fn create_new_task_and_list() {
     // Fetch tasks and check if the task was created
     let response = context
         .client
-        .get(format!("{}/api/tasks", context.base_url))
+        .get(format!("{}/api/task", context.base_url))
         .send()
         .await
         .expect("Failed to execute request");
@@ -78,7 +78,7 @@ async fn create_new_orphan_and_list() {
     // Fetch tasks and check if the task was created
     let response = context
         .client
-        .get(format!("{}/api/tasks/orphans", context.base_url))
+        .get(format!("{}/api/task/orphans", context.base_url))
         .send()
         .await
         .expect("Failed to execute request");
@@ -122,7 +122,7 @@ async fn update_task_test() {
 
     let update_res = context
         .client
-        .put(format!("{}/api/tasks/{}", context.base_url, task_id))
+        .put(format!("{}/api/task/{}", context.base_url, task_id))
         .json(&update_dto)
         .send()
         .await
@@ -164,7 +164,7 @@ async fn delete_tasks_test() {
 
     let delete_res = context
         .client
-        .delete(format!("{}/api/tasks", context.base_url))
+        .delete(format!("{}/api/task", context.base_url))
         .json(&delete_dto)
         .send()
         .await
@@ -180,7 +180,7 @@ async fn delete_tasks_test() {
     // Verify it's gone
     let list_res = context
         .client
-        .get(format!("{}/api/tasks", context.base_url))
+        .get(format!("{}/api/task", context.base_url))
         .send()
         .await
         .expect("Failed to list tasks");

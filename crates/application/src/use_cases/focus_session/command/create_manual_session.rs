@@ -4,6 +4,7 @@ use uuid::Uuid;
 
 #[derive(Debug, Clone)]
 pub struct CreateManualFocusSessionCommand {
+    pub user_id: Uuid,
     pub category_id: Option<Uuid>,
     pub task_id: Option<Uuid>,
     pub session_type: FocusSessionType,

@@ -64,6 +64,7 @@ src/
     ```bash
     cp .env.example .env
     ```
+    > **Important**: You must generate a strong `JWT_SECRET` for production security.
 
 3.  **Start the application**:
     This command builds the Docker image and starts the `app` and `db` services.
@@ -74,6 +75,16 @@ src/
 4.  **Access the API**:
     -   **API**: `http://localhost:8080`
     -   **Swagger UI**: `http://localhost:8080/swagger-ui`
+
+5.  **Initial Admin Setup**:
+    To automatically create an admin user on startup, add the following variables to your `.env` file (or docker-compose environment):
+    ```bash
+    ADMIN_USERNAME=admin
+    ADMIN_PASSWORD=your_secure_password
+    ```
+    The application will check for these variables on startup. If an user with that username does not exist, it will be created with the `Admin` role.
+    
+    > **Note**: For security reasons, it is recommended to remove these variables from your environment after the initial setup is complete.
 
 ### Development Setup (without Docker)
 

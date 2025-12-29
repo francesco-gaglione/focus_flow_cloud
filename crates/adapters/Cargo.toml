@@ -1,0 +1,37 @@
+[package]
+name = "adapters"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+domain = { path = "../domain" }
+application = { path = "../application" }
+axum = { workspace = true, features=["ws"]}
+tokio = { workspace = true, features = ["full"] }
+utoipa = { workspace = true, features = ["axum_extras", "chrono", "uuid"] }
+utoipa-axum.workspace = true
+utoipa-swagger-ui = { workspace = true, features = ["axum"] }
+tower-http = { workspace = true, features = ["trace", "cors"] }
+tracing.workspace = true
+serde = { workspace = true, features = ["derive"] }
+matchit.workspace = true
+tower = { workspace = true, features = ["util"] }
+tower-sessions.workspace = true
+time = "0.3"
+deadpool-diesel.workspace = true
+diesel = { workspace = true, features = ["postgres", "uuid", "chrono", "r2d2"] }
+diesel_migrations.workspace = true
+async-trait.workspace = true
+tracing-subscriber = { workspace = true, features = ["env-filter"] }
+tracing-tree.workspace = true
+uuid = { workspace = true, features = ["v4", "serde"] }
+chrono = { workspace = true, features = ["serde"] }
+serde_json.workspace = true
+thiserror.workspace = true
+validator = { workspace = true, features = ["derive"] }
+http.workspace = true
+futures-util.workspace = true
+lazy_static.workspace = true
+regex.workspace = true
+dotenvy.workspace = true
+serde_urlencoded = "0.7.1"

@@ -13,6 +13,18 @@ pub enum DomainError {
 
     #[error("Invalid stats parameter: {0}")]
     InvalidStatsParam(String),
+
+    #[error("Invalid password policy: {0}")]
+    InvalidPasswordPolicy(String),
+
+    #[error("Password hashing error: {0}")]
+    PasswordHashingError(String),
+
+    #[error("Token generation error: {0}")]
+    TokenGenerationError(String),
+
+    #[error("Token verification error: {0}")]
+    TokenVerificationError(String),
 }
 
 pub type DomainResult<T> = Result<T, DomainError>;

@@ -6,6 +6,9 @@ pub enum AppError {
     #[error("Resource not found: {0}")]
     NotFound(String),
 
+    #[error("User not found: {0}")]
+    UserNotFound(String),
+
     #[error("Resource already exist: {0}")]
     ResourceAlreadyExist(String),
 
@@ -20,6 +23,9 @@ pub enum AppError {
 
     #[error("Database error: {0}")]
     Database(String),
+
+    #[error("Invalid user parameter: {0}")]
+    InvalidUserParam(String),
 
     #[error("Invalid focus session duration")]
     InvalidFocusSessionDuration,
@@ -39,8 +45,23 @@ pub enum AppError {
     #[error("Invalid stats parameter: {0}")]
     InvalidStatsParam(String),
 
+    #[error("Invalid password policy: {0}")]
+    InvalidPasswordPolicy(String),
+
+    #[error("Password hashing error: {0}")]
+    PasswordHashingError(String),
+
     #[error("Persistance error: {0}")]
     Persistence(String),
+
+    #[error("Token error: {0}")]
+    TokenError(String),
+
+    #[error("Validation error: {0}")]
+    Validation(String),
+
+    #[error("Unauthorized: {0}")]
+    Unauthorized(String),
 }
 
 impl From<DomainError> for AppError {
@@ -50,6 +71,10 @@ impl From<DomainError> for AppError {
             DomainError::InvalidColor(msg) => AppError::InvalidColor(msg),
             DomainError::InvalidFocusSessionParam(msg) => AppError::InvalidFocusSessionParam(msg),
             DomainError::InvalidStatsParam(msg) => AppError::InvalidStatsParam(msg),
+            DomainError::InvalidPasswordPolicy(msg) => AppError::InvalidPasswordPolicy(msg),
+            DomainError::PasswordHashingError(msg) => AppError::PasswordHashingError(msg),
+            DomainError::TokenGenerationError(msg) => AppError::TokenError(msg),
+            DomainError::TokenVerificationError(msg) => AppError::TokenError(msg),
         }
     }
 }

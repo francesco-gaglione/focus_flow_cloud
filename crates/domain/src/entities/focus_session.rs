@@ -8,6 +8,7 @@ use uuid::Uuid;
 #[derive(Debug, Clone)]
 pub struct FocusSession {
     id: Uuid,
+    user_id: Uuid,
     category_id: Option<Uuid>,
     task_id: Option<Uuid>,
     session_type: FocusSessionType,
@@ -22,6 +23,7 @@ pub struct FocusSession {
 impl FocusSession {
     #[allow(clippy::too_many_arguments)]
     pub fn new(
+        user_id: Uuid,
         category_id: Option<Uuid>,
         task_id: Option<Uuid>,
         session_type: FocusSessionType,
@@ -44,6 +46,7 @@ impl FocusSession {
 
         Ok(FocusSession {
             id: Uuid::new_v4(),
+            user_id,
             category_id,
             task_id,
             session_type,
@@ -59,6 +62,7 @@ impl FocusSession {
     #[allow(clippy::too_many_arguments)]
     pub fn reconstitute(
         id: Uuid,
+        user_id: Uuid,
         category_id: Option<Uuid>,
         task_id: Option<Uuid>,
         session_type: FocusSessionType,
@@ -71,6 +75,7 @@ impl FocusSession {
     ) -> Self {
         FocusSession {
             id,
+            user_id,
             category_id,
             task_id,
             session_type,
@@ -123,6 +128,10 @@ impl FocusSession {
 
     pub fn id(&self) -> Uuid {
         self.id
+    }
+
+    pub fn user_id(&self) -> Uuid {
+        self.user_id
     }
 
     pub fn category_id(&self) -> Option<Uuid> {

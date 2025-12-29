@@ -8,12 +8,12 @@ members = [
     "crates/domain",
     "crates/application",
     "crates/infrastructure",
-    "crates/api",
+    "crates/adapters",
 ]
 resolver = "2"
 
 [dependencies]
-api = { path = "crates/api" }
+adapters = { path = "crates/adapters" }
 infrastructure = { path = "crates/infrastructure" }
 domain = { path = "crates/domain" }
 application = { path = "crates/application" }
@@ -52,6 +52,8 @@ validator = { version = "0.20.0", features = ["derive"] }
 rand = "0.8"
 config = "0.13"
 matchit = "0.8.4"
+tower-sessions = { version = "0.14.0", features = ["memory-store"] }
+
 
 # Dev dependencies
 [dev-dependencies]

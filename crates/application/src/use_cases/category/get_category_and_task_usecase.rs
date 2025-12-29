@@ -64,6 +64,7 @@ mod tests {
         category_persistence.expect_find_all().returning(move || {
             Ok(vec![Category::reconstitute(
                 category_id.clone(),
+                Uuid::new_v4(),
                 "Test Category".to_string(),
                 None,
                 "#FF0000".to_string(),
@@ -75,6 +76,7 @@ mod tests {
             .returning(move |_| {
                 Ok(vec![Task::reconstitute(
                     Uuid::new_v4(),
+                    Uuid::new_v4(), // user_id
                     Some(category_id),
                     "task".to_string(),
                     Some("description".to_string()),

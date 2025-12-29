@@ -71,6 +71,7 @@ mod tests {
             .returning(move |_| {
                 Ok(Category::reconstitute(
                     category_id,
+                    uuid::Uuid::new_v4(),
                     name_clone_update.clone(),
                     Some(description_clone_update.clone()),
                     color_clone_update.clone(),
@@ -83,6 +84,7 @@ mod tests {
             .returning(move |_| {
                 Ok(Category::reconstitute(
                     category_id,
+                    uuid::Uuid::new_v4(),
                     name_clone_find.clone(),
                     Some(description_clone_find.clone()),
                     color_clone_find.clone(),

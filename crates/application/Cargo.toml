@@ -12,6 +12,7 @@ uuid = { workspace = true, features = ["v4", "serde"] }
 chrono = { workspace = true, features = ["serde"] }
 serde = { workspace = true, features = ["derive"] }
 futures-util.workspace = true
+validator = { workspace = true, features = ["derive"] }
 
 [dev-dependencies]
 mockall = "0.11"

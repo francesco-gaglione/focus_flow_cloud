@@ -4,6 +4,7 @@ use uuid::Uuid;
 #[derive(Debug, Clone)]
 pub struct Task {
     id: Uuid,
+    user_id: Uuid,
     category_id: Option<Uuid>,
     name: String,
     description: Option<String>,
@@ -14,6 +15,7 @@ pub struct Task {
 impl Task {
     pub fn reconstitute(
         id: Uuid,
+        user_id: Uuid,
         category_id: Option<Uuid>,
         name: String,
         description: Option<String>,
@@ -22,6 +24,7 @@ impl Task {
     ) -> Self {
         Self {
             id,
+            user_id,
             category_id,
             name,
             description,
@@ -31,6 +34,7 @@ impl Task {
     }
 
     pub fn create(
+        user_id: Uuid,
         category_id: Option<Uuid>,
         name: String,
         description: Option<String>,
@@ -38,6 +42,7 @@ impl Task {
     ) -> Self {
         Self {
             id: Uuid::new_v4(),
+            user_id,
             category_id,
             name,
             description,
@@ -48,6 +53,10 @@ impl Task {
 
     pub fn id(&self) -> Uuid {
         self.id
+    }
+
+    pub fn user_id(&self) -> Uuid {
+        self.user_id
     }
 
     pub fn category_id(&self) -> Option<Uuid> {

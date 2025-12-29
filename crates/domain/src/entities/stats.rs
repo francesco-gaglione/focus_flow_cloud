@@ -524,7 +524,7 @@ mod stats_tests {
 
     #[test]
     fn test_daily_activity_item_new() {
-        let date = NaiveDate::from_ymd(2023, 1, 1);
+        let date = NaiveDate::from_ymd_opt(2023, 1, 1).unwrap();
         let category_distribution = vec![
             DailyActivityDistributionItem::new("Category 1".to_string(), Uuid::new_v4(), 10),
             DailyActivityDistributionItem::new("Category 2".to_string(), Uuid::new_v4(), 20),

@@ -17,6 +17,7 @@ impl CreateSessionUseCase {
 
     pub async fn execute(&self, session_cmd: CreateFocusSessionCommand) -> AppResult<FocusSession> {
         let session = FocusSession::new(
+            session_cmd.user_id,
             session_cmd.category_id,
             session_cmd.task_id,
             session_cmd.session_type,
@@ -52,6 +53,7 @@ mod tests {
 
         let focus_session = FocusSession::reconstitute(
             id,
+            Uuid::new_v4(), // user_id
             Some(category_id),
             Some(task_id),
             FocusSessionType::Work,
@@ -68,6 +70,7 @@ mod tests {
             .returning(move |_| Ok(focus_session.clone()));
 
         let cmd = CreateFocusSessionCommand {
+            user_id: Uuid::new_v4(),
             category_id: Some(category_id),
             task_id: Some(task_id),
             session_type: FocusSessionType::Work,
@@ -102,6 +105,7 @@ mod tests {
             });
 
         let cmd = CreateFocusSessionCommand {
+            user_id: Uuid::new_v4(),
             category_id: Some(Uuid::new_v4()),
             task_id: Some(Uuid::new_v4()),
             session_type: FocusSessionType::Work,

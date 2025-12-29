@@ -1,11 +1,11 @@
-use api::adapters::http::dto::{
-    category_api::create_category::CreateCategoryDto,
-    common::session_type_enum::SessionTypeEnum,
-    session_api::create_manual_session::CreateManualSessionDto,
-    stats_api::{ConcentrationPeriodDto, GetStatsByPeriodResponseDto},
-    task_api::create_task::CreateTaskDto,
+use adapters::http::{
+    category::create_category::CreateCategoryDto,
+    dto::common::session_type_enum::SessionTypeEnum,
+    session::create_manual_session::CreateManualSessionDto,
+    stats::calculate_stats_by_period::{ConcentrationPeriodDto, GetStatsByPeriodResponseDto},
+    task::create_task::CreateTaskDto,
 };
-use chrono::{Duration, TimeZone, Utc};
+use chrono::{Duration, Utc};
 use common::setup;
 
 mod common;
