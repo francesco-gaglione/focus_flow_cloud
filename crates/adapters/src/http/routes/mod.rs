@@ -7,7 +7,7 @@ pub fn api_routes(state: AppState) -> Router<AppState> {
     let protected_routes = Router::new()
         .nest("/category", crate::http::category::routes::router())
         .nest("/task", crate::http::task::routes::router())
-        .nest("/session", crate::http::session::routes::router())
+        .nest("/focus-session", crate::http::session::routes::router())
         .nest("/setting", crate::http::user_setting::routes::router())
         .nest("/users", crate::http::users::routes::router())
         .nest("/stats", crate::http::stats::routes::router())
