@@ -65,7 +65,7 @@ impl TestContext {
     ) -> CreateManualSessionResponseDto {
         let response = self
             .client
-            .post(format!("{}/api/session/manual", self.base_url))
+            .post(format!("{}/api/focus-session/manual", self.base_url))
             .json(dto)
             .send()
             .await

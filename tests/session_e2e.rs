@@ -75,7 +75,7 @@ async fn create_new_session_and_list() {
     // Fetch sessions and check if the session was created
     let response = context
         .client
-        .get(format!("{}/api/session", context.base_url))
+        .get(format!("{}/api/focus-session", context.base_url))
         .send()
         .await
         .expect("Failed to execute request");
@@ -187,7 +187,7 @@ async fn update_session_and_list() {
     let response = context
         .client
         .put(format!(
-            "{}/api/session/{}",
+            "{}/api/focus-session/{}",
             context.base_url, create_manual_session_response.id
         ))
         .json(&update_manual_session_dto)
@@ -200,7 +200,7 @@ async fn update_session_and_list() {
     // Fetch session and verify updated
     let response = context
         .client
-        .get(format!("{}/api/session", context.base_url))
+        .get(format!("{}/api/focus-session", context.base_url))
         .send()
         .await
         .expect("Failed to execute request");
