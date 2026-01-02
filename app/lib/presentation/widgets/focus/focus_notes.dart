@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
+import '../common/markdown_editor_input.dart';
 
 import 'package:focus_flow_app/domain/entities/note_template.dart';
 
@@ -139,40 +140,9 @@ class _FocusNotesWidgetState extends State<FocusNotesWidget> {
               ],
             ),
             const SizedBox(height: 16),
-            TextField(
+            MarkdownEditorInput(
               controller: _notesController,
-              maxLines: 8,
-              style: Theme.of(context).textTheme.bodyMedium,
-              decoration: InputDecoration(
-                hintText: context.tr('focus.notes_hint'),
-                hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant.withAlpha(
-                    (255 * 0.5).round(),
-                  ),
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide.none,
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide(
-                    color: colorScheme.outlineVariant.withAlpha(
-                      (255 * 0.2).round(),
-                    ),
-                  ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide(
-                    color: colorScheme.primary.withAlpha((255 * 0.5).round()),
-                    width: 2,
-                  ),
-                ),
-                filled: true,
-                fillColor: colorScheme.surface.withAlpha((255 * 0.5).round()),
-                contentPadding: const EdgeInsets.all(16),
-              ),
+              hint: context.tr('focus.notes_hint'),
             ),
           ],
         ),
