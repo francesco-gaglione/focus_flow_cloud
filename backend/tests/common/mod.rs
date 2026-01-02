@@ -146,7 +146,9 @@ pub async fn setup() -> TestContext {
     };
 
     // Initialize App State (this runs migrations)
-    let app_state = init_app_state(config, "test-version".to_string()).await.unwrap();
+    let app_state = init_app_state(config, "test-version".to_string())
+        .await
+        .unwrap();
 
     // Create App Router
     let app = create_app(app_state);
