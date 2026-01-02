@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - "*"
+      - "v*"
 
 env:
   CARGO_TERM_COLOR: always
@@ -79,6 +79,14 @@ jobs:
             type=raw,value=latest
             type=ref,event=tag
 
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          generate_release_notes: true
+          files: |
+             focus_flow_cloud-amd64
+             
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
