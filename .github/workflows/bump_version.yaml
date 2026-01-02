@@ -24,6 +24,9 @@ jobs:
       - name: Set up Just
         uses: extractions/setup-just@v2
 
+      - name: Install git-cliff
+        uses: kenji-miyake/setup-git-cliff@v2
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:

@@ -194,7 +194,24 @@ _bump_semver part target:
         # Assuming sync, versions should be same. Use next_v from last bump.
         tag_name = f'v{next_v}'
 
-    # 4. Commit and Tag
+    # 4. Generate Changelog
+    # We use git-cliff. We assume it's installed (local or CI).
+    # If not, we warn and skip to avoid crashing, OR we assume CI has it.
+    # We try to run it.
+    try:
+        print(f"Generating changelog for {tag_name}...")
+        # --tag {tag_name} sets the tag for the "unreleased" commits we are about to tag
+        # --unreleased tells cliff to process the unreleased commits
+        # --prepend CHANGELOG.md appends to top (or creates new)
+        # However, simplistic: git-cliff -o CHANGELOG.md updates it.
+        # But we need to tell it that the "current unreleased" stuff belongs to {tag_name}.
+        # git-cliff --tag {tag_name} -o CHANGELOG.md
+        run_cmd(f'git cliff --tag {tag_name} -o CHANGELOG.md')
+        files_to_commit.append('CHANGELOG.md')
+    except Exception as e:
+        print(f"Warning: git-cliff failed or not found. Skipping changelog generation. Error: {e}")
+
+    # 5. Commit and Tag
     files_str = ' '.join(files_to_commit)
     run_cmd(f'git add {files_str}')
     run_cmd(f'git commit -m \"chore: bump {target} to {tag_name}\"')
