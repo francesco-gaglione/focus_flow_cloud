@@ -35,7 +35,7 @@ jobs:
       - name: Build binaries
         run: |
           cargo build --release --target x86_64-unknown-linux-gnu
-      
+
       - name: Prepare binaries
         run: |
           cp target/x86_64-unknown-linux-gnu/release/focus_flow_cloud ./focus_flow_cloud-amd64
@@ -87,18 +87,13 @@ jobs:
 
   create-release:
     needs: [backend-build]
-    # Run even if backend-build was skipped? No, create release makes sense if we built something OR if it's an app tag?
-    # User said "users build their own APK". So for app release, we just want a tag in git.
-    # We could technically create an empty GitHub release layout.
-    # But usually, if there are no artifacts, the git tag itself IS the release.
-    # So I will skip create-release if backend-build was skipped (i.e. app-only release).
     if: always() && (needs.backend-build.result == 'success')
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Download Backend Artifact
         uses: actions/download-artifact@v4
         with:

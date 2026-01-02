@@ -206,7 +206,7 @@ _bump_semver part target:
         # However, simplistic: git-cliff -o CHANGELOG.md updates it.
         # But we need to tell it that the \"current unreleased\" stuff belongs to {tag_name}.
         # git-cliff --tag {tag_name} -o CHANGELOG.md
-        run_cmd(f'git cliff --tag {tag_name} -o CHANGELOG.md')
+        run_cmd(f'git cliff --tag {tag_name} --prepend CHANGELOG.md')
         files_to_commit.append('CHANGELOG.md')
     except Exception as e:
         print(f'Warning: git-cliff failed or not found. Skipping changelog generation. Error: {e}')
