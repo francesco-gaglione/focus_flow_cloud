@@ -5,12 +5,14 @@ class MarkdownEditorInput extends StatefulWidget {
   final TextEditingController controller;
   final String? label;
   final String? hint;
+  final bool hideFullScreenButton;
 
   const MarkdownEditorInput({
     super.key,
     required this.controller,
     this.label,
     this.hint,
+    this.hideFullScreenButton = false,
   });
 
   @override
@@ -61,6 +63,33 @@ class _MarkdownEditorInputState extends State<MarkdownEditorInput> {
     );
   }
 
+  void _openFullScreen(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (context) => Scaffold(
+          appBar: AppBar(
+            title: Text(widget.label ?? 'Editor'),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.check),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+          ),
+          body: SafeArea(
+            child: MarkdownEditorInput(
+              controller: widget.controller,
+              hint: widget.hint,
+              // Avoid recursive full screen button in the full screen mode
+              hideFullScreenButton: true,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -73,22 +102,38 @@ class _MarkdownEditorInputState extends State<MarkdownEditorInput> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(widget.label!, style: Theme.of(context).textTheme.titleSmall),
-              // Preview Toggle
-              IconButton(
-                icon: Icon(_isPreview ? Icons.edit : Icons.visibility),
-                tooltip: _isPreview ? 'Edit' : 'Preview',
-                onPressed: () => setState(() => _isPreview = !_isPreview),
-                visualDensity: VisualDensity.compact,
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                   if (!widget.hideFullScreenButton)
+                     IconButton(
+                        icon: const Icon(Icons.open_in_full),
+                        tooltip: 'Full Screen',
+                        onPressed: () => _openFullScreen(context),
+                        visualDensity: VisualDensity.compact,
+                     ),
+                   IconButton(
+                     icon: Icon(_isPreview ? Icons.edit : Icons.visibility),
+                     tooltip: _isPreview ? 'Edit' : 'Preview',
+                     onPressed: () => setState(() => _isPreview = !_isPreview),
+                     visualDensity: VisualDensity.compact,
+                   ),
+                ],
               ),
             ],
           ),
           const SizedBox(height: 4),
         ] else ...[
-           // If no label, putting the toggle in the toolbar or above might be better.
-           // Let's add a small header row if label is null but we want the toggle.
            Row(
              mainAxisAlignment: MainAxisAlignment.end,
              children: [
+                if (!widget.hideFullScreenButton)
+                   IconButton(
+                      icon: const Icon(Icons.open_in_full),
+                      tooltip: 'Full Screen',
+                      onPressed: () => _openFullScreen(context),
+                      visualDensity: VisualDensity.compact,
+                   ),
                 IconButton(
                   icon: Icon(_isPreview ? Icons.edit : Icons.visibility),
                   tooltip: _isPreview ? 'Edit' : 'Preview',
@@ -99,7 +144,9 @@ class _MarkdownEditorInputState extends State<MarkdownEditorInput> {
            ),
         ],
         
-        Container(
+        Expanded(
+           flex: widget.hideFullScreenButton ? 1 : 0, 
+           child: Container(
           decoration: BoxDecoration(
             color: colorScheme.surfaceContainerHighest.withAlpha(50),
             borderRadius: BorderRadius.circular(12),
@@ -167,7 +214,9 @@ class _MarkdownEditorInputState extends State<MarkdownEditorInput> {
                 ),
                 
               // Editor / Preview Area
-              AnimatedSwitcher(
+              Expanded(
+                flex: widget.hideFullScreenButton ? 1 : 0,
+                child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 200),
                 child: _isPreview
                     ? Container(
@@ -191,7 +240,8 @@ class _MarkdownEditorInputState extends State<MarkdownEditorInput> {
                     : TextField(
                         controller: widget.controller,
                         maxLines: null,
-                        minLines: 5,
+                        expands: widget.hideFullScreenButton, // Expand in full screen mode
+                        minLines: widget.hideFullScreenButton ? null : 5,
                         keyboardType: TextInputType.multiline,
                         decoration: InputDecoration(
                           hintText: widget.hint,
@@ -201,9 +251,11 @@ class _MarkdownEditorInputState extends State<MarkdownEditorInput> {
                           fillColor: colorScheme.surface,
                         ),
                       ),
+              )
               ),
             ],
           ),
+        )
         ),
       ],
     );
