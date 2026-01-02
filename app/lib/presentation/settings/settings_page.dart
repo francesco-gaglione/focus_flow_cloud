@@ -14,6 +14,8 @@ import 'bloc/settings_event.dart';
 import 'bloc/settings_state.dart';
 import '../../domain/entities/note_template.dart';
 import '../widgets/common/markdown_editor_input.dart';
+import '../pages/onboarding/backend_config_page.dart';
+import '../../core/services/configuration_service.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -174,6 +176,27 @@ class _SettingsPageState extends State<SettingsPage> {
                     title: Text(context.tr('settings.app_name')),
                     subtitle: Text(context.tr('settings.app_description')),
                     leading: const Icon(Icons.timer),
+                  ),
+                  const Divider(),
+                  ListTile(
+                    title: const Text('Server Configuration'),
+                    subtitle: FutureBuilder<String?>(
+                      future: Future.value(sl<ConfigurationService>().apiBaseUrl),
+                      builder: (context, snapshot) {
+                        return Text(snapshot.data ?? 'Not Configured');
+                      },
+                    ),
+                    leading: const Icon(Icons.cloud_sync),
+                    onTap: () {
+                      Navigator.push(
+                        context, 
+                        MaterialPageRoute(
+                          builder: (_) => BackendConfigPage(
+                            configService: sl<ConfigurationService>(),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),

@@ -49,7 +49,13 @@ import '../../presentation/settings/bloc/settings_bloc.dart';
 import '../services/version_service.dart';
 import '../../presentation/version/cubit/version_cubit.dart';
 
+import '../services/configuration_service.dart';
+
 final sl = GetIt.instance;
+
+Future<void> resetDependencies() async {
+  await sl.reset();
+}
 
 Future<void> setupDependencies(String baseUrl, String wsUrl) async {
   // External
@@ -58,6 +64,9 @@ Future<void> setupDependencies(String baseUrl, String wsUrl) async {
 
   // Core Services
   sl.registerLazySingleton<TokenService>(() => TokenService(sl()));
+  sl.registerLazySingleton<ConfigurationService>(
+    () => ConfigurationService(sl()),
+  );
 
   // Dio
   sl.registerLazySingleton<Dio>(() {
