@@ -112,6 +112,10 @@ bump-minor:
 bump-major:
     @just _bump_semver major both
 
+# Auto Bump (Synced)
+bump-auto:
+    @just _bump_semver auto both
+
 # Helper: bumps version based on part and target
 [private]
 _bump_semver part target:
@@ -133,6 +137,45 @@ _bump_semver part target:
             match = re.search(pattern, content, re.MULTILINE)
             return match.group(1)
 
+    def run_cmd(cmd):
+        print(f'Running: {cmd}')
+        subprocess.check_call(cmd, shell=True)
+
+    def get_last_tag():
+        try:
+            # Get the latest tag (reachable)
+            cmd = 'git describe --tags --abbrev=0'
+            tag = subprocess.check_output(cmd, shell=True).decode('utf-8').strip()
+            return tag
+        except:
+            return None
+
+    def detect_bump(last_tag):
+        if not last_tag:
+            return 'minor' # Default to minor for first run? Or patch.
+
+        # Get commits since last tag
+        cmd = f'git log {last_tag}..HEAD --pretty=format:%s'
+        try:
+            commits = subprocess.check_output(cmd, shell=True).decode('utf-8').split('\n')
+        except:
+            return 'patch'
+
+        bump_type = None
+        
+        for msg in commits:
+            msg = msg.lower()
+            if 'breaking change' in msg or re.search(r'!: ', msg):
+                return 'major'
+            if msg.startswith('feat'):
+                if bump_type != 'major':
+                    bump_type = 'minor'
+            if msg.startswith('fix'):
+                if bump_type is None:
+                    bump_type = 'patch'
+        
+        return bump_type
+
     def bump(version, part):
         major, minor, patch = map(int, version.split('.'))
         if part == 'major':
@@ -146,9 +189,16 @@ _bump_semver part target:
             patch += 1
         return f'{major}.{minor}.{patch}'
 
-    def run_cmd(cmd):
-        print(f'Running: {cmd}')
-        subprocess.check_call(cmd, shell=True)
+    # Logic Start
+    if part == 'auto':
+        last_tag = get_last_tag()
+        print(f'Last tag: {last_tag}')
+        detected = detect_bump(last_tag)
+        if not detected:
+            print('No relevant changes detected (feat/fix/breaking). Skipping bump.')
+            sys.exit(0)
+        print(f'Auto-detected bump: {detected}')
+        part = detected
 
     # Paths
     be_cargo = 'backend/Cargo.toml'
@@ -163,7 +213,7 @@ _bump_semver part target:
         next_v = bump(curr, part)
         print(f'Bumping Backend: {curr} -> {next_v}')
         
-        # Sed command (Mac/Linux compatible via subprocess if needed, but python replace is safer)
+        # Sed command replacement with python regex
         with open(be_cargo, 'r') as f: s = f.read()
         s = re.sub(r'(^version = \")(.*?)(\")', f'\\g<1>{next_v}\\g<3>', s, flags=re.MULTILINE)
         with open(be_cargo, 'w') as f: f.write(s)
@@ -174,42 +224,28 @@ _bump_semver part target:
 
     # 2. Bump App
     if target in ['app', 'both']:
-        # Note: Pubspec has + build number. We preserve the +1 or reset? 
-        # User implies simple semantic versioning for now.
         curr = get_version(app_pub, r'^version: (.*?)\+')
         next_v = bump(curr, part)
         print(f'Bumping App: {curr} -> {next_v}')
         
         with open(app_pub, 'r') as f: s = f.read()
-        # Regex to match version: 1.0.0+1
         s = re.sub(r'(^version: )(.*?)(\+)', f'\\g<1>{next_v}\\g<3>', s, flags=re.MULTILINE)
         with open(app_pub, 'w') as f: f.write(s)
         
         files_to_commit.append(app_pub)
         if target == 'app':
             tag_name = f'app-v{next_v}'
+        # If target is both, we usually use vX.Y.Z, but let's sync app-v and backend-v consistency
+        # Actually for 'both', we use simple vX.Y.Z as tag
 
     # 3. Determine Tag for 'both'
     if target == 'both':
-        # Assuming sync, versions should be same. Use next_v from last bump.
         tag_name = f'v{next_v}'
 
     # 4. Generate Changelog
-    # We use git-cliff. We assume it's installed (local or CI).
-    # If not, we warn and skip to avoid crashing, OR we assume CI has it.
-    # We try to run it.
-    try:
-        print(f'Generating changelog for {tag_name}...')
-        # --tag {tag_name} sets the tag for the \"unreleased\" commits we are about to tag
-        # --unreleased tells cliff to process the unreleased commits
-        # --prepend CHANGELOG.md appends to top (or creates new)
-        # However, simplistic: git-cliff -o CHANGELOG.md updates it.
-        # But we need to tell it that the \"current unreleased\" stuff belongs to {tag_name}.
-        # git-cliff --tag {tag_name} -o CHANGELOG.md
-        run_cmd(f'git cliff --tag {tag_name} --prepend CHANGELOG.md')
-        files_to_commit.append('CHANGELOG.md')
-    except Exception as e:
-        print(f'Warning: git-cliff failed or not found. Skipping changelog generation. Error: {e}')
+    print(f'Generating changelog for {tag_name}...')
+    run_cmd(f'git cliff --tag {tag_name} --prepend CHANGELOG.md')
+    files_to_commit.append('CHANGELOG.md')
 
     # 5. Commit and Tag
     files_str = ' '.join(files_to_commit)
