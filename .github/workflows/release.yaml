@@ -85,9 +85,45 @@ jobs:
           platforms: linux/amd64
           cache-to: type=gha,mode=max
 
+  app-build:
+    if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/app-v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build APK (Release)
+        run: flutter build apk --release
+
+      - name: Rename APK
+        run: mv build/app/outputs/flutter-apk/app-release.apk ./focus_flow_app.apk
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-apk
+          path: app/focus_flow_app.apk
+          if-no-files-found: error
+
   create-release:
-    needs: [backend-build]
-    if: always() && (needs.backend-build.result == 'success')
+    needs: [backend-build, app-build]
+    if: always() && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -95,14 +131,23 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Download Backend Artifact
+        if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/backend-v')
         uses: actions/download-artifact@v4
         with:
           name: backend-bin
+
+      - name: Download App Artifact
+        if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/app-v')
+        uses: actions/download-artifact@v4
+        with:
+          name: app-apk
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
           generate_release_notes: true
+          fail_on_unmatched_files: false
           files: |
-            focus_flow_cloud-amd64
+            focus_flow_cloud-*
+            *.apk
