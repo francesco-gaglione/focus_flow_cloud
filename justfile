@@ -165,7 +165,7 @@ _bump_semver part target:
         
         # Sed command (Mac/Linux compatible via subprocess if needed, but python replace is safer)
         with open(be_cargo, 'r') as f: s = f.read()
-        s = re.sub(r'(^version = \")(.*?)(\")', f'\g<1>{next_v}\g<3>', s, flags=re.MULTILINE)
+        s = re.sub(r'(^version = \")(.*?)(\")', f'\\g<1>{next_v}\\g<3>', s, flags=re.MULTILINE)
         with open(be_cargo, 'w') as f: f.write(s)
         
         files_to_commit.append(be_cargo)
@@ -182,7 +182,7 @@ _bump_semver part target:
         
         with open(app_pub, 'r') as f: s = f.read()
         # Regex to match version: 1.0.0+1
-        s = re.sub(r'(^version: )(.*?)(\+)', f'\g<1>{next_v}\g<3>', s, flags=re.MULTILINE)
+        s = re.sub(r'(^version: )(.*?)(\+)', f'\\g<1>{next_v}\\g<3>', s, flags=re.MULTILINE)
         with open(app_pub, 'w') as f: f.write(s)
         
         files_to_commit.append(app_pub)
@@ -199,17 +199,17 @@ _bump_semver part target:
     # If not, we warn and skip to avoid crashing, OR we assume CI has it.
     # We try to run it.
     try:
-        print(f"Generating changelog for {tag_name}...")
-        # --tag {tag_name} sets the tag for the "unreleased" commits we are about to tag
+        print(f'Generating changelog for {tag_name}...')
+        # --tag {tag_name} sets the tag for the \"unreleased\" commits we are about to tag
         # --unreleased tells cliff to process the unreleased commits
         # --prepend CHANGELOG.md appends to top (or creates new)
         # However, simplistic: git-cliff -o CHANGELOG.md updates it.
-        # But we need to tell it that the "current unreleased" stuff belongs to {tag_name}.
+        # But we need to tell it that the \"current unreleased\" stuff belongs to {tag_name}.
         # git-cliff --tag {tag_name} -o CHANGELOG.md
         run_cmd(f'git cliff --tag {tag_name} -o CHANGELOG.md')
         files_to_commit.append('CHANGELOG.md')
     except Exception as e:
-        print(f"Warning: git-cliff failed or not found. Skipping changelog generation. Error: {e}")
+        print(f'Warning: git-cliff failed or not found. Skipping changelog generation. Error: {e}')
 
     # 5. Commit and Tag
     files_str = ' '.join(files_to_commit)
