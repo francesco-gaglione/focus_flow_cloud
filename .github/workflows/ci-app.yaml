@@ -51,8 +51,8 @@ jobs:
         # I will change this to `touch .env` or just remove it if not needed for build, but analyze usually doesn't need env unless generated code does.
         # Safe bet: `touch .env` to avoid failure if it's just expected to exist.
         
-      - name: Create dummy .env
-        run: touch .env
+      - name: Create dummy config.json
+        run: echo '{"BASE_URL":"http://localhost:8080","WS_URL":"ws://localhost:8080/ws/session"}' > assets/config.json
 
       - name: Analyze
         run: flutter analyze

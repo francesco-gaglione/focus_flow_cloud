@@ -4,12 +4,15 @@ on:
   push:
     tags:
       - "v*"
+      - "backend-v*"
+      - "app-v*"
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
   backend-build:
+    if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/backend-v')
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -82,36 +85,14 @@ jobs:
           platforms: linux/amd64
           cache-to: type=gha,mode=max
 
-  app-build:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: app
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: "stable"
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Create dummy .env
-        run: touch .env
-
-      - name: Build APK (Release)
-        run: flutter build apk --release
-
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-apk
-          path: app/build/app/outputs/flutter-apk/app-release.apk
-          if-no-files-found: error
-
   create-release:
-    needs: [backend-build, app-build]
+    needs: [backend-build]
+    # Run even if backend-build was skipped? No, create release makes sense if we built something OR if it's an app tag?
+    # User said "users build their own APK". So for app release, we just want a tag in git.
+    # We could technically create an empty GitHub release layout.
+    # But usually, if there are no artifacts, the git tag itself IS the release.
+    # So I will skip create-release if backend-build was skipped (i.e. app-only release).
+    if: always() && (needs.backend-build.result == 'success')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -122,14 +103,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: backend-bin
-          
-      - name: Download App Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: app-apk
-
-      - name: Rename APK
-        run: mv app-release.apk focus-flow-app.apk
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -138,4 +111,3 @@ jobs:
           generate_release_notes: true
           files: |
             focus_flow_cloud-amd64
-            focus-flow-app.apk

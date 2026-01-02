@@ -96,67 +96,113 @@ docker-build-backend:
 # RELEASE & VERSIONING
 # ============================================================================
 
-# Bump patch version (0.0.X)
-bump-patch:
-    @just _bump_semver patch
+# Bump Backend Patch (Independent)
+bump-backend-patch:
+    @just _bump_semver patch backend
 
-# Bump minor version (0.X.0)
+# Bump App Patch (Independent)
+bump-app-patch:
+    @just _bump_semver patch app
+
+# Bump Minor (Synced)
 bump-minor:
-    @just _bump_semver minor
+    @just _bump_semver minor both
 
-# Bump major version (X.0.0)
+# Bump Major (Synced)
 bump-major:
-    @just _bump_semver major
+    @just _bump_semver major both
 
-# Helper: bumps version based on part (internal)
+# Helper: bumps version based on part and target
 [private]
-_bump_semver part:
+_bump_semver part target:
     #!/usr/bin/env bash
     set -e
-
-    # 1. Get current version from backend/Cargo.toml
-    CURRENT_VERSION=$(grep '^version =' backend/Cargo.toml | head -n 1 | cut -d '"' -f 2)
-    echo "Current version: $CURRENT_VERSION"
-
-    # 2. Calculate next version using Python
-    NEXT_VERSION=$(python3 -c "
+    
+    # Python script to handle logic
+    python3 -c "
     import sys
-    v = '$CURRENT_VERSION'.split('.')
-    major, minor, patch = map(int, v)
-    part = '{{ part }}'
-    if part == 'major':
-        major += 1
-        minor = 0
-        patch = 0
-    elif part == 'minor':
-        minor += 1
-        patch = 0
-    elif part == 'patch':
-        patch += 1
-    print(f'{major}.{minor}.{patch}')
-    ")
+    import re
+    import subprocess
 
-    echo "Bumping to: $NEXT_VERSION"
+    part = '{{part}}'
+    target = '{{target}}'
+    
+    def get_version(file, pattern):
+        with open(file, 'r') as f:
+            content = f.read()
+            match = re.search(pattern, content, re.MULTILINE)
+            return match.group(1)
 
-    # 3. Update backend/Cargo.toml
-    # Use sed compatible with both GNU and BSD (macOS)
-    sed -i.bak -E "s/^version = \"[0-9]+\.[0-9]+\.[0-9]+\"/version = \"$NEXT_VERSION\"/" backend/Cargo.toml
-    rm backend/Cargo.toml.bak
+    def bump(version, part):
+        major, minor, patch = map(int, version.split('.'))
+        if part == 'major':
+            major += 1
+            minor = 0
+            patch = 0
+        elif part == 'minor':
+            minor += 1
+            patch = 0
+        elif part == 'patch':
+            patch += 1
+        return f'{major}.{minor}.{patch}'
 
-    # 4. Update app/pubspec.yaml
-    # Pubspec also has build number (+1), we reset it or keep it?
-    # User said "stable and similar". A simple approach is keeping +1 or just resetting it.
-    # We'll just replace the version string part.
-    sed -i.bak -E "s/^version: [0-9]+\.[0-9]+\.[0-9]+\+1/version: $NEXT_VERSION+1/" app/pubspec.yaml
-    rm app/pubspec.yaml.bak
+    def run_cmd(cmd):
+        print(f'Running: {cmd}')
+        subprocess.check_call(cmd, shell=True)
 
-    # 5. Commit and Tag
-    echo "Committing and tagging..."
-    git add backend/Cargo.toml app/pubspec.yaml
-    git commit -m "chore: bump version to v$NEXT_VERSION"
-    git tag "v$NEXT_VERSION"
+    # Paths
+    be_cargo = 'backend/Cargo.toml'
+    app_pub = 'app/pubspec.yaml'
+    
+    files_to_commit = []
+    tag_name = ''
+    
+    # 1. Bump Backend
+    if target in ['backend', 'both']:
+        curr = get_version(be_cargo, r'^version = \"(.*?)\"')
+        next_v = bump(curr, part)
+        print(f'Bumping Backend: {curr} -> {next_v}')
+        
+        # Sed command (Mac/Linux compatible via subprocess if needed, but python replace is safer)
+        with open(be_cargo, 'r') as f: s = f.read()
+        s = re.sub(r'(^version = \")(.*?)(\")', f'\g<1>{next_v}\g<3>', s, flags=re.MULTILINE)
+        with open(be_cargo, 'w') as f: f.write(s)
+        
+        files_to_commit.append(be_cargo)
+        if target == 'backend': 
+            tag_name = f'backend-v{next_v}'
 
-    echo "Done! Run 'git push origin master --tags' to push the release."
+    # 2. Bump App
+    if target in ['app', 'both']:
+        # Note: Pubspec has + build number. We preserve the +1 or reset? 
+        # User implies simple semantic versioning for now.
+        curr = get_version(app_pub, r'^version: (.*?)\+')
+        next_v = bump(curr, part)
+        print(f'Bumping App: {curr} -> {next_v}')
+        
+        with open(app_pub, 'r') as f: s = f.read()
+        # Regex to match version: 1.0.0+1
+        s = re.sub(r'(^version: )(.*?)(\+)', f'\g<1>{next_v}\g<3>', s, flags=re.MULTILINE)
+        with open(app_pub, 'w') as f: f.write(s)
+        
+        files_to_commit.append(app_pub)
+        if target == 'app':
+            tag_name = f'app-v{next_v}'
+
+    # 3. Determine Tag for 'both'
+    if target == 'both':
+        # Assuming sync, versions should be same. Use next_v from last bump.
+        tag_name = f'v{next_v}'
+
+    # 4. Commit and Tag
+    files_str = ' '.join(files_to_commit)
+    run_cmd(f'git add {files_str}')
+    run_cmd(f'git commit -m \"chore: bump {target} to {tag_name}\"')
+    run_cmd(f'git tag {tag_name}')
+    print(f'Done! Created tag {tag_name}')
+    "
+    
+    echo "Push with: git push origin master --tags"
 
 # Print all available recipes
 help:
