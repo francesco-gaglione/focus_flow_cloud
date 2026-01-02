@@ -215,7 +215,7 @@ _bump_semver part target:
         
         # Sed command replacement with python regex
         with open(be_cargo, 'r') as f: s = f.read()
-        s = re.sub(r'(^version = \")(.*?)(\")', f'\\g<1>{next_v}\\g<3>', s, flags=re.MULTILINE)
+        s = re.sub(r'(^version = \")(.*?)(\")', f'\\\\g<1>{next_v}\\\\g<3>', s, flags=re.MULTILINE)
         with open(be_cargo, 'w') as f: f.write(s)
         
         files_to_commit.append(be_cargo)
@@ -229,7 +229,7 @@ _bump_semver part target:
         print(f'Bumping App: {curr} -> {next_v}')
         
         with open(app_pub, 'r') as f: s = f.read()
-        s = re.sub(r'(^version: )(.*?)(\+)', f'\\g<1>{next_v}\\g<3>', s, flags=re.MULTILINE)
+        s = re.sub(r'(^version: )(.*?)(\+)', f'\\\\g<1>{next_v}\\\\g<3>', s, flags=re.MULTILINE)
         with open(app_pub, 'w') as f: f.write(s)
         
         files_to_commit.append(app_pub)
@@ -244,7 +244,7 @@ _bump_semver part target:
 
     # 4. Generate Changelog
     print(f'Generating changelog for {tag_name}...')
-    run_cmd(f'git cliff --tag {tag_name} --prepend CHANGELOG.md')
+    run_cmd(f'git cliff --tag {tag_name} --unreleased --prepend CHANGELOG.md')
     files_to_commit.append('CHANGELOG.md')
 
     # 5. Commit and Tag
