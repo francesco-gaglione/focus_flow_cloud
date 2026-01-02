@@ -6,6 +6,7 @@ import 'package:focus_flow_app/domain/entities/task.dart';
 import 'package:focus_flow_app/presentation/focus/bloc/focus_bloc.dart';
 import 'package:focus_flow_app/presentation/focus/bloc/focus_event.dart';
 import 'package:focus_flow_app/presentation/focus/bloc/focus_state.dart';
+import '../common/markdown_editor_input.dart';
 
 class ManualSessionBottomSheet extends StatefulWidget {
   const ManualSessionBottomSheet({super.key});
@@ -223,13 +224,9 @@ class _ManualSessionBottomSheetState extends State<ManualSessionBottomSheet> {
                 const SizedBox(height: 16),
 
                 // Notes
-                TextField(
+                MarkdownEditorInput(
                   controller: _notesController,
-                  decoration: InputDecoration(
-                    labelText: 'manual_session.notes'.tr(),
-                    alignLabelWithHint: true,
-                  ),
-                  maxLines: 3,
+                  label: 'manual_session.notes'.tr(),
                 ),
                 const SizedBox(height: 24),
 

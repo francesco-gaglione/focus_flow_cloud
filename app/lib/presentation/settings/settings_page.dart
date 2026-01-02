@@ -13,6 +13,7 @@ import 'bloc/settings_bloc.dart';
 import 'bloc/settings_event.dart';
 import 'bloc/settings_state.dart';
 import '../../domain/entities/note_template.dart';
+import '../widgets/common/markdown_editor_input.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -521,24 +522,26 @@ class _SettingsPageState extends State<SettingsPage> {
       builder:
           (dialogContext) => AlertDialog(
             title: Text(template == null ? context.tr('settings.add_template') : context.tr('settings.edit_template')),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: nameController,
-                  decoration: InputDecoration(
-                    labelText: context.tr('settings.template_name'),
-                  ),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: nameController,
+                      decoration: InputDecoration(
+                        labelText: context.tr('settings.template_name'),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    MarkdownEditorInput(
+                      controller: contentController,
+                      label: context.tr('settings.template_content'),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: contentController,
-                  decoration: InputDecoration(
-                    labelText: context.tr('settings.template_content'),
-                  ),
-                  maxLines: 5,
-                ),
-              ],
+              ),
             ),
             actions: [
               TextButton(
