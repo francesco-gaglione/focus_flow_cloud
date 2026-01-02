@@ -9,34 +9,16 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-
-  create-release-branch:
-    runs-on: ubuntu-latest
-    needs: docker-build-push
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Create Release Branch
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          TAG_NAME=${GITHUB_REF#refs/tags/}
-          BRANCH_NAME="release/$TAG_NAME"
-          git checkout -b $BRANCH_NAME
-          git push origin $BRANCH_NAME
-
-  docker-build-push:
+  backend-build:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
+    defaults:
+      run:
+        working-directory: backend
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v4
 
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
@@ -44,6 +26,8 @@ jobs:
           targets: x86_64-unknown-linux-gnu
 
       - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "backend"
 
       - name: Build binaries
         run: |
@@ -53,11 +37,18 @@ jobs:
         run: |
           cp target/x86_64-unknown-linux-gnu/release/focus_flow_cloud ./focus_flow_cloud-amd64
 
+      - name: Upload Binary Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-bin
+          path: backend/focus_flow_cloud-amd64
+          if-no-files-found: error
+
       - name: Extract version from Cargo.toml
         id: crate-version
         uses: colathro/crate-version@2.0.0
         with:
-          file: "./Cargo.toml"
+          file: "backend/Cargo.toml"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -79,22 +70,72 @@ jobs:
             type=raw,value=latest
             type=ref,event=tag
 
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          generate_release_notes: true
-          files: |
-             focus_flow_cloud-amd64
-             
-      - name: Build and push
+      - name: Build and push Docker
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: ./Dockerfile.production
+          context: backend
+          file: backend/Dockerfile.production
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           platforms: linux/amd64
           cache-to: type=gha,mode=max
+
+  app-build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Create dummy .env
+        run: touch .env
+
+      - name: Build APK (Release)
+        run: flutter build apk --release
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-apk
+          path: app/build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
+
+  create-release:
+    needs: [backend-build, app-build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Download Backend Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-bin
+          
+      - name: Download App Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: app-apk
+
+      - name: Rename APK
+        run: mv app-release.apk focus-flow-app.apk
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          generate_release_notes: true
+          files: |
+            focus_flow_cloud-amd64
+            focus-flow-app.apk

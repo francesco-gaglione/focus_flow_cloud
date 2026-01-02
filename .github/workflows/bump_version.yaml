@@ -1,0 +1,58 @@
+name: Automated Version Bump
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  bump:
+    if: |
+      contains(github.event.head_commit.message, '[patch]') || 
+      contains(github.event.head_commit.message, '[minor]') || 
+      contains(github.event.head_commit.message, '[major]')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT }}
+          fetch-depth: 0
+
+      - name: Set up Just
+        uses: extractions/setup-just@v1/dist/setup-just.js
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Configure Git User
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Determine Bump Type
+        id: type
+        run: |
+          MSG="${{ github.event.head_commit.message }}"
+          if [[ "$MSG" == *"[major]"* ]]; then
+            echo "part=major" >> $GITHUB_OUTPUT
+            echo "Detected Major Bump"
+          elif [[ "$MSG" == *"[minor]"* ]]; then
+            echo "part=minor" >> $GITHUB_OUTPUT
+            echo "Detected Minor Bump"
+          else
+            echo "part=patch" >> $GITHUB_OUTPUT
+            echo "Detected Patch Bump"
+          fi
+
+      - name: Bump Version
+        run: just bump-${{ steps.type.outputs.part }}
+        env:
+            GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+
+      - name: Push Changes
+        # Important: origin must be authenticated with the PAT for protected branch push
+        run: git push origin master --tags

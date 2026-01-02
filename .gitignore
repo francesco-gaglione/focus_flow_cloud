@@ -1,5 +1,43 @@
-/target
+# Backend (Rust)
+backend/target
+backend/.env
+
+# App (Flutter)
+app/build/
+app/.dart_tool/
+app/.flutter-plugins
+app/.flutter-plugins-dependencies
+app/.pub-cache/
+app/.pub/
+app/ios/Flutter/.last_build_id
+app/android/app/debug
+app/android/app/profile
+app/android/app/release
+
+# Generic
 .idea
 .zed
 .env
 .k8s
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Flutter/Dart/Pub related (general)
+**/doc/api/
+

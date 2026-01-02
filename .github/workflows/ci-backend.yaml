@@ -1,0 +1,40 @@
+name: Backend CI
+
+on:
+  pull_request:
+    branches: ["master"]
+    paths:
+      - "backend/**"
+      - ".github/workflows/ci-backend.yaml"
+  push:
+    branches: ["master"]
+    paths:
+      - "backend/**"
+      - ".github/workflows/ci-backend.yaml"
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  check-and-build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "backend"
+      - name: Check formatting
+        run: cargo fmt -- --check
+      - name: Lint
+        run: cargo clippy -- -D warnings
+      - name: Test
+        run: cargo test
+      - name: Build
+        run: cargo build

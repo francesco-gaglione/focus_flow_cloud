@@ -1,157 +1,119 @@
-# FocusFlow Cloud
+# FocusFlow Cloud & App
 
-[![Build Status](https://github.com/francesco-gaglione/focus_flow_cloud/actions/workflows/docker-build.yml/badge.svg)](https://github.com/francesco-gaglione/focus_flow_cloud/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Backend CI](https://github.com/francesco-gaglione/focus_flow_cloud/actions/workflows/ci-backend.yaml/badge.svg)](https://github.com/francesco-gaglione/focus_flow_cloud/actions)
+[![App CI](https://github.com/francesco-gaglione/focus_flow_cloud/actions/workflows/ci-app.yaml/badge.svg)](https://github.com/francesco-gaglione/focus_flow_cloud/actions)
 
-A Pomodoro technique tracking backend service built with Rust. I created this application for my personal use to track my focus sessions and productivity, and decided to share it in case others might find it useful.
+A comprehensive Pomodoro technique tracking solution featuring a Rust backend and a Flutter mobile application. This monorepo contains both the cloud infrastructure and the client application.
 
-## 🎯 What is FocusFlow Cloud?
+## 🎯 What is FocusFlow?
 
-FocusFlow Cloud is a backend service that helps you implement the Pomodoro technique for time management. It tracks your work sessions and breaks, provides statistics on your 
-productivity patterns, and allows you to organize tasks into categories.
+FocusFlow is a complete ecosystem for time management using the Pomodoro technique. It allows you to:
 
-I use this application daily to manage my own focus time, which is why I've invested time in making it robust and feature-complete.
+- **Track Sessions**: Manage work and break intervals.
+- **Sync in Real-time**: Synchronize state across multiple devices using WebSockets.
+- **Organize Tasks**: Categorize and color-code your to-dos.
+- **Analyze Productivity**: View detailed statistics and patterns.
+
+I built this project for my personal use to optimize my daily workflow and decided to share it as an open-source project.
+
+## 📂 Project Structure
+
+This is a monorepo containing:
+
+- **[`backend/`](backend/)**: The server-side application built with Rust (Axum, Diesel, Tokio).
+- **[`app/`](app/)**: The client-side mobile application built with Flutter (Bloc, Dio, GoRouter).
 
 ## 🚀 Features
 
-- **Pomodoro Session Tracking**: Work/break cycle management following Pomodoro technique
-- **Real-time WebSocket Communication**: Multi-client session synchronization (I use it across multiple devices)
-- **Category & Task Management**: Organize your focus sessions
-- **Statistics Dashboard**: Insights into your productivity patterns
-- **RESTful API**: Complete with OpenAPI/Swagger documentation
-- **Clean Architecture**: Well-separated concerns and testable code
+### Backend
 
-## 🛠️ Tech Stack
+- **Pomodoro Session Tracking**: Core logic for timer state.
+- **Real-time Synchronization**: WebSocket broadcasting to all connected clients.
+- **RESTful API**: Documented via OpenAPI/Swagger.
+- **Clean Architecture**: Domain-driven design.
 
-- **Language**: Rust (Tokio, Axum)
-- **Database**: PostgreSQL with Diesel ORM
-- **Real-time**: WebSocket communication
-- **API Documentation**: OpenAPI with Swagger UI
-- **Containerization**: Docker & Docker Compose
-- **CI/CD**: GitHub Actions
+### App
 
-## 🏗️ Architecture
+- **Timer UI**: Clean, responsive interface for managing sessions.
+- **Task Management**: Create and organize tasks with categories.
+- **Statistics**: Visual insights into your productivity.
+- **Multi-platform**: Runs on iOS, Android, and Web.
 
-The project follows clean architecture principles:
+## 🛠️ Getting Started
 
-```
-src/
-├── adapters/      # HTTP layer, persistence adapters, DTOs
-├── application/   # Business logic, use cases, interfaces
-├── domain/        # Core entities and business rules
-└── infra/         # Infrastructure setup and configuration
-```
-
-## 🚀 Getting Started
+We use [`just`](https://github.com/casey/just) to manage commands for the entire repository. This makes it easy to build, run, and test both projects from the root.
 
 ### Prerequisites
 
-- Rust 1.70+
-- Docker & Docker Compose
-- PostgreSQL (if running without Docker)
-- `just` command runner (optional, for convenience)
+- **Rust**: 1.70+
+- **Flutter**: 3.7.0+
+- **Docker & Docker Compose**: For running the database and services.
+- **Just**: (Optional but recommended) `cargo install just`
 
-### Quick Start with Docker
+### Quick Commands
 
-1.  **Clone the repository**:
+The `justfile` provides a unified interface:
+
+| Command                  | Description                                    |
+| ------------------------ | ---------------------------------------------- |
+| `just backend-run`       | Run the Rust backend locally                   |
+| `just backend-run-debug` | Run the backend with debug logging             |
+| `just backend-test`      | Run all backend tests                          |
+| `just app-pub-get`       | Install Flutter dependencies                   |
+| `just app-run`           | Run the Flutter app (requires device/emulator) |
+| `just test-all`          | Run tests for both backend and app             |
+
+### 1. Setup Backend
+
+1.  **Environment Variables**:
+    We have set up a default `.env` for local development in `backend/`.
+
     ```bash
-    git clone https://github.com/francesco-gaglione/focusflow-cloud.git
-    cd focusflow-cloud
+    # Ensure backend/.env exists and is configured for localhost
     ```
 
-2.  **Set up environment variables**:
-    Copy the example `.env.example` file to `.env` and customize it if needed. The default values are suitable for the Docker setup.
-    ```bash
-    cp .env.example .env
-    ```
-    > **Important**: You must generate a strong `JWT_SECRET` for production security.
+2.  **Start Database**:
 
-3.  **Start the application**:
-    This command builds the Docker image and starts the `app` and `db` services.
     ```bash
-    docker-compose up --build
+    cd backend
+    docker-compose up -d db
     ```
 
-4.  **Access the API**:
-    -   **API**: `http://localhost:8080`
-    -   **Swagger UI**: `http://localhost:8080/swagger-ui`
+3.  **Run Migration**:
 
-5.  **Initial Admin Setup**:
-    To automatically create an admin user on startup, add the following variables to your `.env` file (or docker-compose environment):
     ```bash
-    ADMIN_USERNAME=admin
-    ADMIN_PASSWORD=your_secure_password
-    ```
-    The application will check for these variables on startup. If an user with that username does not exist, it will be created with the `Admin` role.
-    
-    > **Note**: For security reasons, it is recommended to remove these variables from your environment after the initial setup is complete.
-
-### Development Setup (without Docker)
-
-1.  **Set up environment variables**:
-    Copy `.env.example` to `.env` and update `DATABASE_URL` to point to your local PostgreSQL instance.
-    ```bash
-    cp .env.example .env
-    # nano .env
-    ```
-
-2.  **Run database migrations**:
-    Ensure your PostgreSQL server is running, then run:
-    ```bash
+    cd backend
     diesel migration run
     ```
 
-3.  **Start the development server**:
-    You can use `just` for convenience or run the `cargo` command directly.
+4.  **Run Server**:
     ```bash
-    # With just
-    just run
+    just backend-run
+    ```
+    The server will start at `http://localhost:8080`.
 
-    # Or with cargo
-    cargo run
+### 2. Setup App
+
+1.  **Install Dependencies**:
+
+    ```bash
+    just app-pub-get
     ```
 
-
-## 📚 API Documentation
-
-Once the server is running, visit:
-- **Swagger UI**: `http://localhost:8080/swagger-ui`
-- **OpenAPI JSON**: `http://localhost:8080/api-docs/openapi.json`
-
-## 🧪 Testing
-
-```bash
-# Run all tests
-cargo test
-```
-
-## 📖 Key Components
-
-### WebSocket Protocol
-
-The real-time functionality uses WebSocket communication with message broadcasting:
-
-- **Session Management**: Start/pause/terminate Pomodoro sessions
-- **Workspace Sync**: Multi-client state synchronization
-- **Real-time Updates**: Instant updates across connected clients
-
-### Database Schema
-
-- **Categories**: Task categories with color coding
-- **Tasks**: Individual tasks that can be scheduled
-- **Focus Sessions**: Pomodoro work/break sessions with statistics
+2.  **Run App**:
+    ```bash
+    cd app
+    flutter run
+    ```
 
 ## 🤝 Contributing
 
-I'm happy to accept suggestions and improvements from the community! Feel free to open issues or submit pull requests if you find bugs or have ideas for enhancements.
+Contributions are welcome! This monorepo allows you to work on the full stack.
+
+- If you change the API, please ensure the Flutter client is updated accordingly.
+- Run `just test-all` before submitting a PR.
 
 ## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- Built with [Rust](https://www.rust-lang.org/)
-- Powered by [Axum](https://github.com/tokio-rs/axum) web framework
-- Database operations with [Diesel](https://diesel.rs/)
-- Real-time communication with [Tokio-Tungstenite](https://github.com/snapview/tokio-tungstenite)

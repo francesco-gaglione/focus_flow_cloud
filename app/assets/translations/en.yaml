@@ -1,0 +1,175 @@
+# Common
+common:
+  cancel: Cancel
+  create: Create
+  update: Update
+  delete: Delete
+  retry: Retry
+  save: Save
+  close: Close
+  category: Category
+  task: Task
+  start_time: Start Time
+  end_time: End Time
+
+# Category Section
+category:
+  title: Categories
+  empty_state_title: No categories and tasks yet
+  empty_state_message: Tap the + button to create your first category or add a task
+  add_category_button: Category
+  unassigned_tasks: Unassigned Tasks
+  unassigned_task_description: Tasks without a category
+  create_category_dialog_title: Create Category
+  edit_category_dialog_title: Edit Category
+  delete_category_dialog_title: Delete Category?
+  delete_category_dialog_message: This will permanently delete the category and all its tasks. This action cannot be undone.
+  delete_task_dialog_title: Delete Task?
+  delete_task_dialog_message: This will permanently delete the task. This action cannot be undone.
+  delete_button: Delete
+  name_label: Name
+  name_hint: Enter category name
+  description_label: Description
+  description_hint: Optional description
+  name_required: Please enter a category name
+
+# Task Section
+task:
+  create_orphan_title: Create Orphan Task
+  edit_orphan_title: Edit Orphan Task
+  name_label: Task Name
+  name_hint: Enter task name
+  description_label: Description
+  description_hint: Optional description
+  name_required: Please enter a task name
+
+# Focus Section
+focus:
+  title: Focus
+  session_title: Focus Session
+  short_break_title: Short Break
+  long_break_title: Long Break
+  short_break_status: On a short break...
+  long_break_status: On a long break...
+  focusing: Focusing...
+  ready_to_focus: Ready to focus
+  overtime: Overtime
+  start: Start
+  pause: Pause
+  break: Break
+  terminate: Terminate
+  reset: Reset
+  level_title: Focus Level
+  level_low: Low focus - Easy tasks
+  level_medium: Medium focus - Regular tasks
+  level_high: High focus - Challenging tasks
+  level_maximum: Maximum focus - Deep work
+  notes_title: Session Notes
+  notes_hint: Write your thoughts, ideas, or reflections...
+  timeline_title: Today's Focus Sessions
+  timeline_empty: No sessions completed yet
+  level_badge: Level
+  select_category_task: Select Category & Task to Work On
+  clear_selection: Clear selection
+  category_label: Category
+  task_label: Task
+  orphan_tasks_label: Orphan Tasks
+  orphan_tasks_helper: Tasks without a category
+  duration_label: Duration
+  time_range_label: Time Range
+  edit_session_title: Edit Session
+  save_success: Session updated successfully
+  save_error: Error updating session
+  load_template: Load Template
+
+# Settings Section
+settings:
+  title: Settings
+  appearance: Appearance
+  dark_mode: Dark Mode
+  switch_to_light: Switch to light theme
+  switch_to_dark: Switch to dark theme
+
+  language: Language
+  english: English
+  italian: Italian
+  select_language: Select Language
+  accent_color: Accent color
+  about: About
+  version: Version
+  app_name: Focus Flow
+  app_description: Pomodoro Timer & Task Manager
+  account: Account
+  change_username: Change Username
+  change_password: Change Password
+  create_user: Create User
+  logout: Logout
+  new_username: New Username
+  old_password: Old Password
+  new_password: New Password
+  cancel: Cancel
+  save: Save
+  create: Create
+  username: Username
+  password: Password
+
+  note_templates: Note Templates
+  note_template_desc: Define a template for your session notes
+  add_template: Add Template
+  edit_template: Edit Template
+  template_name: Template Name
+  template_content: Template Content
+  template_saved: Template saved
+  no_templates: No templates defined
+
+# Statistics Section
+statistics:
+  title: Statistics
+  placeholder_message: Charts and stats will be here
+  day: Day
+  week: Week
+  month: Month
+  focus_time: Focus Time
+  sessions: Sessions
+  activity: Activity
+  categories: Categories
+  top_tasks: Top Tasks
+  no_activity: No activity
+  no_activity_data: No activity data
+  no_category_data: No category data
+  no_task_data: "No task data available"
+  concentration_score: "Concentration Score"
+  most_productive: "Most Productive"
+  least_productive: "Least Productive"
+  average_session: "Avg Session"
+  break_time: "Break Time"
+  morning: "Morning"
+  afternoon: "Afternoon"
+  yesterday: "Yesterday"
+  last_week: "Last week"
+  last_7_days: "Last 7 days"
+  last_30_days: "Last 30 days"
+
+# Navigation
+navigation:
+  focus: Focus
+  categories: Categories
+  statistics: Statistics
+  settings: Settings
+
+# Error Messages
+error:
+  title: Something went wrong
+  retry: Retry
+
+# Manual Session
+manual_session:
+  title: Add Manual Session
+  category: Category
+  task: Task
+  start_time: Start Time
+  end_time: End Time
+  focus_level: Focus Level
+  notes: Notes
+  error_end_time: End time cannot be before start time
+  error_category: Please select a category

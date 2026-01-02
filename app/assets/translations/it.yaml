@@ -1,0 +1,175 @@
+# Comune
+common:
+  cancel: Annulla
+  create: Crea
+  update: Aggiorna
+  delete: Elimina
+  retry: Riprova
+  save: Salva
+  close: Chiudi
+  category: Categoria
+  task: Attività
+  start_time: Ora di inizio
+  end_time: Ora di fine
+
+# Sezione Categorie
+category:
+  title: Categorie
+  empty_state_title: Nessuna categoria e attività ancora
+  empty_state_message: Tocca il pulsante + per creare la tua prima categoria o aggiungere un'attività
+  add_category_button: Categoria
+  unassigned_tasks: Attività non assegnate
+  unassigned_task_description: Attività senza una categoria
+  create_category_dialog_title: Crea Categoria
+  edit_category_dialog_title: Modifica Categoria
+  delete_category_dialog_title: Eliminare la categoria?
+  delete_category_dialog_message: Questo eliminerà permanentemente la categoria e tutte le sue attività. Questa azione non può essere annullata.
+  delete_task_dialog_title: Eliminare l'attività?
+  delete_task_dialog_message: Questo eliminerà permanentemente l'attività. Questa azione non può essere annullata.
+  delete_button: Elimina
+  name_label: Nome
+  name_hint: Inserisci il nome della categoria
+  description_label: Descrizione
+  description_hint: Descrizione opzionale
+  name_required: Inserisci un nome per la categoria
+
+# Sezione Attività
+task:
+  create_orphan_title: Crea Attività Orfana
+  edit_orphan_title: Modifica Attività Orfana
+  name_label: Nome Attività
+  name_hint: Inserisci il nome dell'attività
+  description_label: Descrizione
+  description_hint: Descrizione opzionale
+  name_required: Inserisci un nome per l'attività
+
+# Sezione Focus
+focus:
+  title: Focus
+  session_title: Sessione di Focus
+  short_break_title: Pausa Breve
+  long_break_title: Pausa Lunga
+  short_break_status: In pausa breve...
+  long_break_status: In pausa lunga...
+  focusing: In focus...
+  ready_to_focus: Pronto per il focus
+  overtime: Tempo extra
+  start: Avvia
+  pause: Pausa
+  break: Pausa
+  terminate: Termina
+  reset: Ripristina
+  level_title: Livello di Focus
+  level_low: Focus basso - Attività facili
+  level_medium: Focus medio - Attività regolari
+  level_high: Focus alto - Attività impegnative
+  level_maximum: Focus massimo - Lavoro profondo
+  notes_title: Note della Sessione
+  notes_hint: Scrivi i tuoi pensieri, idee o riflessioni...
+  timeline_title: Sessioni di Focus di Oggi
+  timeline_empty: Nessuna sessione completata ancora
+  level_badge: Livello
+  select_category_task: Seleziona Categoria e Attività su cui lavorare
+  clear_selection: Cancella selezione
+  category_label: Categoria
+  task_label: Attività
+  orphan_tasks_label: Attività Orfane
+  orphan_tasks_helper: Attività senza una categoria
+  duration_label: Durata
+  time_range_label: Orario
+  edit_session_title: Modifica Sessione
+  save_success: Sessione aggiornata con successo
+  save_error: Errore durante l'aggiornamento della sessione
+  load_template: Carica Modello
+
+# Sezione Impostazioni
+settings:
+  title: Impostazioni
+  appearance: Aspetto
+  dark_mode: Modalità Scura
+  switch_to_light: Passa al tema chiaro
+  switch_to_dark: Passa al tema scuro
+
+  language: Lingua
+  english: Inglese
+  italian: Italiano
+  select_language: Seleziona Lingua
+  accent_color: Colore principale
+  about: Informazioni
+  version: Versione
+  app_name: Focus Flow
+  app_description: Timer Pomodoro e Gestore Attività
+  account: Account
+  change_username: Cambia Username
+  change_password: Cambia Password
+  create_user: Crea Utente
+  logout: Logout
+  new_username: Nuovo Username
+  old_password: Vecchia Password
+  new_password: Nuova Password
+  cancel: Annulla
+  save: Salva
+  create: Crea
+  username: Username
+  password: Password
+
+  note_templates: Modelli Note
+  note_template_desc: Definisci un modello per le note della sessione
+  add_template: Aggiungi Modello
+  edit_template: Modifica Modello
+  template_name: Nome Modello
+  template_content: Contenuto Modello
+  template_saved: Modello salvato
+  no_templates: Nessun modello definito
+
+# Sezione Statistiche
+statistics:
+  title: Statistiche
+  placeholder_message: Grafici e statistiche saranno qui
+  day: Giorno
+  week: Settimana
+  month: Mese
+  focus_time: Tempo di Focus
+  sessions: Sessioni
+  activity: Attività
+  categories: Categorie
+  top_tasks: Attività Principali
+  no_activity: Nessuna attività
+  no_activity_data: Nessun dato di attività
+  no_category_data: Nessun dato di categoria
+  no_task_data: "Nessun dato di attività"
+  concentration_score: "Punteggio Concentrazione"
+  most_productive: "Più Produttivo"
+  least_productive: "Meno Produttivo"
+  average_session: "Sessione Media"
+  break_time: "Tempo di Pausa"
+  morning: "Mattina"
+  afternoon: "Pomeriggio"
+  yesterday: "Ieri"
+  last_week: "Ultima Settimana"
+  last_7_days: "Ultimi 7 giorni"
+  last_30_days: "Ultimi 30 Giorni"
+
+# Navigazione
+navigation:
+  focus: Focus
+  categories: Categorie
+  statistics: Statistiche
+  settings: Impostazioni
+
+# Messaggi di Errore
+error:
+  title: Qualcosa è andato storto
+  retry: Riprova
+
+# Sessione Manuale
+manual_session:
+  title: Aggiungi Sessione Manuale
+  category: Categoria
+  task: Attività
+  start_time: Ora Inizio
+  end_time: Ora Fine
+  focus_level: Livello Focus
+  notes: Note
+  error_end_time: L'ora di fine non può essere prima dell'inizio
+  error_category: Seleziona una categoria
