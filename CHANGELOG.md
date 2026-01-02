@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [app-v1.3.1] - 2026-01-02
+
+### Bug Fixes
+
+- Correct regex backreference escaping in version bumping and add `--unreleased` flag to changelog generation.
+
+### Features
+
+- Add `bump-auto` recipe to automatically determine semantic version bumps from git commit history.
+
+### Other
+
+- Merge branch 'master' of https://github.com/francesco-gaglione/focus_flow_cloud
+- [app-patch]
+- [app-patch]
+
 ## [1.2.0] - 2026-01-02
 
 ### Fix
