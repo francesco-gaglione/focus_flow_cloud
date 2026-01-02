@@ -1,5 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
+import '../common/markdown_editor_input.dart';
 import 'package:focus_flow_app/domain/entities/category.dart';
 import 'package:focus_flow_app/domain/entities/category_with_tasks.dart';
 import 'package:focus_flow_app/domain/entities/focus_session.dart';
@@ -254,9 +256,9 @@ class _SessionDetailsModalState extends State<SessionDetailsModal> {
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: colorScheme.outlineVariant),
                 ),
-                child: Text(
-                  widget.session.notes!,
-                  style: Theme.of(context).textTheme.bodyMedium,
+                child: MarkdownBody(
+                  data: widget.session.notes!,
+                  styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)),
                 ),
               ),
             ],
@@ -402,15 +404,9 @@ class _SessionDetailsModalState extends State<SessionDetailsModal> {
             ),
             const SizedBox(height: 24),
             
-            TextField(
+            MarkdownEditorInput(
               controller: _notesController,
-              decoration: InputDecoration(
-                labelText: context.tr('focus.notes_title'),
-                alignLabelWithHint: true,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                prefixIcon: const Icon(Icons.notes),
-              ),
-              maxLines: 3,
+              label: context.tr('focus.notes_title'),
             ),
           ],
           
