@@ -82,4 +82,7 @@ pub struct AppState {
 
     // Services
     pub token_service: Arc<dyn TokenService>,
+
+    // Version
+    pub version: String,
 }

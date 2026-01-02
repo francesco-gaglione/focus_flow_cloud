@@ -8,7 +8,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     init_tracing();
 
     let config = infrastructure::config::load_from_env();
-    let app_state = init_app_state(config).await?;
+    let app_state = init_app_state(config, env!("CARGO_PKG_VERSION").to_string()).await?;
 
     let app = create_app(app_state.clone());
 

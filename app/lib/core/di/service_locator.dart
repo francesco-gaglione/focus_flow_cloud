@@ -46,6 +46,8 @@ import '../../presentation/auth/cubit/auth_cubit.dart';
 import '../../presentation/settings/cubit/account_cubit.dart';
 import '../../presentation/app/app_router.dart';
 import '../../presentation/settings/bloc/settings_bloc.dart';
+import '../services/version_service.dart';
+import '../../presentation/version/cubit/version_cubit.dart';
 
 final sl = GetIt.instance;
 
@@ -272,6 +274,10 @@ Future<void> setupDependencies(String baseUrl, String wsUrl) async {
   sl.registerLazySingleton<CalculateStatsByPeriod>(
     () => CalculateStatsByPeriod(statisticsRepository: sl()),
   );
+  // Version Check
+  sl.registerLazySingleton<VersionService>(() => VersionService(sl()));
+  sl.registerFactory(() => VersionCubit(sl()));
+
   // Cubits - Settings
   sl.registerFactory(() => SettingsBloc(userSettingsRepository: sl()));
 }

@@ -40,7 +40,10 @@ use adapters::http::app_state::AppState;
 use adapters::persistence::persistence_impl::persistence::postgres_persistence;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 
-pub async fn init_app_state(config: AppConfig) -> Result<AppState, Box<dyn std::error::Error>> {
+pub async fn init_app_state(
+    config: AppConfig,
+    version: String,
+) -> Result<AppState, Box<dyn std::error::Error>> {
     let persistence = postgres_persistence(&config.database_url).await;
     run_migrations(&persistence.pool).await;
     let postgres_arc = Arc::new(persistence);
@@ -186,6 +189,7 @@ pub async fn init_app_state(config: AppConfig) -> Result<AppState, Box<dyn std::
         update_user_username_usecase,
         get_user_info_usecase,
         token_service,
+        version,
     })
 }
 
