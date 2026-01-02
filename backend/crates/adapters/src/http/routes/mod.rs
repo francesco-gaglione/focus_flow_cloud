@@ -14,7 +14,10 @@ pub fn api_routes(state: AppState) -> Router<AppState> {
         .nest("/stats", crate::http::stats::routes::router())
         .layer(axum::middleware::from_fn_with_state(state, auth_middleware));
 
-    Router::new().merge(auth_routes).merge(version_routes).merge(protected_routes)
+    Router::new()
+        .merge(auth_routes)
+        .merge(version_routes)
+        .merge(protected_routes)
 }
 
 pub fn ws_routes(state: AppState) -> Router<AppState> {

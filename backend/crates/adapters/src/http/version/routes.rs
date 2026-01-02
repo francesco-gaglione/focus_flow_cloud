@@ -1,7 +1,7 @@
+use crate::http::app_state::AppState;
 use axum::{extract::State, response::Json};
 use serde::Serialize;
 use utoipa::ToSchema;
-use crate::http::app_state::AppState;
 
 #[derive(Serialize, ToSchema)]
 pub struct VersionResponse {

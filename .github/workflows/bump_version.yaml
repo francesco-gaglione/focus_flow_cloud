@@ -22,7 +22,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Just
-        uses: extractions/setup-just@v1/dist/setup-just.js
+        uses: extractions/setup-just@v2
 
       - name: Set up Python
         uses: actions/setup-python@v5

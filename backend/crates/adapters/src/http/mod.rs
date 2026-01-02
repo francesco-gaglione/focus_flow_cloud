@@ -11,5 +11,5 @@ pub mod stats;
 pub mod task;
 pub mod user_setting;
 pub mod users;
-pub mod ws;
 pub mod version;
+pub mod ws;
