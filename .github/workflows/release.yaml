@@ -274,7 +274,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libfuse2
 
       - uses: subosito/flutter-action@v2
         with:
@@ -292,32 +292,89 @@ jobs:
       - name: Build ${{ matrix.target }}
         run: ${{ matrix.build_cmd }}
 
-      # ZIP: Linux
-      - name: Zip Linux Build
+      - name: Extract App Version
+        id: version
+        shell: bash
+        run: |
+          VERSION=$(grep 'version:' pubspec.yaml | sed 's/version: //' | sed 's/+.*//')
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      # --------------------------------------------------------------------------
+      # LINUX -> AppImage
+      # --------------------------------------------------------------------------
+      - name: Create AppImage (Linux)
         if: matrix.os == 'ubuntu-latest'
         run: |
-          cd ${{ matrix.output_path }}
-          zip -r ../../../../../${{ matrix.zip_name }} .
+          # Install linuxdeploy
+          wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+          wget https://github.com/linuxdeploy/linuxdeploy-plugin-appimage/releases/download/continuous/linuxdeploy-plugin-appimage-x86_64.AppImage
+          chmod +x linuxdeploy-x86_64.AppImage
+          chmod +x linuxdeploy-plugin-appimage-x86_64.AppImage
 
-      # ZIP: macOS
-      - name: Zip macOS Build
+          # Prepare AppDir
+          mkdir -p AppDir/usr/bin
+          cp -r ${{ matrix.output_path }}/* AppDir/usr/bin/
+          # Create desktop entry and icon for linuxdeploy to find
+          echo "[Desktop Entry]" > AppDir/focus_flow.desktop
+          echo "Type=Application" >> AppDir/focus_flow.desktop
+          echo "Name=Focus Flow" >> AppDir/focus_flow.desktop
+          echo "Exec=focus_flow_app" >> AppDir/focus_flow.desktop
+          echo "Icon=focus_flow" >> AppDir/focus_flow.desktop
+          echo "Categories=Utility;" >> AppDir/focus_flow.desktop
+          
+          # Use a placeholder icon if one doesn't exist (linuxdeploy needs one)
+          # Assuming you set up icons, if not, create a dummy png
+          touch AppDir/focus_flow.png
+
+          # Build AppImage
+          # Point to the binary explicitly
+          ./linuxdeploy-x86_64.AppImage --appdir AppDir --output appimage \
+            --desktop-file AppDir/focus_flow.desktop \
+            --icon-file AppDir/focus_flow.png \
+            --executable AppDir/usr/bin/focus_flow_app
+            
+          mv Focus_Flow*.AppImage focus_flow_app-linux-x86_64.AppImage
+
+      # --------------------------------------------------------------------------
+      # MACOS -> DMG
+      # --------------------------------------------------------------------------
+      - name: Create DMG (macOS)
         if: matrix.os == 'macos-latest'
         run: |
-          cd ${{ matrix.output_path }}
-          zip -r ../../../../../${{ matrix.zip_name }} .
+          brew install create-dmg
+          cd build/macos/Build/Products/Release
+          create-dmg \
+            --volname "Focus Flow Installer" \
+            --window-pos 200 120 \
+            --window-size 800 400 \
+            --icon-size 100 \
+            --icon "focus_flow_app.app" 200 190 \
+            --hide-extension "focus_flow_app.app" \
+            --app-drop-link 600 185 \
+            "focus_flow_app.dmg" \
+            "focus_flow_app.app"
+          mv focus_flow_app.dmg ../../../../../focus_flow_app-macos.dmg
 
-      # ZIP: Windows
-      - name: Zip Windows Build
+      # --------------------------------------------------------------------------
+      # WINDOWS -> Setup.exe
+      # --------------------------------------------------------------------------
+      - name: Create Installer (Windows)
         if: matrix.os == 'windows-latest'
         run: |
-          Compress-Archive -Path ${{ matrix.output_path }}\* -DestinationPath ${{ matrix.zip_name }}
+          choco install innosetup
+          # Compile the ISS script
+          # Pass the version definition
+          iscc "/dMyAppVersion=${{ env.VERSION }}" app\installers\windows\focus_flow_app.iss
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-${{ matrix.target }}
-          path: app/${{ matrix.zip_name }}
-          if-no-files-found: error
+          path: |
+            focus_flow_app-linux-x86_64.AppImage
+            focus_flow_app-macos.dmg
+            focus_flow_app-windows-setup.exe
+          if-no-files-found: ignore
 
       - name: Cancel Workflow on Failure
         if: failure()
@@ -353,7 +410,9 @@ jobs:
             release_assets/**/focus_flow_cloud-amd64
             release_assets/**/focus_flow_cloud-arm64
             release_assets/**/focus_flow_app.apk
-            release_assets/**/*.zip
+            release_assets/**/*.AppImage
+            release_assets/**/*.dmg
+            release_assets/**/*.exe
           generate_release_notes: true
           fail_on_unmatched_files: true
 
