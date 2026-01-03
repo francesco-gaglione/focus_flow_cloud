@@ -60,6 +60,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -105,7 +108,6 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/${{ github.repository_owner }}/focusflowcloud
-        # ... kept metadata config simple or same as before
           tags: |
             type=raw,value=${{ steps.crate-version.outputs.version }}
             type=raw,value=latest
@@ -120,13 +122,13 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           cache-to: type=gha,mode=max
 
   # ============================================================================
-  # APP
+  # APP - ANDROID
   # ============================================================================
-  app-build:
+  app-build-android:
     if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/app-v')
     runs-on: ubuntu-latest
     permissions:
@@ -163,10 +165,94 @@ jobs:
           if-no-files-found: error
 
   # ============================================================================
+  # APP - DESKTOP (Windows, macOS, Linux)
+  # ============================================================================
+  app-build-desktop:
+    if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/app-v')
+    name: Build ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: Linux
+            build_cmd: flutter build linux --release
+            output_path: build/linux/x64/release/bundle
+            zip_name: focus_flow_app-linux-x64.zip
+          - os: windows-latest
+            target: Windows
+            build_cmd: flutter build windows --release
+            output_path: build/windows/x64/runner/Release
+            zip_name: focus_flow_app-windows-x64.zip
+          - os: macos-latest
+            target: macOS
+            build_cmd: flutter build macos --release
+            output_path: build/macos/Build/Products/Release
+            zip_name: focus_flow_app-macos.zip
+    defaults:
+      run:
+        working-directory: app
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      # Linux prerequisites
+      - name: Install Linux Dependencies
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Enable Desktop Support
+        run: |
+          flutter config --enable-linux-desktop
+          flutter config --enable-macos-desktop
+          flutter config --enable-windows-desktop
+
+      - name: Build ${{ matrix.target }}
+        run: ${{ matrix.build_cmd }}
+
+      # ZIP: Linux
+      - name: Zip Linux Build
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          cd ${{ matrix.output_path }}
+          zip -r ../../../../../${{ matrix.zip_name }} .
+
+      # ZIP: macOS
+      - name: Zip macOS Build
+        if: matrix.os == 'macos-latest'
+        run: |
+          cd ${{ matrix.output_path }}
+          zip -r ../../../../../${{ matrix.zip_name }} .
+
+      # ZIP: Windows
+      - name: Zip Windows Build
+        if: matrix.os == 'windows-latest'
+        run: |
+          Compress-Archive -Path ${{ matrix.output_path }}\* -DestinationPath ${{ matrix.zip_name }}
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-${{ matrix.target }}
+          path: app/${{ matrix.zip_name }}
+          if-no-files-found: error
+
+  # ============================================================================
   # RELEASE
   # ============================================================================
   create-release:
-    needs: [backend-build, app-build]
+    needs: [backend-build, app-build-android, app-build-desktop]
     if: always() && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') && (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/backend-v') || startsWith(github.ref, 'refs/tags/app-v'))
     runs-on: ubuntu-latest
     permissions:
@@ -180,11 +266,29 @@ jobs:
         with:
           name: backend-bin
 
-      - name: Download App Artifact
+      - name: Download App APK
         if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/app-v')
         uses: actions/download-artifact@v4
         with:
           name: app-apk
+
+      - name: Download App Linux
+        if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/app-v')
+        uses: actions/download-artifact@v4
+        with:
+          name: app-Linux
+
+      - name: Download App Windows
+        if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/app-v')
+        uses: actions/download-artifact@v4
+        with:
+          name: app-Windows
+
+      - name: Download App macOS
+        if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/app-v')
+        uses: actions/download-artifact@v4
+        with:
+          name: app-macOS
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -195,3 +299,4 @@ jobs:
           files: |
             focus_flow_cloud-*
             *.apk
+            *.zip
