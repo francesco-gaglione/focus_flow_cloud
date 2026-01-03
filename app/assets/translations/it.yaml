@@ -81,6 +81,7 @@ focus:
   save_success: Sessione aggiornata con successo
   save_error: Errore durante l'aggiornamento della sessione
   load_template: Carica Modello
+  select_template: Seleziona Modello
 
 # Sezione Impostazioni
 settings:
