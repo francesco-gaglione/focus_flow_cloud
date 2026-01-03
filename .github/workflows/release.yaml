@@ -62,7 +62,7 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/backend-v')
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: write
       actions: write
     defaults:
@@ -79,8 +79,10 @@ jobs:
           # Add arm64 architecture
           sudo dpkg --add-architecture arm64
 
-          # Remove default sources to prevent conflicts (Ubuntu 24.04 uses ubuntu.sources)
+          # Remove default sources and conflicting PGDG (Postgres) sources
+          # The runner has a newer libpq-dev (v18) from PGDG that conflicts with Ubuntu's libpq-dev:arm64 (v16)
           sudo rm -f /etc/apt/sources.list.d/ubuntu.sources
+          sudo rm -f /etc/apt/sources.list.d/pgdg.sources.list
 
           # Rewrite sources.list to strictly separate architectures
           # amd64 -> archive.ubuntu.com / azure.archive.ubuntu.com
@@ -98,7 +100,9 @@ jobs:
           EOF
           
           sudo apt-get update
-          sudo apt-get install -y gcc-aarch64-linux-gnu libpq-dev:amd64 libpq-dev:arm64
+          # Explicitly remove conflicting libpq-dev before re-installing version-matched packages
+          sudo apt-get remove -y libpq-dev
+          sudo apt-get install -y gcc-aarch64-linux-gnu libpq-dev libpq-dev:arm64
 
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
