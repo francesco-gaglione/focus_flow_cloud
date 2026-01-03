@@ -7,7 +7,7 @@ on:
       - "doc/**"
       - ".github/workflows/ci-doc.yaml"
   push:
-    branches: ["*"]
+    branches: ["master"]
     paths:
       - "doc/**"
       - ".github/workflows/ci-doc.yaml"
