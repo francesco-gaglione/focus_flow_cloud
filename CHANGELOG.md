@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.9.0] - 2026-01-03
+
+### Bug Fixes
+
+- Correctly configure ARM64 cross-compilation dependencies in release workflow by adjusting apt sources.
+
+### Features
+
+- Build ARM64 binaries in the release workflow and rollback release tags on failure.
+- Configure release workflow for arm64 cross-compilation dependencies and add Rust cache key.
+- Refactor release management by removing release creation and tag cleanup from the main workflow, adding immediate workflow cancellation on job failure, and introducing a new dedicated workflow for cleaning up failed release tags.
+
+### Other
+
+- Merge branch 'master' of https://github.com/francesco-gaglione/focus_flow_cloud
+
 ## [1.8.0] - 2026-01-03
 
 ### Features
