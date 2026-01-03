@@ -6,25 +6,74 @@
 
 /* You can override the default Infima variables here. */
 :root {
-  --ifm-color-primary: #2e8555;
-  --ifm-color-primary-dark: #29784c;
-  --ifm-color-primary-darker: #277148;
-  --ifm-color-primary-darkest: #205d3b;
-  --ifm-color-primary-light: #33925d;
-  --ifm-color-primary-lighter: #359962;
-  --ifm-color-primary-lightest: #3cad6e;
+  /* Brand Color: #6750A4 (Material Deep Purple) */
+  --ifm-color-primary: #6750A4;
+  --ifm-color-primary-dark: #5c4893;
+  --ifm-color-primary-darker: #57448b;
+  --ifm-color-primary-darkest: #473873;
+  --ifm-color-primary-light: #7d65b6;
+  --ifm-color-primary-lighter: #8770bd;
+  --ifm-color-primary-lightest: #a795cf;
+  
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+
+  /* Material 3 Styling */
+  --ifm-button-border-radius: 20px;
+  --ifm-card-border-radius: 12px;
+  --ifm-navbar-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  
+  --feature-card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --feature-card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
 [data-theme='dark'] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
+  /* Lighter purple for dark mode contrast */
+  --ifm-color-primary: #D0BCFF;
+  --ifm-color-primary-dark: #bb9eff;
+  --ifm-color-primary-darker: #b08fff;
+  --ifm-color-primary-darkest: #9063ff;
+  --ifm-color-primary-light: #e6dbff;
+  --ifm-color-primary-lighter: #f0ebff;
+  --ifm-color-primary-lightest: #ffffff;
+  
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}
+
+/* Custom Hero Styling */
+.hero--primary {
+  background: linear-gradient(135deg, var(--ifm-color-primary-darker) 0%, var(--ifm-color-primary) 100%);
+}
+
+.hero__title {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+/* Feature Cards */
+.feature-card {
+  height: 100%;
+  padding: 2rem;
+  border-radius: var(--ifm-card-border-radius);
+  background: var(--ifm-background-surface-color);
+  box-shadow: var(--feature-card-shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid var(--ifm-color-emphasis-200);
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--feature-card-shadow-hover);
+}
+
+[data-theme='dark'] .feature-card {
+  background: var(--ifm-card-background-color);
+  border-color: var(--ifm-color-emphasis-100);
+}
+
+.feature-emoji {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  display: block;
 }
