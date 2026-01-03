@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.0] - 2026-01-03
+
+### Documentation
+
+- Add documentation badge and link to README
+- Reorganize CHANGELOG entries by categorizing 'Doc created' as a feature and standardizing 'Fix' to 'Bug Fixes'.
+
+### Features
+
+- Make commit message parsing case-insensitive and skip signal commits.
+- Add multi-platform desktop app builds (Linux, Windows, macOS) and ARM64 Docker image support to the release workflow. (#29)
+
 ## [1.4.0] - 2026-01-03
 
 ### Features
