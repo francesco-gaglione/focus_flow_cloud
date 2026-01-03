@@ -98,7 +98,7 @@ jobs:
           EOF
           
           sudo apt-get update
-          sudo apt-get install -y gcc-aarch64-linux-gnu libpq-dev:arm64
+          sudo apt-get install -y gcc-aarch64-linux-gnu libpq-dev:amd64 libpq-dev:arm64
 
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
@@ -117,8 +117,17 @@ jobs:
       - name: Build binaries (arm64)
         env:
           CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
+          PKG_CONFIG_libpq_aarch64_unknown_linux_gnu: /usr/lib/aarch64-linux-gnu/pkgconfig
+          PKG_CONFIG_allow_cross_aarch64_unknown_linux_gnu: 1
+          PKG_CONFIG_PATH: /usr/lib/aarch64-linux-gnu/pkgconfig
+          PKG_CONFIG_ALLOW_CROSS: 1
         run: |
           cargo build --release --target aarch64-unknown-linux-gnu
+
+      - name: Delete Tag on Failure
+        if: failure()
+        run: |
+          git push --delete origin ${GITHUB_REF#refs/tags/}
 
       - name: Prepare binaries
         run: |
