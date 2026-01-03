@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.0] - 2026-01-03
+
+### Features
+
+- Build ARM64 binaries in the release workflow and rollback release tags on failure.
+
 ## [1.5.0] - 2026-01-03
 
 ### Documentation
