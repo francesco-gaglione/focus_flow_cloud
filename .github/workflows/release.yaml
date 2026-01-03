@@ -63,28 +63,42 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
+      - name: Install Cross-Compilation Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu
+
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: x86_64-unknown-linux-gnu
+          targets: x86_64-unknown-linux-gnu,aarch64-unknown-linux-gnu
 
       - uses: swatinem/rust-cache@v2
         with:
           workspaces: "backend"
 
-      - name: Build binaries
+      - name: Build binaries (amd64)
         run: |
           cargo build --release --target x86_64-unknown-linux-gnu
+
+      - name: Build binaries (arm64)
+        env:
+          CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
+        run: |
+          cargo build --release --target aarch64-unknown-linux-gnu
 
       - name: Prepare binaries
         run: |
           cp target/x86_64-unknown-linux-gnu/release/focus_flow_cloud ./focus_flow_cloud-amd64
+          cp target/aarch64-unknown-linux-gnu/release/focus_flow_cloud ./focus_flow_cloud-arm64
 
       - name: Upload Binary Artifact
         uses: actions/upload-artifact@v4
         with:
           name: backend-bin
-          path: backend/focus_flow_cloud-amd64
+          path: |
+            backend/focus_flow_cloud-amd64
+            backend/focus_flow_cloud-arm64
           if-no-files-found: error
 
       - name: Extract version from Cargo.toml
@@ -300,3 +314,23 @@ jobs:
             focus_flow_cloud-*
             *.apk
             *.zip
+
+  # ============================================================================
+  # CLEANUP ON FAILURE
+  # ============================================================================
+  cleanup-failure:
+    name: Rollback Release Tag
+    needs: [backend-build, app-build-android, app-build-desktop, create-release, docs]
+    if: failure() && startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Delete tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          echo "Release workflow failed. Deleting tag $TAG_NAME..."
+          git push --delete origin $TAG_NAME
