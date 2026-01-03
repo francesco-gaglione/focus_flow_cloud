@@ -100,8 +100,9 @@ jobs:
           EOF
           
           sudo apt-get update
-          # Explicitly remove conflicting libpq-dev before re-installing version-matched packages
-          sudo apt-get remove -y libpq-dev
+          # Explicitly remove conflicting libpq packages (libpq5 is the runtime, causing the version skew)
+          sudo apt-get remove -y libpq-dev libpq5
+          sudo apt-get autoremove -y
           sudo apt-get install -y gcc-aarch64-linux-gnu libpq-dev libpq-dev:arm64
 
       - name: Set up Rust
