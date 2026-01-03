@@ -1,0 +1,1 @@
+"use strict";(globalThis.webpackChunkdoc=globalThis.webpackChunkdoc||[]).push([[2684],{8460(o){o.exports=JSON.parse('{"metadata":{"permalink":"/focus_flow_cloud/blog","page":1,"postsPerPage":10,"totalPages":1,"totalCount":4,"blogDescription":"Blog","blogTitle":"Blog"}}')}}]);
