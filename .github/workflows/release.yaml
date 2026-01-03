@@ -14,11 +14,15 @@ jobs:
   # ============================================================================
   # DOCS
   # ============================================================================
+  # ============================================================================
+  # DOCS
+  # ============================================================================
   docs:
     name: Build & Deploy Docs
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      actions: write
     defaults:
       run:
         working-directory: doc
@@ -45,6 +49,12 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./doc/build
 
+      - name: Cancel Workflow on Failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh run cancel ${{ github.run_id }}
+
   # ============================================================================
   # BACKEND
   # ============================================================================
@@ -54,6 +64,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      actions: write
     defaults:
       run:
         working-directory: backend
@@ -65,13 +76,23 @@ jobs:
 
       - name: Install Cross-Compilation Dependencies
         run: |
+          # Add 32-bit architecture for potential cross-compilation helpers (often needed)
           sudo dpkg --add-architecture arm64
-          sudo sed -i 's/^deb http/deb [arch=amd64] http/' /etc/apt/sources.list
-          sudo sed -i 's/^deb mirror/deb [arch=amd64] mirror/' /etc/apt/sources.list
-          echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release -cs) main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
-          echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release -cs)-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
-          echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release -cs)-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
-          echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release -cs)-security main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
+
+          # Rewrite sources.list to strictly separate architectures
+          # amd64 -> archive.ubuntu.com / azure.archive.ubuntu.com
+          # arm64 -> ports.ubuntu.com
+          sudo tee /etc/apt/sources.list <<EOF
+          deb [arch=amd64] http://azure.archive.ubuntu.com/ubuntu/ $(lsb_release -cs) main restricted universe multiverse
+          deb [arch=amd64] http://azure.archive.ubuntu.com/ubuntu/ $(lsb_release -cs)-updates main restricted universe multiverse
+          deb [arch=amd64] http://azure.archive.ubuntu.com/ubuntu/ $(lsb_release -cs)-backports main restricted universe multiverse
+          deb [arch=amd64] http://azure.archive.ubuntu.com/ubuntu/ $(lsb_release -cs)-security main restricted universe multiverse
+          
+          deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release -cs) main restricted universe multiverse
+          deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release -cs)-updates main restricted universe multiverse
+          deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release -cs)-backports main restricted universe multiverse
+          deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release -cs)-security main restricted universe multiverse
+          EOF
           sudo apt-get update
           sudo apt-get install -y gcc-aarch64-linux-gnu libpq-dev:arm64
 
@@ -147,6 +168,12 @@ jobs:
           platforms: linux/amd64,linux/arm64
           cache-to: type=gha,mode=max
 
+      - name: Cancel Workflow on Failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh run cancel ${{ github.run_id }}
+
   # ============================================================================
   # APP - ANDROID
   # ============================================================================
@@ -155,6 +182,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      actions: write
     defaults:
       run:
         working-directory: app
@@ -186,6 +214,12 @@ jobs:
           path: app/focus_flow_app.apk
           if-no-files-found: error
 
+      - name: Cancel Workflow on Failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh run cancel ${{ github.run_id }}
+
   # ============================================================================
   # APP - DESKTOP (Windows, macOS, Linux)
   # ============================================================================
@@ -194,7 +228,7 @@ jobs:
     name: Build ${{ matrix.target }}
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         include:
           - os: ubuntu-latest
@@ -217,6 +251,7 @@ jobs:
         working-directory: app
     permissions:
       contents: read
+      actions: write
     steps:
       - uses: actions/checkout@v4
 
@@ -270,75 +305,8 @@ jobs:
           path: app/${{ matrix.zip_name }}
           if-no-files-found: error
 
-  # ============================================================================
-  # RELEASE
-  # ============================================================================
-  create-release:
-    needs: [backend-build, app-build-android, app-build-desktop]
-    if: always() && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') && (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/backend-v') || startsWith(github.ref, 'refs/tags/app-v'))
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Download Backend Artifact
-        if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/backend-v')
-        uses: actions/download-artifact@v4
-        with:
-          name: backend-bin
-
-      - name: Download App APK
-        if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/app-v')
-        uses: actions/download-artifact@v4
-        with:
-          name: app-apk
-
-      - name: Download App Linux
-        if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/app-v')
-        uses: actions/download-artifact@v4
-        with:
-          name: app-Linux
-
-      - name: Download App Windows
-        if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/app-v')
-        uses: actions/download-artifact@v4
-        with:
-          name: app-Windows
-
-      - name: Download App macOS
-        if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/app-v')
-        uses: actions/download-artifact@v4
-        with:
-          name: app-macOS
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          generate_release_notes: true
-          fail_on_unmatched_files: false
-          files: |
-            focus_flow_cloud-*
-            *.apk
-            *.zip
-
-  # ============================================================================
-  # CLEANUP ON FAILURE
-  # ============================================================================
-  cleanup-failure:
-    name: Rollback Release Tag
-    needs: [backend-build, app-build-android, app-build-desktop, create-release, docs]
-    if: failure() && startsWith(github.ref, 'refs/tags/')
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-      - name: Delete tag
+      - name: Cancel Workflow on Failure
+        if: failure()
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          TAG_NAME=${GITHUB_REF#refs/tags/}
-          echo "Release workflow failed. Deleting tag $TAG_NAME..."
-          git push --delete origin $TAG_NAME
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh run cancel ${{ github.run_id }}

@@ -1,0 +1,32 @@
+name: Cleanup Release Failure
+
+on:
+  workflow_run:
+    workflows: ["Release"]
+    types:
+      - completed
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    if: ${{ (github.event.workflow_run.conclusion == 'failure' || github.event.workflow_run.conclusion == 'cancelled') }}
+    steps:
+      - name: Delete Tag
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ github.event.workflow_run.head_branch }}
+        run: |
+           echo "Workflow conclusion: ${{ github.event.workflow_run.conclusion }}"
+           echo "Head branch/tag: $TAG_NAME"
+           
+           # Check if it looks like one of our tags
+           if [[ "$TAG_NAME" == v* ]] || [[ "$TAG_NAME" == backend-v* ]] || [[ "$TAG_NAME" == app-v* ]]; then
+             echo "Deleting failed release tag: $TAG_NAME"
+             # API call to delete the tag ref
+             gh api -X DELETE "repos/${{ github.repository }}/git/refs/tags/$TAG_NAME" || echo "Failed to delete tag (it might be already deleted)"
+           else
+             echo "Not a release tag or already cleaned up."
+           fi
