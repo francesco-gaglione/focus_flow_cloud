@@ -1,4 +1,6 @@
 import 'package:dio/dio.dart';
+import 'package:logger/logger.dart';
+import '../../adapters/network/auth_interceptor.dart';
 import 'package:focus_flow_app/adapters/repositories/http_category_repository.dart';
 import 'package:focus_flow_app/adapters/repositories/http_session_repository.dart';
 import 'package:focus_flow_app/adapters/repositories/http_statistics_repository.dart';
@@ -58,6 +60,7 @@ Future<void> resetDependencies() async {
 }
 
 Future<void> setupDependencies(String baseUrl, String wsUrl) async {
+  final logger = Logger();
   // External
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerSingleton<SharedPreferences>(sharedPreferences);
@@ -70,71 +73,13 @@ Future<void> setupDependencies(String baseUrl, String wsUrl) async {
 
   // Dio
   sl.registerLazySingleton<Dio>(() {
-    final dio = Dio(
+    return Dio(
       BaseOptions(
         baseUrl: baseUrl,
         connectTimeout: const Duration(seconds: 30),
         receiveTimeout: const Duration(seconds: 15),
       ),
     );
-    dio.interceptors.add(
-      InterceptorsWrapper(
-        onRequest: (options, handler) {
-          final token = sl<TokenService>().getToken();
-          if (token != null) {
-            options.headers['Authorization'] = 'Bearer $token';
-          }
-          handler.next(options);
-        },
-        onError: (error, handler) async {
-          if (error.type == DioExceptionType.cancel) {
-            handler.next(error);
-            return;
-          }
-
-          if (error.response?.statusCode == 401) {
-            final path = error.requestOptions.path;
-            // Avoid loops: don't refresh if we failed on login or refresh endpoints
-            if (path.contains('/api/auth/login') ||
-                path.contains('/api/auth/refresh')) {
-              handler.next(error);
-              return;
-            }
-
-            final refreshToken = sl<TokenService>().getRefreshToken();
-            if (refreshToken != null) {
-              try {
-                // Attempt refresh
-                final response = await sl<AuthRepository>().refreshToken(
-                  refreshToken,
-                );
-
-                // Save new tokens
-                await sl<TokenService>().saveToken(response.token);
-                await sl<TokenService>().saveRefreshToken(
-                  response.refreshToken,
-                );
-
-                // Retry the original request
-                final options = error.requestOptions;
-                options.headers['Authorization'] = 'Bearer ${response.token}';
-
-                final cloneReq = await sl<Dio>().fetch(options);
-                handler.resolve(cloneReq);
-                return;
-              } catch (e) {
-                // Refresh failed, clear session
-                await sl<TokenService>().clearToken();
-              }
-            } else {
-              await sl<TokenService>().clearToken();
-            }
-          }
-          handler.next(error);
-        },
-      ),
-    );
-    return dio;
   });
 
   // Repositories - User Settings
@@ -289,4 +234,22 @@ Future<void> setupDependencies(String baseUrl, String wsUrl) async {
 
   // Cubits - Settings
   sl.registerFactory(() => SettingsBloc(userSettingsRepository: sl()));
+
+  // Interceptors
+  // Interceptors
+  try {
+    sl.registerLazySingleton<AuthInterceptor>(
+      () => AuthInterceptor(
+        tokenService: sl(),
+        authRepository: sl(),
+        dio: sl(),
+        onSessionExpired: () => sl<AuthCubit>().logout(),
+      ),
+    );
+
+    final dio = sl<Dio>();
+    dio.interceptors.add(sl<AuthInterceptor>());
+  } catch (e) {
+    logger.e('Error setting up interceptors: $e');
+  }
 }
