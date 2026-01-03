@@ -62,6 +62,11 @@ const config: Config = {
         ],
     ],
 
+    markdown: {
+        mermaid: true,
+    },
+    themes: ['@docusaurus/theme-mermaid'],
+
     themeConfig: {
         // Replace with your project's social card
         image: "img/docusaurus-social-card.jpg",
@@ -71,7 +76,7 @@ const config: Config = {
         navbar: {
             title: "Focus Flow",
             logo: {
-                alt: "My Site Logo",
+                alt: "Focus Flow Logo",
                 src: "img/app_icon.png",
             },
             items: [

@@ -2,46 +2,28 @@
 sidebar_position: 1
 ---
 
-# Tutorial Intro
+# Introduction
 
-Let's discover **Docusaurus in less than 5 minutes**.
+Welcome to the **FocusFlow** documentation!
 
-## Getting Started
+FocusFlow is a complete ecosystem for time management using the **Pomodoro technique**. It is designed to help you optimize your daily workflow by tracking sessions, organizing tasks, and analyzing your productivity patterns.
 
-Get started by **creating a new site**.
+## 🎯 Core Features
 
-Or **try Docusaurus immediately** with **[docusaurus.new](https://docusaurus.new)**.
+FocusFlow provides a synchronized experience across all your devices:
 
-### What you'll need
+- **⏱️ Focus Sessions**: Manage work and break intervals efficiently. The core timer logic ensures you stay on track.
+- **⚡ Real-time Synchronization**: Synchronize your state across multiple devices using WebSockets. Start a timer on your phone and see it update instantly on your desktop.
+- **✅ Task Management**: Create, organize, and color-code your to-dos. Keep your tasks aligned with your focus sessions.
+- **📊 Productivity Analytics**: View detailed statistics to understand your work habits and improve over time.
 
-- [Node.js](https://nodejs.org/en/download/) version 20.0 or above:
-  - When installing Node.js, you are recommended to check all checkboxes related to dependencies.
+## 📱 Platforms
 
-## Generate a new site
+FocusFlow is a cross-platform solution:
 
-Generate a new Docusaurus site using the **classic template**.
+- **Mobile App**: Built with [Flutter](https://flutter.dev), available for iOS, Android, MacOS, Windows, Linux.
+- **Cloud Backend**: Powered by [Rust](https://www.rust-lang.org/) (Axum, Tokio), ensuring high performance and reliability.
 
-The classic template will automatically be added to your project after you run the command:
+## 🤝 Open Source
 
-```bash
-npm init docusaurus@latest my-website classic
-```
-
-You can type this command into Command Prompt, Powershell, Terminal, or any other integrated terminal of your code editor.
-
-The command also installs all necessary dependencies you need to run Docusaurus.
-
-## Start your site
-
-Run the development server:
-
-```bash
-cd my-website
-npm run start
-```
-
-The `cd` command changes the directory you're working with. In order to work with your newly created Docusaurus site, you'll need to navigate the terminal there.
-
-The `npm run start` command builds your website locally and serves it through a development server, ready for you to view at http://localhost:3000/.
-
-Open `docs/intro.md` (this page) and edit some lines: the site **reloads automatically** and displays your changes.
+I built this project for my personal use to optimize my daily workflow and decided to share it as an open-source project. Contributions are welcome! Check out the [Contributing](./contributing) guide to get started.
