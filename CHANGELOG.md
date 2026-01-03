@@ -4,12 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ## [1.4.0] - 2026-01-03
 
-### Other
+### Features
+
+- Doc created
+
+### Bug Fixes
 
 - Add 'select_template' to translations (#26)
 - Add AuthInterceptor for token management (#27)
-- Doc created
-- [minor]
 
 ## [app-v1.3.1] - 2026-01-02
 
@@ -24,12 +26,11 @@ All notable changes to this project will be documented in this file.
 ### Other
 
 - Merge branch 'master' of https://github.com/francesco-gaglione/focus_flow_cloud
-- [app-patch]
-- [app-patch]
+
 
 ## [1.2.0] - 2026-01-02
 
-### Fix
+### Bug Fixes
 
 - Use double backslashes in regex replacements
 
