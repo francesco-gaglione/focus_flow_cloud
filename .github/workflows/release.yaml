@@ -74,13 +74,12 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
-      - name: Install Cross-Compilation Dependencies
+      - name: Configure System
         run: |
           # Add arm64 architecture
           sudo dpkg --add-architecture arm64
 
           # Remove default sources and conflicting PGDG (Postgres) sources
-          # The runner has a newer libpq-dev (v18) from PGDG that conflicts with Ubuntu's libpq-dev:arm64 (v16)
           sudo rm -f /etc/apt/sources.list.d/ubuntu.sources
           sudo rm -f /etc/apt/sources.list.d/pgdg.sources.list
 
@@ -100,10 +99,9 @@ jobs:
           EOF
           
           sudo apt-get update
-          # Explicitly remove conflicting libpq packages (libpq5 is the runtime, causing the version skew)
+          # Explicitly remove conflicting libpq packages to ensure clean state
           sudo apt-get remove -y libpq-dev libpq5
           sudo apt-get autoremove -y
-          sudo apt-get install -y gcc-aarch64-linux-gnu libpq-dev libpq-dev:arm64
 
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
@@ -117,7 +115,10 @@ jobs:
 
       - name: Build binaries (amd64)
         run: |
+          sudo apt-get install -y libpq-dev
           cargo build --release --target x86_64-unknown-linux-gnu
+          # Remove amd64 libs to clean up for arm64 build
+          sudo apt-get remove -y libpq-dev libpq5
 
       - name: Build binaries (arm64)
         env:
@@ -127,6 +128,7 @@ jobs:
           PKG_CONFIG_PATH: /usr/lib/aarch64-linux-gnu/pkgconfig
           PKG_CONFIG_ALLOW_CROSS: 1
         run: |
+          sudo apt-get install -y gcc-aarch64-linux-gnu libpq-dev:arm64
           cargo build --release --target aarch64-unknown-linux-gnu
 
       - name: Delete Tag on Failure
