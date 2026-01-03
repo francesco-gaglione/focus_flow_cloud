@@ -65,8 +65,15 @@ jobs:
 
       - name: Install Cross-Compilation Dependencies
         run: |
+          sudo dpkg --add-architecture arm64
+          sudo sed -i 's/^deb http/deb [arch=amd64] http/' /etc/apt/sources.list
+          sudo sed -i 's/^deb mirror/deb [arch=amd64] mirror/' /etc/apt/sources.list
+          echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release -cs) main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
+          echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release -cs)-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
+          echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release -cs)-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
+          echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release -cs)-security main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
           sudo apt-get update
-          sudo apt-get install -y gcc-aarch64-linux-gnu
+          sudo apt-get install -y gcc-aarch64-linux-gnu libpq-dev:arm64
 
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
@@ -75,6 +82,7 @@ jobs:
 
       - uses: swatinem/rust-cache@v2
         with:
+          key: ${{ runner.os }}-rust-${{ hashFiles('**/Cargo.lock') }}
           workspaces: "backend"
 
       - name: Build binaries (amd64)
