@@ -118,3 +118,7 @@ The backend is a Rust workspace organized into four main crates, strictly follow
     - **Setup**: `setup.rs` bootstraps the database pool and other infrastructure.
     - **Database**: Database migrations and connection logic.
     - **Services**: Implementations of external services (e.g., Crypto, Third-party APIs).
+
+## Swagger
+
+API documentation for the backend is available at `/swagger-ui`.
