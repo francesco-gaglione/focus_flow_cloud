@@ -1,19 +1,24 @@
-name: Deploy Documentation
+name: Doc CI
 
 on:
-  push:
-    branches:
-      - main
+  pull_request:
+    branches: ["*"]
     paths:
-      - 'doc/**'
-
-permissions:
-  contents: write
+      - "doc/**"
+      - ".github/workflows/ci-doc.yaml"
+  push:
+    branches: ["*"]
+    paths:
+      - "doc/**"
+      - ".github/workflows/ci-doc.yaml"
 
 jobs:
-  deploy:
-    name: Deploy to GitHub Pages
+  build:
+    if: "!contains(github.event.head_commit.message, 'chore: bump')"
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: doc
     steps:
       - uses: actions/checkout@v4
       
@@ -25,15 +30,7 @@ jobs:
           cache-dependency-path: doc/package-lock.json
 
       - name: Install dependencies
-        working-directory: doc
         run: npm ci
 
       - name: Build website
-        working-directory: doc
         run: npm run build
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./doc/build

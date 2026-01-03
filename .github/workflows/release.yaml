@@ -11,6 +11,43 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  # ============================================================================
+  # DOCS
+  # ============================================================================
+  docs:
+    name: Build & Deploy Docs
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    defaults:
+      run:
+        working-directory: doc
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: doc/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build website
+        run: npm run build
+
+      - name: Deploy to GitHub Pages
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./doc/build
+
+  # ============================================================================
+  # BACKEND
+  # ============================================================================
   backend-build:
     if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/backend-v')
     runs-on: ubuntu-latest
@@ -68,6 +105,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/${{ github.repository_owner }}/focusflowcloud
+        # ... kept metadata config simple or same as before
           tags: |
             type=raw,value=${{ steps.crate-version.outputs.version }}
             type=raw,value=latest
@@ -85,6 +123,9 @@ jobs:
           platforms: linux/amd64
           cache-to: type=gha,mode=max
 
+  # ============================================================================
+  # APP
+  # ============================================================================
   app-build:
     if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/app-v')
     runs-on: ubuntu-latest
@@ -121,9 +162,12 @@ jobs:
           path: app/focus_flow_app.apk
           if-no-files-found: error
 
+  # ============================================================================
+  # RELEASE
+  # ============================================================================
   create-release:
     needs: [backend-build, app-build]
-    if: always() && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled')
+    if: always() && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') && (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/backend-v') || startsWith(github.ref, 'refs/tags/app-v'))
     runs-on: ubuntu-latest
     permissions:
       contents: write
