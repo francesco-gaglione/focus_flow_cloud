@@ -81,6 +81,7 @@ focus:
   save_success: Session updated successfully
   save_error: Error updating session
   load_template: Load Template
+  select_template: Select Template
 
 # Settings Section
 settings:
