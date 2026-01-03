@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.15.0] - 2026-01-03
+
+### Features
+
+- Refine release asset upload logic with glob patterns and strict file matching, while removing tag deletion on failure.
+
+### Other
+
+- Merge branch 'master' of https://github.com/francesco-gaglione/focus_flow_cloud
+
 ## [1.14.0] - 2026-01-03
 
 ### Features
