@@ -47,19 +47,20 @@ commit_preprocessors = [
 ]
 # regex for parsing and grouping commits
 commit_parsers = [
-  { message = "^feat", group = "Features" },
-  { message = "^fix", group = "Bug Fixes" },
-  { message = "^doc", group = "Documentation" },
-  { message = "^perf", group = "Performance" },
-  { message = "^refactor", group = "Refactor" },
-  { message = "^style", group = "Styling" },
-  { message = "^test", group = "Testing" },
+  { message = "^(?i)feat", group = "Features" },
+  { message = "^(?i)fix", group = "Bug Fixes" },
+  { message = "^(?i)doc", group = "Documentation" },
+  { message = "^(?i)perf", group = "Performance" },
+  { message = "^(?i)refactor", group = "Refactor" },
+  { message = "^(?i)style", group = "Styling" },
+  { message = "^(?i)test", group = "Testing" },
   { message = "^chore\\(release\\): prepare for", skip = true },
   { message = "^chore\\(deps.*\\)", skip = true },
   { message = "^chore\\(pr\\)", skip = true },
   { message = "^chore\\(pull\\)", skip = true },
   { message = "^chore: bump", skip = true }, # Skip our own bump commits
-  { message = "^chore|^ci", group = "Miscellaneous Tasks" },
+  { message = "^(?i)\\[(minor|major|patch|app-patch|app-minor|app-major)\\]", skip = true }, # Skip signal commits
+  { message = "^(?i)chore|^(?i)ci", group = "Miscellaneous Tasks" },
   { body = ".*security", group = "Security" },
   { message = ".*", group = "Other" },
 ]
