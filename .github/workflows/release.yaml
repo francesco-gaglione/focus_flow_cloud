@@ -76,8 +76,11 @@ jobs:
 
       - name: Install Cross-Compilation Dependencies
         run: |
-          # Add 32-bit architecture for potential cross-compilation helpers (often needed)
+          # Add arm64 architecture
           sudo dpkg --add-architecture arm64
+
+          # Remove default sources to prevent conflicts (Ubuntu 24.04 uses ubuntu.sources)
+          sudo rm -f /etc/apt/sources.list.d/ubuntu.sources
 
           # Rewrite sources.list to strictly separate architectures
           # amd64 -> archive.ubuntu.com / azure.archive.ubuntu.com
@@ -93,6 +96,7 @@ jobs:
           deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release -cs)-backports main restricted universe multiverse
           deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release -cs)-security main restricted universe multiverse
           EOF
+          
           sudo apt-get update
           sudo apt-get install -y gcc-aarch64-linux-gnu libpq-dev:arm64
 
