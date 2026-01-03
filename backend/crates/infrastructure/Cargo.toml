@@ -25,6 +25,6 @@ thiserror.workspace = true
 jsonwebtoken = { version = "10.2.0", features = ["rust_crypto"] }
 
 [dev-dependencies]
-testcontainers = "0.23"
-testcontainers-modules = { version = "0.11", features = ["postgres"] }
-tokio = { version = "1", features = ["full"] }
+testcontainers.workspace = true
+testcontainers-modules.workspace = true
+tokio = { workspace = true, features = ["full"] }

@@ -7,7 +7,7 @@ on:
       - "backend/**"
       - ".github/workflows/ci-backend.yaml"
   push:
-    branches: ["*"]
+    branches: ["master"]
     paths:
       - "backend/**"
       - ".github/workflows/ci-backend.yaml"
