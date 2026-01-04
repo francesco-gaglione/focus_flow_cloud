@@ -131,6 +131,12 @@ impl FocusSessionPersistence for PostgresPersistence {
                     query = query.filter(concentration_score.le(max_score));
                 }
 
+                if let Some(has_notes) = filters.has_notes {
+                    if has_notes {
+                        query = query.filter(notes.is_not_null());
+                    }
+                }
+
                 query.load::<DbFocusSession>(conn)
             })
             .await

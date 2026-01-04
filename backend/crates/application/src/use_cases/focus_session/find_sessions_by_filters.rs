@@ -56,6 +56,7 @@ impl FindSessionsByFiltersUseCase {
             session_type: filters.session_type,
             min_concentration_score,
             max_concentration_score,
+            has_notes: filters.has_notes,
         };
 
         Ok(self.session_persistence.find_by_filters(filter).await?)
@@ -110,6 +111,7 @@ mod tests {
             category_ids: Some(vec![category_id.to_string()]),
             session_type: Some(FocusSessionType::Work),
             concentration_score_range: Some(ConcentrationScoreFilter { min: 1, max: 5 }),
+            has_notes: None,
         };
 
         let use_case = FindSessionsByFiltersUseCase::new(Arc::new(mock_session_persistence));
@@ -120,6 +122,55 @@ mod tests {
         assert_eq!(sessions.len(), 1);
         assert_eq!(sessions[0].id(), session_id);
         assert_eq!(sessions[0].concentration_score(), Some(5));
+    }
+
+    #[tokio::test]
+    async fn test_find_session_by_filters_has_notes() {
+        let mut mock_session_persistence = MockFocusSessionPersistence::new();
+
+        let session_id = Uuid::new_v4();
+        let started_at = DateTime::from_timestamp(1761118663, 0).unwrap();
+        let ended_at = DateTime::from_timestamp(1761118714, 0).unwrap();
+
+        let focus_session = FocusSession::reconstitute(
+            session_id,
+            Uuid::new_v4(),
+            None,
+            None,
+            FocusSessionType::Work,
+            Some(51),
+            Some(5),
+            Some("note".to_string()),
+            started_at,
+            Some(ended_at),
+            started_at,
+        );
+
+        mock_session_persistence
+            .expect_find_by_filters()
+            .returning(move |filter| {
+                if filter.has_notes == Some(true) {
+                     Ok(vec![focus_session.clone()])
+                } else {
+                     Ok(vec![])
+                }
+            });
+
+        let use_case = FindSessionsByFiltersUseCase::new(Arc::new(mock_session_persistence));
+
+        let filters = FindSessionFiltersCommand {
+            date_range: None,
+            category_ids: None,
+            session_type: None,
+            concentration_score_range: None,
+            has_notes: Some(true),
+        };
+
+        let result = use_case.execute(filters).await;
+        assert!(result.is_ok());
+        let sessions = result.unwrap();
+        assert_eq!(sessions.len(), 1);
+        assert_eq!(sessions[0].id(), session_id);
     }
 
     #[tokio::test]
@@ -137,6 +188,7 @@ mod tests {
             category_ids: None,
             session_type: None,
             concentration_score_range: None,
+            has_notes: None,
         };
 
         let result = use_case.execute(filters).await;
@@ -158,6 +210,7 @@ mod tests {
             category_ids: None,
             session_type: None,
             concentration_score_range: None,
+            has_notes: None,
         };
 
         let use_case = FindSessionsByFiltersUseCase::new(Arc::new(mock_session_persistence));

@@ -6,6 +6,7 @@ pub struct FindSessionFiltersCommand {
     pub category_ids: Option<Vec<String>>,
     pub session_type: Option<FocusSessionType>,
     pub concentration_score_range: Option<ConcentrationScoreFilter>,
+    pub has_notes: Option<bool>,
 }
 
 #[derive(Debug, Clone)]

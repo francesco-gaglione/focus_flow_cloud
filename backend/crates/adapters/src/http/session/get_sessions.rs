@@ -30,6 +30,7 @@ pub struct GetSessionFiltersDto {
     pub min_concentration_score: Option<i32>,
     #[schema(example = "5")]
     pub max_concentration_score: Option<i32>,
+    pub has_notes: Option<bool>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
@@ -107,6 +108,7 @@ pub async fn get_sessions(
         category_ids: query.category_ids.clone(),
         session_type,
         concentration_score_range,
+        has_notes: query.has_notes,
     };
 
     let sessions = state

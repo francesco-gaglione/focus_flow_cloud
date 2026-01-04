@@ -179,4 +179,5 @@ pub struct SessionFilter {
     pub session_type: Option<FocusSessionType>,
     pub min_concentration_score: Option<i32>,
     pub max_concentration_score: Option<i32>,
+    pub has_notes: Option<bool>,
 }

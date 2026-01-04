@@ -48,6 +48,7 @@ impl CalculateStatsByPeriodUseCase {
                 session_type: None,
                 min_concentration_score: None,
                 max_concentration_score: None,
+                has_notes: None,
             })
             .await?;
 
