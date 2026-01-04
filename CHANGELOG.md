@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.16.0] - 2026-01-03
+
+### Features
+
+- Generate platform-specific installers (AppImage, DMG, Inno Setup) for releases and add Windows installer script.
+
 ## [1.15.0] - 2026-01-03
 
 ### Features
