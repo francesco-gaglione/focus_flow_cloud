@@ -219,3 +219,68 @@ async fn update_session_and_list() {
     assert_eq!(session.concentration_score, Some(2));
     assert_eq!(session.actual_duration, Some(7200));
 }
+
+#[tokio::test]
+async fn find_sessions_with_filters() {
+    let context = setup().await;
+
+    // 1. Create Session with Notes
+    let session_with_notes = CreateManualSessionDto {
+        task_id: None,
+        category_id: None,
+        session_type: SessionTypeEnum::Work,
+        concentration_score: Some(5),
+        started_at: Utc::now().timestamp(),
+        ended_at: Utc::now().timestamp() + 1800,
+        notes: Some("My notes".to_string()),
+    };
+    context.create_manual_session(&session_with_notes).await;
+
+    // 2. Create Session without Notes
+    let session_no_notes = CreateManualSessionDto {
+        task_id: None,
+        category_id: None,
+        session_type: SessionTypeEnum::ShortBreak,
+        concentration_score: None,
+        started_at: Utc::now().timestamp() - 3600,
+        ended_at: Utc::now().timestamp() - 1800,
+        notes: None,
+    };
+    context.create_manual_session(&session_no_notes).await;
+
+    // 3. Filter: hasNotes = true
+    let response = context
+        .client
+        .get(format!("{}/api/focus-session", context.base_url))
+        .query(&[("hasNotes", "true")])
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    assert_eq!(response.status(), 200);
+    let body: GetSessionFiltersResponseDto = response
+        .json()
+        .await
+        .expect("Failed to deserialize response");
+    
+    assert_eq!(body.focus_sessions.len(), 1, "Should find exactly one session with notes");
+    assert!(body.focus_sessions[0].notes.is_some());
+
+    // 4. Filter: hasNotes = false
+    let response = context
+        .client
+        .get(format!("{}/api/focus-session", context.base_url))
+        .query(&[("hasNotes", "false")])
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    assert_eq!(response.status(), 200);
+    let body: GetSessionFiltersResponseDto = response
+        .json()
+        .await
+        .expect("Failed to deserialize response");
+
+    assert_eq!(body.focus_sessions.len(), 1, "Should find exactly one session without notes");
+    assert!(body.focus_sessions[0].notes.is_none());
+}

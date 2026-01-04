@@ -134,6 +134,8 @@ impl FocusSessionPersistence for PostgresPersistence {
                 if let Some(has_notes) = filters.has_notes {
                     if has_notes {
                         query = query.filter(notes.is_not_null());
+                    } else {
+                        query = query.filter(notes.is_null());
                     }
                 }
 

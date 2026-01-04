@@ -29,6 +29,10 @@ backend-run-debug:
 backend-test:
     cd backend && cargo test --workspace --lib --bins
 
+# Run backend E2E tests
+backend-test-e2e:
+    cd backend && cargo test --test "*_e2e"
+
 # Check backend formatting
 backend-fmt-check:
     cd backend && cargo fmt --all -- --check
