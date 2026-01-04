@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.22.0] - 2026-01-04
+
+### Documentation
+
+- Add detailed Conventional Commit guidelines to README and contributing documentation.
+
 ## [1.21.0] - 2026-01-04
 
 ### Bug Fixes
