@@ -117,6 +117,32 @@ Contributions are welcome! This monorepo allows you to work on the full stack.
 - If you change the API, please ensure the Flutter client is updated accordingly.
 - Run `just test-all` before submitting a PR.
 
+### Commit Guidelines
+
+We strictly follow **[Conventional Commits](https://www.conventionalcommits.org/)** to manage versioning and changelogs automatically.
+
+**Format:**
+
+```text
+<type>(<scope>): <subject>
+```
+
+**Common Types:**
+
+- `feat`: A new feature (**Minor** version bump)
+- `fix`: A bug fix (**Patch** version bump)
+- `docs`, `chore`, `refactor`, `test`: Other changes (no version bump)
+
+> [!IMPORTANT]
+> **💥 Breaking Changes**
+> If your changes break backward compatibility, you **MUST** indicate it to trigger a **MAJOR** version bump.
+>
+> You can do this by adding a `!` after the type:
+>
+> ```text
+> feat!: remove legacy API endpoints
+> ```
+
 ## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
