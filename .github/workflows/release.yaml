@@ -274,7 +274,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libfuse2
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libfuse2 imagemagick
 
       - uses: subosito/flutter-action@v2
         with:
@@ -322,8 +322,8 @@ jobs:
           echo "Icon=focus_flow" >> AppDir/focus_flow.desktop
           echo "Categories=Utility;" >> AppDir/focus_flow.desktop
           
-          # Use the actual app icon
-          cp assets/icon/app_icon.png AppDir/focus_flow.png
+          # Use the actual app icon, resized to 512x512 (max supported by linuxdeploy)
+          convert assets/icon/app_icon.png -resize 512x512 AppDir/focus_flow.png
 
           # Build AppImage
           # Point to the binary explicitly
