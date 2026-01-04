@@ -370,8 +370,8 @@ jobs:
         with:
           name: app-${{ matrix.target }}
           path: |
-            focus_flow_app-linux-x86_64.AppImage
-            focus_flow_app-macos.dmg
+            app/focus_flow_app-linux-x86_64.AppImage
+            app/focus_flow_app-macos.dmg
             focus_flow_app-windows-setup.exe
           if-no-files-found: ignore
 
