@@ -322,9 +322,8 @@ jobs:
           echo "Icon=focus_flow" >> AppDir/focus_flow.desktop
           echo "Categories=Utility;" >> AppDir/focus_flow.desktop
           
-          # Use a placeholder icon if one doesn't exist (linuxdeploy needs one)
-          # Assuming you set up icons, if not, create a dummy png
-          touch AppDir/focus_flow.png
+          # Use the actual app icon
+          cp assets/icon/app_icon.png AppDir/focus_flow.png
 
           # Build AppImage
           # Point to the binary explicitly
