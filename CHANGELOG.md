@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.18.0] - 2026-01-04
+
+### Bug Fixes
+
+- Resize app icon to 512x512 for Linux AppImage and add imagemagick dependency
+
+### Features
+
+- Generate platform-specific installers (AppImage, DMG, Inno Setup) for releases and add Windows installer script.
+- Use actual app icon for AppImage build instead of a placeholder.
+
+### Other
+
+- Merge branch 'master' of https://github.com/francesco-gaglione/focus_flow_cloud
+
 ## [1.17.0] - 2026-01-04
 
 ### Features
