@@ -347,11 +347,11 @@ jobs:
             --window-pos 200 120 \
             --window-size 800 400 \
             --icon-size 100 \
-            --icon "focus_flow_app.app" 200 190 \
-            --hide-extension "focus_flow_app.app" \
+            --icon "Focus Flow.app" 200 190 \
+            --hide-extension "Focus Flow.app" \
             --app-drop-link 600 185 \
             "focus_flow_app.dmg" \
-            "focus_flow_app.app"
+            "Focus Flow.app"
           mv focus_flow_app.dmg ../../../../../focus_flow_app-macos.dmg
 
       # --------------------------------------------------------------------------
