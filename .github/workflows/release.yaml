@@ -363,7 +363,7 @@ jobs:
           choco install innosetup
           # Compile the ISS script
           # Pass the version definition
-          iscc "/dMyAppVersion=${{ env.VERSION }}" app\installers\windows\focus_flow_app.iss
+          iscc "/dMyAppVersion=${{ env.VERSION }}" installers\windows\focus_flow_app.iss
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
