@@ -46,6 +46,7 @@ impl CalculateStatsByPeriodUseCase {
                 start_date,
                 end_date,
                 category_ids: None,
+                task_ids: None,
                 session_type: None,
                 min_concentration_score: None,
                 max_concentration_score: None,

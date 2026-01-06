@@ -3,7 +3,7 @@ use crate::http::dto::validators::validate_uuids::validate_uuids;
 use crate::http_error::{HttpError, HttpResult};
 use crate::mappers::focus_session_mapper::FocusSessionMapper;
 use crate::openapi::SESSION_TAG;
-use application::use_cases::focus_session::command::find_session_filters::{
+use application::use_cases::focus_session::find_sessions_by_filters::{
     ConcentrationScoreFilter, FindSessionFiltersCommand, FocusSessionDateFilter,
 };
 use axum::extract::{Extension, Query, State};
@@ -55,6 +55,9 @@ pub struct GetSessionFiltersDto {
     #[serde(default, deserialize_with = "deserialize_option_string_or_vec")]
     #[validate(custom(function = "validate_uuids"))]
     pub category_ids: Option<Vec<String>>,
+    #[serde(default, deserialize_with = "deserialize_option_string_or_vec")]
+    #[validate(custom(function = "validate_uuids"))]
+    pub task_ids: Option<Vec<String>>,
     pub session_type: Option<SessionTypeEnum>,
     #[schema(example = "1")]
     pub min_concentration_score: Option<i32>,
@@ -139,6 +142,7 @@ pub async fn get_sessions(
         user_id: session.user_id,
         date_range,
         category_ids: query.category_ids.clone(),
+        task_ids: query.task_ids.clone(),
         session_type,
         concentration_score_range,
         has_notes: query.has_notes,

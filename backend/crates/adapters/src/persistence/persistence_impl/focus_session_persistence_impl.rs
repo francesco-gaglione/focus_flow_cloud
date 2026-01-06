@@ -130,6 +130,14 @@ impl FocusSessionPersistence for PostgresPersistence {
                     );
                 }
 
+                if let Some(task_ids) = filters.task_ids {
+                    query = query.filter(
+                        focus_session::task_id
+                            .eq_any(task_ids.clone())
+                            .or(tasks::id.eq_any(task_ids)),
+                    );
+                }
+
                 if let Some(s_type) = filters.session_type {
                     query = query.filter(focus_session::session_type.eq(s_type.to_string()));
                 }

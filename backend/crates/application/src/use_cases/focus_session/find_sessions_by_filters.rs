@@ -1,10 +1,33 @@
 use crate::app_error::{AppError, AppResult};
-use crate::use_cases::focus_session::command::find_session_filters::FindSessionFiltersCommand;
 use chrono::DateTime;
 use domain::entities::focus_session::{FocusSession, SessionFilter};
+use domain::entities::focus_session_type::FocusSessionType;
 use domain::traits::focus_session_persistence::FocusSessionPersistence;
 use std::sync::Arc;
 use uuid::Uuid;
+
+#[derive(Debug, Clone)]
+pub struct FindSessionFiltersCommand {
+    pub user_id: Uuid,
+    pub date_range: Option<FocusSessionDateFilter>,
+    pub category_ids: Option<Vec<String>>,
+    pub task_ids: Option<Vec<String>>,
+    pub session_type: Option<FocusSessionType>,
+    pub concentration_score_range: Option<ConcentrationScoreFilter>,
+    pub has_notes: Option<bool>,
+}
+
+#[derive(Debug, Clone)]
+pub struct FocusSessionDateFilter {
+    pub start_date: i64,
+    pub end_date: i64,
+}
+
+#[derive(Debug, Clone)]
+pub struct ConcentrationScoreFilter {
+    pub min: i32,
+    pub max: i32,
+}
 
 pub struct FindSessionsByFiltersUseCase {
     session_persistence: Arc<dyn FocusSessionPersistence>,
@@ -44,6 +67,16 @@ impl FindSessionsByFiltersUseCase {
             })
             .transpose()?;
 
+        let task_ids = filters
+            .task_ids
+            .map(|ids| {
+                ids.iter()
+                    .map(|id| Uuid::parse_str(id))
+                    .collect::<Result<Vec<_>, _>>()
+                    .map_err(|_| AppError::InvalidId("Task task id".to_string()))
+            })
+            .transpose()?;
+
         let (min_concentration_score, max_concentration_score) = filters
             .concentration_score_range
             .map(|s| (s.min, s.max))
@@ -54,6 +87,7 @@ impl FindSessionsByFiltersUseCase {
             start_date,
             end_date,
             category_ids,
+            task_ids,
             session_type: filters.session_type,
             min_concentration_score,
             max_concentration_score,
@@ -68,9 +102,6 @@ impl FindSessionsByFiltersUseCase {
 mod tests {
     use super::*;
     use crate::mocks::MockFocusSessionPersistence;
-    use crate::use_cases::focus_session::command::find_session_filters::{
-        ConcentrationScoreFilter, FocusSessionDateFilter,
-    };
     use chrono::DateTime;
     use domain::entities::focus_session_type::FocusSessionType;
     use std::sync::Arc;
@@ -111,6 +142,7 @@ mod tests {
             }),
             user_id: Uuid::new_v4(),
             category_ids: Some(vec![category_id.to_string()]),
+            task_ids: None,
             session_type: Some(FocusSessionType::Work),
             concentration_score_range: Some(ConcentrationScoreFilter { min: 1, max: 5 }),
             has_notes: None,
@@ -164,6 +196,7 @@ mod tests {
             user_id: Uuid::new_v4(),
             date_range: None,
             category_ids: None,
+            task_ids: None,
             session_type: None,
             concentration_score_range: None,
             has_notes: Some(true),
@@ -190,6 +223,7 @@ mod tests {
             user_id: Uuid::new_v4(),
             date_range: None,
             category_ids: None,
+            task_ids: None,
             session_type: None,
             concentration_score_range: None,
             has_notes: None,
@@ -213,6 +247,7 @@ mod tests {
                 end_date: 1761119000,
             }),
             category_ids: None,
+            task_ids: None,
             session_type: None,
             concentration_score_range: None,
             has_notes: None,
