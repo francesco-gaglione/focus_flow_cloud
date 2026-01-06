@@ -8,6 +8,8 @@ import 'package:focus_flow_app/presentation/notes/bloc/notes_event.dart';
 import 'package:focus_flow_app/presentation/notes/bloc/notes_state.dart';
 import 'package:focus_flow_app/presentation/widgets/common/markdown_editor_input.dart';
 import 'package:focus_flow_app/domain/entities/category.dart';
+import 'package:focus_flow_app/domain/entities/category_with_tasks.dart';
+import 'package:focus_flow_app/domain/entities/task.dart';
 
 class NotesView extends StatelessWidget {
   const NotesView({super.key});
@@ -44,6 +46,8 @@ class NotesView extends StatelessWidget {
                         _DateFilterChip(),
                         const SizedBox(width: 8),
                         _CategoryFilterChip(),
+                        const SizedBox(width: 8),
+                        _TaskFilterChip(),
                         const SizedBox(width: 8),
                         _ClearFiltersButton(),
                       ],
@@ -141,22 +145,30 @@ class _CategoryFilterChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = context.watch<NotesBloc>().state;
     final selectedId = state.selectedCategoryId;
-    final selectedCategory = state.categories.cast<Category?>().firstWhere(
-      (c) => c?.id == selectedId,
-      orElse: () => null,
-    );
+    final selectedCategoryWithTasks =
+        state.categories
+            .cast<CategoryWithTasks?>()
+            .firstWhere(
+              (c) => c?.category.id == selectedId,
+              orElse: () => null,
+            );
 
     final isFiltered = selectedId != null;
-    final label = isFiltered ? selectedCategory?.name ?? 'Unknown' : 'Category';
+    final label =
+        isFiltered
+            ? selectedCategoryWithTasks?.category.name ?? 'Unknown'
+            : 'Category';
 
     return PopupMenuButton<String?>(
       tooltip: 'Filter by Category',
       initialValue: selectedId,
       itemBuilder: (context) {
         return state.categories.map(
-            (category) =>
-                PopupMenuItem(value: category.id, child: Text(category.name)),
-          ).toList();
+          (c) => PopupMenuItem(
+            value: c.category.id,
+            child: Text(c.category.name),
+          ),
+        ).toList();
       },
       onSelected: (value) {
         context.read<NotesBloc>().add(NotesCategoryChanged(value));
@@ -169,6 +181,71 @@ class _CategoryFilterChip extends StatelessWidget {
             isFiltered
                 ? const Icon(Icons.close, size: 18)
                 : const Icon(Icons.category_outlined, size: 18),
+        showCheckmark: false,
+      ),
+    );
+  }
+}
+
+class _TaskFilterChip extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final state = context.watch<NotesBloc>().state;
+    final selectedTaskId = state.selectedTaskId;
+    final selectedCategoryId = state.selectedCategoryId;
+
+    // Get available tasks based on selected category
+    final List<Task> availableTasks;
+    if (selectedCategoryId != null) {
+      final categoryWithTasks = state.categories.firstWhere(
+        (c) => c.category.id == selectedCategoryId,
+        orElse: () => CategoryWithTasks(
+          category: Category(
+            id: '',
+            name: '',
+            color: '',
+            createdAt: DateTime.fromMillisecondsSinceEpoch(0),
+            updatedAt: DateTime.fromMillisecondsSinceEpoch(0),
+          ), // Should ideally handle gracefully
+          tasks: [],
+        ),
+      );
+      availableTasks = categoryWithTasks.tasks;
+    } else {
+      availableTasks =
+          state.categories.expand((c) => c.tasks).toList();
+    }
+
+    final selectedTask = availableTasks.cast<Task?>().firstWhere(
+      (t) => t?.id == selectedTaskId,
+      orElse: () => null,
+    );
+
+    final isFiltered = selectedTaskId != null;
+    final label = isFiltered ? selectedTask?.name ?? 'Unknown' : 'Task';
+
+    // Disable chip if no tasks available
+    if (availableTasks.isEmpty) return const SizedBox.shrink();
+
+    return PopupMenuButton<String?>(
+      tooltip: 'Filter by Task',
+      initialValue: selectedTaskId,
+      itemBuilder: (context) {
+        return availableTasks.map(
+          (task) => PopupMenuItem(value: task.id, child: Text(task.name)),
+        ).toList();
+      },
+      onSelected: (value) {
+        context.read<NotesBloc>().add(NotesTaskChanged(value));
+      },
+      child: FilterChip(
+        label: Text(label),
+        selected: isFiltered,
+        onSelected: null, // Handled by PopupMenuButton
+        avatar:
+            isFiltered
+                ? const Icon(Icons.close, size: 18)
+                : const Icon(Icons.check_circle_outline, size: 18),
         showCheckmark: false,
       ),
     );
@@ -252,6 +329,45 @@ class _NoteCard extends StatelessWidget {
                       ),
                     ),
                   ],
+                  if (session.taskId != null) ...[
+                    const SizedBox(width: 8),
+                    Builder(
+                      builder: (context) {
+                        final taskName = _getTaskName(context, session.taskId);
+                        if (taskName == null) return const SizedBox.shrink();
+                        
+                        return Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.secondaryContainer.withAlpha(
+                              100,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.check_circle_outline,
+                                size: 14,
+                                color: theme.colorScheme.onSecondaryContainer,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                taskName,
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color: theme.colorScheme.onSecondaryContainer,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                   const Spacer(),
                   Text(
                     DateFormat('MMM d, y • HH:mm').format(session.createdAt),
@@ -282,7 +398,20 @@ class _NoteCard extends StatelessWidget {
     if (categoryId == null) return null;
     final state = context.read<NotesBloc>().state;
     try {
-      return state.categories.firstWhere((c) => c.id == categoryId).name;
+      return state.categories.firstWhere((c) => c.category.id == categoryId).category.name;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  String? _getTaskName(BuildContext context, String? taskId) {
+    if (taskId == null) return null;
+    final state = context.read<NotesBloc>().state;
+    try {
+      return state.categories
+          .expand((c) => c.tasks)
+          .firstWhere((t) => t.id == taskId)
+          .name;
     } catch (_) {
       return null;
     }
@@ -345,7 +474,8 @@ class _NoteDetailsDialogState extends State<_NoteDetailsDialog> {
       final state = context.read<NotesBloc>().state;
       categoryName =
           state.categories
-              .firstWhere((c) => c.id == widget.session.categoryId)
+              .firstWhere((c) => c.category.id == widget.session.categoryId)
+              .category
               .name;
     } catch (_) {}
 
@@ -501,7 +631,7 @@ class _ClearFiltersButton extends StatelessWidget {
     // Only rebuild when filters changed
     final hasFilters = context.select((NotesBloc bloc) {
       final state = bloc.state;
-      return state.startDate != null || state.endDate != null || state.selectedCategoryId != null;
+      return state.startDate != null || state.endDate != null || state.selectedCategoryId != null || state.selectedTaskId != null;
     });
 
     if (!hasFilters) return const SizedBox.shrink();

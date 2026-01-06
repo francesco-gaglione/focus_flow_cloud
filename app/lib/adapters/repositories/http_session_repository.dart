@@ -54,6 +54,7 @@ class HttpSessionRepository implements SessionRepository {
     int? startDate,
     int? endDate,
     List<String>? categoryIds,
+    String? taskId,
     SessionType? sessionType,
     int? minConcentrationScore,
     int? maxConcentrationScore,
@@ -65,6 +66,7 @@ class HttpSessionRepository implements SessionRepository {
     if (categoryIds != null && categoryIds.isNotEmpty) {
       queryParams['categoryIds'] = categoryIds.join(',');
     }
+    if (taskId != null) queryParams['taskIds'] = taskId;
     if (sessionType != null) queryParams['sessionType'] = sessionType.value;
     if (minConcentrationScore != null) {
       queryParams['minConcentrationScore'] = minConcentrationScore;

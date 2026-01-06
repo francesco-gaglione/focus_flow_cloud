@@ -31,6 +31,15 @@ class NotesCategoryChanged extends NotesEvent {
 
 class NotesFilterCleared extends NotesEvent {}
 
+class NotesTaskChanged extends NotesEvent {
+  final String? taskId;
+
+  const NotesTaskChanged(this.taskId);
+
+  @override
+  List<Object?> get props => [taskId];
+}
+
 class NotesNoteSaved extends NotesEvent {
 
   final String sessionId;

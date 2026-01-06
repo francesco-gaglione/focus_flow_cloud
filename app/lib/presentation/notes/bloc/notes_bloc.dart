@@ -24,6 +24,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     on<NotesStarted>(_onNotesStarted);
     on<NotesDateRangeChanged>(_onDateRangeChanged);
     on<NotesCategoryChanged>(_onCategoryChanged);
+    on<NotesTaskChanged>(_onTaskChanged);
     on<NotesFilterCleared>(_onFilterCleared);
     on<NotesNoteSaved>(_onNoteSaved);
   }
@@ -39,6 +40,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
       startDate: null,
       endDate: null,
       selectedCategoryId: null,
+      selectedTaskId: null,
       errorMessage: state.errorMessage,
       isUpdating: state.isUpdating,
     );
@@ -83,7 +85,8 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
       categories: state.categories,
       startDate: state.startDate,
       endDate: state.endDate,
-      selectedCategoryId: event.categoryId, // Allow null here
+      selectedCategoryId: event.categoryId, 
+      selectedTaskId: null, // Reset task when category changes
       errorMessage: state.errorMessage,
       isUpdating: state.isUpdating,
     );
@@ -120,10 +123,19 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
   Future<void> _fetchCategories(Emitter<NotesState> emit) async {
     final result = await getCategoriesAndTasks.execute();
     if (result.success && result.categoriesWithTasks != null) {
-      final categories =
-          result.categoriesWithTasks!.map((e) => e.category).toList();
-      emit(state.copyWith(categories: categories));
+      emit(state.copyWith(categories: result.categoriesWithTasks));
     }
+  }
+
+  Future<void> _onTaskChanged(
+    NotesTaskChanged event,
+    Emitter<NotesState> emit,
+  ) async {
+    final newState =  state.copyWith(
+      selectedTaskId: event.taskId,
+    );
+    emit(newState);
+    await _fetchNotes(emit, newState);
   }
 
   Future<void> _fetchNotes(
@@ -151,6 +163,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
           currentState.selectedCategoryId != null
               ? [currentState.selectedCategoryId!]
               : null,
+      taskId: currentState.selectedTaskId,
       hasNote: true,
     );
 

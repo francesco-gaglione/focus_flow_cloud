@@ -12,6 +12,7 @@ abstract class SessionRepository {
     int? startDate,
     int? endDate,
     List<String>? categoryIds,
+    String? taskId,
     SessionType? sessionType,
     int? minConcentrationScore,
     int? maxConcentrationScore,
