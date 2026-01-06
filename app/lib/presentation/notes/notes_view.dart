@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:focus_flow_app/domain/entities/focus_session.dart';
 import 'package:focus_flow_app/presentation/notes/bloc/notes_bloc.dart';
 import 'package:focus_flow_app/presentation/notes/bloc/notes_event.dart';
@@ -17,7 +18,7 @@ class NotesView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Notes Archive')),
+      appBar: AppBar(title: Text('notes.title'.tr())),
       body: BlocConsumer<NotesBloc, NotesState>(
         listener: (context, state) {
           if (state.errorMessage != null) {
@@ -68,7 +69,7 @@ class NotesView extends StatelessWidget {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'No notes found for this period',
+                          'notes.no_notes_found'.tr(),
                           style: Theme.of(
                             context,
                           ).textTheme.bodyLarge?.copyWith(
@@ -108,8 +109,8 @@ class _DateFilterChip extends StatelessWidget {
     final isFiltered = state.startDate != null;
     final label =
         isFiltered
-            ? '${DateFormat('MMM d').format(state.startDate!)} - ${DateFormat('MMM d').format(state.endDate!)}'
-            : 'Date Range';
+            ? '${DateFormat('MMM d', context.locale.toString()).format(state.startDate!)} - ${DateFormat('MMM d', context.locale.toString()).format(state.endDate!)}'
+            : 'notes.date_range'.tr();
 
     return FilterChip(
       label: Text(label),
@@ -157,10 +158,10 @@ class _CategoryFilterChip extends StatelessWidget {
     final label =
         isFiltered
             ? selectedCategoryWithTasks?.category.name ?? 'Unknown'
-            : 'Category';
+            : 'common.category'.tr();
 
     return PopupMenuButton<String?>(
-      tooltip: 'Filter by Category',
+      tooltip: 'notes.filter_by_category'.tr(),
       initialValue: selectedId,
       itemBuilder: (context) {
         return state.categories.map(
@@ -222,13 +223,13 @@ class _TaskFilterChip extends StatelessWidget {
     );
 
     final isFiltered = selectedTaskId != null;
-    final label = isFiltered ? selectedTask?.name ?? 'Unknown' : 'Task';
+    final label = isFiltered ? selectedTask?.name ?? 'Unknown' : 'common.task'.tr();
 
     // Disable chip if no tasks available
     if (availableTasks.isEmpty) return const SizedBox.shrink();
 
     return PopupMenuButton<String?>(
-      tooltip: 'Filter by Task',
+      tooltip: 'notes.filter_by_task'.tr(),
       initialValue: selectedTaskId,
       itemBuilder: (context) {
         return availableTasks.map(
@@ -370,7 +371,7 @@ class _NoteCard extends StatelessWidget {
                   ],
                   const Spacer(),
                   Text(
-                    DateFormat('MMM d, y • HH:mm').format(session.createdAt),
+                    DateFormat('MMM d, y • HH:mm', context.locale.toString()).format(session.createdAt),
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: theme.colorScheme.outline,
                     ),
@@ -501,7 +502,7 @@ class _NoteDetailsDialogState extends State<_NoteDetailsDialog> {
                 }
               },
               icon: Icon(_isEditing ? Icons.save : Icons.edit),
-              label: Text(_isEditing ? 'Save Changes' : 'Edit Note'),
+              label: Text(_isEditing ? 'notes.save_changes'.tr() : 'notes.edit_note'.tr()),
             ),
             body: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -535,7 +536,7 @@ class _NoteDetailsDialogState extends State<_NoteDetailsDialog> {
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Text(
-                                'Editing',
+                                'notes.editing'.tr(),
                                 style: theme.textTheme.labelMedium?.copyWith(
                                   color: theme.colorScheme.onPrimaryContainer,
                                   fontWeight: FontWeight.bold,
@@ -547,7 +548,7 @@ class _NoteDetailsDialogState extends State<_NoteDetailsDialog> {
                       const SizedBox(height: 16),
                       if (!_isEditing) ...[
                         Text(
-                          DateFormat.yMMMMEEEEd().format(
+                          DateFormat.yMMMMEEEEd(context.locale.toString()).format(
                             widget.session.createdAt,
                           ),
                           style: theme.textTheme.headlineSmall?.copyWith(
@@ -557,7 +558,7 @@ class _NoteDetailsDialogState extends State<_NoteDetailsDialog> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '${DateFormat.Hm().format(widget.session.createdAt)} • ${widget.session.sessionType.value}',
+                          '${DateFormat.Hm(context.locale.toString()).format(widget.session.createdAt)} • ${widget.session.sessionType.value}',
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
@@ -593,7 +594,7 @@ class _NoteDetailsDialogState extends State<_NoteDetailsDialog> {
                             padding: const EdgeInsets.all(16.0),
                             child: MarkdownEditorInput(
                               controller: _controller,
-                              hint: 'Write your notes here...',
+                              hint: 'notes.write_hint'.tr(),
                             ),
                           )
                           : SingleChildScrollView(
@@ -601,7 +602,7 @@ class _NoteDetailsDialogState extends State<_NoteDetailsDialog> {
                             child: MarkdownBody(
                               data:
                                   _controller.text.isEmpty
-                                      ? '*No content*'
+                                      ? 'notes.no_content'.tr()
                                       : _controller.text,
                               styleSheet: MarkdownStyleSheet.fromTheme(
                                 theme,
@@ -641,7 +642,7 @@ class _ClearFiltersButton extends StatelessWidget {
         context.read<NotesBloc>().add(NotesFilterCleared());
       }, 
       icon: const Icon(Icons.refresh),
-      tooltip: 'Clear all filters',
+      tooltip: 'notes.clear_filters'.tr(),
       style: IconButton.styleFrom(
         backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
         foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant,

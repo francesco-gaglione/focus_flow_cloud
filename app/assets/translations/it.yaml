@@ -174,3 +174,18 @@ manual_session:
   notes: Note
   error_end_time: L'ora di fine non può essere prima dell'inizio
   error_category: Seleziona una categoria
+
+# Sezione Note
+notes:
+  title: Archivio Note
+  no_notes_found: Nessuna nota trovata in questo periodo
+  date_range: Intervallo Date
+  all_tasks: Tutte le attività
+  filter_by_category: Filtra per Categoria
+  filter_by_task: Filtra per Attività
+  write_hint: Scrivi qui le tue note...
+  no_content: "*Nessun contenuto*"
+  save_changes: Salva Modifiche
+  edit_note: Modifica Nota
+  editing: Modifica in corso
+  clear_filters: Pulisci filtri
