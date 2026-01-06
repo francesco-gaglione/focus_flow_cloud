@@ -283,21 +283,45 @@ class _StatisticsViewState extends State<StatisticsView> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Simple responsive logic: 2 columns on narrow screens, 3 on wider
-        final crossAxisCount = constraints.maxWidth > 600 ? 3 : 2;
-        return GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: crossAxisCount,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            childAspectRatio: 1.5, // Adjust aspect ratio for card shape
+        final isDesktop = constraints.maxWidth > 600;
+
+        if (isDesktop) {
+          int crossAxisCount = 3;
+          if (constraints.maxWidth > 1100) {
+            crossAxisCount = 5;
+          } else if (constraints.maxWidth > 800) {
+            crossAxisCount = 4;
+          }
+
+          return GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: crossAxisCount,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: 2.8,
+            ),
+            itemCount: items.length,
+            itemBuilder: (context, index) {
+              return _buildSummaryCard(context, items[index]);
+            },
+          );
+        }
+
+        return SizedBox(
+          height: 80,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: items.length,
+            separatorBuilder: (context, index) => const SizedBox(width: 12),
+            itemBuilder: (context, index) {
+              return SizedBox(
+                width: 150,
+                child: _buildSummaryCard(context, items[index]),
+              );
+            },
           ),
-          itemCount: items.length,
-          itemBuilder: (context, index) {
-            return _buildSummaryCard(context, items[index]);
-          },
         );
       },
     );
@@ -306,19 +330,17 @@ class _StatisticsViewState extends State<StatisticsView> {
   Widget _buildSummaryCard(BuildContext context, _SummaryItem item) {
     final colorScheme = Theme.of(context).colorScheme;
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerHighest.withAlpha(
           (255 * 0.5).round(),
         ), // Glass-like opacity
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: colorScheme.outlineVariant.withAlpha((255 * 0.2).round()),
         ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(8),
@@ -326,31 +348,33 @@ class _StatisticsViewState extends State<StatisticsView> {
               color: item.color.withAlpha((255 * 0.1).round()),
               shape: BoxShape.circle,
             ),
-            child: Icon(item.icon, color: item.color, size: 24),
+            child: Icon(item.icon, color: item.color, size: 20),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                item.value,
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20, // Slightly smaller headline for grid
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  item.value,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                item.title,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                  fontWeight: FontWeight.w500,
+                Text(
+                  item.title,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    fontSize: 10,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
