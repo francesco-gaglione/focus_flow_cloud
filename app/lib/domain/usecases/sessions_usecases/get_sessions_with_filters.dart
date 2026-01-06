@@ -13,6 +13,7 @@ class GetSessionsWithFilters {
     SessionType? sessionType,
     int? minConcentrationScore,
     int? maxConcentrationScore,
+    bool? hasNote,
   }) async {
     try {
       // Validate concentration scores if provided
@@ -62,6 +63,7 @@ class GetSessionsWithFilters {
         sessionType: sessionType,
         minConcentrationScore: minConcentrationScore,
         maxConcentrationScore: maxConcentrationScore,
+        hasNote: hasNote,
       );
 
       return GetSessionsWithFiltersResult(success: true, sessions: sessions);

@@ -42,6 +42,7 @@ impl CalculateStatsByPeriodUseCase {
         let sessions = self
             .focus_session_persistence
             .find_by_filters(SessionFilter {
+                user_id: period.user_id,
                 start_date,
                 end_date,
                 category_ids: None,

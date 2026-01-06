@@ -1,9 +1,11 @@
 import 'package:dio/dio.dart';
+import 'package:logger/logger.dart';
 import '../../domain/entities/focus_session.dart';
 import '../../domain/repositories/session_repository.dart';
 import '../dtos/session_dtos.dart';
 
 class HttpSessionRepository implements SessionRepository {
+  final logger = Logger();
   final Dio _dio;
   final String baseUrl;
 
@@ -28,7 +30,7 @@ class HttpSessionRepository implements SessionRepository {
             categoryId: session.categoryId,
             concentrationScore: session.concentrationScore,
             notes: session.notes,
-            createdAt: DateTime.fromMillisecondsSinceEpoch(session.createdAt),
+            createdAt: DateTime.fromMillisecondsSinceEpoch(session.createdAt * 1000, isUtc: true),
           ),
         )
         .toList();
@@ -55,11 +57,14 @@ class HttpSessionRepository implements SessionRepository {
     SessionType? sessionType,
     int? minConcentrationScore,
     int? maxConcentrationScore,
+    bool? hasNote,
   }) async {
     final queryParams = <String, dynamic>{};
     if (startDate != null) queryParams['startDate'] = startDate;
     if (endDate != null) queryParams['endDate'] = endDate;
-    if (categoryIds != null) queryParams['categoryIds'] = categoryIds;
+    if (categoryIds != null && categoryIds.isNotEmpty) {
+      queryParams['categoryIds'] = categoryIds.join(',');
+    }
     if (sessionType != null) queryParams['sessionType'] = sessionType.value;
     if (minConcentrationScore != null) {
       queryParams['minConcentrationScore'] = minConcentrationScore;
@@ -67,28 +72,44 @@ class HttpSessionRepository implements SessionRepository {
     if (maxConcentrationScore != null) {
       queryParams['maxConcentrationScore'] = maxConcentrationScore;
     }
+    if (hasNote != null) queryParams['hasNotes'] = hasNote;
 
-    final response = await _dio.get(
-      '$baseUrl/api/focus-session',
-      queryParameters: queryParams,
-    );
-    final dto = GetSessionFiltersResponseDto.fromJson(response.data);
-    return dto.focusSessions
-        .map(
-          (session) => FocusSession(
-            id: session.id,
-            sessionType: SessionType.fromString(session.sessionType),
-            startedAt: session.startedAt,
-            endedAt: session.endedAt,
-            actualDuration: session.actualDuration,
-            taskId: session.taskId,
-            categoryId: session.categoryId,
-            concentrationScore: session.concentrationScore,
-            notes: session.notes,
-            createdAt: DateTime.fromMillisecondsSinceEpoch(session.createdAt),
-          ),
-        )
-        .toList();
+    logger.i('Fetching sessions with params: $queryParams');
+
+    try {
+      final response = await _dio.get(
+        '$baseUrl/api/focus-session',
+        queryParameters: queryParams,
+        options: Options(listFormat: ListFormat.multi),
+      );
+      final dto = GetSessionFiltersResponseDto.fromJson(response.data);
+      return dto.focusSessions
+          .map(
+            (session) => FocusSession(
+              id: session.id,
+              sessionType: SessionType.fromString(session.sessionType),
+              startedAt: session.startedAt,
+              endedAt: session.endedAt,
+              actualDuration: session.actualDuration,
+              taskId: session.taskId,
+              categoryId: session.categoryId,
+              concentrationScore: session.concentrationScore,
+              notes: session.notes,
+              createdAt: DateTime.fromMillisecondsSinceEpoch(session.createdAt * 1000, isUtc: true),
+            ),
+          )
+          .toList();
+    } on DioException catch (e) {
+      if (e.response != null) {
+        logger.e(
+          'Error fetching sessions: ${e.response?.statusCode}',
+          error: e.response?.data,
+        );
+      } else {
+        logger.e('Error fetching sessions: ${e.message}');
+      }
+      rethrow;
+    }
   }
 
   @override
@@ -185,7 +206,7 @@ class HttpSessionRepository implements SessionRepository {
       categoryId: json['categoryId'],
       concentrationScore: json['concentrationScore'],
       notes: json['notes'],
-      createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt']),
+      createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt'] * 1000, isUtc: true),
     );
   }
 

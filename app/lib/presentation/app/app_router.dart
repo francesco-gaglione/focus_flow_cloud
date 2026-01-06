@@ -7,6 +7,7 @@ import '../focus/focus_page.dart';
 import '../category/category_page.dart';
 import '../statistics/statistics_page.dart';
 import '../settings/settings_page.dart';
+import '../notes/notes_page.dart';
 import 'main_layout.dart';
 
 class AppRouter {
@@ -47,6 +48,10 @@ class AppRouter {
           GoRoute(
             path: '/settings',
             builder: (context, state) => const SettingsPage(),
+          ),
+          GoRoute(
+            path: '/notes',
+            builder: (context, state) => const NotesPage(),
           ),
         ],
       ),

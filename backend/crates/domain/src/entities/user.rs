@@ -1,5 +1,7 @@
 use uuid::Uuid;
 
+pub type UserId = Uuid;
+
 use crate::entities::user_role::UserRole;
 
 #[derive(Debug, Clone)]

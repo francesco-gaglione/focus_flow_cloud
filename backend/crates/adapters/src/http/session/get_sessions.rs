@@ -6,10 +6,10 @@ use crate::openapi::SESSION_TAG;
 use application::use_cases::focus_session::command::find_session_filters::{
     ConcentrationScoreFilter, FindSessionFiltersCommand, FocusSessionDateFilter,
 };
-use axum::extract::{Query, State};
+use axum::extract::{Extension, Query, State};
 use axum::Json;
 use domain::entities::focus_session_type::FocusSessionType;
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize};
 use tracing::debug;
 use utoipa::{IntoParams, ToSchema};
 use validator::Validate;
@@ -17,12 +17,42 @@ use validator::Validate;
 use crate::http::dto::common::{
     focus_session::FocusSessionDto, session_type_enum::SessionTypeEnum,
 };
+use crate::http::model::session_model::UserSession;
+
+fn deserialize_option_string_or_vec<'de, D>(
+    deserializer: D,
+) -> Result<Option<Vec<String>>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    #[derive(Deserialize)]
+    #[serde(untagged)]
+    enum StringOrVec {
+        String(String),
+        Vec(Vec<String>),
+    }
+
+    let value = Option::<StringOrVec>::deserialize(deserializer)?;
+
+    match value {
+        Some(StringOrVec::Vec(v)) => Ok(Some(v)),
+        Some(StringOrVec::String(s)) => {
+            if s.is_empty() {
+                Ok(None)
+            } else {
+                Ok(Some(s.split(',').map(|s| s.trim().to_string()).collect()))
+            }
+        }
+        None => Ok(None),
+    }
+}
 
 #[derive(Debug, Serialize, Deserialize, Validate, ToSchema, IntoParams)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSessionFiltersDto {
     pub start_date: Option<i64>,
     pub end_date: Option<i64>,
+    #[serde(default, deserialize_with = "deserialize_option_string_or_vec")]
     #[validate(custom(function = "validate_uuids"))]
     pub category_ids: Option<Vec<String>>,
     pub session_type: Option<SessionTypeEnum>,
@@ -59,9 +89,11 @@ pub struct GetSessionFiltersResponseDto {
 )]
 pub async fn get_sessions(
     State(state): State<AppState>,
+    Extension(session): Extension<UserSession>,
     query: Query<GetSessionFiltersDto>,
 ) -> HttpResult<Json<GetSessionFiltersResponseDto>> {
     debug!("query: {:?}", query);
+    let state = state;
 
     if (query.start_date.is_some() && query.end_date.is_none())
         || (query.start_date.is_none() && query.end_date.is_some())
@@ -104,6 +136,7 @@ pub async fn get_sessions(
     };
 
     let filters = FindSessionFiltersCommand {
+        user_id: session.user_id,
         date_range,
         category_ids: query.category_ids.clone(),
         session_type,

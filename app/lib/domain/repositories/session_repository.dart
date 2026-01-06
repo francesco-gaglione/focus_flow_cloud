@@ -15,6 +15,7 @@ abstract class SessionRepository {
     SessionType? sessionType,
     int? minConcentrationScore,
     int? maxConcentrationScore,
+    bool? hasNote,
   });
 
   /// Create a new manual session

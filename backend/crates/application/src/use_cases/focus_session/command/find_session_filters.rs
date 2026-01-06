@@ -1,7 +1,9 @@
 use domain::entities::focus_session_type::FocusSessionType;
+use domain::entities::user::UserId;
 
 #[derive(Debug, Clone)]
 pub struct FindSessionFiltersCommand {
+    pub user_id: UserId,
     pub date_range: Option<FocusSessionDateFilter>,
     pub category_ids: Option<Vec<String>>,
     pub session_type: Option<FocusSessionType>,

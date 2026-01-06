@@ -50,6 +50,7 @@ impl FindSessionsByFiltersUseCase {
             .unzip();
 
         let filter = SessionFilter {
+            user_id: filters.user_id,
             start_date,
             end_date,
             category_ids,
@@ -108,6 +109,7 @@ mod tests {
                 start_date: 1761118000,
                 end_date: 1761119000,
             }),
+            user_id: Uuid::new_v4(),
             category_ids: Some(vec![category_id.to_string()]),
             session_type: Some(FocusSessionType::Work),
             concentration_score_range: Some(ConcentrationScoreFilter { min: 1, max: 5 }),
@@ -150,15 +152,16 @@ mod tests {
             .expect_find_by_filters()
             .returning(move |filter| {
                 if filter.has_notes == Some(true) {
-                     Ok(vec![focus_session.clone()])
+                    Ok(vec![focus_session.clone()])
                 } else {
-                     Ok(vec![])
+                    Ok(vec![])
                 }
             });
 
         let use_case = FindSessionsByFiltersUseCase::new(Arc::new(mock_session_persistence));
 
         let filters = FindSessionFiltersCommand {
+            user_id: Uuid::new_v4(),
             date_range: None,
             category_ids: None,
             session_type: None,
@@ -184,6 +187,7 @@ mod tests {
         let use_case = FindSessionsByFiltersUseCase::new(Arc::new(mock_session_persistence));
 
         let filters = FindSessionFiltersCommand {
+            user_id: Uuid::new_v4(),
             date_range: None,
             category_ids: None,
             session_type: None,
@@ -203,6 +207,7 @@ mod tests {
 
         // Test invalid start date (would cause DateTime::from_timestamp_secs to return None)
         let filters = FindSessionFiltersCommand {
+            user_id: Uuid::new_v4(),
             date_range: Some(FocusSessionDateFilter {
                 start_date: i64::MAX, // Invalid timestamp
                 end_date: 1761119000,

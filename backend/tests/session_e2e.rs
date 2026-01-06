@@ -8,6 +8,7 @@ use adapters::http::{
         update_session::UpdateFocusSessionDto,
     },
     task::{create_task::CreateTaskDto, get_tasks::TasksResponseDto},
+    users::create_user::CreateUserDto,
 };
 use chrono::Utc;
 use tracing::info;
@@ -262,8 +263,12 @@ async fn find_sessions_with_filters() {
         .json()
         .await
         .expect("Failed to deserialize response");
-    
-    assert_eq!(body.focus_sessions.len(), 1, "Should find exactly one session with notes");
+
+    assert_eq!(
+        body.focus_sessions.len(),
+        1,
+        "Should find exactly one session with notes"
+    );
     assert!(body.focus_sessions[0].notes.is_some());
 
     // 4. Filter: hasNotes = false
@@ -281,6 +286,195 @@ async fn find_sessions_with_filters() {
         .await
         .expect("Failed to deserialize response");
 
-    assert_eq!(body.focus_sessions.len(), 1, "Should find exactly one session without notes");
+    assert_eq!(
+        body.focus_sessions.len(),
+        1,
+        "Should find exactly one session without notes"
+    );
     assert!(body.focus_sessions[0].notes.is_none());
+}
+
+#[tokio::test]
+async fn find_sessions_with_category_and_notes() {
+    let context = setup().await;
+
+    // 1. Create Category
+    let create_category_dto = CreateCategoryDto {
+        name: "Work".to_string(),
+        description: Some("Work related tasks".to_string()),
+        color: Some("#FF5733".to_string()),
+    };
+    let category = context.create_category(&create_category_dto).await;
+
+    // 2. Create Session with Category and Notes
+    let session = CreateManualSessionDto {
+        task_id: None,
+        category_id: Some(category.category_id.clone()),
+        session_type: SessionTypeEnum::Work,
+        concentration_score: Some(5),
+        started_at: Utc::now().timestamp(),
+        ended_at: Utc::now().timestamp() + 1800,
+        notes: Some("My notes".to_string()),
+    };
+    context.create_manual_session(&session).await;
+
+    // 3. Query with categoryIds and hasNotes=true
+    let response = context
+        .client
+        .get(format!("{}/api/focus-session", context.base_url))
+        .query(&[
+            ("categoryIds", category.category_id.as_str()),
+            ("hasNotes", "true"),
+        ])
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    assert_eq!(response.status(), 200);
+    let body: GetSessionFiltersResponseDto = response
+        .json()
+        .await
+        .expect("Failed to deserialize response");
+
+    assert_eq!(body.focus_sessions.len(), 1);
+    assert_eq!(
+        body.focus_sessions[0].category_id,
+        Some(category.category_id.clone())
+    );
+    assert!(body.focus_sessions[0].notes.is_some());
+}
+
+#[tokio::test]
+async fn find_sessions_by_task_category() {
+    let context = setup().await;
+
+    // 1. Create Category
+    let create_category_dto = CreateCategoryDto {
+        name: "Work".to_string(),
+        description: Some("Work related tasks".to_string()),
+        color: Some("#FF5733".to_string()),
+    };
+    let category = context.create_category(&create_category_dto).await;
+
+    // 2. Create Task linked to Category
+    let create_task_dto = CreateTaskDto {
+        name: "Task 1".to_string(),
+        description: None,
+        category_id: Some(category.category_id.clone()),
+        scheduled_date: Some(Utc::now().timestamp()),
+    };
+    let task = context.create_task(&create_task_dto).await;
+
+    // 3. Create Session linked to Task (but NO category_id explicitly)
+    let session = CreateManualSessionDto {
+        task_id: Some(task.id.clone()),
+        category_id: None, // Implicitly belongs to category via task
+        session_type: SessionTypeEnum::Work,
+        concentration_score: Some(5),
+        started_at: Utc::now().timestamp(),
+        ended_at: Utc::now().timestamp() + 1800,
+        notes: Some("Session via task".to_string()),
+    };
+    context.create_manual_session(&session).await;
+
+    // 4. Query with categoryIds
+    let response = context
+        .client
+        .get(format!("{}/api/focus-session", context.base_url))
+        .query(&[
+            ("categoryIds", category.category_id.as_str()),
+            ("hasNotes", "true"),
+        ])
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    assert_eq!(response.status(), 200);
+    let body: GetSessionFiltersResponseDto = response
+        .json()
+        .await
+        .expect("Failed to deserialize response");
+
+    assert_eq!(
+        body.focus_sessions.len(),
+        1,
+        "Should find session via task category"
+    );
+    assert_eq!(
+        body.focus_sessions[0].notes,
+        Some("Session via task".to_string())
+    );
+}
+
+#[tokio::test]
+async fn test_user_isolation() {
+    let context = setup().await;
+
+    // 1. Create Session for User A (Admin)
+    let session_a = CreateManualSessionDto {
+        task_id: None,
+        category_id: None,
+        session_type: SessionTypeEnum::Work,
+        concentration_score: None,
+        started_at: Utc::now().timestamp(),
+        ended_at: Utc::now().timestamp() + 1800,
+        notes: Some("User A Session".to_string()),
+    };
+    context.create_manual_session(&session_a).await;
+
+    // 2. Create User B
+    let create_user_dto = CreateUserDto {
+        username: "user_b".to_string(),
+        password: "password".to_string(),
+    };
+    context.create_user(&create_user_dto).await;
+
+    // 3. Login as User B
+    let login_body = serde_json::json!({
+        "username": "user_b",
+        "password": "password"
+    });
+
+    let client = reqwest::Client::new();
+    let response = client
+        .post(format!("{}/api/auth/login", context.base_url))
+        .json(&login_body)
+        .send()
+        .await
+        .expect("Failed to login as user_b");
+
+    assert_eq!(response.status(), 200, "Failed to login as user_b");
+    let login_response: serde_json::Value = response.json().await.unwrap();
+    let token = login_response["token"].as_str().unwrap();
+
+    // 4. Create Client for User B
+    let mut headers = reqwest::header::HeaderMap::new();
+    headers.insert(
+        reqwest::header::AUTHORIZATION,
+        reqwest::header::HeaderValue::from_str(&format!("Bearer {}", token)).unwrap(),
+    );
+    let client_b = reqwest::Client::builder()
+        .default_headers(headers)
+        .build()
+        .unwrap();
+
+    // 5. User B tries to get sessions
+    let response = client_b
+        .get(format!("{}/api/focus-session", context.base_url))
+        .send()
+        .await
+        .expect("Failed to execute request for user_b");
+
+    assert_eq!(response.status(), 200);
+    let body: GetSessionFiltersResponseDto = response
+        .json()
+        .await
+        .expect("Failed to deserialize response");
+
+    // 6. Assert User B sees 0 sessions
+    assert_eq!(
+        body.focus_sessions.len(),
+        0,
+        "User B should not see User A's sessions"
+    );
 }
