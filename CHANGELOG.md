@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.23.0] - 2026-01-06
+
+### Features
+
+- Add filter for sessions with notes (#30)
+
 ## [1.22.0] - 2026-01-04
 
 ### Documentation
