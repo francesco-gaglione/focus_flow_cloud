@@ -173,10 +173,13 @@ impl FocusSession {
 
 #[derive(Debug, Clone)]
 pub struct SessionFilter {
+    pub user_id: Uuid,
     pub start_date: Option<DateTime<Utc>>,
     pub end_date: Option<DateTime<Utc>>,
     pub category_ids: Option<Vec<Uuid>>,
+    pub task_ids: Option<Vec<Uuid>>,
     pub session_type: Option<FocusSessionType>,
     pub min_concentration_score: Option<i32>,
     pub max_concentration_score: Option<i32>,
+    pub has_notes: Option<bool>,
 }

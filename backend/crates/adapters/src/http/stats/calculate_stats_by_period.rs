@@ -1,8 +1,9 @@
 use crate::http::app_state::AppState;
+use crate::http::model::session_model::UserSession;
 use crate::http_error::HttpResult;
 use crate::openapi::STATS_TAG;
 use application::use_cases::stats::command::calculate_stats_by_period::StatsPeriod;
-use axum::extract::{Query, State};
+use axum::extract::{Extension, Query, State};
 use axum::Json;
 use domain::entities::stats::{
     CategoryDistributionItem, ConcentrationPeriod, DailyActivityDistributionItem,
@@ -189,11 +190,13 @@ impl From<DailyActivityDistributionItem> for DailyActivityDistributionDto {
 )]
 pub async fn calculate_stats_by_period_api(
     State(state): State<AppState>,
+    Extension(session): Extension<UserSession>,
     query: Query<GetStatsByPeriodDto>,
 ) -> HttpResult<Json<GetStatsByPeriodResponseDto>> {
     debug!("query: {:?}", query);
 
     let stats_period = StatsPeriod {
+        user_id: session.user_id,
         start_date: query.start_date,
         end_date: query.end_date,
     };

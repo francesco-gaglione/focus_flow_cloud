@@ -23,6 +23,7 @@ import 'package:focus_flow_app/domain/usecases/tasks_usecases/create_task.dart';
 import 'package:focus_flow_app/domain/usecases/tasks_usecases/delete_tasks.dart';
 import 'package:focus_flow_app/domain/usecases/tasks_usecases/fetch_orphan_tasks.dart';
 import 'package:focus_flow_app/domain/usecases/tasks_usecases/update_task.dart';
+import 'package:focus_flow_app/domain/usecases/sessions_usecases/update_session.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -50,6 +51,7 @@ import '../../presentation/app/app_router.dart';
 import '../../presentation/settings/bloc/settings_bloc.dart';
 import '../services/version_service.dart';
 import '../../presentation/version/cubit/version_cubit.dart';
+
 
 import '../services/configuration_service.dart';
 
@@ -224,6 +226,10 @@ Future<void> setupDependencies(String baseUrl, String wsUrl) async {
     ),
   );
 
+  sl.registerLazySingleton<UpdateSession>(
+    () => UpdateSession(sessionRepository: sl()),
+  );
+
   // Use Cases - Statistics
   sl.registerLazySingleton<CalculateStatsByPeriod>(
     () => CalculateStatsByPeriod(statisticsRepository: sl()),
@@ -234,6 +240,9 @@ Future<void> setupDependencies(String baseUrl, String wsUrl) async {
 
   // Cubits - Settings
   sl.registerFactory(() => SettingsBloc(userSettingsRepository: sl()));
+
+  // Cubits - Notes
+
 
   // Interceptors
   // Interceptors

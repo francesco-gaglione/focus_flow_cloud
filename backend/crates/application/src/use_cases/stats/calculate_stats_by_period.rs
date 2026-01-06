@@ -42,12 +42,15 @@ impl CalculateStatsByPeriodUseCase {
         let sessions = self
             .focus_session_persistence
             .find_by_filters(SessionFilter {
+                user_id: period.user_id,
                 start_date,
                 end_date,
                 category_ids: None,
+                task_ids: None,
                 session_type: None,
                 min_concentration_score: None,
                 max_concentration_score: None,
+                has_notes: None,
             })
             .await?;
 

@@ -71,6 +71,11 @@ class MainLayout extends StatelessWidget {
                   selectedIcon: Icon(Icons.bar_chart),
                   label: Text(''),
                 ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.note_alt_outlined),
+                  selectedIcon: Icon(Icons.note_alt),
+                  label: Text(''),
+                ),
               ],
             ),
             const VerticalDivider(thickness: 1, width: 1),
@@ -119,6 +124,13 @@ class MainLayout extends StatelessWidget {
               selectedIcon: Icons.bar_chart,
               isSelected: currentPath.startsWith('/stats'),
               onTap: () => context.go('/stats'),
+            ),
+            _buildNavItem(
+              context,
+              icon: Icons.note_alt_outlined,
+              selectedIcon: Icons.note_alt,
+              isSelected: currentPath.startsWith('/notes'),
+              onTap: () => context.go('/notes'),
             ),
             _buildNavItem(
               context,
@@ -171,6 +183,7 @@ class MainLayout extends StatelessWidget {
     if (currentPath.startsWith('/focus')) return 0;
     if (currentPath.startsWith('/categories')) return 1;
     if (currentPath.startsWith('/stats')) return 2;
+    if (currentPath.startsWith('/notes')) return 3;
     return 0;
   }
 
@@ -186,6 +199,9 @@ class MainLayout extends StatelessWidget {
         context.go('/stats');
         break;
       case 3:
+        context.go('/notes');
+        break;
+      case 4:
         context.go('/settings');
         break;
     }

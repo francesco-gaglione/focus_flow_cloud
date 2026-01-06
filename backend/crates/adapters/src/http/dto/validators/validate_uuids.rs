@@ -1,3 +1,4 @@
+use tracing::warn;
 use uuid::Uuid;
 use validator::ValidationError;
 
@@ -7,6 +8,7 @@ pub fn validate_uuids(uuids_str: &Vec<String>) -> Result<(), ValidationError> {
         Uuid::parse_str(id).map(|_| ()).map_err(|_| {
             let mut error = ValidationError::new("invalid_uuid");
             error.message = Some("Category ID must be a valid UUID".into());
+            warn!("Invalid UUID: {}", id);
             error
         })?
     }

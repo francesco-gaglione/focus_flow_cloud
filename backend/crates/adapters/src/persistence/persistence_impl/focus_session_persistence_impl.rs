@@ -4,7 +4,7 @@ use crate::persistence::db_models::db_focus_session::{
 use crate::persistence::schema;
 use crate::persistence::PostgresPersistence;
 use async_trait::async_trait;
-use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper};
+use diesel::{BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper};
 use domain::entities::focus_session::{FocusSession, SessionFilter};
 use domain::error::persistence_error::{PersistenceError, PersistenceResult};
 use domain::traits::focus_session_persistence::FocusSessionPersistence;
@@ -104,31 +104,58 @@ impl FocusSessionPersistence for PostgresPersistence {
 
         let result = conn
             .interact(move |conn| {
-                use schema::focus_session::dsl::*;
-                let mut query = focus_session.into_boxed();
+                use schema::focus_session;
+                use schema::tasks;
+
+                let mut query = focus_session::table
+                    .left_join(tasks::table)
+                    .select(focus_session::all_columns)
+                    .into_boxed();
+
+                query = query.filter(focus_session::user_id.eq(filters.user_id));
 
                 if let Some(start) = filters.start_date {
-                    query = query.filter(started_at.ge(start));
+                    query = query.filter(focus_session::started_at.ge(start));
                 }
 
                 if let Some(end) = filters.end_date {
-                    query = query.filter(started_at.le(end));
+                    query = query.filter(focus_session::started_at.le(end));
                 }
 
                 if let Some(cat_ids) = filters.category_ids {
-                    query = query.filter(category_id.eq_any(cat_ids));
+                    query = query.filter(
+                        focus_session::category_id
+                            .eq_any(cat_ids.clone())
+                            .or(tasks::category_id.eq_any(cat_ids)),
+                    );
+                }
+
+                if let Some(task_ids) = filters.task_ids {
+                    query = query.filter(
+                        focus_session::task_id
+                            .eq_any(task_ids.clone())
+                            .or(tasks::id.eq_any(task_ids)),
+                    );
                 }
 
                 if let Some(s_type) = filters.session_type {
-                    query = query.filter(session_type.eq(s_type.to_string()));
+                    query = query.filter(focus_session::session_type.eq(s_type.to_string()));
                 }
 
                 if let Some(min_score) = filters.min_concentration_score {
-                    query = query.filter(concentration_score.ge(min_score));
+                    query = query.filter(focus_session::concentration_score.ge(min_score));
                 }
 
                 if let Some(max_score) = filters.max_concentration_score {
-                    query = query.filter(concentration_score.le(max_score));
+                    query = query.filter(focus_session::concentration_score.le(max_score));
+                }
+
+                if let Some(has_notes) = filters.has_notes {
+                    if has_notes {
+                        query = query.filter(focus_session::notes.is_not_null());
+                    } else {
+                        query = query.filter(focus_session::notes.is_null());
+                    }
                 }
 
                 query.load::<DbFocusSession>(conn)
@@ -136,6 +163,9 @@ impl FocusSessionPersistence for PostgresPersistence {
             .await
             .map_err(|e| PersistenceError::Unexpected(e.to_string()))?
             .map_err(|e| PersistenceError::Unexpected(e.to_string()))?;
+
+        let result: Vec<DbFocusSession> = result; // Type hint
+        info!("Found {} sessions", result.len());
 
         Ok(result.into_iter().map(|s| s.into()).collect())
     }

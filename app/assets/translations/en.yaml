@@ -174,3 +174,18 @@ manual_session:
   notes: Notes
   error_end_time: End time cannot be before start time
   error_category: Please select a category
+
+# Notes Section
+notes:
+  title: Notes Archive
+  no_notes_found: No notes found for this period
+  date_range: Date Range
+  all_tasks: All Tasks
+  filter_by_category: Filter by Category
+  filter_by_task: Filter by Task
+  write_hint: Write your notes here...
+  no_content: "*No content*"
+  save_changes: Save Changes
+  edit_note: Edit Note
+  editing: Editing
+  clear_filters: Clear all filters
