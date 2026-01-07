@@ -6,6 +6,7 @@ class MarkdownEditorInput extends StatefulWidget {
   final String? label;
   final String? hint;
   final bool hideFullScreenButton;
+  final Widget Function(BuildContext)? fullScreenOverlayBuilder;
 
   const MarkdownEditorInput({
     super.key,
@@ -13,6 +14,7 @@ class MarkdownEditorInput extends StatefulWidget {
     this.label,
     this.hint,
     this.hideFullScreenButton = false,
+    this.fullScreenOverlayBuilder,
   });
 
   @override
@@ -66,7 +68,7 @@ class _MarkdownEditorInputState extends State<MarkdownEditorInput> {
   void _openFullScreen(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        fullscreenDialog: true,
+        // fullscreenDialog: true,
         builder: (context) => Scaffold(
           appBar: AppBar(
             title: Text(widget.label ?? 'Editor'),
@@ -83,8 +85,13 @@ class _MarkdownEditorInputState extends State<MarkdownEditorInput> {
               hint: widget.hint,
               // Avoid recursive full screen button in the full screen mode
               hideFullScreenButton: true,
+              fullScreenOverlayBuilder: widget.fullScreenOverlayBuilder,
             ),
           ),
+          floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+          floatingActionButton: widget.fullScreenOverlayBuilder != null 
+              ? widget.fullScreenOverlayBuilder!(context)
+              : null,
         ),
       ),
     );

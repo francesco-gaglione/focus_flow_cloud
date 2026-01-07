@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../common/markdown_editor_input.dart';
 
 import 'package:focus_flow_app/domain/entities/note_template.dart';
+import 'package:focus_flow_app/presentation/widgets/focus/minimalist_timer_header.dart';
 
 class FocusNotesWidget extends StatefulWidget {
   final String? initialNotes;
@@ -143,6 +144,7 @@ class _FocusNotesWidgetState extends State<FocusNotesWidget> {
             MarkdownEditorInput(
               controller: _notesController,
               hint: context.tr('focus.notes_hint'),
+              fullScreenOverlayBuilder: (context) => const MinimalistTimerHeader(),
             ),
           ],
         ),

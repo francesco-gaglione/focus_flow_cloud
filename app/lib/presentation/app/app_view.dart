@@ -7,6 +7,8 @@ import '../../core/theme/app_theme.dart';
 import 'locale_cubit.dart';
 import 'theme_cubit.dart';
 import 'app_router.dart';
+import '../../presentation/focus/bloc/focus_bloc.dart';
+import '../../presentation/focus/bloc/focus_event.dart';
 import '../../presentation/version/cubit/version_cubit.dart';
 import '../../presentation/version/version_listener.dart';
 
@@ -26,8 +28,23 @@ class AppView extends StatelessWidget {
           final lightTheme = AppTheme.light(state.accentColor);
           final darkTheme = AppTheme.dark(state.accentColor);
 
-          return BlocProvider(
-            create: (_) => sl<VersionCubit>()..checkVersion(),
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (_) => sl<VersionCubit>()..checkVersion(),
+              ),
+              BlocProvider(
+                create:
+                    (_) => FocusBloc(
+                      getCategoriesAndTask: sl(),
+                      fetchOrphanTasks: sl(),
+                      websocketRepository: sl(),
+                      getSessionsWithFilters: sl(),
+                      sessionRepository: sl(),
+                      userSettingsRepository: sl(),
+                    )..add(InitState()),
+              ),
+            ],
             child: MaterialApp.router(
               theme: lightTheme,
               darkTheme: darkTheme,
