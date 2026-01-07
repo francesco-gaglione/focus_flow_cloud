@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.24.0] - 2026-01-07
+
+### Documentation
+
+- Add screenshots to Documentation Website and README
+
+### Features
+
+- Optimize Statistics Overview layout for better space efficiency
+- Add persistent timer header in full-screen note editor
+
 ## [1.23.0] - 2026-01-06
 
 ### Features
