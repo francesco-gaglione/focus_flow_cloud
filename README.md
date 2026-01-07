@@ -9,6 +9,29 @@ A comprehensive Pomodoro technique tracking solution featuring a Rust backend an
 
 > 📚 **Full Documentation**: [https://francesco-gaglione.github.io/focus_flow_cloud/](https://francesco-gaglione.github.io/focus_flow_cloud/)
 
+## 📸 Demo
+
+<table align="center">
+  <tr>
+    <td align="center" width="25%"><b>Focus Session</b></td>
+    <td align="center" width="25%"><b>Task Management</b></td>
+    <td align="center" width="25%"><b>Statistics</b></td>
+    <td align="center" width="25%"><b>Settings</b></td>
+  </tr>
+  <tr>
+    <td><img src="doc/static/img/screenshots/focus_light.png" alt="Focus Session Light" width="100%" /></td>
+    <td><img src="doc/static/img/screenshots/category_light.png" alt="Tasks Light" width="100%" /></td>
+    <td><img src="doc/static/img/screenshots/stats_light.png" alt="Statistics Light" width="100%" /></td>
+    <td><img src="doc/static/img/screenshots/settings_light.png" alt="Settings Light" width="100%" /></td>
+  </tr>
+  <tr>
+    <td><img src="doc/static/img/screenshots/focus_dark.png" alt="Focus Session Dark" width="100%" /></td>
+    <td><img src="doc/static/img/screenshots/category_dark.png" alt="Tasks Dark" width="100%" /></td>
+    <td><img src="doc/static/img/screenshots/stats_dark.png" alt="Statistics Dark" width="100%" /></td>
+    <td><img src="doc/static/img/screenshots/settings_dark.png" alt="Settings Dark" width="100%" /></td>
+  </tr>
+</table>
+
 ## 🎯 What is FocusFlow?
 
 FocusFlow is a complete ecosystem for time management using the Pomodoro technique. It allows you to:
