@@ -8,6 +8,7 @@ import 'package:focus_flow_app/domain/entities/focus_session.dart';
 import 'package:focus_flow_app/domain/entities/task.dart';
 import 'package:focus_flow_app/domain/repositories/session_repository.dart';
 import 'package:get_it/get_it.dart';
+import 'package:focus_flow_app/presentation/widgets/focus/minimalist_timer_header.dart';
 
 class SessionDetailsModal extends StatefulWidget {
   final FocusSession session;
@@ -407,6 +408,7 @@ class _SessionDetailsModalState extends State<SessionDetailsModal> {
             MarkdownEditorInput(
               controller: _notesController,
               label: context.tr('focus.notes_title'),
+              fullScreenOverlayBuilder: (context) => const MinimalistTimerHeader(),
             ),
           ],
           

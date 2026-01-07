@@ -11,6 +11,7 @@ import 'package:focus_flow_app/presentation/widgets/common/markdown_editor_input
 import 'package:focus_flow_app/domain/entities/category.dart';
 import 'package:focus_flow_app/domain/entities/category_with_tasks.dart';
 import 'package:focus_flow_app/domain/entities/task.dart';
+import 'package:focus_flow_app/presentation/widgets/focus/minimalist_timer_header.dart';
 
 class NotesView extends StatelessWidget {
   const NotesView({super.key});
@@ -595,6 +596,7 @@ class _NoteDetailsDialogState extends State<_NoteDetailsDialog> {
                             child: MarkdownEditorInput(
                               controller: _controller,
                               hint: 'notes.write_hint'.tr(),
+                              fullScreenOverlayBuilder: (context) => const MinimalistTimerHeader(),
                             ),
                           )
                           : SingleChildScrollView(
