@@ -34,6 +34,7 @@ class FocusViewState extends State<FocusView> with WidgetsBindingObserver {
     // Check initial state for active session color
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final state = context.read<FocusBloc>().state;
+      context.read<FocusBloc>().add(ReloadCategoriesAndTasks());
       if (state.selectedCategory != null) {
         try {
           int colorInt = int.parse(
@@ -58,6 +59,7 @@ class FocusViewState extends State<FocusView> with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) {
       logger.d('App resumed, checking WebSocket connection');
       context.read<FocusBloc>().add(CheckConnection());
+      context.read<FocusBloc>().add(ReloadCategoriesAndTasks());
     }
   }
 
