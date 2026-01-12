@@ -70,6 +70,7 @@ class FocusBloc extends Bloc<FocusEvent, FocusState> {
     on<WebSocketConnectionUpdated>(_onWebSocketConnectionUpdated);
     on<CheckConnection>(_onCheckConnection);
     on<AddManualSession>(_onAddManualSession);
+    on<ReloadCategoriesAndTasks>(_onReloadCategoriesAndTasks);
   }
 
   @override
@@ -448,6 +449,35 @@ class FocusBloc extends Bloc<FocusEvent, FocusState> {
       if (!state.isWebSocketConnected) {
         emit(state.copyWith(isWebSocketConnected: true));
       }
+    }
+  }
+
+  Future<void> _onReloadCategoriesAndTasks(
+    ReloadCategoriesAndTasks event,
+    Emitter<FocusState> emit,
+  ) async {
+    logger.d('Reloading categories and tasks..');
+    try {
+      final results = await Future.wait([
+        _getCategoriesAndTasks.execute(),
+        _fetchOrphanTasks.execute(),
+      ]);
+
+      final categoriesResult = results[0] as GetCategoriesAndTasksResult;
+      final orphanTasksResult = results[1] as FetchOrphanTasksResult;
+
+      if (categoriesResult.success && orphanTasksResult.success) {
+        emit(
+          state.copyWith(
+            categories: categoriesResult.categoriesWithTasks ?? [],
+            orphanTasks: orphanTasksResult.orphanTasks ?? [],
+          ),
+        );
+      } else {
+        logger.w('Failed to reload categories or orphan tasks');
+      }
+    } catch (e) {
+      logger.e('Error reloading categories and tasks', error: e);
     }
   }
 }
