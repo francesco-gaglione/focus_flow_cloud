@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.24.2] - 2026-01-12
+
+### Other
+
+- Unified patch release
+- [path]
+
 ## [app-v1.24.1] - 2026-01-12
 
 ### Bug Fixes
