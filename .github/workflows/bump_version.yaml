@@ -8,8 +8,7 @@ on:
 jobs:
   bump:
     if: |
-      contains(github.event.head_commit.message, '[backend-patch]') || 
-      contains(github.event.head_commit.message, '[app-patch]') || 
+      contains(github.event.head_commit.message, '[patch]') ||
       contains(github.event.head_commit.message, '[minor]') || 
       contains(github.event.head_commit.message, '[major]')
     runs-on: ubuntu-latest
@@ -47,12 +46,9 @@ jobs:
           elif [[ "$MSG" == *"[minor]"* ]]; then
             echo "part=minor" >> $GITHUB_OUTPUT
             echo "Detected Minor Bump"
-          elif [[ "$MSG" == *"[backend-patch]"* ]]; then
-            echo "part=backend-patch" >> $GITHUB_OUTPUT
-            echo "Detected Backend Patch"
-          elif [[ "$MSG" == *"[app-patch]"* ]]; then
-            echo "part=app-patch" >> $GITHUB_OUTPUT
-            echo "Detected App Patch"
+          elif [[ "$MSG" == *"[patch]"* ]]; then
+            echo "part=patch" >> $GITHUB_OUTPUT
+            echo "Detected Global Patch"
           else
             echo "part=unknown" >> $GITHUB_OUTPUT
             echo "No matching tag found"
@@ -60,6 +56,13 @@ jobs:
           fi
 
       - name: Bump Version
+        if: steps.type.outputs.part == 'patch'
+        run: just bump-patch
+        env:
+            GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+
+      - name: Bump Version (Other)
+        if: steps.type.outputs.part != 'patch'
         run: just bump-${{ steps.type.outputs.part }}
         env:
             GITHUB_TOKEN: ${{ secrets.GH_PAT }}

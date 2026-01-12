@@ -106,13 +106,9 @@ docker-build-backend:
 # RELEASE & VERSIONING
 # ============================================================================
 
-# Bump Backend Patch (Independent)
-bump-backend-patch:
-    @just _bump_semver patch backend
-
-# Bump App Patch (Independent)
-bump-app-patch:
-    @just _bump_semver patch app
+# Bump Patch (Synced)
+bump-patch:
+    @just _bump_semver patch both
 
 # Bump Minor (Synced)
 bump-minor:
