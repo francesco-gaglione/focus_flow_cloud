@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [app-v1.24.1] - 2026-01-12
+
+### Bug Fixes
+
+- Focus list does not update after adding a new Category or Task
+- Template creation modal does not open
+- App hangs indefinitely when refresh token is invalid
+
 ## [1.24.0] - 2026-01-07
 
 ### Documentation
