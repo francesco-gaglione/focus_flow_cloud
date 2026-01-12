@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../core/services/configuration_service.dart';
 import '../../../main.dart'; // To access restartApp
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../auth/cubit/auth_cubit.dart';
 
 class BackendConfigPage extends StatefulWidget {
   final ConfigurationService configService;
@@ -48,6 +50,15 @@ class _BackendConfigPageState extends State<BackendConfigPage> {
       }
 
       await widget.configService.setApiBaseUrl(url);
+
+      // Force logout to clear tokens from the previous server
+      if (mounted) {
+        try {
+          await context.read<AuthCubit>().logout();
+        } catch (_) {
+          // Ignore if AuthCubit is not found (e.g. during first run/onboarding)
+        }
+      }
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

@@ -35,7 +35,8 @@ class AuthInterceptor extends QueuedInterceptorsWrapper {
       if (err.response?.statusCode == 401) {
         final path = err.requestOptions.path;
         if (path.contains('/api/auth/login') ||
-            path.contains('/api/auth/refresh')) {
+            path.contains('/api/auth/refresh') ||
+            path.contains('/api/auth/logout')) {
           return super.onError(err, handler);
         }
 
