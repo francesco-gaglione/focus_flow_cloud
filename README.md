@@ -4,6 +4,7 @@
 [![Backend CI](https://github.com/francesco-gaglione/focus_flow_cloud/actions/workflows/ci-backend.yaml/badge.svg)](https://github.com/francesco-gaglione/focus_flow_cloud/actions)
 [![App CI](https://github.com/francesco-gaglione/focus_flow_cloud/actions/workflows/ci-app.yaml/badge.svg)](https://github.com/francesco-gaglione/focus_flow_cloud/actions)
 [![Documentation](https://img.shields.io/badge/docs-focusflow-brightgreen)](https://francesco-gaglione.github.io/focus_flow_cloud/)
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=flat&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/francescogaglione)
 
 A comprehensive Pomodoro technique tracking solution featuring a Rust backend and a Flutter mobile application. This monorepo contains both the cloud infrastructure and the client application.
 
