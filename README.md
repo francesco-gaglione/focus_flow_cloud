@@ -68,70 +68,63 @@ This is a monorepo containing:
 
 ## 🛠️ Getting Started
 
-We use [`just`](https://github.com/casey/just) to manage commands for the entire repository. This makes it easy to build, run, and test both projects from the root.
+### 🐳 Self-Hosting with Docker
 
-### Prerequisites
+The easiest way to run FocusFlow is using Docker Compose.
 
-- **Rust**: 1.70+
-- **Flutter**: 3.7.0+
-- **Docker & Docker Compose**: For running the database and services.
-- **Just**: (Optional but recommended) `cargo install just`
+PLEASE READ THE [FULL DOCUMENTATION](doc/docs/getting-started.md) for detailed setup instructions.
 
-### Quick Commands
+**Quick Example (`docker-compose.yml`):**
 
-The `justfile` provides a unified interface:
+```yaml
+services:
+  backend:
+    image: ghcr.io/francesco-gaglione/focusflowcloud:latest
+    environment:
+      - DATABASE_BASE_URL=db:5432
+      - POSTGRES_USER=focusflow
+      - POSTGRES_PASSWORD=secure_pw
+      - POSTGRES_DB=focusflow
+      - JWT_SECRET=change_me
+      - CORS_ORIGIN=*
+    ports: ["8080:8080"]
+    depends_on: [db]
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=focusflow
+      - POSTGRES_PASSWORD=secure_pw
+      - POSTGRES_DB=focusflow
+```
 
-| Command                  | Description                                    |
-| ------------------------ | ---------------------------------------------- |
-| `just backend-run`       | Run the Rust backend locally                   |
-| `just backend-run-debug` | Run the backend with debug logging             |
-| `just backend-test`      | Run all backend tests                          |
-| `just app-pub-get`       | Install Flutter dependencies                   |
-| `just app-run`           | Run the Flutter app (requires device/emulator) |
-| `just test-all`          | Run tests for both backend and app             |
+### 💻 Development Setup
 
-### 1. Setup Backend
+We use [`just`](https://github.com/casey/just) to manage commands for the entire repository.
 
-1.  **Environment Variables**:
-    We have set up a default `.env` for local development in `backend/`.
+**Prerequisites**: Rust 1.70+, Flutter 3.7.0+, Docker.
 
+**Quick Commands**:
+
+| Command | Description |
+| :--- | :--- |
+| `just backend-run` | Run the Rust backend locally |
+| `just app-run` | Run the Flutter app |
+| `just test-all` | Run all tests |
+
+#### 1. Setup Backend (Local)
+
+1.  **Environment**: `backend/.env` is required. See `.env.example`.
+2.  **Database**:
     ```bash
-    # Ensure backend/.env exists and is configured for localhost
-    ```
-
-2.  **Start Database**:
-
-    ```bash
-    cd backend
-    docker-compose up -d db
-    ```
-
-3.  **Run Migration**:
-
-    ```bash
-    cd backend
+    cd backend && docker-compose up -d db
     diesel migration run
     ```
+3.  **Run**: `just backend-run`
 
-4.  **Run Server**:
-    ```bash
-    just backend-run
-    ```
-    The server will start at `http://localhost:8080`.
+#### 2. Setup App (Local)
 
-### 2. Setup App
-
-1.  **Install Dependencies**:
-
-    ```bash
-    just app-pub-get
-    ```
-
-2.  **Run App**:
-    ```bash
-    cd app
-    flutter run
-    ```
+1.  **Install**: `just app-pub-get`
+2.  **Run**: `cd app && flutter run`
 
 ## 🤝 Contributing
 
