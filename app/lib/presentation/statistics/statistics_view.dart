@@ -56,12 +56,7 @@ class _StatisticsViewState extends State<StatisticsView> {
                         const SizedBox(height: 24),
                         _buildSummaryCards(context, state.statistics),
                         const SizedBox(height: 32),
-                        _buildSectionTitle(
-                          context,
-                          context.tr('statistics.activity'),
-                        ),
-                        const SizedBox(height: 16),
-                        _buildActivityChart(
+                        _buildActivitySection(
                           context,
                           state.statistics,
                           state.categoryColors,
@@ -418,6 +413,26 @@ class _StatisticsViewState extends State<StatisticsView> {
     );
   }
 
+  Widget _buildActivitySection(
+    BuildContext context,
+    PeriodStatistics stats,
+    Map<String, Color> categoryColors,
+    StatisticsTimeRange timeRange,
+  ) {
+    if (stats.dailyActivity.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle(context, context.tr('statistics.activity')),
+        const SizedBox(height: 16),
+        _buildActivityChart(context, stats, categoryColors, timeRange),
+      ],
+    );
+  }
+
   Widget _buildActivityChart(
     BuildContext context,
     PeriodStatistics stats,
@@ -426,13 +441,6 @@ class _StatisticsViewState extends State<StatisticsView> {
   ) {
     final dailyActivity = _fillMissingDates(stats.dailyActivity, timeRange);
 
-    // Check if there is any actual activity in the filled list (excluding placeholders if needed,
-    // but _fillMissingDates returns placeholders with empty distribution.
-    // If the original list was empty, we might still want to show the chart with empty bars
-    // OR show the no data widget.
-    // However, usually "No Data" is better if there's absolutely nothing.
-    // Let's check if the original stats.dailyActivity is empty AND we are not just showing empty days.
-    // Actually, if stats.dailyActivity is empty, it means no data for the period.
     if (stats.dailyActivity.isEmpty) {
       return SizedBox(
         height: 240,
@@ -443,6 +451,8 @@ class _StatisticsViewState extends State<StatisticsView> {
         ),
       );
     }
+
+    final yAxisParams = _calculateYAxisParams(dailyActivity);
 
     return Container(
       height: 240,
@@ -456,7 +466,7 @@ class _StatisticsViewState extends State<StatisticsView> {
       child: BarChart(
         BarChartData(
           alignment: BarChartAlignment.spaceAround,
-          maxY: _calculateMaxY(dailyActivity),
+          maxY: yAxisParams.maxY,
           barTouchData: BarTouchData(
             touchTooltipData: BarTouchTooltipData(
               getTooltipColor:
@@ -508,6 +518,10 @@ class _StatisticsViewState extends State<StatisticsView> {
 
                     if (timeRange == StatisticsTimeRange.month ||
                         timeRange == StatisticsTimeRange.last30Days) {
+                      final isMobile = MediaQuery.of(context).size.width < 900;
+                      if (isMobile && date.day != 1 && date.day % 5 != 0) {
+                        return const SizedBox.shrink();
+                      }
                       return Padding(
                         padding: const EdgeInsets.only(top: 8.0),
                         child: Text(
@@ -535,8 +549,39 @@ class _StatisticsViewState extends State<StatisticsView> {
                 },
               ),
             ),
-            leftTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                reservedSize: 40,
+                interval: yAxisParams.interval,
+                getTitlesWidget: (double value, TitleMeta meta) {
+                  if (value == 0) return const SizedBox.shrink();
+
+                  String text;
+                  if (value < 3600) {
+                    text = '${(value / 60).round()}m';
+                  } else {
+                    if (value % 3600 == 0) {
+                      text = '${(value / 3600).round()}h';
+                    } else {
+                      text = '${(value / 3600).toStringAsFixed(1)}h';
+                    }
+                  }
+
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: Text(
+                      text,
+                      style: const TextStyle(
+                        fontSize: 10,
+                        color: Colors.grey,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      textAlign: TextAlign.right,
+                    ),
+                  );
+                },
+              ),
             ),
             topTitles: const AxisTitles(
               sideTitles: SideTitles(showTitles: false),
@@ -548,13 +593,14 @@ class _StatisticsViewState extends State<StatisticsView> {
           gridData: FlGridData(
             show: true,
             drawVerticalLine: false,
-            horizontalInterval: _calculateMaxY(dailyActivity) / 4,
+            horizontalInterval: yAxisParams.interval,
             getDrawingHorizontalLine:
                 (value) => FlLine(
                   color: Theme.of(
                     context,
                   ).colorScheme.outlineVariant.withAlpha((255 * 0.2).round()),
                   strokeWidth: 1,
+                  dashArray: [5, 5],
                 ),
           ),
           borderData: FlBorderData(show: false),
@@ -602,8 +648,11 @@ class _StatisticsViewState extends State<StatisticsView> {
     );
   }
 
-  double _calculateMaxY(List<DailyActivity> activities) {
-    if (activities.isEmpty) return 100;
+  ({double maxY, double interval}) _calculateYAxisParams(
+    List<DailyActivity> activities,
+  ) {
+    if (activities.isEmpty) return (maxY: 3600.0, interval: 900.0);
+
     final maxVal =
         activities
             .map(
@@ -612,9 +661,36 @@ class _StatisticsViewState extends State<StatisticsView> {
                 (sum, item) => sum + item.totalFocusTime,
               ),
             )
-            .reduce((a, b) => a > b ? a : b)
+            .fold(0, (max, current) => current > max ? current : max)
             .toDouble();
-    return maxVal > 0 ? maxVal * 1.2 : 100;
+
+    if (maxVal == 0) return (maxY: 3600.0, interval: 900.0);
+
+    final niceIntervals = [
+      900.0, // 15m
+      1800.0, // 30m
+      3600.0, // 1h
+      7200.0, // 2h
+      14400.0, // 4h
+      28800.0, // 8h
+      43200.0, // 12h
+    ];
+
+    double targetInterval = maxVal / 4;
+    
+    double interval = niceIntervals.firstWhere(
+      (i) => i >= targetInterval,
+      orElse: () {
+        return (targetInterval / 3600).ceil() * 3600.0; 
+      },
+    );
+
+    double maxY = (maxVal / interval).ceil() * interval;
+    if (maxY == maxVal) {
+        maxY += interval;
+    }
+
+    return (maxY: maxY, interval: interval);
   }
 
   List<DailyActivity> _fillMissingDates(
