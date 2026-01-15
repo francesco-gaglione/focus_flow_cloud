@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.25.0] - 2026-01-15
+
+### Bug Fixes
+
+- Note card header overflow on mobile
+- Unable to connect to focusflow via the android app, updated doc
+
 ## [1.24.2] - 2026-01-12
 
 ### Other
