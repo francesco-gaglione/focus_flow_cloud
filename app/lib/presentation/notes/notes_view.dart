@@ -147,13 +147,9 @@ class _CategoryFilterChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = context.watch<NotesBloc>().state;
     final selectedId = state.selectedCategoryId;
-    final selectedCategoryWithTasks =
-        state.categories
-            .cast<CategoryWithTasks?>()
-            .firstWhere(
-              (c) => c?.category.id == selectedId,
-              orElse: () => null,
-            );
+    final selectedCategoryWithTasks = state.categories
+        .cast<CategoryWithTasks?>()
+        .firstWhere((c) => c?.category.id == selectedId, orElse: () => null);
 
     final isFiltered = selectedId != null;
     final label =
@@ -165,12 +161,14 @@ class _CategoryFilterChip extends StatelessWidget {
       tooltip: 'notes.filter_by_category'.tr(),
       initialValue: selectedId,
       itemBuilder: (context) {
-        return state.categories.map(
-          (c) => PopupMenuItem(
-            value: c.category.id,
-            child: Text(c.category.name),
-          ),
-        ).toList();
+        return state.categories
+            .map(
+              (c) => PopupMenuItem(
+                value: c.category.id,
+                child: Text(c.category.name),
+              ),
+            )
+            .toList();
       },
       onSelected: (value) {
         context.read<NotesBloc>().add(NotesCategoryChanged(value));
@@ -201,21 +199,21 @@ class _TaskFilterChip extends StatelessWidget {
     if (selectedCategoryId != null) {
       final categoryWithTasks = state.categories.firstWhere(
         (c) => c.category.id == selectedCategoryId,
-        orElse: () => CategoryWithTasks(
-          category: Category(
-            id: '',
-            name: '',
-            color: '',
-            createdAt: DateTime.fromMillisecondsSinceEpoch(0),
-            updatedAt: DateTime.fromMillisecondsSinceEpoch(0),
-          ), // Should ideally handle gracefully
-          tasks: [],
-        ),
+        orElse:
+            () => CategoryWithTasks(
+              category: Category(
+                id: '',
+                name: '',
+                color: '',
+                createdAt: DateTime.fromMillisecondsSinceEpoch(0),
+                updatedAt: DateTime.fromMillisecondsSinceEpoch(0),
+              ), // Should ideally handle gracefully
+              tasks: [],
+            ),
       );
       availableTasks = categoryWithTasks.tasks;
     } else {
-      availableTasks =
-          state.categories.expand((c) => c.tasks).toList();
+      availableTasks = state.categories.expand((c) => c.tasks).toList();
     }
 
     final selectedTask = availableTasks.cast<Task?>().firstWhere(
@@ -224,7 +222,8 @@ class _TaskFilterChip extends StatelessWidget {
     );
 
     final isFiltered = selectedTaskId != null;
-    final label = isFiltered ? selectedTask?.name ?? 'Unknown' : 'common.task'.tr();
+    final label =
+        isFiltered ? selectedTask?.name ?? 'Unknown' : 'common.task'.tr();
 
     // Disable chip if no tasks available
     if (availableTasks.isEmpty) return const SizedBox.shrink();
@@ -233,9 +232,11 @@ class _TaskFilterChip extends StatelessWidget {
       tooltip: 'notes.filter_by_task'.tr(),
       initialValue: selectedTaskId,
       itemBuilder: (context) {
-        return availableTasks.map(
-          (task) => PopupMenuItem(value: task.id, child: Text(task.name)),
-        ).toList();
+        return availableTasks
+            .map(
+              (task) => PopupMenuItem(value: task.id, child: Text(task.name)),
+            )
+            .toList();
       },
       onSelected: (value) {
         context.read<NotesBloc>().add(NotesTaskChanged(value));
@@ -281,70 +282,20 @@ class _NoteCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primaryContainer.withAlpha(100),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
+                  Expanded(
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
                       children: [
-                        Icon(
-                          _getSessionTypeIcon(session.sessionType),
-                          size: 14,
-                          color: theme.colorScheme.onPrimaryContainer,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          session.sessionType.value,
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            color: theme.colorScheme.onPrimaryContainer,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (categoryName != null) ...[
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.tertiaryContainer.withAlpha(
-                          100,
-                        ),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        categoryName,
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: theme.colorScheme.onTertiaryContainer,
-                        ),
-                      ),
-                    ),
-                  ],
-                  if (session.taskId != null) ...[
-                    const SizedBox(width: 8),
-                    Builder(
-                      builder: (context) {
-                        final taskName = _getTaskName(context, session.taskId);
-                        if (taskName == null) return const SizedBox.shrink();
-                        
-                        return Container(
+                        Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 8,
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: theme.colorScheme.secondaryContainer.withAlpha(
+                            color: theme.colorScheme.primaryContainer.withAlpha(
                               100,
                             ),
                             borderRadius: BorderRadius.circular(8),
@@ -353,26 +304,96 @@ class _NoteCard extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(
-                                Icons.check_circle_outline,
+                                _getSessionTypeIcon(session.sessionType),
                                 size: 14,
-                                color: theme.colorScheme.onSecondaryContainer,
+                                color: theme.colorScheme.onPrimaryContainer,
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                taskName,
+                                session.sessionType.value,
                                 style: theme.textTheme.labelSmall?.copyWith(
-                                  color: theme.colorScheme.onSecondaryContainer,
+                                  color: theme.colorScheme.onPrimaryContainer,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ],
                           ),
-                        );
-                      },
+                        ),
+                        if (categoryName != null)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.tertiaryContainer
+                                  .withAlpha(100),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              categoryName,
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: theme.colorScheme.onTertiaryContainer,
+                              ),
+                            ),
+                          ),
+                        if (session.taskId != null)
+                          Builder(
+                            builder: (context) {
+                              final taskName = _getTaskName(
+                                context,
+                                session.taskId,
+                              );
+                              if (taskName == null) {
+                                return const SizedBox.shrink();
+                              }
+
+                              return Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: theme.colorScheme.secondaryContainer
+                                      .withAlpha(100),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.check_circle_outline,
+                                      size: 14,
+                                      color:
+                                          theme
+                                              .colorScheme
+                                              .onSecondaryContainer,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      taskName,
+                                      style: theme.textTheme.labelSmall
+                                          ?.copyWith(
+                                            color:
+                                                theme
+                                                    .colorScheme
+                                                    .onSecondaryContainer,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                      ],
                     ),
-                  ],
-                  const Spacer(),
+                  ),
+                  const SizedBox(width: 8),
                   Text(
-                    DateFormat('MMM d, y • HH:mm', context.locale.toString()).format(session.createdAt),
+                    DateFormat(
+                      'MMM d, y • HH:mm',
+                      context.locale.toString(),
+                    ).format(session.createdAt),
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: theme.colorScheme.outline,
                     ),
@@ -400,7 +421,10 @@ class _NoteCard extends StatelessWidget {
     if (categoryId == null) return null;
     final state = context.read<NotesBloc>().state;
     try {
-      return state.categories.firstWhere((c) => c.category.id == categoryId).category.name;
+      return state.categories
+          .firstWhere((c) => c.category.id == categoryId)
+          .category
+          .name;
     } catch (_) {
       return null;
     }
@@ -503,7 +527,9 @@ class _NoteDetailsDialogState extends State<_NoteDetailsDialog> {
                 }
               },
               icon: Icon(_isEditing ? Icons.save : Icons.edit),
-              label: Text(_isEditing ? 'notes.save_changes'.tr() : 'notes.edit_note'.tr()),
+              label: Text(
+                _isEditing ? 'notes.save_changes'.tr() : 'notes.edit_note'.tr(),
+              ),
             ),
             body: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -549,9 +575,9 @@ class _NoteDetailsDialogState extends State<_NoteDetailsDialog> {
                       const SizedBox(height: 16),
                       if (!_isEditing) ...[
                         Text(
-                          DateFormat.yMMMMEEEEd(context.locale.toString()).format(
-                            widget.session.createdAt,
-                          ),
+                          DateFormat.yMMMMEEEEd(
+                            context.locale.toString(),
+                          ).format(widget.session.createdAt),
                           style: theme.textTheme.headlineSmall?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: theme.colorScheme.onSurface,
@@ -596,7 +622,8 @@ class _NoteDetailsDialogState extends State<_NoteDetailsDialog> {
                             child: MarkdownEditorInput(
                               controller: _controller,
                               hint: 'notes.write_hint'.tr(),
-                              fullScreenOverlayBuilder: (context) => const MinimalistTimerHeader(),
+                              fullScreenOverlayBuilder:
+                                  (context) => const MinimalistTimerHeader(),
                             ),
                           )
                           : SingleChildScrollView(
@@ -634,7 +661,10 @@ class _ClearFiltersButton extends StatelessWidget {
     // Only rebuild when filters changed
     final hasFilters = context.select((NotesBloc bloc) {
       final state = bloc.state;
-      return state.startDate != null || state.endDate != null || state.selectedCategoryId != null || state.selectedTaskId != null;
+      return state.startDate != null ||
+          state.endDate != null ||
+          state.selectedCategoryId != null ||
+          state.selectedTaskId != null;
     });
 
     if (!hasFilters) return const SizedBox.shrink();
@@ -642,7 +672,7 @@ class _ClearFiltersButton extends StatelessWidget {
     return IconButton(
       onPressed: () {
         context.read<NotesBloc>().add(NotesFilterCleared());
-      }, 
+      },
       icon: const Icon(Icons.refresh),
       tooltip: 'notes.clear_filters'.tr(),
       style: IconButton.styleFrom(
