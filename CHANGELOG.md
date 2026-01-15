@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.25.1] - 2026-01-15
+
+### Features
+
+- Add internet permission to Android manifest.
+
 ## [1.25.0] - 2026-01-15
 
 ### Bug Fixes
