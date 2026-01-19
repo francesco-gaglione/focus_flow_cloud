@@ -32,7 +32,6 @@ pub struct GetStatsByPeriodResponseDto {
     pub less_concentrated_period: ConcentrationPeriodDto,
     pub concentration_distribution: [u32; 5],
     pub category_distribution: Vec<CategoryDistributionDto>,
-    pub task_distribution: Vec<TaskDistributionDto>,
     pub daily_activity: Vec<DailyActivityDto>,
 }
 
@@ -50,13 +49,12 @@ pub struct CategoryDistributionDto {
     pub category_id: String,
     pub total_focus_time: i64,
     pub percentage: f32,
+    pub task_distribution: Vec<TaskDistributionDto>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct TaskDistributionDto {
-    pub category_name: Option<String>,
-    pub category_id: Option<String>,
     pub task_name: String,
     pub total_focus_time: i64,
     pub percentage: f32,
@@ -93,12 +91,6 @@ impl From<Stats> for GetStatsByPeriodResponseDto {
                 .into_iter()
                 .map(|item| item.into())
                 .collect(),
-            task_distribution: stats
-                .task_distribution()
-                .to_vec()
-                .into_iter()
-                .map(|item| item.into())
-                .collect(),
             daily_activity: stats
                 .daily_activity()
                 .to_vec()
@@ -125,6 +117,12 @@ impl From<CategoryDistributionItem> for CategoryDistributionDto {
             category_id: item.category_id().to_string(),
             total_focus_time: item.total_focus_time(),
             percentage: item.percentage(),
+            task_distribution: item
+                .task_distribution()
+                .to_vec()
+                .into_iter()
+                .map(|item| item.into())
+                .collect(),
         }
     }
 }
@@ -132,8 +130,6 @@ impl From<CategoryDistributionItem> for CategoryDistributionDto {
 impl From<TaskDistributionItem> for TaskDistributionDto {
     fn from(item: TaskDistributionItem) -> Self {
         Self {
-            category_name: item.category_name().map(|s| s.to_string()),
-            category_id: item.category_id().map(|id| id.to_string()),
             task_name: item.task_name().to_string(),
             total_focus_time: item.total_focus_time(),
             percentage: item.percentage(),

@@ -22,26 +22,24 @@ class CategoryDistribution {
   final String categoryName;
   final int totalFocusTime;
   final double percentage;
+  final List<TaskDistribution> taskDistribution;
 
   CategoryDistribution({
     required this.categoryId,
     required this.categoryName,
     required this.totalFocusTime,
     required this.percentage,
+    required this.taskDistribution,
   });
 }
 
 class TaskDistribution {
   final String taskName;
-  final String? categoryId;
-  final String? categoryName;
   final int totalFocusTime;
   final double percentage;
 
   TaskDistribution({
     required this.taskName,
-    this.categoryId,
-    this.categoryName,
     required this.totalFocusTime,
     required this.percentage,
   });
@@ -75,7 +73,6 @@ class PeriodStatistics {
   final ConcentrationPeriod lessConcentratedPeriod;
   final List<int> concentrationDistribution;
   final List<CategoryDistribution> categoryDistribution;
-  final List<TaskDistribution> taskDistribution;
   final List<DailyActivity> dailyActivity;
 
   PeriodStatistics({
@@ -87,7 +84,6 @@ class PeriodStatistics {
     required this.lessConcentratedPeriod,
     required this.concentrationDistribution,
     required this.categoryDistribution,
-    required this.taskDistribution,
     required this.dailyActivity,
   });
 }

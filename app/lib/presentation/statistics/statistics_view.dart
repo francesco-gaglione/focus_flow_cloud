@@ -76,13 +76,6 @@ class _StatisticsViewState extends State<StatisticsView> {
                         const SizedBox(height: 32),
                         _buildSectionTitle(
                           context,
-                          context.tr('statistics.top_tasks'),
-                        ),
-                        const SizedBox(height: 16),
-                        _buildTopTasksList(context, state.statistics),
-                        const SizedBox(height: 32),
-                        _buildSectionTitle(
-                          context,
                           context.tr('statistics.concentration_score'),
                         ),
                         const SizedBox(height: 16),
@@ -677,17 +670,17 @@ class _StatisticsViewState extends State<StatisticsView> {
     ];
 
     double targetInterval = maxVal / 4;
-    
+
     double interval = niceIntervals.firstWhere(
       (i) => i >= targetInterval,
       orElse: () {
-        return (targetInterval / 3600).ceil() * 3600.0; 
+        return (targetInterval / 3600).ceil() * 3600.0;
       },
     );
 
     double maxY = (maxVal / interval).ceil() * interval;
     if (maxY == maxVal) {
-        maxY += interval;
+      maxY += interval;
     }
 
     return (maxY: maxY, interval: interval);
@@ -789,54 +782,141 @@ class _StatisticsViewState extends State<StatisticsView> {
               final color =
                   categoryColors[category.categoryId] ??
                   Theme.of(context).colorScheme.primary;
+              final hasTasks = category.taskDistribution.isNotEmpty;
+
               return Padding(
                 padding: const EdgeInsets.only(bottom: 16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                child: Theme(
+                  data: Theme.of(
+                    context,
+                  ).copyWith(dividerColor: Colors.transparent),
+                  child: ExpansionTile(
+                    tilePadding: EdgeInsets.zero,
+                    childrenPadding: const EdgeInsets.only(top: 8, bottom: 8),
+                    enabled: hasTasks,
+                    trailing:
+                        hasTasks
+                            ? Icon(
+                              Icons.keyboard_arrow_down,
+                              size: 20,
+                              color:
+                                  Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
+                            )
+                            : const SizedBox.shrink(),
+                    title: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Container(
-                              width: 12,
-                              height: 12,
-                              decoration: BoxDecoration(
-                                color: color,
-                                shape: BoxShape.circle,
-                              ),
+                            Row(
+                              children: [
+                                Container(
+                                  width: 12,
+                                  height: 12,
+                                  decoration: BoxDecoration(
+                                    color: color,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  category.categoryName,
+                                  style: Theme.of(context).textTheme.bodyMedium
+                                      ?.copyWith(fontWeight: FontWeight.w600),
+                                ),
+                              ],
                             ),
-                            const SizedBox(width: 8),
                             Text(
-                              category.categoryName,
-                              style: Theme.of(context).textTheme.bodyMedium
-                                  ?.copyWith(fontWeight: FontWeight.w600),
+                              '${category.percentage.toStringAsFixed(1)}% - ${_formatDuration(Duration(seconds: category.totalFocusTime))}',
+                              style: Theme.of(
+                                context,
+                              ).textTheme.bodySmall?.copyWith(
+                                color:
+                                    Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
+                              ),
                             ),
                           ],
                         ),
-                        Text(
-                          '${category.percentage.toStringAsFixed(1)}% - ${_formatDuration(Duration(seconds: category.totalFocusTime))}',
-                          style: Theme.of(
-                            context,
-                          ).textTheme.bodySmall?.copyWith(
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
+                        const SizedBox(height: 8),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: LinearProgressIndicator(
+                            value: category.percentage / 100,
+                            backgroundColor: color.withAlpha(
+                              (255 * 0.1).round(),
+                            ),
+                            color: color,
+                            minHeight: 12,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: LinearProgressIndicator(
-                        value: category.percentage / 100,
-                        backgroundColor: color.withAlpha((255 * 0.1).round()),
-                        color: color,
-                        minHeight: 12,
-                      ),
-                    ),
-                  ],
+                    children:
+                        category.taskDistribution.map((task) {
+                          return Padding(
+                            padding: const EdgeInsets.only(
+                              left: 20.0,
+                              top: 8.0,
+                              bottom: 8.0,
+                              right: 16.0,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        task.taskName,
+                                        style:
+                                            Theme.of(
+                                              context,
+                                            ).textTheme.bodySmall,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      '${task.percentage.toStringAsFixed(1)}% (${_formatDuration(Duration(seconds: task.totalFocusTime))})',
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodySmall?.copyWith(
+                                        color:
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.onSurfaceVariant,
+                                        fontSize: 10,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(4),
+                                  child: LinearProgressIndicator(
+                                    value: task.percentage / 100,
+                                    backgroundColor: color.withAlpha(
+                                      (255 * 0.1).round(),
+                                    ),
+                                    color: color.withAlpha(
+                                      (255 * 0.7).round(),
+                                    ), // Slightly lighter/transparent than category
+                                    minHeight: 8,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                  ),
                 ),
               );
             }).toList(),
@@ -946,119 +1026,6 @@ class _StatisticsViewState extends State<StatisticsView> {
                 );
               }).toList(),
         ),
-      ),
-    );
-  }
-
-  Widget _buildTopTasksList(BuildContext context, PeriodStatistics stats) {
-    final tasks = stats.taskDistribution;
-    if (tasks.isEmpty) {
-      return _buildNoDataWidget(
-        context,
-        context.tr('statistics.no_task_data'),
-        Icons.list_alt_outlined,
-      );
-    }
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(
-          context,
-        ).colorScheme.surfaceContainerHighest.withAlpha((255 * 0.3).round()),
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Column(
-        children:
-            tasks.take(5).map((task) {
-              final duration = Duration(seconds: task.totalFocusTime);
-              return Container(
-                margin: const EdgeInsets.only(bottom: 12),
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withAlpha((255 * 0.05).round()),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      backgroundColor:
-                          Theme.of(context).colorScheme.primaryContainer,
-                      child: Text(
-                        task.taskName.isNotEmpty
-                            ? task.taskName[0].toUpperCase()
-                            : '?',
-                        style: TextStyle(
-                          color:
-                              Theme.of(context).colorScheme.onPrimaryContainer,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            task.taskName,
-                            style: Theme.of(context).textTheme.bodyLarge
-                                ?.copyWith(fontWeight: FontWeight.w600),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          Text(
-                            task.categoryName ?? 'Uncategorized',
-                            style: Theme.of(
-                              context,
-                            ).textTheme.bodySmall?.copyWith(
-                              color:
-                                  Theme.of(
-                                    context,
-                                  ).colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.secondaryContainer,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: Theme.of(context).colorScheme.outlineVariant
-                              .withAlpha((255 * 0.2).round()),
-                        ),
-                      ),
-                      child: Text(
-                        _formatDuration(duration),
-                        style: Theme.of(
-                          context,
-                        ).textTheme.labelMedium?.copyWith(
-                          color:
-                              Theme.of(
-                                context,
-                              ).colorScheme.onSecondaryContainer,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }).toList(),
       ),
     );
   }

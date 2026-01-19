@@ -24,6 +24,7 @@ class CategoryDistributionDto with _$CategoryDistributionDto {
     required String categoryName,
     required int totalFocusTime,
     required double percentage,
+    required List<TaskDistributionDto> taskDistribution,
   }) = _CategoryDistributionDto;
 
   factory CategoryDistributionDto.fromJson(Map<String, dynamic> json) =>
@@ -35,6 +36,10 @@ class CategoryDistributionDto with _$CategoryDistributionDto {
       categoryName: entity.categoryName,
       totalFocusTime: entity.totalFocusTime,
       percentage: entity.percentage,
+      taskDistribution:
+          entity.taskDistribution
+              .map((dist) => TaskDistributionDto.fromEntity(dist))
+              .toList(),
     );
   }
 }
@@ -43,8 +48,6 @@ class CategoryDistributionDto with _$CategoryDistributionDto {
 class TaskDistributionDto with _$TaskDistributionDto {
   const factory TaskDistributionDto({
     required String taskName,
-    String? categoryId,
-    String? categoryName,
     required int totalFocusTime,
     required double percentage,
   }) = _TaskDistributionDto;
@@ -55,8 +58,6 @@ class TaskDistributionDto with _$TaskDistributionDto {
   factory TaskDistributionDto.fromEntity(TaskDistribution entity) {
     return TaskDistributionDto(
       taskName: entity.taskName,
-      categoryId: entity.categoryId,
-      categoryName: entity.categoryName,
       totalFocusTime: entity.totalFocusTime,
       percentage: entity.percentage,
     );
@@ -117,7 +118,6 @@ class GetStatsByPeriodResponseDto with _$GetStatsByPeriodResponseDto {
     required String lessConcentratedPeriod,
     required List<int> concentrationDistribution,
     required List<CategoryDistributionDto> categoryDistribution,
-    required List<TaskDistributionDto> taskDistribution,
     required List<DailyActivityDto> dailyActivity,
   }) = _GetStatsByPeriodResponseDto;
 
@@ -136,10 +136,6 @@ class GetStatsByPeriodResponseDto with _$GetStatsByPeriodResponseDto {
       categoryDistribution:
           entity.categoryDistribution
               .map((dist) => CategoryDistributionDto.fromEntity(dist))
-              .toList(),
-      taskDistribution:
-          entity.taskDistribution
-              .map((dist) => TaskDistributionDto.fromEntity(dist))
               .toList(),
       dailyActivity:
           entity.dailyActivity

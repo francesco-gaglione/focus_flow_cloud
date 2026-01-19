@@ -203,6 +203,8 @@ mixin _$CategoryDistributionDto {
   String get categoryName => throw _privateConstructorUsedError;
   int get totalFocusTime => throw _privateConstructorUsedError;
   double get percentage => throw _privateConstructorUsedError;
+  List<TaskDistributionDto> get taskDistribution =>
+      throw _privateConstructorUsedError;
 
   /// Serializes this CategoryDistributionDto to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -226,6 +228,7 @@ abstract class $CategoryDistributionDtoCopyWith<$Res> {
     String categoryName,
     int totalFocusTime,
     double percentage,
+    List<TaskDistributionDto> taskDistribution,
   });
 }
 
@@ -251,6 +254,7 @@ class _$CategoryDistributionDtoCopyWithImpl<
     Object? categoryName = null,
     Object? totalFocusTime = null,
     Object? percentage = null,
+    Object? taskDistribution = null,
   }) {
     return _then(
       _value.copyWith(
@@ -274,6 +278,11 @@ class _$CategoryDistributionDtoCopyWithImpl<
                     ? _value.percentage
                     : percentage // ignore: cast_nullable_to_non_nullable
                         as double,
+            taskDistribution:
+                null == taskDistribution
+                    ? _value.taskDistribution
+                    : taskDistribution // ignore: cast_nullable_to_non_nullable
+                        as List<TaskDistributionDto>,
           )
           as $Val,
     );
@@ -294,6 +303,7 @@ abstract class _$$CategoryDistributionDtoImplCopyWith<$Res>
     String categoryName,
     int totalFocusTime,
     double percentage,
+    List<TaskDistributionDto> taskDistribution,
   });
 }
 
@@ -319,6 +329,7 @@ class __$$CategoryDistributionDtoImplCopyWithImpl<$Res>
     Object? categoryName = null,
     Object? totalFocusTime = null,
     Object? percentage = null,
+    Object? taskDistribution = null,
   }) {
     return _then(
       _$CategoryDistributionDtoImpl(
@@ -342,6 +353,11 @@ class __$$CategoryDistributionDtoImplCopyWithImpl<$Res>
                 ? _value.percentage
                 : percentage // ignore: cast_nullable_to_non_nullable
                     as double,
+        taskDistribution:
+            null == taskDistribution
+                ? _value._taskDistribution
+                : taskDistribution // ignore: cast_nullable_to_non_nullable
+                    as List<TaskDistributionDto>,
       ),
     );
   }
@@ -355,7 +371,8 @@ class _$CategoryDistributionDtoImpl implements _CategoryDistributionDto {
     required this.categoryName,
     required this.totalFocusTime,
     required this.percentage,
-  });
+    required final List<TaskDistributionDto> taskDistribution,
+  }) : _taskDistribution = taskDistribution;
 
   factory _$CategoryDistributionDtoImpl.fromJson(Map<String, dynamic> json) =>
       _$$CategoryDistributionDtoImplFromJson(json);
@@ -368,10 +385,18 @@ class _$CategoryDistributionDtoImpl implements _CategoryDistributionDto {
   final int totalFocusTime;
   @override
   final double percentage;
+  final List<TaskDistributionDto> _taskDistribution;
+  @override
+  List<TaskDistributionDto> get taskDistribution {
+    if (_taskDistribution is EqualUnmodifiableListView)
+      return _taskDistribution;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_taskDistribution);
+  }
 
   @override
   String toString() {
-    return 'CategoryDistributionDto(categoryId: $categoryId, categoryName: $categoryName, totalFocusTime: $totalFocusTime, percentage: $percentage)';
+    return 'CategoryDistributionDto(categoryId: $categoryId, categoryName: $categoryName, totalFocusTime: $totalFocusTime, percentage: $percentage, taskDistribution: $taskDistribution)';
   }
 
   @override
@@ -386,7 +411,11 @@ class _$CategoryDistributionDtoImpl implements _CategoryDistributionDto {
             (identical(other.totalFocusTime, totalFocusTime) ||
                 other.totalFocusTime == totalFocusTime) &&
             (identical(other.percentage, percentage) ||
-                other.percentage == percentage));
+                other.percentage == percentage) &&
+            const DeepCollectionEquality().equals(
+              other._taskDistribution,
+              _taskDistribution,
+            ));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -397,6 +426,7 @@ class _$CategoryDistributionDtoImpl implements _CategoryDistributionDto {
     categoryName,
     totalFocusTime,
     percentage,
+    const DeepCollectionEquality().hash(_taskDistribution),
   );
 
   /// Create a copy of CategoryDistributionDto
@@ -421,6 +451,7 @@ abstract class _CategoryDistributionDto implements CategoryDistributionDto {
     required final String categoryName,
     required final int totalFocusTime,
     required final double percentage,
+    required final List<TaskDistributionDto> taskDistribution,
   }) = _$CategoryDistributionDtoImpl;
 
   factory _CategoryDistributionDto.fromJson(Map<String, dynamic> json) =
@@ -434,6 +465,8 @@ abstract class _CategoryDistributionDto implements CategoryDistributionDto {
   int get totalFocusTime;
   @override
   double get percentage;
+  @override
+  List<TaskDistributionDto> get taskDistribution;
 
   /// Create a copy of CategoryDistributionDto
   /// with the given fields replaced by the non-null parameter values.
@@ -450,8 +483,6 @@ TaskDistributionDto _$TaskDistributionDtoFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$TaskDistributionDto {
   String get taskName => throw _privateConstructorUsedError;
-  String? get categoryId => throw _privateConstructorUsedError;
-  String? get categoryName => throw _privateConstructorUsedError;
   int get totalFocusTime => throw _privateConstructorUsedError;
   double get percentage => throw _privateConstructorUsedError;
 
@@ -472,13 +503,7 @@ abstract class $TaskDistributionDtoCopyWith<$Res> {
     $Res Function(TaskDistributionDto) then,
   ) = _$TaskDistributionDtoCopyWithImpl<$Res, TaskDistributionDto>;
   @useResult
-  $Res call({
-    String taskName,
-    String? categoryId,
-    String? categoryName,
-    int totalFocusTime,
-    double percentage,
-  });
+  $Res call({String taskName, int totalFocusTime, double percentage});
 }
 
 /// @nodoc
@@ -497,8 +522,6 @@ class _$TaskDistributionDtoCopyWithImpl<$Res, $Val extends TaskDistributionDto>
   @override
   $Res call({
     Object? taskName = null,
-    Object? categoryId = freezed,
-    Object? categoryName = freezed,
     Object? totalFocusTime = null,
     Object? percentage = null,
   }) {
@@ -509,16 +532,6 @@ class _$TaskDistributionDtoCopyWithImpl<$Res, $Val extends TaskDistributionDto>
                     ? _value.taskName
                     : taskName // ignore: cast_nullable_to_non_nullable
                         as String,
-            categoryId:
-                freezed == categoryId
-                    ? _value.categoryId
-                    : categoryId // ignore: cast_nullable_to_non_nullable
-                        as String?,
-            categoryName:
-                freezed == categoryName
-                    ? _value.categoryName
-                    : categoryName // ignore: cast_nullable_to_non_nullable
-                        as String?,
             totalFocusTime:
                 null == totalFocusTime
                     ? _value.totalFocusTime
@@ -544,13 +557,7 @@ abstract class _$$TaskDistributionDtoImplCopyWith<$Res>
   ) = __$$TaskDistributionDtoImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    String taskName,
-    String? categoryId,
-    String? categoryName,
-    int totalFocusTime,
-    double percentage,
-  });
+  $Res call({String taskName, int totalFocusTime, double percentage});
 }
 
 /// @nodoc
@@ -568,8 +575,6 @@ class __$$TaskDistributionDtoImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? taskName = null,
-    Object? categoryId = freezed,
-    Object? categoryName = freezed,
     Object? totalFocusTime = null,
     Object? percentage = null,
   }) {
@@ -580,16 +585,6 @@ class __$$TaskDistributionDtoImplCopyWithImpl<$Res>
                 ? _value.taskName
                 : taskName // ignore: cast_nullable_to_non_nullable
                     as String,
-        categoryId:
-            freezed == categoryId
-                ? _value.categoryId
-                : categoryId // ignore: cast_nullable_to_non_nullable
-                    as String?,
-        categoryName:
-            freezed == categoryName
-                ? _value.categoryName
-                : categoryName // ignore: cast_nullable_to_non_nullable
-                    as String?,
         totalFocusTime:
             null == totalFocusTime
                 ? _value.totalFocusTime
@@ -610,8 +605,6 @@ class __$$TaskDistributionDtoImplCopyWithImpl<$Res>
 class _$TaskDistributionDtoImpl implements _TaskDistributionDto {
   const _$TaskDistributionDtoImpl({
     required this.taskName,
-    this.categoryId,
-    this.categoryName,
     required this.totalFocusTime,
     required this.percentage,
   });
@@ -622,17 +615,13 @@ class _$TaskDistributionDtoImpl implements _TaskDistributionDto {
   @override
   final String taskName;
   @override
-  final String? categoryId;
-  @override
-  final String? categoryName;
-  @override
   final int totalFocusTime;
   @override
   final double percentage;
 
   @override
   String toString() {
-    return 'TaskDistributionDto(taskName: $taskName, categoryId: $categoryId, categoryName: $categoryName, totalFocusTime: $totalFocusTime, percentage: $percentage)';
+    return 'TaskDistributionDto(taskName: $taskName, totalFocusTime: $totalFocusTime, percentage: $percentage)';
   }
 
   @override
@@ -642,10 +631,6 @@ class _$TaskDistributionDtoImpl implements _TaskDistributionDto {
             other is _$TaskDistributionDtoImpl &&
             (identical(other.taskName, taskName) ||
                 other.taskName == taskName) &&
-            (identical(other.categoryId, categoryId) ||
-                other.categoryId == categoryId) &&
-            (identical(other.categoryName, categoryName) ||
-                other.categoryName == categoryName) &&
             (identical(other.totalFocusTime, totalFocusTime) ||
                 other.totalFocusTime == totalFocusTime) &&
             (identical(other.percentage, percentage) ||
@@ -654,14 +639,8 @@ class _$TaskDistributionDtoImpl implements _TaskDistributionDto {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-    runtimeType,
-    taskName,
-    categoryId,
-    categoryName,
-    totalFocusTime,
-    percentage,
-  );
+  int get hashCode =>
+      Object.hash(runtimeType, taskName, totalFocusTime, percentage);
 
   /// Create a copy of TaskDistributionDto
   /// with the given fields replaced by the non-null parameter values.
@@ -683,8 +662,6 @@ class _$TaskDistributionDtoImpl implements _TaskDistributionDto {
 abstract class _TaskDistributionDto implements TaskDistributionDto {
   const factory _TaskDistributionDto({
     required final String taskName,
-    final String? categoryId,
-    final String? categoryName,
     required final int totalFocusTime,
     required final double percentage,
   }) = _$TaskDistributionDtoImpl;
@@ -694,10 +671,6 @@ abstract class _TaskDistributionDto implements TaskDistributionDto {
 
   @override
   String get taskName;
-  @override
-  String? get categoryId;
-  @override
-  String? get categoryName;
   @override
   int get totalFocusTime;
   @override
@@ -1153,8 +1126,6 @@ mixin _$GetStatsByPeriodResponseDto {
   List<int> get concentrationDistribution => throw _privateConstructorUsedError;
   List<CategoryDistributionDto> get categoryDistribution =>
       throw _privateConstructorUsedError;
-  List<TaskDistributionDto> get taskDistribution =>
-      throw _privateConstructorUsedError;
   List<DailyActivityDto> get dailyActivity =>
       throw _privateConstructorUsedError;
 
@@ -1188,7 +1159,6 @@ abstract class $GetStatsByPeriodResponseDtoCopyWith<$Res> {
     String lessConcentratedPeriod,
     List<int> concentrationDistribution,
     List<CategoryDistributionDto> categoryDistribution,
-    List<TaskDistributionDto> taskDistribution,
     List<DailyActivityDto> dailyActivity,
   });
 }
@@ -1219,7 +1189,6 @@ class _$GetStatsByPeriodResponseDtoCopyWithImpl<
     Object? lessConcentratedPeriod = null,
     Object? concentrationDistribution = null,
     Object? categoryDistribution = null,
-    Object? taskDistribution = null,
     Object? dailyActivity = null,
   }) {
     return _then(
@@ -1264,11 +1233,6 @@ class _$GetStatsByPeriodResponseDtoCopyWithImpl<
                     ? _value.categoryDistribution
                     : categoryDistribution // ignore: cast_nullable_to_non_nullable
                         as List<CategoryDistributionDto>,
-            taskDistribution:
-                null == taskDistribution
-                    ? _value.taskDistribution
-                    : taskDistribution // ignore: cast_nullable_to_non_nullable
-                        as List<TaskDistributionDto>,
             dailyActivity:
                 null == dailyActivity
                     ? _value.dailyActivity
@@ -1298,7 +1262,6 @@ abstract class _$$GetStatsByPeriodResponseDtoImplCopyWith<$Res>
     String lessConcentratedPeriod,
     List<int> concentrationDistribution,
     List<CategoryDistributionDto> categoryDistribution,
-    List<TaskDistributionDto> taskDistribution,
     List<DailyActivityDto> dailyActivity,
   });
 }
@@ -1329,7 +1292,6 @@ class __$$GetStatsByPeriodResponseDtoImplCopyWithImpl<$Res>
     Object? lessConcentratedPeriod = null,
     Object? concentrationDistribution = null,
     Object? categoryDistribution = null,
-    Object? taskDistribution = null,
     Object? dailyActivity = null,
   }) {
     return _then(
@@ -1374,11 +1336,6 @@ class __$$GetStatsByPeriodResponseDtoImplCopyWithImpl<$Res>
                 ? _value._categoryDistribution
                 : categoryDistribution // ignore: cast_nullable_to_non_nullable
                     as List<CategoryDistributionDto>,
-        taskDistribution:
-            null == taskDistribution
-                ? _value._taskDistribution
-                : taskDistribution // ignore: cast_nullable_to_non_nullable
-                    as List<TaskDistributionDto>,
         dailyActivity:
             null == dailyActivity
                 ? _value._dailyActivity
@@ -1402,11 +1359,9 @@ class _$GetStatsByPeriodResponseDtoImpl
     required this.lessConcentratedPeriod,
     required final List<int> concentrationDistribution,
     required final List<CategoryDistributionDto> categoryDistribution,
-    required final List<TaskDistributionDto> taskDistribution,
     required final List<DailyActivityDto> dailyActivity,
   }) : _concentrationDistribution = concentrationDistribution,
        _categoryDistribution = categoryDistribution,
-       _taskDistribution = taskDistribution,
        _dailyActivity = dailyActivity;
 
   factory _$GetStatsByPeriodResponseDtoImpl.fromJson(
@@ -1443,15 +1398,6 @@ class _$GetStatsByPeriodResponseDtoImpl
     return EqualUnmodifiableListView(_categoryDistribution);
   }
 
-  final List<TaskDistributionDto> _taskDistribution;
-  @override
-  List<TaskDistributionDto> get taskDistribution {
-    if (_taskDistribution is EqualUnmodifiableListView)
-      return _taskDistribution;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_taskDistribution);
-  }
-
   final List<DailyActivityDto> _dailyActivity;
   @override
   List<DailyActivityDto> get dailyActivity {
@@ -1462,7 +1408,7 @@ class _$GetStatsByPeriodResponseDtoImpl
 
   @override
   String toString() {
-    return 'GetStatsByPeriodResponseDto(totalSessions: $totalSessions, totalBreaks: $totalBreaks, totalFocusTime: $totalFocusTime, totalBreakTime: $totalBreakTime, mostConcentratedPeriod: $mostConcentratedPeriod, lessConcentratedPeriod: $lessConcentratedPeriod, concentrationDistribution: $concentrationDistribution, categoryDistribution: $categoryDistribution, taskDistribution: $taskDistribution, dailyActivity: $dailyActivity)';
+    return 'GetStatsByPeriodResponseDto(totalSessions: $totalSessions, totalBreaks: $totalBreaks, totalFocusTime: $totalFocusTime, totalBreakTime: $totalBreakTime, mostConcentratedPeriod: $mostConcentratedPeriod, lessConcentratedPeriod: $lessConcentratedPeriod, concentrationDistribution: $concentrationDistribution, categoryDistribution: $categoryDistribution, dailyActivity: $dailyActivity)';
   }
 
   @override
@@ -1491,10 +1437,6 @@ class _$GetStatsByPeriodResponseDtoImpl
               _categoryDistribution,
             ) &&
             const DeepCollectionEquality().equals(
-              other._taskDistribution,
-              _taskDistribution,
-            ) &&
-            const DeepCollectionEquality().equals(
               other._dailyActivity,
               _dailyActivity,
             ));
@@ -1512,7 +1454,6 @@ class _$GetStatsByPeriodResponseDtoImpl
     lessConcentratedPeriod,
     const DeepCollectionEquality().hash(_concentrationDistribution),
     const DeepCollectionEquality().hash(_categoryDistribution),
-    const DeepCollectionEquality().hash(_taskDistribution),
     const DeepCollectionEquality().hash(_dailyActivity),
   );
 
@@ -1543,7 +1484,6 @@ abstract class _GetStatsByPeriodResponseDto
     required final String lessConcentratedPeriod,
     required final List<int> concentrationDistribution,
     required final List<CategoryDistributionDto> categoryDistribution,
-    required final List<TaskDistributionDto> taskDistribution,
     required final List<DailyActivityDto> dailyActivity,
   }) = _$GetStatsByPeriodResponseDtoImpl;
 
@@ -1566,8 +1506,6 @@ abstract class _GetStatsByPeriodResponseDto
   List<int> get concentrationDistribution;
   @override
   List<CategoryDistributionDto> get categoryDistribution;
-  @override
-  List<TaskDistributionDto> get taskDistribution;
   @override
   List<DailyActivityDto> get dailyActivity;
 
