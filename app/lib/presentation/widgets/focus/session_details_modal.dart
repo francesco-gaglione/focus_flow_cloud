@@ -1,6 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import '../common/markdown_editor_input.dart';
 import 'package:focus_flow_app/domain/entities/category.dart';
 import 'package:focus_flow_app/domain/entities/category_with_tasks.dart';
@@ -50,11 +50,16 @@ class _SessionDetailsModalState extends State<SessionDetailsModal> {
     // Ensure score is within 0-5 range
     if (_concentrationScore > 5) _concentrationScore = 5;
     if (_concentrationScore < 0) _concentrationScore = 0;
-    
-    _startTime = DateTime.fromMillisecondsSinceEpoch(widget.session.startedAt * 1000);
-    _endTime = widget.session.endedAt != null
-        ? DateTime.fromMillisecondsSinceEpoch(widget.session.endedAt! * 1000)
-        : DateTime.now();
+
+    _startTime = DateTime.fromMillisecondsSinceEpoch(
+      widget.session.startedAt * 1000,
+    );
+    _endTime =
+        widget.session.endedAt != null
+            ? DateTime.fromMillisecondsSinceEpoch(
+              widget.session.endedAt! * 1000,
+            )
+            : DateTime.now();
     _selectedCategoryId = widget.session.categoryId;
     _selectedTaskId = widget.session.taskId;
   }
@@ -106,18 +111,22 @@ class _SessionDetailsModalState extends State<SessionDetailsModal> {
     Category? currentCategory;
     if (_selectedCategoryId != null) {
       try {
-        currentCategory = widget.categories
-            .firstWhere((c) => c.category.id == _selectedCategoryId)
-            .category;
+        currentCategory =
+            widget.categories
+                .firstWhere((c) => c.category.id == _selectedCategoryId)
+                .category;
       } catch (_) {}
     }
 
     switch (widget.session.sessionType) {
       case SessionType.work:
         title = currentCategory?.name ?? context.tr('focus.session_title');
-        color = currentCategory != null
-            ? Color(int.parse(currentCategory.color.replaceFirst('#', '0xFF')))
-            : colorScheme.primary;
+        color =
+            currentCategory != null
+                ? Color(
+                  int.parse(currentCategory.color.replaceFirst('#', '0xFF')),
+                )
+                : colorScheme.primary;
         icon = Icons.work;
         break;
       case SessionType.shortBreak:
@@ -163,7 +172,7 @@ class _SessionDetailsModalState extends State<SessionDetailsModal> {
                 )
               else
                 const SizedBox(width: 48), // Spacer to balance the row
-              
+
               if (_isEditing)
                 FilledButton.icon(
                   onPressed: _saveChanges,
@@ -179,7 +188,7 @@ class _SessionDetailsModalState extends State<SessionDetailsModal> {
             ],
           ),
           const SizedBox(height: 16),
-          
+
           if (!_isEditing) ...[
             // VIEW MODE
             Row(
@@ -199,7 +208,9 @@ class _SessionDetailsModalState extends State<SessionDetailsModal> {
                     children: [
                       Text(
                         title,
-                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        style: Theme.of(
+                          context,
+                        ).textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: colorScheme.onSurface,
                         ),
@@ -207,9 +218,8 @@ class _SessionDetailsModalState extends State<SessionDetailsModal> {
                       if (isWorkSession && widget.task != null)
                         Text(
                           widget.task!.name,
-                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
+                          style: Theme.of(context).textTheme.bodyLarge
+                              ?.copyWith(color: colorScheme.onSurfaceVariant),
                         ),
                     ],
                   ),
@@ -239,7 +249,8 @@ class _SessionDetailsModalState extends State<SessionDetailsModal> {
                 '${widget.session.concentrationScore}/5',
               ),
             ],
-            if (widget.session.notes != null && widget.session.notes!.isNotEmpty) ...[
+            if (widget.session.notes != null &&
+                widget.session.notes!.isNotEmpty) ...[
               const SizedBox(height: 24),
               Text(
                 context.tr('focus.notes_title'),
@@ -267,42 +278,45 @@ class _SessionDetailsModalState extends State<SessionDetailsModal> {
             // EDIT MODE
             Text(
               context.tr('focus.edit_session_title'),
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 24),
-            
+
             if (isWorkSession) ...[
               DropdownButtonFormField<String>(
                 initialValue: _selectedCategoryId,
                 decoration: InputDecoration(
                   labelText: context.tr('common.category'),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   prefixIcon: const Icon(Icons.folder_outlined),
                 ),
-                items: widget.categories.map((c) {
-                  final categoryColor = Color(
-                    int.parse(c.category.color.replaceFirst('#', '0xFF')),
-                  );
-                  return DropdownMenuItem(
-                    value: c.category.id,
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 12,
-                          height: 12,
-                          decoration: BoxDecoration(
-                            color: categoryColor,
-                            shape: BoxShape.circle,
-                          ),
+                items:
+                    widget.categories.map((c) {
+                      final categoryColor = Color(
+                        int.parse(c.category.color.replaceFirst('#', '0xFF')),
+                      );
+                      return DropdownMenuItem(
+                        value: c.category.id,
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 12,
+                              height: 12,
+                              decoration: BoxDecoration(
+                                color: categoryColor,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Text(c.category.name),
+                          ],
                         ),
-                        const SizedBox(width: 12),
-                        Text(c.category.name),
-                      ],
-                    ),
-                  );
-                }).toList(),
+                      );
+                    }).toList(),
                 onChanged: (value) {
                   setState(() {
                     _selectedCategoryId = value;
@@ -316,20 +330,20 @@ class _SessionDetailsModalState extends State<SessionDetailsModal> {
                 initialValue: _selectedTaskId,
                 decoration: InputDecoration(
                   labelText: context.tr('common.task'),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   prefixIcon: const Icon(Icons.check_circle_outline),
                 ),
-                items: _getAvailableTasks().map((t) {
-                  return DropdownMenuItem(
-                    value: t.id,
-                    child: Text(t.name),
-                  );
-                }).toList(),
+                items:
+                    _getAvailableTasks().map((t) {
+                      return DropdownMenuItem(value: t.id, child: Text(t.name));
+                    }).toList(),
                 onChanged: (value) => setState(() => _selectedTaskId = value),
               ),
               const SizedBox(height: 16),
             ],
-            
+
             Row(
               children: [
                 Expanded(
@@ -338,7 +352,9 @@ class _SessionDetailsModalState extends State<SessionDetailsModal> {
                     child: InputDecorator(
                       decoration: InputDecoration(
                         labelText: context.tr('common.start_time'),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         prefixIcon: const Icon(Icons.access_time),
                       ),
                       child: Text(DateFormat('HH:mm').format(_startTime)),
@@ -352,7 +368,9 @@ class _SessionDetailsModalState extends State<SessionDetailsModal> {
                     child: InputDecorator(
                       decoration: InputDecoration(
                         labelText: context.tr('common.end_time'),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         prefixIcon: const Icon(Icons.access_time_filled),
                       ),
                       child: Text(DateFormat('HH:mm').format(_endTime)),
@@ -362,12 +380,12 @@ class _SessionDetailsModalState extends State<SessionDetailsModal> {
               ],
             ),
             const SizedBox(height: 24),
-            
+
             Text(
               context.tr('focus.level_badge'),
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Container(
@@ -398,20 +416,23 @@ class _SessionDetailsModalState extends State<SessionDetailsModal> {
                     max: 5,
                     divisions: 5,
                     label: _concentrationScore.toString(),
-                    onChanged: (value) => setState(() => _concentrationScore = value.round()),
+                    onChanged:
+                        (value) =>
+                            setState(() => _concentrationScore = value.round()),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 24),
-            
+
             MarkdownEditorInput(
               controller: _notesController,
               label: context.tr('focus.notes_title'),
-              fullScreenOverlayBuilder: (context) => const MinimalistTimerHeader(),
+              fullScreenOverlayBuilder:
+                  (context) => const MinimalistTimerHeader(),
             ),
           ],
-          
+
           const SizedBox(height: 32),
         ],
       ),
@@ -435,7 +456,7 @@ class _SessionDetailsModalState extends State<SessionDetailsModal> {
       context: context,
       initialTime: initialTime,
     );
-    
+
     if (picked != null) {
       setState(() {
         final now = DateTime.now();
@@ -446,7 +467,7 @@ class _SessionDetailsModalState extends State<SessionDetailsModal> {
           picked.hour,
           picked.minute,
         );
-        
+
         if (isStart) {
           _startTime = newDateTime;
         } else {
@@ -473,9 +494,9 @@ class _SessionDetailsModalState extends State<SessionDetailsModal> {
         const SizedBox(width: 12),
         Text(
           label,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
         ),
         const Spacer(),
         Text(
