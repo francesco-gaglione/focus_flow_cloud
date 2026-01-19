@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0] - 2026-01-19
+
+### Documentation
+
+- Add Buy Me A Coffee badge to README.
+
+### Features
+
+- Add custom funding link to FUNDING.yml for project support.
+- Enhance statistics activity chart with dynamic Y-axis labels and dashed grid lines
+- [**breaking**] Refactor task distribution into categories (#48)
+
 ## [1.25.1] - 2026-01-15
 
 ### Features
