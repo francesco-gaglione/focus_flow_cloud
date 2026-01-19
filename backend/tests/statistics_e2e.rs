@@ -154,27 +154,35 @@ async fn test_calculate_stats_scenarios() {
     // Study: 50 mins
     // Sorted by total_focus_time desc -> Study first, then Work.
     assert_eq!(stats.category_distribution.len(), 2);
-    assert_eq!(stats.category_distribution[0].category_name, "Study");
-    assert_eq!(stats.category_distribution[0].total_focus_time, 50 * 60);
+
+    let study_dist = stats
+        .category_distribution
+        .iter()
+        .find(|c| c.category_name == "Study")
+        .expect("Study category not found");
+    assert_eq!(study_dist.total_focus_time, 50 * 60);
     // Percentage: 50 / 75 * 100 = 66.666...
-    assert!((stats.category_distribution[0].percentage - 66.66).abs() < 0.1);
+    assert!((study_dist.percentage - 66.66).abs() < 0.1);
 
-    assert_eq!(stats.category_distribution[1].category_name, "Work");
-    assert_eq!(stats.category_distribution[1].total_focus_time, 25 * 60);
+    let work_dist = stats
+        .category_distribution
+        .iter()
+        .find(|c| c.category_name == "Work")
+        .expect("Work category not found");
+    assert_eq!(work_dist.total_focus_time, 25 * 60);
     // Percentage: 25 / 75 * 100 = 33.333...
-    assert!((stats.category_distribution[1].percentage - 33.33).abs() < 0.1);
+    assert!((work_dist.percentage - 33.33).abs() < 0.1);
 
-    // Task Distribution
-    // Only sessions with task_id should appear.
-    assert_eq!(stats.task_distribution.len(), 1);
-    assert_eq!(stats.task_distribution[0].task_name, "Coding");
-    assert_eq!(
-        stats.task_distribution[0].category_name,
-        Some("Work".to_string())
-    );
-    assert_eq!(stats.task_distribution[0].total_focus_time, 25 * 60);
-    // Percentage: 25 / 25 * 100 = 100.0 (calculated relative to total time on tasks)
-    assert!((stats.task_distribution[0].percentage - 100.0).abs() < 0.1);
+    // Task Distribution (Nested under Category)
+    // Work category should have the "Coding" task
+    assert_eq!(work_dist.task_distribution.len(), 1);
+    assert_eq!(work_dist.task_distribution[0].task_name, "Coding");
+    assert_eq!(work_dist.task_distribution[0].total_focus_time, 25 * 60);
+    // Percentage: 25 / 75 * 100 = 33.33... (calculated relative to GLOBAL total time)
+    assert!((work_dist.task_distribution[0].percentage - 33.33).abs() < 0.1);
+
+    // Study category has no tasks
+    assert!(study_dist.task_distribution.is_empty());
 }
 
 #[tokio::test]

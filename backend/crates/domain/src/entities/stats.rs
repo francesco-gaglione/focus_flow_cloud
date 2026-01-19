@@ -17,7 +17,6 @@ pub struct Stats {
     less_concentrated_period: ConcentrationPeriod,
     concentration_distribution: [u32; 5],
     category_distribution: Vec<CategoryDistributionItem>,
-    task_distribution: Vec<TaskDistributionItem>,
     daily_activity: Vec<DailyActivityItem>,
 }
 
@@ -34,15 +33,10 @@ impl Stats {
             .map(|c| (c.id(), c.name().to_string()))
             .collect();
 
-        let task_details: HashMap<Uuid, (String, Option<String>)> = tasks
+        // Task id - Task name
+        let task_details: HashMap<Uuid, String> = tasks
             .iter()
-            .map(|t| {
-                let cat_name = t
-                    .category_id()
-                    .and_then(|id| category_names.get(&id))
-                    .cloned();
-                (t.id(), (t.name().to_string(), cat_name))
-            })
+            .map(|t| (t.id(), t.name().to_string()))
             .collect();
 
         let (work_sessions, break_sessions): (Vec<_>, Vec<_>) = sessions
@@ -79,8 +73,8 @@ impl Stats {
             category_distribution: Self::calculate_category_distribution(
                 sessions,
                 &category_names,
+                &task_details,
             )?,
-            task_distribution: Self::calculate_task_distribution(sessions, &task_details)?,
             daily_activity,
         })
     }
@@ -173,6 +167,7 @@ impl Stats {
     fn calculate_category_distribution(
         sessions: &[FocusSession],
         category_names: &HashMap<Uuid, String>,
+        task_details: &HashMap<Uuid, String>,
     ) -> DomainResult<Vec<CategoryDistributionItem>> {
         let mut category_times: HashMap<Uuid, i64> = HashMap::new();
         let mut total_time: i64 = 0;
@@ -196,11 +191,25 @@ impl Stats {
                         0.0
                     };
 
+                    // Filter sessions for this category to ensure we only list relevant tasks
+                    let category_sessions: Vec<FocusSession> = sessions
+                        .iter()
+                        .filter(|s| s.category_id() == Some(category_id))
+                        .cloned()
+                        .collect();
+
+                    let task_distribution = Self::calculate_task_distribution(
+                        &category_sessions,
+                        task_details,
+                        total_time,
+                    )?;
+
                     CategoryDistributionItem::new(
                         name.to_string(),
                         category_id,
                         total_focus_time,
                         percentage,
+                        task_distribution,
                     )
                 })
             })
@@ -213,42 +222,30 @@ impl Stats {
 
     fn calculate_task_distribution(
         sessions: &[FocusSession],
-        task_details: &HashMap<Uuid, (String, Option<String>)>,
+        task_details: &HashMap<Uuid, String>, // taskId - task_name
+        total_time: i64,                      // filtered period total time
     ) -> DomainResult<Vec<TaskDistributionItem>> {
         let mut task_times: HashMap<Uuid, i64> = HashMap::new();
-        let mut total_time: i64 = 0;
 
         for session in sessions {
             if let (Some(task_id), Some(duration)) = (session.task_id(), session.actual_duration())
             {
                 *task_times.entry(task_id).or_insert(0) += duration;
-                total_time += duration;
             }
         }
 
         let mut distribution: Vec<TaskDistributionItem> = task_times
             .into_iter()
             .filter_map(|(task_id, total_focus_time)| {
-                task_details
-                    .get(&task_id)
-                    .map(|(task_name, category_name)| {
-                        let percentage = if total_time > 0 {
-                            (total_focus_time as f32 / total_time as f32) * 100.0
-                        } else {
-                            0.0
-                        };
+                task_details.get(&task_id).map(|task_name| {
+                    let percentage = if total_time > 0 {
+                        (total_focus_time as f32 / total_time as f32) * 100.0
+                    } else {
+                        0.0
+                    };
 
-                        TaskDistributionItem::new(
-                            category_name.clone(),
-                            sessions
-                                .iter()
-                                .find(|s| s.task_id() == Some(task_id))
-                                .and_then(|s| s.category_id()),
-                            task_name.clone(),
-                            total_focus_time,
-                            percentage,
-                        )
-                    })
+                    TaskDistributionItem::new(task_name.clone(), total_focus_time, percentage)
+                })
             })
             .collect::<DomainResult<Vec<TaskDistributionItem>>>()?;
 
@@ -336,10 +333,6 @@ impl Stats {
         &self.category_distribution
     }
 
-    pub fn task_distribution(&self) -> &[TaskDistributionItem] {
-        &self.task_distribution
-    }
-
     pub fn daily_activity(&self) -> &[DailyActivityItem] {
         &self.daily_activity
     }
@@ -357,6 +350,7 @@ pub struct CategoryDistributionItem {
     category_id: Uuid,
     total_focus_time: i64,
     percentage: f32,
+    task_distribution: Vec<TaskDistributionItem>,
 }
 
 impl CategoryDistributionItem {
@@ -365,6 +359,7 @@ impl CategoryDistributionItem {
         category_id: Uuid,
         total_focus_time: i64,
         percentage: f32,
+        task_distribution: Vec<TaskDistributionItem>,
     ) -> DomainResult<Self> {
         if !(0.0..=100.001).contains(&percentage) {
             return Err(DomainError::InvalidStatsParam(format!(
@@ -377,6 +372,7 @@ impl CategoryDistributionItem {
             category_id,
             total_focus_time,
             percentage,
+            task_distribution,
         })
     }
 
@@ -395,46 +391,33 @@ impl CategoryDistributionItem {
     pub fn percentage(&self) -> f32 {
         self.percentage
     }
+
+    pub fn task_distribution(&self) -> &Vec<TaskDistributionItem> {
+        &self.task_distribution
+    }
 }
 
 #[derive(Debug, Clone)]
 pub struct TaskDistributionItem {
-    category_name: Option<String>,
-    category_id: Option<Uuid>,
     task_name: String,
     total_focus_time: i64,
     percentage: f32,
 }
 
 impl TaskDistributionItem {
-    pub fn new(
-        category_name: Option<String>,
-        category_id: Option<Uuid>,
-        task_name: String,
-        total_focus_time: i64,
-        percentage: f32,
-    ) -> DomainResult<Self> {
+    pub fn new(task_name: String, total_focus_time: i64, percentage: f32) -> DomainResult<Self> {
         if !(0.0..=100.001).contains(&percentage) {
             return Err(DomainError::InvalidStatsParam(format!(
                 "Percentage must be between 0 and 100, got {}",
                 percentage
             )));
         }
+
         Ok(Self {
-            category_name,
-            category_id,
             task_name,
             total_focus_time,
             percentage,
         })
-    }
-
-    pub fn category_name(&self) -> Option<&str> {
-        self.category_name.as_deref()
-    }
-
-    pub fn category_id(&self) -> Option<Uuid> {
-        self.category_id
     }
 
     pub fn task_name(&self) -> &str {
@@ -505,6 +488,7 @@ impl DailyActivityDistributionItem {
 #[cfg(test)]
 mod stats_tests {
     use super::*;
+    use chrono::{DateTime, Utc};
 
     #[test]
     fn test_daily_activity_distribution_item_new() {
@@ -529,9 +513,264 @@ mod stats_tests {
             DailyActivityDistributionItem::new("Category 1".to_string(), Uuid::new_v4(), 10),
             DailyActivityDistributionItem::new("Category 2".to_string(), Uuid::new_v4(), 20),
         ];
-        let item = DailyActivityItem::new(date, category_distribution);
 
+        let item = DailyActivityItem::new(date, category_distribution);
         assert_eq!(item.date(), date);
         assert_eq!(item.category_distribution().len(), 2);
+    }
+
+    #[test]
+    fn test_stats_calculation_correctness() {
+        // Fixed date: 2023-01-01 10:00:00 UTC (Morning)
+        let date = DateTime::parse_from_rfc3339("2023-01-01T10:00:00Z")
+            .unwrap()
+            .with_timezone(&Utc);
+
+        // Session 1 duration: 1 hour (3600 seconds)
+        let end_date_1 = date + chrono::Duration::seconds(3600);
+
+        // Session 2 duration: 2 hours (7200 seconds)
+        let end_date_2 = date + chrono::Duration::seconds(7200);
+
+        let categories = vec![
+            Category::create(
+                Uuid::new_v4(),
+                "Category 1".to_string(),
+                Some("des".to_string()),
+                "#000000".to_string(),
+            )
+            .unwrap(),
+            Category::create(
+                Uuid::new_v4(),
+                "Category 2".to_string(),
+                Some("des".to_string()),
+                "#000000".to_string(),
+            )
+            .unwrap(),
+        ];
+
+        let tasks = vec![
+            Task::create(
+                Uuid::new_v4(),
+                Some(categories.get(0).unwrap().id()),
+                "Task 1".to_string(),
+                Some("des".to_string()),
+                None,
+            ),
+            Task::create(
+                Uuid::new_v4(),
+                Some(categories.get(1).unwrap().id()),
+                "Task 2".to_string(),
+                Some("des".to_string()),
+                None,
+            ),
+        ];
+
+        let focus_sessions = vec![
+            FocusSession::new(
+                categories.get(0).unwrap().user_id(),
+                Some(categories.get(0).unwrap().id()),
+                Some(tasks.get(0).unwrap().id()),
+                FocusSessionType::Work,
+                Some(3),
+                Some("notes cat 1, task 1".to_string()),
+                date,
+                Some(end_date_1),
+            )
+            .unwrap(),
+            FocusSession::new(
+                categories.get(1).unwrap().user_id(),
+                Some(categories.get(1).unwrap().id()),
+                Some(tasks.get(1).unwrap().id()),
+                FocusSessionType::Work,
+                Some(3),
+                Some("notes cat 2, task 2".to_string()),
+                date,
+                Some(end_date_2),
+            )
+            .unwrap(),
+        ];
+
+        let stats = Stats::calculate(&focus_sessions, &categories, &tasks, false);
+        assert!(stats.is_ok());
+
+        let stats = stats.unwrap();
+        assert_eq!(stats.total_sessions(), 2);
+        assert_eq!(stats.total_breaks(), 0);
+        assert_eq!(stats.total_focus_time(), 3600 + 7200);
+        assert_eq!(stats.total_break_time(), 0);
+
+        // Both sessions are in the morning (10 AM), so Morning is most concentrated
+        assert!(matches!(
+            stats.most_concentrated_period(),
+            ConcentrationPeriod::Morning
+        ));
+
+        // Since there are no afternoon sessions, afternoon average is MAX, so Morning (avg 3) < MAX.
+        // Thus Morning is also the "least" concentrated when compared to "no data" treated as MAX.
+        assert!(matches!(
+            stats.less_concentrated_period(),
+            ConcentrationPeriod::Morning
+        ));
+
+        // Concentration distribution: both have score 3 (index 2)
+        assert_eq!(stats.concentration_distribution(), &[0, 0, 2, 0, 0]);
+
+        // Category distribution
+        let cat_dist = stats.category_distribution();
+        assert_eq!(cat_dist.len(), 2);
+
+        // Sorted by focus time desc: Category 2 (7200) should be first
+        assert_eq!(cat_dist[0].category_name(), "Category 2");
+        assert_eq!(cat_dist[0].total_focus_time(), 7200);
+
+        // 7200 / 10800 = 0.666...
+        assert!((cat_dist[0].percentage() - 66.66).abs() < 0.01);
+        assert_eq!(cat_dist[1].category_name(), "Category 1");
+        assert_eq!(cat_dist[1].total_focus_time(), 3600);
+
+        // 3600 / 10800 = 0.333...
+        assert!((cat_dist[1].percentage() - 33.33).abs() < 0.01);
+
+        // Daily activity is empty because is_multi_day is false
+        assert!(stats.daily_activity().is_empty());
+    }
+
+    #[test]
+    fn test_stats_multi_day_and_distributions() {
+        // Day 1: 2023-01-01
+        let day1_start = DateTime::parse_from_rfc3339("2023-01-01T10:00:00Z")
+            .unwrap()
+            .with_timezone(&Utc);
+
+        let day1_end = day1_start + chrono::Duration::seconds(3600); // 1 hour
+
+        // Day 2: 2023-01-02
+        let day2_start = DateTime::parse_from_rfc3339("2023-01-02T15:00:00Z")
+            .unwrap()
+            .with_timezone(&Utc);
+        let day2_end = day2_start + chrono::Duration::seconds(7200); // 2 hours
+        let categories = vec![
+            Category::create(
+                Uuid::new_v4(),
+                "Cat A".to_string(),
+                None,
+                "#ffffff".to_string(),
+            )
+            .unwrap(),
+            Category::create(
+                Uuid::new_v4(),
+                "Cat B".to_string(),
+                None,
+                "#000000".to_string(),
+            )
+            .unwrap(),
+        ];
+
+        let tasks = vec![
+            Task::create(
+                Uuid::new_v4(),
+                Some(categories[0].id()),
+                "Task A1".to_string(),
+                None,
+                None,
+            ),
+            Task::create(
+                Uuid::new_v4(),
+                Some(categories[1].id()),
+                "Task B1".to_string(),
+                None,
+                None,
+            ),
+        ];
+
+        let sessions = vec![
+            // Session 1: Cat A, Task A1, 1 hour, Day 1
+            FocusSession::new(
+                Uuid::new_v4(),
+                Some(categories[0].id()),
+                Some(tasks[0].id()),
+                FocusSessionType::Work,
+                Some(5),
+                None,
+                day1_start,
+                Some(day1_end),
+            )
+            .unwrap(),
+            // Session 2: Cat B, Task B1, 2 hours, Day 2
+            FocusSession::new(
+                Uuid::new_v4(),
+                Some(categories[1].id()),
+                Some(tasks[1].id()),
+                FocusSessionType::Work,
+                Some(4),
+                None,
+                day2_start,
+                Some(day2_end),
+            )
+            .unwrap(),
+        ];
+
+        let stats = Stats::calculate(&sessions, &categories, &tasks, true).unwrap();
+
+        // Verify Daily Activity
+        let daily = stats.daily_activity();
+        assert_eq!(daily.len(), 2, "Should have 2 days of activity");
+
+        // Day 1 check
+        assert_eq!(daily[0].date(), day1_start.date_naive());
+        assert_eq!(daily[0].category_distribution().len(), 1);
+        assert_eq!(daily[0].category_distribution()[0].category_name(), "Cat A");
+        assert_eq!(daily[0].category_distribution()[0].total_focus_time(), 3600);
+
+        // Day 2 check
+        assert_eq!(daily[1].date(), day2_start.date_naive());
+        assert_eq!(daily[1].category_distribution().len(), 1);
+        assert_eq!(daily[1].category_distribution()[0].category_name(), "Cat B");
+        assert_eq!(daily[1].category_distribution()[0].total_focus_time(), 7200);
+
+        // Verify Global Task Distribution Percentages
+        // Total Time = 3600 + 7200 = 10800
+        // Task A1: 3600 -> 33.33%
+        // Task B1: 7200 -> 66.66%
+        let cat_dist = stats.category_distribution();
+
+        // Find Cat A
+        let cat_a_dist = cat_dist
+            .iter()
+            .find(|c| c.category_name() == "Cat A")
+            .expect("Cat A not found");
+        let task_a1_dist = &cat_a_dist.task_distribution();
+
+        // Cat A should ONLY contain Task A1
+        assert_eq!(task_a1_dist.len(), 1, "Category A should only list Task A1");
+        assert_eq!(task_a1_dist[0].task_name(), "Task A1");
+
+        // CRITICAL: The percentage should be relative to GLOBAL total (10800), NOT Category total (3600)
+        // 3600 / 10800 = 33.33%
+        assert!(
+            (task_a1_dist[0].percentage() - 33.33).abs() < 0.01,
+            "Task A1 % should be ~33.33%, got {}",
+            task_a1_dist[0].percentage()
+        );
+
+        // Find Cat B
+        let cat_b_dist = cat_dist
+            .iter()
+            .find(|c| c.category_name() == "Cat B")
+            .expect("Cat B not found");
+
+        let task_b1_dist = &cat_b_dist.task_distribution();
+
+        // Cat B should ONLY contain Task B1
+        assert_eq!(task_b1_dist.len(), 1, "Category B should only list Task B1");
+        assert_eq!(task_b1_dist[0].task_name(), "Task B1");
+
+        // 7200 / 10800 = 66.66%
+        assert!(
+            (task_b1_dist[0].percentage() - 66.66).abs() < 0.01,
+            "Task B1 % should be ~66.66%, got {}",
+            task_b1_dist[0].percentage()
+        );
     }
 }
