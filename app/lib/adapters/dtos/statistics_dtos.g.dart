@@ -27,6 +27,10 @@ _$CategoryDistributionDtoImpl _$$CategoryDistributionDtoImplFromJson(
   categoryName: json['categoryName'] as String,
   totalFocusTime: (json['totalFocusTime'] as num).toInt(),
   percentage: (json['percentage'] as num).toDouble(),
+  taskDistribution:
+      (json['taskDistribution'] as List<dynamic>)
+          .map((e) => TaskDistributionDto.fromJson(e as Map<String, dynamic>))
+          .toList(),
 );
 
 Map<String, dynamic> _$$CategoryDistributionDtoImplToJson(
@@ -36,14 +40,13 @@ Map<String, dynamic> _$$CategoryDistributionDtoImplToJson(
   'categoryName': instance.categoryName,
   'totalFocusTime': instance.totalFocusTime,
   'percentage': instance.percentage,
+  'taskDistribution': instance.taskDistribution,
 };
 
 _$TaskDistributionDtoImpl _$$TaskDistributionDtoImplFromJson(
   Map<String, dynamic> json,
 ) => _$TaskDistributionDtoImpl(
   taskName: json['taskName'] as String,
-  categoryId: json['categoryId'] as String?,
-  categoryName: json['categoryName'] as String?,
   totalFocusTime: (json['totalFocusTime'] as num).toInt(),
   percentage: (json['percentage'] as num).toDouble(),
 );
@@ -52,8 +55,6 @@ Map<String, dynamic> _$$TaskDistributionDtoImplToJson(
   _$TaskDistributionDtoImpl instance,
 ) => <String, dynamic>{
   'taskName': instance.taskName,
-  'categoryId': instance.categoryId,
-  'categoryName': instance.categoryName,
   'totalFocusTime': instance.totalFocusTime,
   'percentage': instance.percentage,
 };
@@ -114,10 +115,6 @@ _$GetStatsByPeriodResponseDtoImpl _$$GetStatsByPeriodResponseDtoImplFromJson(
             (e) => CategoryDistributionDto.fromJson(e as Map<String, dynamic>),
           )
           .toList(),
-  taskDistribution:
-      (json['taskDistribution'] as List<dynamic>)
-          .map((e) => TaskDistributionDto.fromJson(e as Map<String, dynamic>))
-          .toList(),
   dailyActivity:
       (json['dailyActivity'] as List<dynamic>)
           .map((e) => DailyActivityDto.fromJson(e as Map<String, dynamic>))
@@ -135,6 +132,5 @@ Map<String, dynamic> _$$GetStatsByPeriodResponseDtoImplToJson(
   'lessConcentratedPeriod': instance.lessConcentratedPeriod,
   'concentrationDistribution': instance.concentrationDistribution,
   'categoryDistribution': instance.categoryDistribution,
-  'taskDistribution': instance.taskDistribution,
   'dailyActivity': instance.dailyActivity,
 };

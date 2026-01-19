@@ -25,12 +25,6 @@ abstract class StatisticsRepository {
     int? endDate,
   );
 
-  /// Get task distribution for a period
-  Future<List<TaskDistribution>> getTaskDistribution(
-    int startDate,
-    int? endDate,
-  );
-
   /// Get daily activity for a period
   Future<List<DailyActivity>> getDailyActivity(int startDate, int? endDate);
 

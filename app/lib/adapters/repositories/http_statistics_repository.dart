@@ -47,18 +47,16 @@ class HttpStatisticsRepository implements StatisticsRepository {
                   categoryName: dist.categoryName,
                   totalFocusTime: dist.totalFocusTime,
                   percentage: dist.percentage,
-                ),
-              )
-              .toList(),
-      taskDistribution:
-          dto.taskDistribution
-              .map(
-                (dist) => TaskDistribution(
-                  taskName: dist.taskName,
-                  categoryId: dist.categoryId,
-                  categoryName: dist.categoryName,
-                  totalFocusTime: dist.totalFocusTime,
-                  percentage: dist.percentage,
+                  taskDistribution:
+                      dist.taskDistribution
+                          .map(
+                            (taskDist) => TaskDistribution(
+                              taskName: taskDist.taskName,
+                              totalFocusTime: taskDist.totalFocusTime,
+                              percentage: taskDist.percentage,
+                            ),
+                          )
+                          .toList(),
                 ),
               )
               .toList(),
@@ -129,18 +127,6 @@ class HttpStatisticsRepository implements StatisticsRepository {
       endDate: endDate,
     );
     return stats.categoryDistribution;
-  }
-
-  @override
-  Future<List<TaskDistribution>> getTaskDistribution(
-    int startDate,
-    int? endDate,
-  ) async {
-    final stats = await calculateStatsByPeriod(
-      startDate: startDate,
-      endDate: endDate,
-    );
-    return stats.taskDistribution;
   }
 
   @override
