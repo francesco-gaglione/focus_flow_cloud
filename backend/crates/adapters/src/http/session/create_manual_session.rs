@@ -31,7 +31,7 @@ pub struct CreateManualSessionDto {
 
     pub ended_at: i64,
 
-    //TODO should be validated?
+    #[validate(length(min = 1))]
     pub notes: Option<String>,
 }
 

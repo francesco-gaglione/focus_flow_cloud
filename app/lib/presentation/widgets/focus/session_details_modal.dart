@@ -75,7 +75,7 @@ class _SessionDetailsModalState extends State<SessionDetailsModal> {
     try {
       await repository.updateSession(
         id: widget.session.id,
-        notes: _notesController.text,
+        notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
         concentrationScore: _concentrationScore,
         startedAt: _startTime.millisecondsSinceEpoch ~/ 1000,
         endedAt: _endTime.millisecondsSinceEpoch ~/ 1000,

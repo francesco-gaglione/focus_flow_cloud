@@ -59,7 +59,7 @@ class AddManualSession extends FocusEvent {
   final DateTime startTime;
   final DateTime endTime;
   final int focusLevel;
-  final String note;
+  final String? note;
 
   AddManualSession({
     this.category,
@@ -67,6 +67,6 @@ class AddManualSession extends FocusEvent {
     required this.startTime,
     required this.endTime,
     required this.focusLevel,
-    required this.note,
+    this.note,
   });
 }
