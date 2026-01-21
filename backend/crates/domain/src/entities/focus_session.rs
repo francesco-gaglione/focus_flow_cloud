@@ -42,6 +42,12 @@ impl FocusSession {
             ));
         }
 
+        if notes.is_some() && notes.as_ref().unwrap().is_empty() {
+            return Err(DomainError::InvalidFocusSessionParam(
+                "Notes field is empty".to_string(),
+            ));
+        }
+
         let actual_duration = ended_at.map(|ended_at| (ended_at - started_at).num_seconds());
 
         Ok(FocusSession {
