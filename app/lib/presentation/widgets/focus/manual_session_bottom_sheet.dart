@@ -91,7 +91,7 @@ class _ManualSessionBottomSheetState extends State<ManualSessionBottomSheet> {
         startTime: _startDate,
         endTime: _endDate,
         focusLevel: _focusLevel,
-        note: _notesController.text,
+        note: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
       ),
     );
     Navigator.of(context).pop();
