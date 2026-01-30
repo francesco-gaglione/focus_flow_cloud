@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.1] - 2026-01-30
+
+### Bug Fixes
+
+- Update focus session domain validation (#51)
+
+### Features
+
+- Backend configuration page accessible via a new route 
+
 ## [2.0.0] - 2026-01-19
 
 ### Documentation
