@@ -8,7 +8,11 @@ import '../category/category_page.dart';
 import '../statistics/statistics_page.dart';
 import '../settings/settings_page.dart';
 import '../notes/notes_page.dart';
+import '../notes/notes_page.dart';
 import 'main_layout.dart';
+import '../../core/services/configuration_service.dart';
+import '../../core/di/service_locator.dart';
+import '../pages/onboarding/backend_config_page.dart';
 
 class AppRouter {
   final AuthCubit authCubit;
@@ -21,7 +25,9 @@ class AppRouter {
     redirect: (context, state) {
       final isLoggedIn = authCubit.state is AuthAuthenticated;
       final isLoggingIn = state.uri.path == '/login';
+      final isConfiguring = state.uri.path == '/config';
 
+      if (isConfiguring) return null;
       if (!isLoggedIn) return '/login';
       if (isLoggedIn && isLoggingIn) return '/focus';
       return null;
@@ -30,6 +36,15 @@ class AppRouter {
       GoRoute(
         path: '/login',
         builder: (context, state) => const LoginPage(),
+      ),
+      GoRoute(
+        path: '/config',
+        builder: (context, state) {
+           return BackendConfigPage(
+              configService: sl<ConfigurationService>(),
+              isFirstRun: false, 
+           );
+        },
       ),
       ShellRoute(
         builder: (context, state, child) {

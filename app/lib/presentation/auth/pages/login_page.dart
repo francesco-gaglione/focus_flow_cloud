@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../auth/cubit/auth_cubit.dart';
 
 class LoginPage extends StatefulWidget {
@@ -62,6 +63,14 @@ class _LoginPageState extends State<LoginPage> {
                       }
                     },
                     child: const Text('Login'),
+                  ),
+                  const SizedBox(height: 16),
+                  TextButton.icon(
+                    onPressed: () {
+                      context.push('/config');
+                    },
+                    icon: const Icon(Icons.settings),
+                    label: const Text('Change Server URL'),
                   ),
                 ],
               ),
