@@ -8,7 +8,7 @@ import '../category/category_page.dart';
 import '../statistics/statistics_page.dart';
 import '../settings/settings_page.dart';
 import '../notes/notes_page.dart';
-import '../notes/notes_page.dart';
+
 import 'main_layout.dart';
 import '../../core/services/configuration_service.dart';
 import '../../core/di/service_locator.dart';
