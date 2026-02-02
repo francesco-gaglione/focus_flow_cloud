@@ -1,7 +1,15 @@
-use std::{collections::HashSet, sync::Arc};
-
 use chrono::{DateTime, Utc};
+use domain::entities::stats::calculators::{
+    category_analysis_calculator::CategoryAnalysisCalculator,
+    concentration_calculator::ConcentrationCalculator,
+    daily_activity_calculator::DailyActivityCalculator,
+    period_summary_calculator::PeriodSummaryCalculator,
+};
 use futures_util::future::join_all;
+use std::{
+    collections::{HashMap, HashSet},
+    sync::Arc,
+};
 use uuid::Uuid;
 
 use crate::{
@@ -97,12 +105,34 @@ impl CalculateStatsByPeriodUseCase {
             _ => false,
         };
 
-        // Calculate stats using domain logic
-        Ok(Stats::calculate(
-            &sessions,
-            &categories,
-            &tasks,
-            is_multi_day,
-        )?)
+        // Build lookup maps
+        let category_names: HashMap<Uuid, String> = categories
+            .iter()
+            .map(|c| (c.id(), c.name().to_string()))
+            .collect();
+
+        let task_details: HashMap<Uuid, String> = tasks
+            .iter()
+            .map(|t| (t.id(), t.name().to_string()))
+            .collect();
+
+        // Calculate stats using orchestrator pattern
+        let period_summary = PeriodSummaryCalculator::calculate(&sessions);
+        let concentration_stats = ConcentrationCalculator::calculate(&sessions);
+        let category_distribution =
+            CategoryAnalysisCalculator::calculate(&sessions, &category_names, &task_details)?;
+
+        let daily_activity = if is_multi_day {
+            DailyActivityCalculator::calculate(&sessions, &category_names)?
+        } else {
+            Vec::new()
+        };
+
+        Ok(Stats::new(
+            period_summary,
+            concentration_stats,
+            category_distribution,
+            daily_activity,
+        ))
     }
 }
