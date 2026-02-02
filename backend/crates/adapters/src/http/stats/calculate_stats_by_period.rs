@@ -151,7 +151,6 @@ impl From<DailyActivityItem> for DailyActivityDto {
                 .timestamp(),
             category_distribution: item
                 .category_distribution
-                .to_vec()
                 .into_iter()
                 .map(|dist| dist.into())
                 .collect(),
