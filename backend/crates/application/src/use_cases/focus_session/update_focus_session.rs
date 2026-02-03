@@ -39,11 +39,8 @@ impl UpdateFocusSessionUseCase {
             session.update_notes(Some(notes));
         }
 
-        if update_session.started_at.is_some() && update_session.ended_at.is_some() {
-            session.update_date_range(
-                update_session.started_at.unwrap(),
-                Some(update_session.ended_at.unwrap()),
-            )?;
+        if let (Some(start), Some(end)) = (update_session.started_at, update_session.ended_at) {
+            session.update_date_range(start, Some(end))?;
         }
 
         Ok(self.session_persistence.update_session(session).await?)
