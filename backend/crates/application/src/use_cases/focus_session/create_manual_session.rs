@@ -1,8 +1,20 @@
-use crate::app_error::AppResult;
 use crate::use_cases::focus_session::command::create_manual_session::CreateManualFocusSessionCommand;
-use domain::entities::focus_session::FocusSession;
+use domain::entities::focus_session::{FocusSession, FocusSessionError};
+use domain::error::persistence_error::PersistenceError;
 use domain::traits::focus_session_persistence::FocusSessionPersistence;
 use std::sync::Arc;
+use thiserror::Error;
+
+#[derive(Debug, Error)]
+pub enum CreateManualSessionError {
+    #[error("Invalid focus session")]
+    InvalidFocusSession(#[from] FocusSessionError),
+
+    #[error("Persistence error")]
+    PersistenceError(#[from] PersistenceError),
+}
+
+pub type CreateManualSessionResult<T> = Result<T, CreateManualSessionError>;
 
 #[derive(Clone)]
 pub struct CreateManualSessionUseCase {
@@ -19,7 +31,7 @@ impl CreateManualSessionUseCase {
     pub async fn execute(
         &self,
         session_cmd: CreateManualFocusSessionCommand,
-    ) -> AppResult<FocusSession> {
+    ) -> CreateManualSessionResult<FocusSession> {
         let session = FocusSession::new(
             session_cmd.user_id,
             session_cmd.category_id,
@@ -41,7 +53,6 @@ impl CreateManualSessionUseCase {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::app_error::AppError;
     use crate::mocks::MockFocusSessionPersistence;
     use chrono::DateTime;
     use domain::entities::focus_session_type::FocusSessionType;
@@ -127,7 +138,12 @@ mod tests {
 
         assert!(result.is_err());
         match result.unwrap_err() {
-            AppError::Database(msg) => assert_eq!(msg, "Invalid session data"),
+            CreateManualSessionError::PersistenceError(err) => {
+                assert_eq!(
+                    err,
+                    PersistenceError::Unexpected("Invalid session data".to_string())
+                );
+            }
             _ => panic!("Expected Database error"),
         }
     }

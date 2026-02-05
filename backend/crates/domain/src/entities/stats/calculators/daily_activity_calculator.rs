@@ -1,5 +1,4 @@
 use crate::entities::focus_session::FocusSession;
-use crate::error::domain_error::DomainResult;
 use chrono::NaiveDate;
 use std::collections::HashMap;
 use uuid::Uuid;
@@ -42,7 +41,7 @@ impl DailyActivityCalculator {
     pub fn calculate(
         sessions: &[FocusSession],
         category_names: &HashMap<Uuid, String>,
-    ) -> DomainResult<Vec<DailyActivityItem>> {
+    ) -> Vec<DailyActivityItem> {
         let mut daily_data: HashMap<NaiveDate, HashMap<Uuid, i64>> = HashMap::new();
 
         for session in sessions {
@@ -77,12 +76,12 @@ impl DailyActivityCalculator {
 
                 category_distribution.sort_by_key(|b| std::cmp::Reverse(b.total_focus_time));
 
-                Ok(DailyActivityItem::new(date, category_distribution))
+                DailyActivityItem::new(date, category_distribution)
             })
-            .collect::<DomainResult<Vec<DailyActivityItem>>>()?;
+            .collect::<Vec<DailyActivityItem>>();
 
         daily_activity.sort_by_key(|a| a.date);
 
-        Ok(daily_activity)
+        daily_activity
     }
 }

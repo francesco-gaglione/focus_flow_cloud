@@ -1,4 +1,5 @@
 use chrono::{DateTime, Utc};
+use thiserror::Error;
 use uuid::Uuid;
 
 use crate::http::dto::common::{
@@ -7,14 +8,23 @@ use crate::http::dto::common::{
 use crate::http::session::{
     create_manual_session::CreateManualSessionDto, update_session::UpdateFocusSessionDto,
 };
-use application::{
-    app_error::{AppError, AppResult},
-    use_cases::focus_session::command::{
-        create_manual_session::CreateManualFocusSessionCommand,
-        update_focus_session::UpdateFocusSessionCommand,
-    },
+use application::use_cases::focus_session::command::{
+    create_manual_session::CreateManualFocusSessionCommand,
+    update_focus_session::UpdateFocusSessionCommand,
 };
 use domain::entities::{focus_session::FocusSession, focus_session_type::FocusSessionType};
+
+#[derive(Debug, Error)]
+pub enum FocusSessionMapperError {
+    #[error("Invalid timestamp: {0}")]
+    InvalidTimestamp(i64),
+    #[error("Start time has a bad format")]
+    InvalidStartTime,
+    #[error("End time has bad format")]
+    InvalidEndTime,
+}
+
+pub type FocusSessionMapperResult<T> = Result<T, FocusSessionMapperError>;
 
 pub struct FocusSessionMapper;
 
@@ -38,7 +48,7 @@ impl FocusSessionMapper {
     pub fn manual_create_dto_to_command(
         user_id: Uuid,
         dto: &CreateManualSessionDto,
-    ) -> AppResult<CreateManualFocusSessionCommand> {
+    ) -> FocusSessionMapperResult<CreateManualFocusSessionCommand> {
         Ok(CreateManualFocusSessionCommand {
             user_id,
             category_id: dto
@@ -60,7 +70,7 @@ impl FocusSessionMapper {
     pub fn session_update_dto_to_command(
         id: String,
         dto: &UpdateFocusSessionDto,
-    ) -> AppResult<UpdateFocusSessionCommand> {
+    ) -> FocusSessionMapperResult<UpdateFocusSessionCommand> {
         Ok(UpdateFocusSessionCommand {
             session_id: Uuid::parse_str(id.as_str()).unwrap(), // should be safe due to validation
             category_id: dto
@@ -76,16 +86,15 @@ impl FocusSessionMapper {
             started_at: dto
                 .started_at
                 .map(|d| {
-                    Self::timestamp_to_datetime(d).map_err(|_| {
-                        AppError::BadRequest("Start time has a bad format".to_string())
-                    })
+                    Self::timestamp_to_datetime(d)
+                        .map_err(|_| FocusSessionMapperError::InvalidStartTime)
                 })
                 .transpose()?,
             ended_at: dto
                 .ended_at
                 .map(|d| {
                     Self::timestamp_to_datetime(d)
-                        .map_err(|_| AppError::BadRequest("End time has bad format".to_string()))
+                        .map_err(|_| FocusSessionMapperError::InvalidEndTime)
                 })
                 .transpose()?,
         })
@@ -102,9 +111,9 @@ impl FocusSessionMapper {
     // Private helper methods for timestamp conversions
 
     /// Convert Unix timestamp (seconds) to DateTime<Utc>
-    fn timestamp_to_datetime(timestamp: i64) -> AppResult<DateTime<Utc>> {
+    fn timestamp_to_datetime(timestamp: i64) -> FocusSessionMapperResult<DateTime<Utc>> {
         let datetime = DateTime::from_timestamp(timestamp, 0)
-            .ok_or_else(|| AppError::BadRequest(format!("Invalid timestamp: {}", timestamp)))?;
+            .ok_or_else(|| FocusSessionMapperError::InvalidTimestamp(timestamp))?;
         Ok(datetime)
     }
 }

@@ -1,12 +1,30 @@
-use crate::http::app_state::AppState;
 use crate::http::model::session_model::UserSession;
 use crate::http_error::HttpResult;
 use crate::openapi::USERS_TAG;
-use application::use_cases::user::register_user::RegisterUserCommand;
+use crate::{http::app_state::AppState, http_error::HttpError};
+use application::use_cases::user::register_user::{RegisterUserCommand, RegisterUserError};
 use axum::{extract::State, Extension, Json};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use validator::Validate;
+
+impl From<RegisterUserError> for HttpError {
+    fn from(value: RegisterUserError) -> Self {
+        match value {
+            RegisterUserError::InvalidUserCredentials(e) => HttpError::Unauthorized(e),
+            RegisterUserError::Unauthorized(e) => HttpError::Unauthorized(e),
+            RegisterUserError::PasswordPolicyViolation(password_policy_error) => {
+                HttpError::BadRequest(password_policy_error.to_string())
+            }
+            RegisterUserError::PersistenceError(persistence_error) => {
+                HttpError::GenericError(persistence_error.to_string())
+            }
+            RegisterUserError::PasswordError(hashing_error) => {
+                HttpError::GenericError(hashing_error.to_string())
+            }
+        }
+    }
+}
 
 #[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
 pub struct CreateUserDto {

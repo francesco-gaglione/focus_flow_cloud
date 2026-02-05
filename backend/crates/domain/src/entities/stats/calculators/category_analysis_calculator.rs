@@ -2,7 +2,6 @@ use crate::entities::focus_session::FocusSession;
 use crate::entities::stats::category_distribution::{
     CategoryDistributionItem, TaskDistributionItem,
 };
-use crate::error::domain_error::DomainResult;
 use std::collections::HashMap;
 use uuid::Uuid;
 
@@ -13,7 +12,7 @@ impl CategoryAnalysisCalculator {
         sessions: &[FocusSession],
         category_names: &HashMap<Uuid, String>,
         task_details: &HashMap<Uuid, String>,
-    ) -> DomainResult<Vec<CategoryDistributionItem>> {
+    ) -> Vec<CategoryDistributionItem> {
         let mut category_times: HashMap<Uuid, i64> = HashMap::new();
         let mut total_time: i64 = 0;
 
@@ -46,8 +45,7 @@ impl CategoryAnalysisCalculator {
                         &category_sessions,
                         task_details,
                         total_time,
-                    )
-                    .ok()?;
+                    );
 
                     CategoryDistributionItem::new(
                         name.to_string(),
@@ -63,14 +61,14 @@ impl CategoryAnalysisCalculator {
 
         distribution.sort_by_key(|b| std::cmp::Reverse(b.total_focus_time()));
 
-        Ok(distribution)
+        distribution
     }
 
     fn calculate_task_distribution(
         sessions: &[FocusSession],
         task_details: &HashMap<Uuid, String>,
         total_time: i64,
-    ) -> DomainResult<Vec<TaskDistributionItem>> {
+    ) -> Vec<TaskDistributionItem> {
         let mut task_times: HashMap<Uuid, i64> = HashMap::new();
 
         for session in sessions {
@@ -97,6 +95,6 @@ impl CategoryAnalysisCalculator {
 
         distribution.sort_by_key(|b| std::cmp::Reverse(b.total_focus_time()));
 
-        Ok(distribution)
+        distribution
     }
 }

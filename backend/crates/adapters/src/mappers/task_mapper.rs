@@ -1,12 +1,22 @@
 use crate::http::dto::common::task_dto::TaskDto;
 use crate::http::task::create_task::CreateTaskDto;
 use crate::http::task::update_task::UpdateTaskDto;
-use application::app_error::{AppError, AppResult};
 use application::use_cases::task::command::create_task::CreateTaskCommand;
 use application::use_cases::task::command::update_task::UpdateTaskCommand;
 use chrono::{DateTime, NaiveDate, NaiveTime, Utc};
 use domain::entities::task::Task;
+use thiserror::Error;
 use uuid::Uuid;
+
+#[derive(Debug, Error)]
+pub enum TaskMapperError {
+    #[error("Invalid category UUID: {0}")]
+    InvalidCategoryUuid(uuid::Error),
+    #[error("Invalid timestamp: {0}")]
+    InvalidTimestamp(i64),
+}
+
+pub type TaskMapperResult<T> = Result<T, TaskMapperError>;
 
 /// Mapper for Task-related conversions between HTTP layer and Application layer
 pub struct TaskMapper;
@@ -17,14 +27,14 @@ impl TaskMapper {
     pub fn create_dto_to_command(
         user_id: Uuid,
         dto: CreateTaskDto,
-    ) -> AppResult<CreateTaskCommand> {
+    ) -> TaskMapperResult<CreateTaskCommand> {
         let scheduled_date = Self::timestamp_to_naive_date(dto.scheduled_date)?;
 
         let category_id = dto
             .category_id
             .map(|id| Uuid::parse_str(&id))
             .transpose()
-            .map_err(|e| AppError::BadRequest(format!("Invalid category UUID: {}", e)))?;
+            .map_err(TaskMapperError::InvalidCategoryUuid)?;
 
         Ok(CreateTaskCommand {
             user_id,
@@ -40,12 +50,12 @@ impl TaskMapper {
     pub fn update_dto_to_command(
         task_id: Uuid,
         dto: UpdateTaskDto,
-    ) -> AppResult<UpdateTaskCommand> {
+    ) -> TaskMapperResult<UpdateTaskCommand> {
         let category_id = dto
             .category_id
             .map(|id| Uuid::parse_str(&id))
             .transpose()
-            .map_err(|e| AppError::BadRequest(format!("Invalid category UUID: {}", e)))?;
+            .map_err(TaskMapperError::InvalidCategoryUuid)?;
 
         let scheduled_date = Self::timestamp_to_naive_date(dto.scheduled_date)?;
         let completed_at = Self::timestamp_to_datetime(dto.completed_at)?;
@@ -80,11 +90,11 @@ impl TaskMapper {
     // Private helper methods for timestamp conversions
 
     /// Convert Unix timestamp (seconds) to NaiveDate
-    fn timestamp_to_naive_date(timestamp: Option<i64>) -> AppResult<Option<NaiveDate>> {
+    fn timestamp_to_naive_date(timestamp: Option<i64>) -> TaskMapperResult<Option<NaiveDate>> {
         match timestamp {
             Some(ts) => {
                 let datetime = DateTime::from_timestamp(ts, 0)
-                    .ok_or_else(|| AppError::BadRequest(format!("Invalid timestamp: {}", ts)))?;
+                    .ok_or_else(|| TaskMapperError::InvalidTimestamp(ts))?;
                 Ok(Some(datetime.date_naive()))
             }
             None => Ok(None),
@@ -92,11 +102,11 @@ impl TaskMapper {
     }
 
     /// Convert Unix timestamp (seconds) to DateTime<Utc>
-    fn timestamp_to_datetime(timestamp: Option<i64>) -> AppResult<Option<DateTime<Utc>>> {
+    fn timestamp_to_datetime(timestamp: Option<i64>) -> TaskMapperResult<Option<DateTime<Utc>>> {
         match timestamp {
             Some(ts) => {
                 let datetime = DateTime::from_timestamp(ts, 0)
-                    .ok_or_else(|| AppError::BadRequest(format!("Invalid timestamp: {}", ts)))?;
+                    .ok_or_else(|| TaskMapperError::InvalidTimestamp(ts))?;
                 Ok(Some(datetime))
             }
             None => Ok(None),

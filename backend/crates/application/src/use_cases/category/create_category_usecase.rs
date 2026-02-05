@@ -1,14 +1,32 @@
 use std::sync::Arc;
 
+use thiserror::Error;
 use uuid::Uuid;
 
-use crate::{
-    app_error::AppResult, use_cases::category::command::create_category::CreateCategoryCommand,
-};
 use domain::{
-    entities::category::Category, helpers::random_hex_color,
+    entities::category::{Category, CategoryError},
+    error::persistence_error::PersistenceError,
+    helpers::random_hex_color,
     traits::category_persistence::CategoryPersistence,
 };
+
+#[derive(Debug, Error)]
+pub enum CreateCategoryError {
+    #[error("Category error")]
+    CategoryError(#[from] CategoryError),
+
+    #[error("Persistence error")]
+    PersistenceError(#[from] PersistenceError),
+}
+
+pub type CreateCategoryResult<T> = Result<T, CreateCategoryError>;
+
+pub struct CreateCategoryCommand {
+    pub user_id: uuid::Uuid,
+    pub name: String,
+    pub description: Option<String>,
+    pub color: Option<String>,
+}
 
 #[derive(Clone)]
 pub struct CreateCategoryUseCases {
@@ -22,7 +40,7 @@ impl CreateCategoryUseCases {
         }
     }
 
-    pub async fn execute(&self, category_cmd: CreateCategoryCommand) -> AppResult<Uuid> {
+    pub async fn execute(&self, category_cmd: CreateCategoryCommand) -> CreateCategoryResult<Uuid> {
         let category = Category::create(
             category_cmd.user_id,
             category_cmd.name,
@@ -46,8 +64,9 @@ mod tests {
 
     use crate::{
         mocks::MockCategoryPersistence,
-        use_cases::category::command::create_category::CreateCategoryCommand,
-        use_cases::category::create_category_usecase::CreateCategoryUseCases,
+        use_cases::category::create_category_usecase::{
+            CreateCategoryCommand, CreateCategoryUseCases,
+        },
     };
 
     #[tokio::test]

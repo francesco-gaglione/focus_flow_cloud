@@ -1,12 +1,33 @@
 use domain::error::persistence_error::PersistenceError;
+use domain::traits::password_hasher::HashingError;
+use domain::traits::password_policy::PasswordPolicyError;
 use domain::traits::{
     password_hasher::PasswordHasher, password_policy::PasswordPolicy,
     user_persistence::UserPersistence,
 };
 use std::sync::Arc;
+use thiserror::Error;
 use uuid::Uuid;
 
-use crate::app_error::{AppError, AppResult};
+#[derive(Debug, Error)]
+pub enum UpdatePasswordError {
+    #[error("Invalid user parameters")]
+    InvalidUserParam(String),
+
+    #[error("Invalid password")]
+    InvalidPassword(#[from] PasswordPolicyError),
+
+    #[error("User not found")]
+    UserNotFound(String),
+
+    #[error("Persistence error")]
+    PersistenceError(#[from] PersistenceError),
+
+    #[error("Hashing error")]
+    HashingError(#[from] HashingError),
+}
+
+pub type UpdatePasswordResult<T> = Result<T, UpdatePasswordError>;
 
 pub struct UpdateUserPasswordCommand {
     pub user_id: Uuid,
@@ -33,9 +54,9 @@ impl UpdateUserPasswordUseCase {
         }
     }
 
-    pub async fn execute(&self, cmd: UpdateUserPasswordCommand) -> AppResult<()> {
+    pub async fn execute(&self, cmd: UpdateUserPasswordCommand) -> UpdatePasswordResult<()> {
         if cmd.new_password.is_empty() || cmd.old_password.is_empty() {
-            return Err(AppError::InvalidUserParam(
+            return Err(UpdatePasswordError::InvalidUserParam(
                 "New and old passwords cannot be empty".to_string(),
             ));
         }
@@ -44,16 +65,17 @@ impl UpdateUserPasswordUseCase {
 
         let mut user = match self.user_persistence.find_user_by_id(cmd.user_id).await {
             Ok(user) => user,
-            Err(PersistenceError::NotFound(msg)) => return Err(AppError::UserNotFound(msg)),
-            Err(e) => return Err(AppError::from(e)),
+            Err(PersistenceError::NotFound(msg)) => {
+                return Err(UpdatePasswordError::UserNotFound(msg))
+            }
+            Err(e) => return Err(UpdatePasswordError::from(e)),
         };
 
         if !self
             .password_hasher
-            .verify_password(&cmd.old_password, user.hashed_password())
-            .map_err(|e| AppError::GenericError(e.to_string()))?
+            .verify_password(&cmd.old_password, user.hashed_password())?
         {
-            return Err(AppError::InvalidUserParam(
+            return Err(UpdatePasswordError::InvalidUserParam(
                 "Invalid old password".to_string(),
             ));
         }
@@ -72,18 +94,19 @@ impl UpdateUserPasswordUseCase {
 mod tests {
     use std::sync::Arc;
 
-    use domain::error::domain_error::DomainError;
     use domain::{
         entities::{user::User, user_role::UserRole},
         error::persistence_error::PersistenceError,
+        traits::password_policy::PasswordPolicyError,
     };
     use mockall::predicate::eq;
     use uuid::Uuid;
 
     use crate::{
-        app_error::AppError,
         mocks::{MockPasswordHasher, MockPasswordPolicy, MockUserPersistence},
-        use_cases::user::update_password::{UpdateUserPasswordCommand, UpdateUserPasswordUseCase},
+        use_cases::user::update_password::{
+            UpdatePasswordError, UpdateUserPasswordCommand, UpdateUserPasswordUseCase,
+        },
     };
 
     #[tokio::test]
@@ -198,7 +221,7 @@ mod tests {
         let result = use_case.execute(cmd).await;
 
         assert!(
-            matches!(result, Err(AppError::InvalidUserParam(msg)) if msg == "Invalid old password")
+            matches!(result, Err(UpdatePasswordError::InvalidUserParam(msg)) if msg == "Invalid old password")
         );
     }
 
@@ -223,7 +246,7 @@ mod tests {
         let result = use_case.execute(cmd).await;
 
         assert!(
-            matches!(result, Err(AppError::InvalidUserParam(msg)) if msg == "New and old passwords cannot be empty")
+            matches!(result, Err(UpdatePasswordError::InvalidUserParam(msg)) if msg == "New and old passwords cannot be empty")
         );
     }
 
@@ -236,7 +259,7 @@ mod tests {
         password_policy_service
             .expect_validate()
             .times(1)
-            .returning(|_| Err(DomainError::InvalidPasswordPolicy("Too short".to_string())));
+            .returning(|_| Err(PasswordPolicyError::InvalidLength("Too short".to_string())));
 
         let use_case = UpdateUserPasswordUseCase::new(
             Arc::new(mock_hasher),
@@ -252,7 +275,10 @@ mod tests {
 
         let result = use_case.execute(cmd).await;
 
-        assert!(result.is_err());
+        assert!(matches!(
+            result,
+            Err(UpdatePasswordError::InvalidPassword(_))
+        ));
     }
 
     #[tokio::test]
@@ -284,6 +310,6 @@ mod tests {
 
         let result = use_case.execute(cmd).await;
 
-        assert!(matches!(result, Err(AppError::UserNotFound(_))));
+        assert!(matches!(result, Err(UpdatePasswordError::UserNotFound(_))));
     }
 }

@@ -1,8 +1,7 @@
 use async_trait::async_trait;
 use chrono::{Duration, Utc};
-use domain::entities::user::User;
-use domain::error::domain_error::{DomainError, DomainResult};
-use domain::services::token_service::TokenService;
+use domain::services::token_service::{TokenService, TokenServiceError};
+use domain::{entities::user::User, services::token_service::TokenServiceResult};
 use jsonwebtoken::{encode, EncodingKey, Header};
 use serde::{Deserialize, Serialize};
 
@@ -26,7 +25,7 @@ impl JwtService {
 
 #[async_trait]
 impl TokenService for JwtService {
-    fn generate_token(&self, user: &User) -> DomainResult<String> {
+    fn generate_token(&self, user: &User) -> TokenServiceResult<String> {
         let expiration = Utc::now()
             .checked_add_signed(Duration::hours(1))
             .expect("valid timestamp")
@@ -44,10 +43,10 @@ impl TokenService for JwtService {
             &claims,
             &EncodingKey::from_secret(self.secret.as_bytes()),
         )
-        .map_err(|e| DomainError::TokenGenerationError(e.to_string()))
+        .map_err(|e| TokenServiceError::TokenGenerationError(e.to_string()))
     }
 
-    fn generate_refresh_token(&self, user: &User) -> DomainResult<String> {
+    fn generate_refresh_token(&self, user: &User) -> TokenServiceResult<String> {
         let expiration = Utc::now()
             .checked_add_signed(Duration::days(7))
             .expect("valid timestamp")
@@ -65,10 +64,10 @@ impl TokenService for JwtService {
             &claims,
             &EncodingKey::from_secret(self.secret.as_bytes()),
         )
-        .map_err(|e| DomainError::TokenGenerationError(e.to_string()))
+        .map_err(|e| TokenServiceError::TokenGenerationError(e.to_string()))
     }
 
-    fn verify_token(&self, token: &str) -> DomainResult<String> {
+    fn verify_token(&self, token: &str) -> TokenServiceResult<String> {
         let validation = jsonwebtoken::Validation::default();
 
         let claims = jsonwebtoken::decode::<Claims>(
@@ -77,18 +76,16 @@ impl TokenService for JwtService {
             &validation,
         )
         .map(|data| data.claims)
-        .map_err(|e| DomainError::TokenVerificationError(format!("Invalid token: {}", e)))?;
+        .map_err(|e| TokenServiceError::InvalidToken)?;
 
         if claims.typ != "access" {
-            return Err(DomainError::TokenVerificationError(
-                "Invalid token type".to_string(),
-            ));
+            return Err(TokenServiceError::InvalidToken);
         }
 
         Ok(claims.sub)
     }
 
-    fn verify_refresh_token(&self, token: &str) -> DomainResult<String> {
+    fn verify_refresh_token(&self, token: &str) -> TokenServiceResult<String> {
         let validation = jsonwebtoken::Validation::default();
 
         let claims = jsonwebtoken::decode::<Claims>(
@@ -97,12 +94,10 @@ impl TokenService for JwtService {
             &validation,
         )
         .map(|data| data.claims)
-        .map_err(|e| DomainError::TokenVerificationError(format!("Invalid token: {}", e)))?;
+        .map_err(|e| TokenServiceError::InvalidToken)?;
 
         if claims.typ != "refresh" {
-            return Err(DomainError::TokenVerificationError(
-                "Invalid token type".to_string(),
-            ));
+            return Err(TokenServiceError::InvalidToken);
         }
 
         Ok(claims.sub)

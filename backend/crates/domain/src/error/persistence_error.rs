@@ -5,10 +5,10 @@ pub enum PersistenceError {
     #[error("Resource not found: {0}")]
     NotFound(String),
 
-    #[error("Entità già esistente (conflitto)")]
+    #[error("Entity already exists")]
     AlreadyExists,
 
-    #[error("Errore tecnico imprevisto: {0}")]
+    #[error("Unexpected error: {0}")]
     Unexpected(String),
 }
 

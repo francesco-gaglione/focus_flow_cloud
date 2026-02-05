@@ -2,14 +2,35 @@ use std::sync::Arc;
 
 use domain::{
     entities::{user::User, user_role::UserRole},
+    error::persistence_error::PersistenceError,
     traits::{
-        password_hasher::PasswordHasher, password_policy::PasswordPolicy,
+        password_hasher::{HashingError, PasswordHasher},
+        password_policy::{PasswordPolicy, PasswordPolicyError},
         user_persistence::UserPersistence,
     },
 };
+use thiserror::Error;
 use uuid::Uuid;
 
-use crate::app_error::{AppError, AppResult};
+#[derive(Debug, Error)]
+pub enum RegisterUserError {
+    #[error("Invalid user credentials: {0}")]
+    InvalidUserCredentials(String),
+
+    #[error("Unauthorized: {0}")]
+    Unauthorized(String),
+
+    #[error("Password policy violation")]
+    PasswordPolicyViolation(#[from] PasswordPolicyError),
+
+    #[error("Persistence error: {0}")]
+    PersistenceError(#[from] PersistenceError),
+
+    #[error("Password error: {0}")]
+    PasswordError(#[from] HashingError),
+}
+
+pub type RegisterUserResult<T> = Result<T, RegisterUserError>;
 
 pub struct RegisterUserCommand {
     pub username: String,
@@ -36,10 +57,10 @@ impl RegisterUserUseCase {
         }
     }
 
-    pub async fn execute(&self, cmd: RegisterUserCommand) -> AppResult<Uuid> {
+    pub async fn execute(&self, cmd: RegisterUserCommand) -> RegisterUserResult<Uuid> {
         // Validate input
         if cmd.username.is_empty() || cmd.password.is_empty() {
-            return Err(AppError::InvalidUserParam(
+            return Err(RegisterUserError::InvalidUserCredentials(
                 "Username and/or password cannot be empty".to_string(),
             ));
         }
@@ -53,7 +74,7 @@ impl RegisterUserUseCase {
             .await?;
 
         if !requester_user.is_admin() {
-            return Err(AppError::Unauthorized(
+            return Err(RegisterUserError::Unauthorized(
                 "Only admin users can register new users".to_string(),
             ));
         }
@@ -71,13 +92,15 @@ mod tests {
     use std::sync::Arc;
 
     use domain::entities::{user::User, user_role::UserRole};
-    use domain::error::{domain_error::DomainError, persistence_error::PersistenceError};
+    use domain::error::persistence_error::PersistenceError;
+    use domain::traits::password_policy::PasswordPolicyError;
     use uuid::Uuid;
 
     use crate::{
-        app_error::AppError,
         mocks::{MockPasswordHasher, MockPasswordPolicy, MockUserPersistence},
-        use_cases::user::register_user::{RegisterUserCommand, RegisterUserUseCase},
+        use_cases::user::register_user::{
+            RegisterUserCommand, RegisterUserError, RegisterUserUseCase,
+        },
     };
 
     #[tokio::test]
@@ -136,7 +159,7 @@ mod tests {
             .expect_validate()
             .times(1)
             .returning(|_| {
-                Err(DomainError::InvalidPasswordPolicy(
+                Err(PasswordPolicyError::InvalidLength(
                     "Invalid password".to_string(),
                 ))
             });
@@ -160,12 +183,10 @@ mod tests {
         let result = use_case.execute(cmd).await;
 
         assert!(result.is_err());
-        assert_eq!(
+        assert!(matches!(
             result.err(),
-            Some(AppError::InvalidPasswordPolicy(
-                "Invalid password".to_string()
-            ))
-        )
+            Some(RegisterUserError::PasswordPolicyViolation(_))
+        ));
     }
 
     #[tokio::test]
@@ -193,12 +214,10 @@ mod tests {
         let result = use_case.execute(cmd).await;
 
         assert!(result.is_err());
-        assert_eq!(
+        assert!(matches!(
             result.err(),
-            Some(AppError::InvalidUserParam(
-                "Username and/or password cannot be empty".to_string()
-            ))
-        )
+            Some(RegisterUserError::InvalidUserCredentials(_))
+        ));
     }
 
     #[tokio::test]
@@ -226,12 +245,10 @@ mod tests {
         let result = use_case.execute(cmd).await;
 
         assert!(result.is_err());
-        assert_eq!(
+        assert!(matches!(
             result.err(),
-            Some(AppError::InvalidUserParam(
-                "Username and/or password cannot be empty".to_string()
-            ))
-        )
+            Some(RegisterUserError::InvalidUserCredentials(_))
+        ));
     }
 
     #[tokio::test]
@@ -277,7 +294,10 @@ mod tests {
 
         println!("{:?}", result);
 
-        assert!(matches!(result, Err(AppError::Database(_))));
+        assert!(matches!(
+            result,
+            Err(RegisterUserError::PersistenceError(_))
+        ));
     }
 
     #[tokio::test]
@@ -322,7 +342,7 @@ mod tests {
 
         assert!(result.is_err());
         match result.err() {
-            Some(AppError::Unauthorized(msg)) => {
+            Some(RegisterUserError::Unauthorized(msg)) => {
                 assert_eq!(msg, "Only admin users can register new users");
             }
             _ => panic!("Expected Unauthorized error"),

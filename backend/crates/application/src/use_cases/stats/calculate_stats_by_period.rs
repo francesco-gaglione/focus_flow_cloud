@@ -1,26 +1,36 @@
 use chrono::{DateTime, Utc};
-use domain::entities::stats::calculators::{
-    category_analysis_calculator::CategoryAnalysisCalculator,
-    concentration_calculator::ConcentrationCalculator,
-    daily_activity_calculator::DailyActivityCalculator,
-    period_summary_calculator::PeriodSummaryCalculator,
+use domain::{
+    entities::stats::calculators::{
+        category_analysis_calculator::CategoryAnalysisCalculator,
+        concentration_calculator::ConcentrationCalculator,
+        daily_activity_calculator::DailyActivityCalculator,
+        period_summary_calculator::PeriodSummaryCalculator,
+    },
+    error::persistence_error::PersistenceError,
 };
 use futures_util::future::join_all;
 use std::{
     collections::{HashMap, HashSet},
     sync::Arc,
 };
+use thiserror::Error;
 use uuid::Uuid;
 
-use crate::{
-    app_error::AppResult, use_cases::stats::command::calculate_stats_by_period::StatsPeriod,
-};
+use crate::use_cases::stats::command::calculate_stats_by_period::StatsPeriod;
 use domain::entities::focus_session::SessionFilter;
 use domain::entities::stats::Stats;
 use domain::traits::{
     category_persistence::CategoryPersistence, focus_session_persistence::FocusSessionPersistence,
     task_persistence::TaskPersistence,
 };
+
+#[derive(Debug, Error, PartialEq)]
+pub enum CalculateStatsByPeriodError {
+    #[error("Persistence error: {0}")]
+    PersistenceError(#[from] PersistenceError),
+}
+
+pub type CalculateStatsByPeriodResult<T> = Result<T, CalculateStatsByPeriodError>;
 
 pub struct CalculateStatsByPeriodUseCase {
     category_persistence: Arc<dyn CategoryPersistence>,
@@ -41,7 +51,7 @@ impl CalculateStatsByPeriodUseCase {
         }
     }
 
-    pub async fn execute(&self, period: StatsPeriod) -> AppResult<Stats> {
+    pub async fn execute(&self, period: StatsPeriod) -> CalculateStatsByPeriodResult<Stats> {
         let start_date: Option<DateTime<Utc>> = DateTime::from_timestamp(period.start_date, 0);
         let end_date: Option<DateTime<Utc>> = period
             .end_date
@@ -120,10 +130,10 @@ impl CalculateStatsByPeriodUseCase {
         let period_summary = PeriodSummaryCalculator::calculate(&sessions);
         let concentration_stats = ConcentrationCalculator::calculate(&sessions);
         let category_distribution =
-            CategoryAnalysisCalculator::calculate(&sessions, &category_names, &task_details)?;
+            CategoryAnalysisCalculator::calculate(&sessions, &category_names, &task_details);
 
         let daily_activity = if is_multi_day {
-            DailyActivityCalculator::calculate(&sessions, &category_names)?
+            DailyActivityCalculator::calculate(&sessions, &category_names)
         } else {
             Vec::new()
         };

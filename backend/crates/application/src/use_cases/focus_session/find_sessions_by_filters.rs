@@ -1,10 +1,25 @@
-use crate::app_error::{AppError, AppResult};
 use chrono::DateTime;
 use domain::entities::focus_session::{FocusSession, SessionFilter};
 use domain::entities::focus_session_type::FocusSessionType;
+use domain::error::persistence_error::PersistenceError;
 use domain::traits::focus_session_persistence::FocusSessionPersistence;
 use std::sync::Arc;
+use thiserror::Error;
 use uuid::Uuid;
+
+#[derive(Debug, Error, PartialEq)]
+pub enum FindSessionByFiltersError {
+    #[error("Invalid date range: {0}")]
+    InvalidDateRange(String),
+    #[error("Invalid category id")]
+    InvalidCategoryId,
+    #[error("Invalid task id")]
+    InvalidTaskId,
+    #[error("Persistence error: {0}")]
+    PersistenceError(#[from] PersistenceError),
+}
+
+pub type FindSessionByFiltersResult<T> = Result<T, FindSessionByFiltersError>;
 
 #[derive(Debug, Clone)]
 pub struct FindSessionFiltersCommand {
@@ -43,15 +58,17 @@ impl FindSessionsByFiltersUseCase {
     pub async fn execute(
         &self,
         filters: FindSessionFiltersCommand,
-    ) -> AppResult<Vec<FocusSession>> {
+    ) -> FindSessionByFiltersResult<Vec<FocusSession>> {
         let (start_date, end_date) = filters
             .date_range
             .as_ref()
             .map(|r| {
-                let start = DateTime::from_timestamp(r.start_date, 0)
-                    .ok_or_else(|| AppError::InvalidDateRange(r.start_date.to_string()));
-                let end = DateTime::from_timestamp(r.end_date, 0)
-                    .ok_or_else(|| AppError::InvalidDateRange(r.end_date.to_string()));
+                let start = DateTime::from_timestamp(r.start_date, 0).ok_or_else(|| {
+                    FindSessionByFiltersError::InvalidDateRange(r.start_date.to_string())
+                });
+                let end = DateTime::from_timestamp(r.end_date, 0).ok_or_else(|| {
+                    FindSessionByFiltersError::InvalidDateRange(r.end_date.to_string())
+                });
                 start.and_then(|s| end.map(|e| (Some(s), Some(e))))
             })
             .transpose()?
@@ -63,7 +80,7 @@ impl FindSessionsByFiltersUseCase {
                 ids.iter()
                     .map(|id| Uuid::parse_str(id))
                     .collect::<Result<Vec<_>, _>>()
-                    .map_err(|_| AppError::InvalidId("Category category id".to_string()))
+                    .map_err(|_| FindSessionByFiltersError::InvalidCategoryId)
             })
             .transpose()?;
 
@@ -73,7 +90,7 @@ impl FindSessionsByFiltersUseCase {
                 ids.iter()
                     .map(|id| Uuid::parse_str(id))
                     .collect::<Result<Vec<_>, _>>()
-                    .map_err(|_| AppError::InvalidId("Task task id".to_string()))
+                    .map_err(|_| FindSessionByFiltersError::InvalidTaskId)
             })
             .transpose()?;
 
@@ -257,6 +274,9 @@ mod tests {
 
         let result = use_case.execute(filters).await;
         assert!(result.is_err());
-        matches!(result.unwrap_err(), AppError::InvalidDateRange(_));
+        matches!(
+            result.unwrap_err(),
+            FindSessionByFiltersError::InvalidDateRange(_)
+        );
     }
 }

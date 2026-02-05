@@ -1,9 +1,21 @@
 use std::sync::Arc;
 
-use domain::traits::user_persistence::UserPersistence;
+use domain::{
+    error::persistence_error::PersistenceError, traits::user_persistence::UserPersistence,
+};
+use thiserror::Error;
 use uuid::Uuid;
 
-use crate::app_error::{AppError, AppResult};
+#[derive(Debug, Error)]
+pub enum DeleteUserError {
+    #[error("Forbidden")]
+    Forbidden,
+
+    #[error("Persistence Error: {0}")]
+    PersistenceError(#[from] PersistenceError),
+}
+
+pub type DeleteUserResult<T> = Result<T, DeleteUserError>;
 
 pub struct DeleteUserCommand {
     pub target_user_id: Uuid,
@@ -19,14 +31,14 @@ impl DeleteUserUseCase {
         Self { user_persistence }
     }
 
-    pub async fn execute(&self, cmd: DeleteUserCommand) -> AppResult<()> {
+    pub async fn execute(&self, cmd: DeleteUserCommand) -> DeleteUserResult<()> {
         // validate permissions
         let requester_is_admin = self
             .user_persistence
             .is_user_admin(cmd.requester_user_id)
             .await?;
         if !requester_is_admin && cmd.target_user_id != cmd.requester_user_id {
-            return Err(AppError::Forbidden);
+            return Err(DeleteUserError::Forbidden);
         }
 
         // Delete user

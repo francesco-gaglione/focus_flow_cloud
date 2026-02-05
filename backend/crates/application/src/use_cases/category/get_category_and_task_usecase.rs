@@ -1,12 +1,21 @@
 use std::sync::Arc;
 
-use crate::{
-    app_error::AppResult,
-    use_cases::category::command::category_with_tasks::{CategoryAndTasks, CategoryWithTasks},
+use crate::use_cases::category::command::category_with_tasks::{
+    CategoryAndTasks, CategoryWithTasks,
 };
-use domain::traits::{
-    category_persistence::CategoryPersistence, task_persistence::TaskPersistence,
+use domain::{
+    error::persistence_error::PersistenceError,
+    traits::{category_persistence::CategoryPersistence, task_persistence::TaskPersistence},
 };
+use thiserror::Error;
+
+#[derive(Debug, Error)]
+pub enum GetCategoryAndTasksError {
+    #[error("Persistence error: {0}")]
+    PersistenceError(#[from] PersistenceError),
+}
+
+pub type GetCategoryAndTasksResult<T> = Result<T, GetCategoryAndTasksError>;
 
 #[derive(Clone)]
 pub struct GetCategoryAndTaskUseCases {
@@ -25,7 +34,7 @@ impl GetCategoryAndTaskUseCases {
         }
     }
 
-    pub async fn execute(&self) -> AppResult<CategoryAndTasks> {
+    pub async fn execute(&self) -> GetCategoryAndTasksResult<CategoryAndTasks> {
         let mut categories = self.category_persistence.find_all().await?;
 
         let mut categories_with_tasks: Vec<CategoryWithTasks> = Vec::new();

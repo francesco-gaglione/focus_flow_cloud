@@ -1,10 +1,19 @@
-use crate::app_error::AppResult;
 use crate::use_cases::task::command::create_task::CreateTaskCommand;
 
 use domain::entities::task::Task;
+use domain::error::persistence_error::PersistenceError;
 use domain::traits::task_persistence::TaskPersistence;
 use std::sync::Arc;
+use thiserror::Error;
 use uuid::Uuid;
+
+#[derive(Debug, Error, PartialEq)]
+pub enum CreateTaskError {
+    #[error("Persistence error: {0}")]
+    PersistenceError(#[from] PersistenceError),
+}
+
+pub type CreateTaskResult<T> = Result<T, CreateTaskError>;
 
 pub struct CreateTaskUseCase {
     task_persistence: Arc<dyn TaskPersistence>,
@@ -15,7 +24,7 @@ impl CreateTaskUseCase {
         Self { task_persistence }
     }
 
-    pub async fn execute(&self, command: CreateTaskCommand) -> AppResult<Uuid> {
+    pub async fn execute(&self, command: CreateTaskCommand) -> CreateTaskResult<Uuid> {
         let task = Task::create(
             command.user_id,
             command.category_id,

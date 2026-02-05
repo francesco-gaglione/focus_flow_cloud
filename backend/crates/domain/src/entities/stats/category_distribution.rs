@@ -1,5 +1,22 @@
-use crate::error::domain_error::{DomainError, DomainResult};
 use uuid::Uuid;
+
+use thiserror::Error;
+
+#[derive(Debug, Error)]
+pub enum CategoryDistributionError {
+    #[error("Invalid stats parameter: {0}")]
+    InvalidStatsParam(String),
+}
+
+pub type CategoryDistributionResult<T> = Result<T, CategoryDistributionError>;
+
+#[derive(Debug, Error)]
+pub enum TaskDistributionError {
+    #[error("Invalid stats parameter: {0}")]
+    InvalidStatsParam(String),
+}
+
+pub type TaskDistributionResult<T> = Result<T, TaskDistributionError>;
 
 // Represents the total time spent on each category and the percentage of total time spent on each category, with tasks details.
 #[derive(Debug, Clone)]
@@ -18,9 +35,9 @@ impl CategoryDistributionItem {
         total_focus_time: i64,
         percentage: f32,
         task_distribution: Vec<TaskDistributionItem>,
-    ) -> DomainResult<Self> {
+    ) -> CategoryDistributionResult<Self> {
         if !(0.0..=100.001).contains(&percentage) {
-            return Err(DomainError::InvalidStatsParam(format!(
+            return Err(CategoryDistributionError::InvalidStatsParam(format!(
                 "Percentage must be between 0 and 100, got {}",
                 percentage
             )));
@@ -63,9 +80,13 @@ pub struct TaskDistributionItem {
 }
 
 impl TaskDistributionItem {
-    pub fn new(task_name: String, total_focus_time: i64, percentage: f32) -> DomainResult<Self> {
+    pub fn new(
+        task_name: String,
+        total_focus_time: i64,
+        percentage: f32,
+    ) -> TaskDistributionResult<Self> {
         if !(0.0..=100.001).contains(&percentage) {
-            return Err(DomainError::InvalidStatsParam(format!(
+            return Err(TaskDistributionError::InvalidStatsParam(format!(
                 "Percentage must be between 0 and 100, got {}",
                 percentage
             )));

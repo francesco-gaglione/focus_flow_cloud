@@ -1,25 +1,22 @@
 #[cfg(test)]
+use domain::entities::{
+    category::Category,
+    focus_session::{FocusSession, SessionFilter},
+    task::Task,
+    user::User,
+    user_setting::UserSetting,
+};
+#[cfg(test)]
 use domain::error::persistence_error::PersistenceResult;
 #[cfg(test)]
-use domain::traits::password_hasher::PasswordHasher;
+use domain::traits::password_hasher::{HashingResult, PasswordHasher};
 #[cfg(test)]
-use domain::traits::password_policy::PasswordPolicy;
+use domain::traits::password_policy::{PasswordPolicy, PasswordPolicyResult};
 #[cfg(test)]
 use domain::traits::{
     category_persistence::CategoryPersistence, focus_session_persistence::FocusSessionPersistence,
     task_persistence::TaskPersistence, user_persistence::UserPersistence,
     user_setting_persistence::UserSettingPersistence,
-};
-#[cfg(test)]
-use domain::{
-    entities::{
-        category::Category,
-        focus_session::{FocusSession, SessionFilter},
-        task::Task,
-        user::User,
-        user_setting::UserSetting,
-    },
-    error::domain_error::DomainResult,
 };
 #[cfg(test)]
 use mockall::mock;
@@ -96,7 +93,7 @@ mock! {
 mock! {
     pub PasswordPolicy {}
     impl PasswordPolicy for PasswordPolicy {
-        fn validate(&self, password: &str) -> DomainResult<()>;
+        fn validate(&self, password: &str) -> PasswordPolicyResult<()>;
     }
 }
 
@@ -104,7 +101,7 @@ mock! {
 mock! {
     pub PasswordHasher {}
     impl PasswordHasher for PasswordHasher {
-        fn hash_password(&self, password: &str) -> DomainResult<String>;
-        fn verify_password(&self, password: &str, hashed_password: &str) -> DomainResult<bool>;
+        fn hash_password(&self, password: &str) -> HashingResult<String>;
+        fn verify_password(&self, password: &str, hashed_password: &str) -> HashingResult<bool>;
     }
 }

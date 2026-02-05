@@ -1,13 +1,35 @@
 use crate::http::app_state::AppState;
 use crate::http::model::session_model::UserSession;
-use crate::http_error::HttpResult;
+use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::USERS_TAG;
-use application::use_cases::user::update_password::UpdateUserPasswordCommand;
+use application::use_cases::user::update_password::{
+    UpdatePasswordError, UpdateUserPasswordCommand,
+};
 use axum::extract::{Extension, State};
 use axum::Json;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use validator::Validate;
+
+impl From<UpdatePasswordError> for HttpError {
+    fn from(value: UpdatePasswordError) -> Self {
+        match value {
+            UpdatePasswordError::InvalidUserParam(e) => HttpError::BadRequest(e),
+            UpdatePasswordError::InvalidPassword(password_policy_error) => {
+                HttpError::BadRequest(password_policy_error.to_string())
+            }
+            UpdatePasswordError::UserNotFound(_) => {
+                HttpError::NotFound("User not found".to_string())
+            }
+            UpdatePasswordError::PersistenceError(persistence_error) => {
+                HttpError::GenericError(persistence_error.to_string())
+            }
+            UpdatePasswordError::HashingError(hashing_error) => {
+                HttpError::GenericError(hashing_error.to_string())
+            }
+        }
+    }
+}
 
 #[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
 pub struct UpdatePasswordDto {

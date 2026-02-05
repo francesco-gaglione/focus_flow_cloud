@@ -2,7 +2,9 @@ use crate::http::app_state::AppState;
 use crate::http::model::session_model::UserSession;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::CATEGORY_TAG;
-use application::use_cases::category::command::create_category::CreateCategoryCommand;
+use application::use_cases::category::create_category_usecase::{
+    CreateCategoryCommand, CreateCategoryError,
+};
 use axum::{extract::State, Extension, Json};
 use lazy_static::lazy_static;
 use regex::Regex;
@@ -13,6 +15,19 @@ use validator::Validate;
 
 lazy_static! {
     static ref COLOR_REGEX: Regex = Regex::new(r"^#[0-9A-Fa-f]{6}$").unwrap();
+}
+
+impl From<CreateCategoryError> for HttpError {
+    fn from(value: CreateCategoryError) -> Self {
+        match value {
+            CreateCategoryError::CategoryError(category_error) => {
+                HttpError::GenericError(category_error.to_string())
+            }
+            CreateCategoryError::PersistenceError(persistence_error) => {
+                HttpError::GenericError(persistence_error.to_string())
+            }
+        }
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]

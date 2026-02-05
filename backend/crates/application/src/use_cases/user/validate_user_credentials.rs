@@ -2,11 +2,27 @@ use std::sync::Arc;
 
 use domain::{
     error::persistence_error::PersistenceError,
-    traits::{password_hasher::PasswordHasher, user_persistence::UserPersistence},
+    traits::{
+        password_hasher::{HashingError, PasswordHasher},
+        user_persistence::UserPersistence,
+    },
 };
+use thiserror::Error;
 use tracing::info;
 
-use crate::app_error::{AppError, AppResult};
+#[derive(Debug, Error)]
+pub enum ValidateUserCredentialsError {
+    #[error("Invalid user parameters")]
+    InvalidUserParams(String),
+
+    #[error("Invalid password")]
+    InvalidPassword(#[from] HashingError),
+
+    #[error("Persistence error")]
+    PersistenceError(#[from] PersistenceError),
+}
+
+pub type ValidateUserCredentialsResult<T> = Result<T, ValidateUserCredentialsError>;
 
 pub struct ValidateUserCredentialsCommand {
     pub username: String,
@@ -29,10 +45,13 @@ impl ValidateUserCredentialsUseCase {
         }
     }
 
-    pub async fn execute(&self, cmd: ValidateUserCredentialsCommand) -> AppResult<()> {
+    pub async fn execute(
+        &self,
+        cmd: ValidateUserCredentialsCommand,
+    ) -> ValidateUserCredentialsResult<()> {
         // Validate user params
         if cmd.username.is_empty() || cmd.password.is_empty() {
-            return Err(AppError::InvalidUserParam(
+            return Err(ValidateUserCredentialsError::InvalidUserParams(
                 "Username or password is empty".to_string(),
             ));
         }
@@ -45,16 +64,18 @@ impl ValidateUserCredentialsUseCase {
             .map_err(|err| match err {
                 PersistenceError::NotFound(msg) => {
                     info!("User not found: {}", msg);
-                    AppError::InvalidUserParam("Invalid username".to_string())
+                    ValidateUserCredentialsError::InvalidUserParams("Invalid username".to_string())
                 }
-                _ => AppError::from(err),
+                _ => ValidateUserCredentialsError::from(err),
             })?;
 
         if !self
             .password_hasher
             .verify_password(&cmd.password, user.hashed_password())?
         {
-            return Err(AppError::InvalidUserParam("Invalid password".to_string()));
+            return Err(ValidateUserCredentialsError::InvalidUserParams(
+                "Invalid password".to_string(),
+            ));
         }
 
         Ok(())
