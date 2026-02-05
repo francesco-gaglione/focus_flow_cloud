@@ -76,7 +76,7 @@ impl TokenService for JwtService {
             &validation,
         )
         .map(|data| data.claims)
-        .map_err(|e| TokenServiceError::InvalidToken)?;
+        .map_err(|_e| TokenServiceError::InvalidToken)?;
 
         if claims.typ != "access" {
             return Err(TokenServiceError::InvalidToken);
@@ -94,7 +94,7 @@ impl TokenService for JwtService {
             &validation,
         )
         .map(|data| data.claims)
-        .map_err(|e| TokenServiceError::InvalidToken)?;
+        .map_err(|_e| TokenServiceError::InvalidToken)?;
 
         if claims.typ != "refresh" {
             return Err(TokenServiceError::InvalidToken);

@@ -93,8 +93,8 @@ impl TaskMapper {
     fn timestamp_to_naive_date(timestamp: Option<i64>) -> TaskMapperResult<Option<NaiveDate>> {
         match timestamp {
             Some(ts) => {
-                let datetime = DateTime::from_timestamp(ts, 0)
-                    .ok_or_else(|| TaskMapperError::InvalidTimestamp(ts))?;
+                let datetime =
+                    DateTime::from_timestamp(ts, 0).ok_or(TaskMapperError::InvalidTimestamp(ts))?;
                 Ok(Some(datetime.date_naive()))
             }
             None => Ok(None),
@@ -105,8 +105,8 @@ impl TaskMapper {
     fn timestamp_to_datetime(timestamp: Option<i64>) -> TaskMapperResult<Option<DateTime<Utc>>> {
         match timestamp {
             Some(ts) => {
-                let datetime = DateTime::from_timestamp(ts, 0)
-                    .ok_or_else(|| TaskMapperError::InvalidTimestamp(ts))?;
+                let datetime =
+                    DateTime::from_timestamp(ts, 0).ok_or(TaskMapperError::InvalidTimestamp(ts))?;
                 Ok(Some(datetime))
             }
             None => Ok(None),

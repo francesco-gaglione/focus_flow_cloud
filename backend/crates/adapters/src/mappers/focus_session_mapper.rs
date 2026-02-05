@@ -17,11 +17,11 @@ use domain::entities::{focus_session::FocusSession, focus_session_type::FocusSes
 #[derive(Debug, Error)]
 pub enum FocusSessionMapperError {
     #[error("Invalid timestamp: {0}")]
-    InvalidTimestamp(i64),
+    Timestamp(i64),
     #[error("Start time has a bad format")]
-    InvalidStartTime,
+    StartTime,
     #[error("End time has bad format")]
-    InvalidEndTime,
+    EndTime,
 }
 
 pub type FocusSessionMapperResult<T> = Result<T, FocusSessionMapperError>;
@@ -86,15 +86,13 @@ impl FocusSessionMapper {
             started_at: dto
                 .started_at
                 .map(|d| {
-                    Self::timestamp_to_datetime(d)
-                        .map_err(|_| FocusSessionMapperError::InvalidStartTime)
+                    Self::timestamp_to_datetime(d).map_err(|_| FocusSessionMapperError::StartTime)
                 })
                 .transpose()?,
             ended_at: dto
                 .ended_at
                 .map(|d| {
-                    Self::timestamp_to_datetime(d)
-                        .map_err(|_| FocusSessionMapperError::InvalidEndTime)
+                    Self::timestamp_to_datetime(d).map_err(|_| FocusSessionMapperError::EndTime)
                 })
                 .transpose()?,
         })
@@ -113,7 +111,7 @@ impl FocusSessionMapper {
     /// Convert Unix timestamp (seconds) to DateTime<Utc>
     fn timestamp_to_datetime(timestamp: i64) -> FocusSessionMapperResult<DateTime<Utc>> {
         let datetime = DateTime::from_timestamp(timestamp, 0)
-            .ok_or_else(|| FocusSessionMapperError::InvalidTimestamp(timestamp))?;
+            .ok_or(FocusSessionMapperError::Timestamp(timestamp))?;
         Ok(datetime)
     }
 }
