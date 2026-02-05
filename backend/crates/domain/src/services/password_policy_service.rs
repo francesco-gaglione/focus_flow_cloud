@@ -1,28 +1,19 @@
-use crate::{
-    error::domain_error::{DomainError, DomainResult},
-    traits::password_policy::PasswordPolicy,
-};
+use crate::traits::password_policy::{PasswordPolicy, PasswordPolicyError, PasswordPolicyResult};
 
 pub struct PasswordPolicyService;
 
 impl PasswordPolicy for PasswordPolicyService {
-    fn validate(&self, password: &str) -> DomainResult<()> {
+    fn validate(&self, password: &str) -> PasswordPolicyResult<()> {
         if password.len() < 8 {
-            Err(DomainError::InvalidPasswordPolicy(
+            Err(PasswordPolicyError::InvalidLength(
                 "Password must be at least 8 characters long".to_string(),
             ))
         } else if !password.chars().any(char::is_uppercase) {
-            Err(DomainError::InvalidPasswordPolicy(
-                "Password must contain at least one uppercase letter".to_string(),
-            ))
+            Err(PasswordPolicyError::MissingUppercase)
         } else if !password.chars().any(char::is_lowercase) {
-            Err(DomainError::InvalidPasswordPolicy(
-                "Password must contain at least one lowercase letter".to_string(),
-            ))
+            Err(PasswordPolicyError::MissingLowercase)
         } else if !password.chars().any(char::is_numeric) {
-            Err(DomainError::InvalidPasswordPolicy(
-                "Password must contain at least one number".to_string(),
-            ))
+            Err(PasswordPolicyError::MissingNumber)
         } else {
             Ok(())
         }

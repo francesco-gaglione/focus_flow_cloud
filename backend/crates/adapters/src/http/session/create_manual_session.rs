@@ -6,11 +6,25 @@ use crate::http::model::session_model::UserSession;
 use crate::http_error::{HttpError, HttpResult};
 use crate::mappers::focus_session_mapper::FocusSessionMapper;
 use crate::openapi::SESSION_TAG;
+use application::use_cases::focus_session::create_manual_session::CreateManualSessionError;
 use axum::{extract::State, Extension, Json};
 use serde::{Deserialize, Serialize};
 use tracing::debug;
 use utoipa::ToSchema;
 use validator::Validate;
+
+impl From<CreateManualSessionError> for HttpError {
+    fn from(value: CreateManualSessionError) -> Self {
+        match value {
+            CreateManualSessionError::InvalidFocusSession(focus_session_error) => {
+                HttpError::BadRequest(focus_session_error.to_string())
+            }
+            CreateManualSessionError::PersistenceError(persistence_error) => {
+                HttpError::GenericError(persistence_error.to_string())
+            }
+        }
+    }
+}
 
 #[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
 #[serde(rename_all = "camelCase")]

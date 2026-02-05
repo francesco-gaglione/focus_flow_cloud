@@ -1,7 +1,18 @@
-use crate::app_error::AppResult;
-use domain::traits::user_setting_persistence::UserSettingPersistence;
+use domain::{
+    error::persistence_error::PersistenceError,
+    traits::user_setting_persistence::UserSettingPersistence,
+};
 use std::sync::Arc;
+use thiserror::Error;
 use uuid::Uuid;
+
+#[derive(Debug, Error, PartialEq)]
+pub enum UpdateSettingsError {
+    #[error("Persistence error: {0}")]
+    PersistenceError(#[from] PersistenceError),
+}
+
+pub type UpdateSettingsResult<T> = Result<T, UpdateSettingsError>;
 
 pub struct UpdateSettingUseCase {
     setting_persistence: Arc<dyn UserSettingPersistence>,
@@ -14,7 +25,12 @@ impl UpdateSettingUseCase {
         }
     }
 
-    pub async fn execute(&self, user_id: Uuid, key: String, value: String) -> AppResult<()> {
+    pub async fn execute(
+        &self,
+        user_id: Uuid,
+        key: String,
+        value: String,
+    ) -> UpdateSettingsResult<()> {
         let settings = self.setting_persistence.find_all().await?;
 
         if settings.iter().any(|s| s.key() == key) {
@@ -30,3 +46,5 @@ impl UpdateSettingUseCase {
         Ok(())
     }
 }
+
+//TODO implements tests

@@ -1,10 +1,22 @@
 use std::sync::Arc;
 
-use crate::{
-    app_error::AppResult,
-    use_cases::focus_session::command::update_focus_session::UpdateFocusSessionCommand,
+use crate::use_cases::focus_session::command::update_focus_session::UpdateFocusSessionCommand;
+use domain::{
+    entities::focus_session::FocusSessionError, error::persistence_error::PersistenceError,
+    traits::focus_session_persistence::FocusSessionPersistence,
 };
-use domain::traits::focus_session_persistence::FocusSessionPersistence;
+use thiserror::Error;
+
+#[derive(Debug, Error, PartialEq)]
+pub enum UpdateFocusSessionError {
+    #[error("Persistence error: {0}")]
+    PersistenceError(#[from] PersistenceError),
+
+    #[error("Focus session error: {0}")]
+    FocusSessionError(#[from] FocusSessionError),
+}
+
+pub type UpdateFocusSessionResult<T> = Result<T, UpdateFocusSessionError>;
 
 pub struct UpdateFocusSessionUseCase {
     session_persistence: Arc<dyn FocusSessionPersistence>,
@@ -17,7 +29,10 @@ impl UpdateFocusSessionUseCase {
         }
     }
 
-    pub async fn execute(&self, update_session: UpdateFocusSessionCommand) -> AppResult<()> {
+    pub async fn execute(
+        &self,
+        update_session: UpdateFocusSessionCommand,
+    ) -> UpdateFocusSessionResult<()> {
         let mut session = self
             .session_persistence
             .find_session_by_id(update_session.session_id)
@@ -39,11 +54,8 @@ impl UpdateFocusSessionUseCase {
             session.update_notes(Some(notes));
         }
 
-        if update_session.started_at.is_some() && update_session.ended_at.is_some() {
-            session.update_date_range(
-                update_session.started_at.unwrap(),
-                Some(update_session.ended_at.unwrap()),
-            )?;
+        if let (Some(start), Some(end)) = (update_session.started_at, update_session.ended_at) {
+            session.update_date_range(start, Some(end))?;
         }
 
         Ok(self.session_persistence.update_session(session).await?)

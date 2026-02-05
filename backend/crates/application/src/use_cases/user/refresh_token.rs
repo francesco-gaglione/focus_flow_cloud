@@ -1,10 +1,27 @@
-use domain::services::token_service::TokenService;
+use domain::error::persistence_error::PersistenceError;
+use domain::services::token_service::{TokenService, TokenServiceError};
 use domain::traits::user_persistence::UserPersistence;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
+use thiserror::Error;
 use validator::Validate;
 
-use crate::app_error::{AppError, AppResult};
+#[derive(Debug, Error)]
+pub enum RefreshTokenError {
+    #[error("Token error: {0}")]
+    TokenError(#[from] TokenServiceError),
+
+    #[error("Validation error: {0}")]
+    Validation(String),
+
+    #[error("Invalid credentials")]
+    InvalidCredentials,
+
+    #[error("Persistence error: {0}")]
+    PersistenceError(#[from] PersistenceError),
+}
+
+pub type RefreshTokenResult<T> = Result<T, RefreshTokenError>;
 
 #[derive(Debug, Deserialize, Serialize, Validate)]
 pub struct RefreshTokenCommand {
@@ -34,36 +51,28 @@ impl RefreshTokenUseCase {
         }
     }
 
-    pub async fn execute(&self, cmd: RefreshTokenCommand) -> AppResult<RefreshTokenOutput> {
+    pub async fn execute(
+        &self,
+        cmd: RefreshTokenCommand,
+    ) -> RefreshTokenResult<RefreshTokenOutput> {
         cmd.validate()
-            .map_err(|e| AppError::Validation(e.to_string()))?;
+            .map_err(|e| RefreshTokenError::Validation(e.to_string()))?;
 
         // Verify refresh token
         let user_id_str = self
             .token_service
-            .verify_refresh_token(&cmd.refresh_token)
-            .map_err(|_| AppError::Unauthorized("Invalid refresh token".to_string()))?;
+            .verify_refresh_token(&cmd.refresh_token)?;
 
         let user_id = uuid::Uuid::parse_str(&user_id_str)
-            .map_err(|_| AppError::Unauthorized("Invalid user ID in token".to_string()))?;
+            .map_err(|_| RefreshTokenError::InvalidCredentials)?;
 
         // Find user
-        let user = self
-            .user_persistence
-            .find_user_by_id(user_id)
-            .await
-            .map_err(|_| AppError::Unauthorized("User not found".to_string()))?;
+        let user = self.user_persistence.find_user_by_id(user_id).await?;
 
         // Generate new tokens
-        let token = self
-            .token_service
-            .generate_token(&user)
-            .map_err(|e| AppError::GenericError(e.to_string()))?;
+        let token = self.token_service.generate_token(&user)?;
 
-        let refresh_token = self
-            .token_service
-            .generate_refresh_token(&user)
-            .map_err(|e| AppError::GenericError(e.to_string()))?;
+        let refresh_token = self.token_service.generate_refresh_token(&user)?;
 
         Ok(RefreshTokenOutput {
             token,
@@ -71,3 +80,5 @@ impl RefreshTokenUseCase {
         })
     }
 }
+
+//TODO unit tests

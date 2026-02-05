@@ -1,9 +1,24 @@
 use std::sync::Arc;
 
-use domain::traits::user_persistence::UserPersistence;
+use domain::{
+    error::persistence_error::PersistenceError, traits::user_persistence::UserPersistence,
+};
+use thiserror::Error;
 use uuid::Uuid;
 
-use crate::app_error::{AppError, AppResult};
+#[derive(Debug, Error, PartialEq)]
+pub enum UpdateUserUsernameError {
+    #[error("Invalid credentials")]
+    InvalidCredentials,
+
+    #[error("Username already exists")]
+    UsernameAlreadyExists,
+
+    #[error("Persistence error: {0}")]
+    PersistenceError(#[from] PersistenceError),
+}
+
+pub type UpdateUserUsernameResult<T> = Result<T, UpdateUserUsernameError>;
 
 pub struct UpdateUserUsernameCommand {
     pub user_id: Uuid,
@@ -19,10 +34,10 @@ impl UpdateUserUsernameUseCase {
         Self { user_persistence }
     }
 
-    pub async fn execute(&self, cmd: UpdateUserUsernameCommand) -> AppResult<()> {
+    pub async fn execute(&self, cmd: UpdateUserUsernameCommand) -> UpdateUserUsernameResult<()> {
         // Validate input
         if cmd.new_username.is_empty() {
-            return Err(AppError::InvalidUserParam("Invalid username".to_string()));
+            return Err(UpdateUserUsernameError::InvalidCredentials);
         }
 
         // Retrieve user
@@ -37,9 +52,7 @@ impl UpdateUserUsernameUseCase {
                 .await
                 .is_ok()
             {
-                return Err(AppError::InvalidUserParam(
-                    "Username already exists".to_string(),
-                ));
+                return Err(UpdateUserUsernameError::UsernameAlreadyExists);
             }
 
             user.update_username(cmd.new_username);
@@ -61,10 +74,9 @@ mod tests {
     use uuid::Uuid;
 
     use crate::{
-        app_error::AppError,
         mocks::MockUserPersistence,
         use_cases::user::update_user_username::{
-            UpdateUserUsernameCommand, UpdateUserUsernameUseCase,
+            UpdateUserUsernameCommand, UpdateUserUsernameError, UpdateUserUsernameUseCase,
         },
     };
 
@@ -188,9 +200,7 @@ mod tests {
 
         let result = use_case.execute(cmd).await;
 
-        assert!(
-            matches!(result, Err(AppError::InvalidUserParam(msg)) if msg == "Username already exists")
-        );
+        assert_eq!(result, Err(UpdateUserUsernameError::UsernameAlreadyExists));
     }
 
     #[tokio::test]
@@ -214,7 +224,7 @@ mod tests {
         assert!(result.is_err());
         assert_eq!(
             result.err(),
-            Some(AppError::InvalidUserParam("Invalid username".to_string()))
+            Some(UpdateUserUsernameError::InvalidCredentials)
         )
     }
 }

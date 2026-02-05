@@ -1,10 +1,19 @@
 use std::sync::Arc;
 
-use crate::{
-    app_error::AppResult, use_cases::category::command::update_category::UpdateCategoryCommand,
-};
+use crate::use_cases::category::command::update_category::UpdateCategoryCommand;
 use domain::entities::category::Category;
-use domain::traits::category_persistence::CategoryPersistence;
+use domain::{
+    error::persistence_error::PersistenceError, traits::category_persistence::CategoryPersistence,
+};
+use thiserror::Error;
+
+#[derive(Debug, Error)]
+pub enum UpdateCategoryError {
+    #[error("Persistence error: {0}")]
+    PersistenceError(#[from] PersistenceError),
+}
+
+pub type UpdateCategoryResult<T> = Result<T, UpdateCategoryError>;
 
 #[derive(Clone)]
 pub struct UpdateCategoryUseCases {
@@ -18,7 +27,7 @@ impl UpdateCategoryUseCases {
         }
     }
 
-    pub async fn execute(&self, command: UpdateCategoryCommand) -> AppResult<Category> {
+    pub async fn execute(&self, command: UpdateCategoryCommand) -> UpdateCategoryResult<Category> {
         let mut category = self.category_persistence.find_by_id(command.id).await?;
 
         if let Some(name) = command.name {

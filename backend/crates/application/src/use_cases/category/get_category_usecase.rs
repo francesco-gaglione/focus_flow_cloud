@@ -1,8 +1,18 @@
 use std::sync::Arc;
 
-use crate::app_error::AppResult;
 use domain::entities::category::Category;
-use domain::traits::category_persistence::CategoryPersistence;
+use domain::{
+    error::persistence_error::PersistenceError, traits::category_persistence::CategoryPersistence,
+};
+use thiserror::Error;
+
+#[derive(Debug, Error)]
+pub enum GetCategoryError {
+    #[error("Persistence error: {0}")]
+    PersistenceError(#[from] PersistenceError),
+}
+
+pub type GetCategoryResult<T> = Result<T, GetCategoryError>;
 
 #[derive(Clone)]
 pub struct GetCategoryUseCases {
@@ -16,7 +26,7 @@ impl GetCategoryUseCases {
         }
     }
 
-    pub async fn execute(&self, category_id: uuid::Uuid) -> AppResult<Category> {
+    pub async fn execute(&self, category_id: uuid::Uuid) -> GetCategoryResult<Category> {
         Ok(self.category_persistence.find_by_id(category_id).await?)
     }
 }

@@ -1,8 +1,17 @@
-use crate::app_error::AppResult;
 use crate::use_cases::task::command::update_task::UpdateTaskCommand;
 use domain::entities::task::Task;
+use domain::error::persistence_error::PersistenceError;
 use domain::traits::task_persistence::TaskPersistence;
 use std::sync::Arc;
+use thiserror::Error;
+
+#[derive(Debug, Error, PartialEq)]
+pub enum UpdateTaskError {
+    #[error("Persistence error: {0}")]
+    PersistenceError(#[from] PersistenceError),
+}
+
+pub type UpdateTaskResult<T> = Result<T, UpdateTaskError>;
 
 pub struct UpdateTaskUseCase {
     task_persistence: Arc<dyn TaskPersistence>,
@@ -13,7 +22,7 @@ impl UpdateTaskUseCase {
         Self { task_persistence }
     }
 
-    pub async fn execute(&self, command: UpdateTaskCommand) -> AppResult<Task> {
+    pub async fn execute(&self, command: UpdateTaskCommand) -> UpdateTaskResult<Task> {
         let mut task = self.task_persistence.find_by_id(command.id).await?;
 
         if let Some(name) = command.name {

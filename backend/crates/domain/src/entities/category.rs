@@ -1,9 +1,15 @@
+use thiserror::Error;
 use uuid::Uuid;
 
-use crate::{
-    error::domain_error::{DomainError, DomainResult},
-    helpers::validate_hex_color,
-};
+use crate::helpers::validate_hex_color;
+
+#[derive(Debug, Error)]
+pub enum CategoryError {
+    #[error("Invalid color: {0}")]
+    InvalidColor(String),
+}
+
+pub type CategoryResult<T> = Result<T, CategoryError>;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Category {
@@ -20,9 +26,9 @@ impl Category {
         name: String,
         description: Option<String>,
         color: String,
-    ) -> DomainResult<Self> {
+    ) -> CategoryResult<Self> {
         if !validate_hex_color(&color) {
-            return Err(DomainError::InvalidColor(color));
+            return Err(CategoryError::InvalidColor(color));
         }
 
         Ok(Category {
@@ -40,9 +46,9 @@ impl Category {
         name: String,
         description: Option<String>,
         color: String,
-    ) -> DomainResult<Self> {
+    ) -> CategoryResult<Self> {
         if !validate_hex_color(&color) {
-            return Err(DomainError::InvalidColor(color));
+            return Err(CategoryError::InvalidColor(color));
         }
 
         Ok(Category {

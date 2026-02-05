@@ -1,9 +1,18 @@
-use crate::{
-    entities::focus_session_type::FocusSessionType,
-    error::domain_error::{DomainError, DomainResult},
-};
-use chrono::{DateTime, Utc};
+use crate::entities::focus_session_type::FocusSessionType;
+use chrono::{DateTime, TimeDelta, Utc};
+use thiserror::Error;
 use uuid::Uuid;
+
+#[derive(Debug, Error, PartialEq)]
+pub enum FocusSessionError {
+    #[error("Invalid focus session parameter: {0}")]
+    InvalidFocusSessionParam(String),
+
+    #[error("Invalid focus session duration: {0}")]
+    InvalidFocusSessionDuration(TimeDelta),
+}
+
+pub type FocusSessionResult<T> = Result<T, FocusSessionError>;
 
 #[derive(Debug, Clone)]
 pub struct FocusSession {
@@ -31,19 +40,19 @@ impl FocusSession {
         notes: Option<String>,
         started_at: DateTime<Utc>,
         ended_at: Option<DateTime<Utc>>,
-    ) -> DomainResult<Self> {
+    ) -> FocusSessionResult<Self> {
         if matches!(
             session_type,
             FocusSessionType::ShortBreak | FocusSessionType::LongBreak
         ) && concentration_score.is_some()
         {
-            return Err(DomainError::InvalidFocusSessionParam(
+            return Err(FocusSessionError::InvalidFocusSessionParam(
                 "concentration_score".to_string(),
             ));
         }
 
         if notes.is_some() && notes.as_ref().unwrap().is_empty() {
-            return Err(DomainError::InvalidFocusSessionParam(
+            return Err(FocusSessionError::InvalidFocusSessionParam(
                 "Notes field is empty".to_string(),
             ));
         }
@@ -118,10 +127,12 @@ impl FocusSession {
         &mut self,
         started_at: DateTime<Utc>,
         ended_at: Option<DateTime<Utc>>,
-    ) -> DomainResult<()> {
+    ) -> FocusSessionResult<()> {
         if let Some(ended_at) = ended_at {
             if ended_at < started_at {
-                return Err(DomainError::InvalidFocusSessionDuration);
+                return Err(FocusSessionError::InvalidFocusSessionDuration(
+                    ended_at - started_at,
+                ));
             }
         }
         self.started_at = started_at;

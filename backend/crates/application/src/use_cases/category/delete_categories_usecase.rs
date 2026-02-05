@@ -1,7 +1,17 @@
 use std::sync::Arc;
 
-use crate::app_error::AppResult;
-use domain::traits::category_persistence::CategoryPersistence;
+use domain::{
+    error::persistence_error::PersistenceError, traits::category_persistence::CategoryPersistence,
+};
+use thiserror::Error;
+
+#[derive(Debug, Error, PartialEq)]
+pub enum DeleteCategoriesError {
+    #[error("Persistence error: {0}")]
+    PersistenceError(#[from] PersistenceError),
+}
+
+pub type DeleteCategoriesResult<T> = Result<T, DeleteCategoriesError>;
 
 #[derive(Clone)]
 pub struct DeleteCategoriesUseCases {
@@ -15,7 +25,10 @@ impl DeleteCategoriesUseCases {
         }
     }
 
-    pub async fn execute(&self, category_ids: Vec<uuid::Uuid>) -> AppResult<Vec<uuid::Uuid>> {
+    pub async fn execute(
+        &self,
+        category_ids: Vec<uuid::Uuid>,
+    ) -> DeleteCategoriesResult<Vec<uuid::Uuid>> {
         let mut deleted_ids: Vec<uuid::Uuid> = Vec::new();
         for category_id in category_ids {
             self.category_persistence

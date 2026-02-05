@@ -5,10 +5,13 @@ use crate::openapi::STATS_TAG;
 use application::use_cases::stats::command::calculate_stats_by_period::StatsPeriod;
 use axum::extract::{Extension, Query, State};
 use axum::Json;
-use domain::entities::stats::{
-    CategoryDistributionItem, ConcentrationPeriod, DailyActivityDistributionItem,
-    DailyActivityItem, Stats, TaskDistributionItem,
+use domain::entities::stats::calculators::daily_activity_calculator::{
+    DailyActivityDistributionItem, DailyActivityItem,
 };
+use domain::entities::stats::category_distribution::{
+    CategoryDistributionItem, TaskDistributionItem,
+};
+use domain::entities::stats::{ConcentrationPeriod, Stats};
 use serde::{Deserialize, Serialize};
 use tracing::debug;
 use utoipa::{IntoParams, ToSchema};
@@ -141,14 +144,13 @@ impl From<DailyActivityItem> for DailyActivityDto {
     fn from(item: DailyActivityItem) -> Self {
         Self {
             date: item
-                .date()
+                .date
                 .and_hms_opt(0, 0, 0)
                 .unwrap()
                 .and_utc()
                 .timestamp(),
             category_distribution: item
-                .category_distribution()
-                .to_vec()
+                .category_distribution
                 .into_iter()
                 .map(|dist| dist.into())
                 .collect(),
@@ -159,9 +161,9 @@ impl From<DailyActivityItem> for DailyActivityDto {
 impl From<DailyActivityDistributionItem> for DailyActivityDistributionDto {
     fn from(item: DailyActivityDistributionItem) -> Self {
         Self {
-            category_name: item.category_name().to_string(),
-            category_id: item.category_id().to_string(),
-            total_focus_time: item.total_focus_time(),
+            category_name: item.category_name.to_string(),
+            category_id: item.category_id.to_string(),
+            total_focus_time: item.total_focus_time,
         }
     }
 }
