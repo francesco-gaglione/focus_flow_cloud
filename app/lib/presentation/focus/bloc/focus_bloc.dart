@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:focus_flow_app/adapters/dtos/ws_dtos.dart';
 import 'package:focus_flow_app/adapters/ws/ws_repository.dart';
 import 'package:focus_flow_app/domain/entities/user_setting.dart';
 import 'package:focus_flow_app/domain/entities/note_template.dart';

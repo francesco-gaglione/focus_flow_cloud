@@ -1,10 +1,10 @@
+use application::auth_traits::password_hasher::{HashingError, PasswordHasher};
 use argon2::{
     password_hash::{
         rand_core::OsRng, PasswordHash, PasswordHasher as ArgonTrait, PasswordVerifier, SaltString,
     },
     Argon2,
 };
-use domain::traits::password_hasher::{HashingError, PasswordHasher};
 use tracing::{debug, error};
 
 #[derive(Default)]

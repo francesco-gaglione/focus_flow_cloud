@@ -47,7 +47,7 @@ pub async fn get_category(
             name: category.name().to_string(),
             description: category.description().map(|s| s.to_string()),
             color: category.color().to_string(),
-            tasks: vec![], //TODO
+            tasks: vec![],
         },
     };
 

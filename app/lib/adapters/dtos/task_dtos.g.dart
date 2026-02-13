@@ -6,15 +6,15 @@ part of 'task_dtos.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$CreateTaskDtoImpl _$$CreateTaskDtoImplFromJson(Map<String, dynamic> json) =>
-    _$CreateTaskDtoImpl(
+_CreateTaskDto _$CreateTaskDtoFromJson(Map<String, dynamic> json) =>
+    _CreateTaskDto(
       name: json['name'] as String,
       description: json['description'] as String?,
       categoryId: json['categoryId'] as String?,
       scheduledDate: (json['scheduledDate'] as num?)?.toInt(),
     );
 
-Map<String, dynamic> _$$CreateTaskDtoImplToJson(_$CreateTaskDtoImpl instance) =>
+Map<String, dynamic> _$CreateTaskDtoToJson(_CreateTaskDto instance) =>
     <String, dynamic>{
       'name': instance.name,
       'description': instance.description,
@@ -22,8 +22,8 @@ Map<String, dynamic> _$$CreateTaskDtoImplToJson(_$CreateTaskDtoImpl instance) =>
       'scheduledDate': instance.scheduledDate,
     };
 
-_$UpdateTaskDtoImpl _$$UpdateTaskDtoImplFromJson(Map<String, dynamic> json) =>
-    _$UpdateTaskDtoImpl(
+_UpdateTaskDto _$UpdateTaskDtoFromJson(Map<String, dynamic> json) =>
+    _UpdateTaskDto(
       name: json['name'] as String?,
       description: json['description'] as String?,
       categoryId: json['categoryId'] as String?,
@@ -31,7 +31,7 @@ _$UpdateTaskDtoImpl _$$UpdateTaskDtoImplFromJson(Map<String, dynamic> json) =>
       completedAt: (json['completedAt'] as num?)?.toInt(),
     );
 
-Map<String, dynamic> _$$UpdateTaskDtoImplToJson(_$UpdateTaskDtoImpl instance) =>
+Map<String, dynamic> _$UpdateTaskDtoToJson(_UpdateTaskDto instance) =>
     <String, dynamic>{
       'name': instance.name,
       'description': instance.description,
@@ -40,78 +40,75 @@ Map<String, dynamic> _$$UpdateTaskDtoImplToJson(_$UpdateTaskDtoImpl instance) =>
       'completedAt': instance.completedAt,
     };
 
-_$DeleteTasksDtoImpl _$$DeleteTasksDtoImplFromJson(Map<String, dynamic> json) =>
-    _$DeleteTasksDtoImpl(
+_DeleteTasksDto _$DeleteTasksDtoFromJson(Map<String, dynamic> json) =>
+    _DeleteTasksDto(
       taskIds:
           (json['taskIds'] as List<dynamic>).map((e) => e as String).toList(),
     );
 
-Map<String, dynamic> _$$DeleteTasksDtoImplToJson(
-  _$DeleteTasksDtoImpl instance,
-) => <String, dynamic>{'taskIds': instance.taskIds};
+Map<String, dynamic> _$DeleteTasksDtoToJson(_DeleteTasksDto instance) =>
+    <String, dynamic>{'taskIds': instance.taskIds};
 
-_$TaskResponseDtoImpl _$$TaskResponseDtoImplFromJson(
+_TaskResponseDto _$TaskResponseDtoFromJson(Map<String, dynamic> json) =>
+    _TaskResponseDto(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      description: json['description'] as String?,
+      categoryId: json['categoryId'] as String?,
+      scheduledDate: (json['scheduledDate'] as num?)?.toInt(),
+      completedAt: (json['completedAt'] as num?)?.toInt(),
+    );
+
+Map<String, dynamic> _$TaskResponseDtoToJson(_TaskResponseDto instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'description': instance.description,
+      'categoryId': instance.categoryId,
+      'scheduledDate': instance.scheduledDate,
+      'completedAt': instance.completedAt,
+    };
+
+_CreateTaskResponseDto _$CreateTaskResponseDtoFromJson(
   Map<String, dynamic> json,
-) => _$TaskResponseDtoImpl(
-  id: json['id'] as String,
-  name: json['name'] as String,
-  description: json['description'] as String?,
-  categoryId: json['categoryId'] as String?,
-  scheduledDate: (json['scheduledDate'] as num?)?.toInt(),
-  completedAt: (json['completedAt'] as num?)?.toInt(),
-);
+) => _CreateTaskResponseDto(id: json['id'] as String);
 
-Map<String, dynamic> _$$TaskResponseDtoImplToJson(
-  _$TaskResponseDtoImpl instance,
-) => <String, dynamic>{
-  'id': instance.id,
-  'name': instance.name,
-  'description': instance.description,
-  'categoryId': instance.categoryId,
-  'scheduledDate': instance.scheduledDate,
-  'completedAt': instance.completedAt,
-};
-
-_$CreateTaskResponseDtoImpl _$$CreateTaskResponseDtoImplFromJson(
-  Map<String, dynamic> json,
-) => _$CreateTaskResponseDtoImpl(id: json['id'] as String);
-
-Map<String, dynamic> _$$CreateTaskResponseDtoImplToJson(
-  _$CreateTaskResponseDtoImpl instance,
+Map<String, dynamic> _$CreateTaskResponseDtoToJson(
+  _CreateTaskResponseDto instance,
 ) => <String, dynamic>{'id': instance.id};
 
-_$UpdateTaskResponseDtoImpl _$$UpdateTaskResponseDtoImplFromJson(
+_UpdateTaskResponseDto _$UpdateTaskResponseDtoFromJson(
   Map<String, dynamic> json,
-) => _$UpdateTaskResponseDtoImpl(
+) => _UpdateTaskResponseDto(
   updatedTask: TaskResponseDto.fromJson(
     json['updatedTask'] as Map<String, dynamic>,
   ),
 );
 
-Map<String, dynamic> _$$UpdateTaskResponseDtoImplToJson(
-  _$UpdateTaskResponseDtoImpl instance,
+Map<String, dynamic> _$UpdateTaskResponseDtoToJson(
+  _UpdateTaskResponseDto instance,
 ) => <String, dynamic>{'updatedTask': instance.updatedTask};
 
-_$DeleteTasksResponseDtoImpl _$$DeleteTasksResponseDtoImplFromJson(
+_DeleteTasksResponseDto _$DeleteTasksResponseDtoFromJson(
   Map<String, dynamic> json,
-) => _$DeleteTasksResponseDtoImpl(
+) => _DeleteTasksResponseDto(
   deletedIds:
       (json['deleted_ids'] as List<dynamic>).map((e) => e as String).toList(),
 );
 
-Map<String, dynamic> _$$DeleteTasksResponseDtoImplToJson(
-  _$DeleteTasksResponseDtoImpl instance,
+Map<String, dynamic> _$DeleteTasksResponseDtoToJson(
+  _DeleteTasksResponseDto instance,
 ) => <String, dynamic>{'deleted_ids': instance.deletedIds};
 
-_$OrphanTasksResponseDtoImpl _$$OrphanTasksResponseDtoImplFromJson(
+_OrphanTasksResponseDto _$OrphanTasksResponseDtoFromJson(
   Map<String, dynamic> json,
-) => _$OrphanTasksResponseDtoImpl(
+) => _OrphanTasksResponseDto(
   orphanTasks:
       (json['orphanTasks'] as List<dynamic>)
           .map((e) => TaskResponseDto.fromJson(e as Map<String, dynamic>))
           .toList(),
 );
 
-Map<String, dynamic> _$$OrphanTasksResponseDtoImplToJson(
-  _$OrphanTasksResponseDtoImpl instance,
+Map<String, dynamic> _$OrphanTasksResponseDtoToJson(
+  _OrphanTasksResponseDto instance,
 ) => <String, dynamic>{'orphanTasks': instance.orphanTasks};

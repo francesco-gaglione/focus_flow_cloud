@@ -1,10 +1,9 @@
 use std::sync::Arc;
 
+use crate::persistence_traits::category_persistence::CategoryPersistence;
+use crate::persistence_traits::persistence_error::PersistenceError;
 use crate::use_cases::category::command::update_category::UpdateCategoryCommand;
 use domain::entities::category::Category;
-use domain::{
-    error::persistence_error::PersistenceError, traits::category_persistence::CategoryPersistence,
-};
 use thiserror::Error;
 
 #[derive(Debug, Error)]

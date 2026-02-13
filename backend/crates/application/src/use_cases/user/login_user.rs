@@ -1,6 +1,6 @@
+use crate::auth_traits::password_hasher::PasswordHasher;
+use crate::persistence_traits::user_persistence::UserPersistence;
 use domain::services::token_service::{TokenService, TokenServiceError};
-use domain::traits::password_hasher::PasswordHasher;
-use domain::traits::user_persistence::UserPersistence;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use thiserror::Error;

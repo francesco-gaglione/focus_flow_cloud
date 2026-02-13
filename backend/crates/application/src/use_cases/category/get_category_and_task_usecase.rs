@@ -1,11 +1,10 @@
 use std::sync::Arc;
 
+use crate::persistence_traits::category_persistence::CategoryPersistence;
+use crate::persistence_traits::persistence_error::PersistenceError;
+use crate::persistence_traits::task_persistence::TaskPersistence;
 use crate::use_cases::category::command::category_with_tasks::{
     CategoryAndTasks, CategoryWithTasks,
-};
-use domain::{
-    error::persistence_error::PersistenceError,
-    traits::{category_persistence::CategoryPersistence, task_persistence::TaskPersistence},
 };
 use thiserror::Error;
 

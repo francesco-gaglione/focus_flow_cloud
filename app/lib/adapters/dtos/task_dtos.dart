@@ -8,7 +8,7 @@ part 'task_dtos.g.dart';
 // Request DTOs
 
 @freezed
-class CreateTaskDto with _$CreateTaskDto {
+abstract class CreateTaskDto with _$CreateTaskDto {
   const factory CreateTaskDto({
     required String name,
     String? description,
@@ -21,7 +21,7 @@ class CreateTaskDto with _$CreateTaskDto {
 }
 
 @freezed
-class UpdateTaskDto with _$UpdateTaskDto {
+abstract class UpdateTaskDto with _$UpdateTaskDto {
   const factory UpdateTaskDto({
     String? name,
     String? description,
@@ -35,7 +35,7 @@ class UpdateTaskDto with _$UpdateTaskDto {
 }
 
 @freezed
-class DeleteTasksDto with _$DeleteTasksDto {
+abstract class DeleteTasksDto with _$DeleteTasksDto {
   const factory DeleteTasksDto({required List<String> taskIds}) =
       _DeleteTasksDto;
 
@@ -46,7 +46,7 @@ class DeleteTasksDto with _$DeleteTasksDto {
 // Response DTOs
 
 @freezed
-class TaskResponseDto with _$TaskResponseDto {
+abstract class TaskResponseDto with _$TaskResponseDto {
   const factory TaskResponseDto({
     required String id,
     required String name,
@@ -72,7 +72,7 @@ class TaskResponseDto with _$TaskResponseDto {
 }
 
 @freezed
-class CreateTaskResponseDto with _$CreateTaskResponseDto {
+abstract class CreateTaskResponseDto with _$CreateTaskResponseDto {
   const factory CreateTaskResponseDto({required String id}) =
       _CreateTaskResponseDto;
 
@@ -81,7 +81,7 @@ class CreateTaskResponseDto with _$CreateTaskResponseDto {
 }
 
 @freezed
-class UpdateTaskResponseDto with _$UpdateTaskResponseDto {
+abstract class UpdateTaskResponseDto with _$UpdateTaskResponseDto {
   const factory UpdateTaskResponseDto({required TaskResponseDto updatedTask}) =
       _UpdateTaskResponseDto;
 
@@ -90,7 +90,7 @@ class UpdateTaskResponseDto with _$UpdateTaskResponseDto {
 }
 
 @freezed
-class DeleteTasksResponseDto with _$DeleteTasksResponseDto {
+abstract class DeleteTasksResponseDto with _$DeleteTasksResponseDto {
   const factory DeleteTasksResponseDto({
     @JsonKey(name: 'deleted_ids') required List<String> deletedIds,
   }) = _DeleteTasksResponseDto;
@@ -100,7 +100,7 @@ class DeleteTasksResponseDto with _$DeleteTasksResponseDto {
 }
 
 @freezed
-class OrphanTasksResponseDto with _$OrphanTasksResponseDto {
+abstract class OrphanTasksResponseDto with _$OrphanTasksResponseDto {
   const factory OrphanTasksResponseDto({
     required List<TaskResponseDto> orphanTasks,
   }) = _OrphanTasksResponseDto;

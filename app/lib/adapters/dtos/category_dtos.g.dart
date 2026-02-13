@@ -6,71 +6,64 @@ part of 'category_dtos.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$CreateCategoryDtoImpl _$$CreateCategoryDtoImplFromJson(
-  Map<String, dynamic> json,
-) => _$CreateCategoryDtoImpl(
-  name: json['name'] as String,
-  color: json['color'] as String?,
-  description: json['description'] as String?,
-);
-
-Map<String, dynamic> _$$CreateCategoryDtoImplToJson(
-  _$CreateCategoryDtoImpl instance,
-) => <String, dynamic>{
-  'name': instance.name,
-  'color': instance.color,
-  'description': instance.description,
-};
-
-_$UpdateCategoryDtoImpl _$$UpdateCategoryDtoImplFromJson(
-  Map<String, dynamic> json,
-) => _$UpdateCategoryDtoImpl(
-  name: json['name'] as String?,
-  color: json['color'] as String?,
-  description: json['description'] as String?,
-);
-
-Map<String, dynamic> _$$UpdateCategoryDtoImplToJson(
-  _$UpdateCategoryDtoImpl instance,
-) => <String, dynamic>{
-  'name': instance.name,
-  'color': instance.color,
-  'description': instance.description,
-};
-
-_$TaskDtoImpl _$$TaskDtoImplFromJson(Map<String, dynamic> json) =>
-    _$TaskDtoImpl(
-      id: json['id'] as String,
+_CreateCategoryDto _$CreateCategoryDtoFromJson(Map<String, dynamic> json) =>
+    _CreateCategoryDto(
       name: json['name'] as String,
+      color: json['color'] as String?,
       description: json['description'] as String?,
-      categoryId: json['categoryId'] as String?,
-      scheduledDate: (json['scheduledDate'] as num?)?.toInt(),
-      completedAt: (json['completedAt'] as num?)?.toInt(),
     );
 
-Map<String, dynamic> _$$TaskDtoImplToJson(_$TaskDtoImpl instance) =>
+Map<String, dynamic> _$CreateCategoryDtoToJson(_CreateCategoryDto instance) =>
     <String, dynamic>{
-      'id': instance.id,
       'name': instance.name,
+      'color': instance.color,
       'description': instance.description,
-      'categoryId': instance.categoryId,
-      'scheduledDate': instance.scheduledDate,
-      'completedAt': instance.completedAt,
     };
 
-_$CategoryDtoImpl _$$CategoryDtoImplFromJson(Map<String, dynamic> json) =>
-    _$CategoryDtoImpl(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      color: json['color'] as String,
+_UpdateCategoryDto _$UpdateCategoryDtoFromJson(Map<String, dynamic> json) =>
+    _UpdateCategoryDto(
+      name: json['name'] as String?,
+      color: json['color'] as String?,
       description: json['description'] as String?,
-      tasks:
-          (json['tasks'] as List<dynamic>)
-              .map((e) => TaskDto.fromJson(e as Map<String, dynamic>))
-              .toList(),
     );
 
-Map<String, dynamic> _$$CategoryDtoImplToJson(_$CategoryDtoImpl instance) =>
+Map<String, dynamic> _$UpdateCategoryDtoToJson(_UpdateCategoryDto instance) =>
+    <String, dynamic>{
+      'name': instance.name,
+      'color': instance.color,
+      'description': instance.description,
+    };
+
+_TaskDto _$TaskDtoFromJson(Map<String, dynamic> json) => _TaskDto(
+  id: json['id'] as String,
+  name: json['name'] as String,
+  description: json['description'] as String?,
+  categoryId: json['categoryId'] as String?,
+  scheduledDate: (json['scheduledDate'] as num?)?.toInt(),
+  completedAt: (json['completedAt'] as num?)?.toInt(),
+);
+
+Map<String, dynamic> _$TaskDtoToJson(_TaskDto instance) => <String, dynamic>{
+  'id': instance.id,
+  'name': instance.name,
+  'description': instance.description,
+  'categoryId': instance.categoryId,
+  'scheduledDate': instance.scheduledDate,
+  'completedAt': instance.completedAt,
+};
+
+_CategoryDto _$CategoryDtoFromJson(Map<String, dynamic> json) => _CategoryDto(
+  id: json['id'] as String,
+  name: json['name'] as String,
+  color: json['color'] as String,
+  description: json['description'] as String?,
+  tasks:
+      (json['tasks'] as List<dynamic>)
+          .map((e) => TaskDto.fromJson(e as Map<String, dynamic>))
+          .toList(),
+);
+
+Map<String, dynamic> _$CategoryDtoToJson(_CategoryDto instance) =>
     <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
@@ -79,46 +72,46 @@ Map<String, dynamic> _$$CategoryDtoImplToJson(_$CategoryDtoImpl instance) =>
       'tasks': instance.tasks,
     };
 
-_$GetCategoriesResponseDtoImpl _$$GetCategoriesResponseDtoImplFromJson(
+_GetCategoriesResponseDto _$GetCategoriesResponseDtoFromJson(
   Map<String, dynamic> json,
-) => _$GetCategoriesResponseDtoImpl(
+) => _GetCategoriesResponseDto(
   categories:
       (json['categories'] as List<dynamic>)
           .map((e) => CategoryDto.fromJson(e as Map<String, dynamic>))
           .toList(),
 );
 
-Map<String, dynamic> _$$GetCategoriesResponseDtoImplToJson(
-  _$GetCategoriesResponseDtoImpl instance,
+Map<String, dynamic> _$GetCategoriesResponseDtoToJson(
+  _GetCategoriesResponseDto instance,
 ) => <String, dynamic>{'categories': instance.categories};
 
-_$CreateCategoryResponseDtoImpl _$$CreateCategoryResponseDtoImplFromJson(
+_CreateCategoryResponseDto _$CreateCategoryResponseDtoFromJson(
   Map<String, dynamic> json,
-) => _$CreateCategoryResponseDtoImpl(created: json['created'] as bool);
+) => _CreateCategoryResponseDto(created: json['created'] as bool);
 
-Map<String, dynamic> _$$CreateCategoryResponseDtoImplToJson(
-  _$CreateCategoryResponseDtoImpl instance,
+Map<String, dynamic> _$CreateCategoryResponseDtoToJson(
+  _CreateCategoryResponseDto instance,
 ) => <String, dynamic>{'created': instance.created};
 
-_$UpdateCategoryResponseDtoImpl _$$UpdateCategoryResponseDtoImplFromJson(
+_UpdateCategoryResponseDto _$UpdateCategoryResponseDtoFromJson(
   Map<String, dynamic> json,
-) => _$UpdateCategoryResponseDtoImpl(
+) => _UpdateCategoryResponseDto(
   updatedCategory: CategoryDto.fromJson(
     json['updatedCategory'] as Map<String, dynamic>,
   ),
 );
 
-Map<String, dynamic> _$$UpdateCategoryResponseDtoImplToJson(
-  _$UpdateCategoryResponseDtoImpl instance,
+Map<String, dynamic> _$UpdateCategoryResponseDtoToJson(
+  _UpdateCategoryResponseDto instance,
 ) => <String, dynamic>{'updatedCategory': instance.updatedCategory};
 
-_$DeleteCategoriesResponseDtoImpl _$$DeleteCategoriesResponseDtoImplFromJson(
+_DeleteCategoriesResponseDto _$DeleteCategoriesResponseDtoFromJson(
   Map<String, dynamic> json,
-) => _$DeleteCategoriesResponseDtoImpl(
+) => _DeleteCategoriesResponseDto(
   deletedIds:
       (json['deleted_ids'] as List<dynamic>).map((e) => e as String).toList(),
 );
 
-Map<String, dynamic> _$$DeleteCategoriesResponseDtoImplToJson(
-  _$DeleteCategoriesResponseDtoImpl instance,
+Map<String, dynamic> _$DeleteCategoriesResponseDtoToJson(
+  _DeleteCategoriesResponseDto instance,
 ) => <String, dynamic>{'deleted_ids': instance.deletedIds};

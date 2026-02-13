@@ -6,9 +6,9 @@ part of 'session_dtos.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$CreateManualSessionDtoImpl _$$CreateManualSessionDtoImplFromJson(
+_CreateManualSessionDto _$CreateManualSessionDtoFromJson(
   Map<String, dynamic> json,
-) => _$CreateManualSessionDtoImpl(
+) => _CreateManualSessionDto(
   sessionType: json['sessionType'] as String,
   startedAt: (json['startedAt'] as num).toInt(),
   endedAt: (json['endedAt'] as num).toInt(),
@@ -18,8 +18,8 @@ _$CreateManualSessionDtoImpl _$$CreateManualSessionDtoImplFromJson(
   notes: json['notes'] as String?,
 );
 
-Map<String, dynamic> _$$CreateManualSessionDtoImplToJson(
-  _$CreateManualSessionDtoImpl instance,
+Map<String, dynamic> _$CreateManualSessionDtoToJson(
+  _CreateManualSessionDto instance,
 ) => <String, dynamic>{
   'sessionType': instance.sessionType,
   'startedAt': instance.startedAt,
@@ -30,9 +30,9 @@ Map<String, dynamic> _$$CreateManualSessionDtoImplToJson(
   'notes': instance.notes,
 };
 
-_$GetSessionFiltersDtoImpl _$$GetSessionFiltersDtoImplFromJson(
+_GetSessionFiltersDto _$GetSessionFiltersDtoFromJson(
   Map<String, dynamic> json,
-) => _$GetSessionFiltersDtoImpl(
+) => _GetSessionFiltersDto(
   startDate: (json['startDate'] as num?)?.toInt(),
   endDate: (json['endDate'] as num?)?.toInt(),
   categoryIds:
@@ -42,8 +42,8 @@ _$GetSessionFiltersDtoImpl _$$GetSessionFiltersDtoImplFromJson(
   maxConcentrationScore: (json['maxConcentrationScore'] as num?)?.toInt(),
 );
 
-Map<String, dynamic> _$$GetSessionFiltersDtoImplToJson(
-  _$GetSessionFiltersDtoImpl instance,
+Map<String, dynamic> _$GetSessionFiltersDtoToJson(
+  _GetSessionFiltersDto instance,
 ) => <String, dynamic>{
   'startDate': instance.startDate,
   'endDate': instance.endDate,
@@ -53,9 +53,9 @@ Map<String, dynamic> _$$GetSessionFiltersDtoImplToJson(
   'maxConcentrationScore': instance.maxConcentrationScore,
 };
 
-_$UpdateFocusSessionDtoImpl _$$UpdateFocusSessionDtoImplFromJson(
+_UpdateFocusSessionDto _$UpdateFocusSessionDtoFromJson(
   Map<String, dynamic> json,
-) => _$UpdateFocusSessionDtoImpl(
+) => _UpdateFocusSessionDto(
   categoryId: json['categoryId'] as String?,
   taskId: json['taskId'] as String?,
   notes: json['notes'] as String?,
@@ -66,8 +66,8 @@ _$UpdateFocusSessionDtoImpl _$$UpdateFocusSessionDtoImplFromJson(
   sessionType: json['sessionType'] as String?,
 );
 
-Map<String, dynamic> _$$UpdateFocusSessionDtoImplToJson(
-  _$UpdateFocusSessionDtoImpl instance,
+Map<String, dynamic> _$UpdateFocusSessionDtoToJson(
+  _UpdateFocusSessionDto instance,
 ) => <String, dynamic>{
   'categoryId': instance.categoryId,
   'taskId': instance.taskId,
@@ -79,53 +79,51 @@ Map<String, dynamic> _$$UpdateFocusSessionDtoImplToJson(
   'sessionType': instance.sessionType,
 };
 
-_$FocusSessionDtoImpl _$$FocusSessionDtoImplFromJson(
+_FocusSessionDto _$FocusSessionDtoFromJson(Map<String, dynamic> json) =>
+    _FocusSessionDto(
+      id: json['id'] as String,
+      sessionType: json['sessionType'] as String,
+      startedAt: (json['startedAt'] as num).toInt(),
+      endedAt: (json['endedAt'] as num?)?.toInt(),
+      actualDuration: (json['actualDuration'] as num?)?.toInt(),
+      taskId: json['taskId'] as String?,
+      categoryId: json['categoryId'] as String?,
+      concentrationScore: (json['concentrationScore'] as num?)?.toInt(),
+      notes: json['notes'] as String?,
+      createdAt: (json['createdAt'] as num).toInt(),
+    );
+
+Map<String, dynamic> _$FocusSessionDtoToJson(_FocusSessionDto instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'sessionType': instance.sessionType,
+      'startedAt': instance.startedAt,
+      'endedAt': instance.endedAt,
+      'actualDuration': instance.actualDuration,
+      'taskId': instance.taskId,
+      'categoryId': instance.categoryId,
+      'concentrationScore': instance.concentrationScore,
+      'notes': instance.notes,
+      'createdAt': instance.createdAt,
+    };
+
+_CreateManualSessionResponseDto _$CreateManualSessionResponseDtoFromJson(
   Map<String, dynamic> json,
-) => _$FocusSessionDtoImpl(
-  id: json['id'] as String,
-  sessionType: json['sessionType'] as String,
-  startedAt: (json['startedAt'] as num).toInt(),
-  endedAt: (json['endedAt'] as num?)?.toInt(),
-  actualDuration: (json['actualDuration'] as num?)?.toInt(),
-  taskId: json['taskId'] as String?,
-  categoryId: json['categoryId'] as String?,
-  concentrationScore: (json['concentrationScore'] as num?)?.toInt(),
-  notes: json['notes'] as String?,
-  createdAt: (json['createdAt'] as num).toInt(),
-);
+) => _CreateManualSessionResponseDto(id: json['id'] as String);
 
-Map<String, dynamic> _$$FocusSessionDtoImplToJson(
-  _$FocusSessionDtoImpl instance,
-) => <String, dynamic>{
-  'id': instance.id,
-  'sessionType': instance.sessionType,
-  'startedAt': instance.startedAt,
-  'endedAt': instance.endedAt,
-  'actualDuration': instance.actualDuration,
-  'taskId': instance.taskId,
-  'categoryId': instance.categoryId,
-  'concentrationScore': instance.concentrationScore,
-  'notes': instance.notes,
-  'createdAt': instance.createdAt,
-};
-
-_$CreateManualSessionResponseDtoImpl
-_$$CreateManualSessionResponseDtoImplFromJson(Map<String, dynamic> json) =>
-    _$CreateManualSessionResponseDtoImpl(id: json['id'] as String);
-
-Map<String, dynamic> _$$CreateManualSessionResponseDtoImplToJson(
-  _$CreateManualSessionResponseDtoImpl instance,
+Map<String, dynamic> _$CreateManualSessionResponseDtoToJson(
+  _CreateManualSessionResponseDto instance,
 ) => <String, dynamic>{'id': instance.id};
 
-_$GetSessionFiltersResponseDtoImpl _$$GetSessionFiltersResponseDtoImplFromJson(
+_GetSessionFiltersResponseDto _$GetSessionFiltersResponseDtoFromJson(
   Map<String, dynamic> json,
-) => _$GetSessionFiltersResponseDtoImpl(
+) => _GetSessionFiltersResponseDto(
   focusSessions:
       (json['focusSessions'] as List<dynamic>)
           .map((e) => FocusSessionDto.fromJson(e as Map<String, dynamic>))
           .toList(),
 );
 
-Map<String, dynamic> _$$GetSessionFiltersResponseDtoImplToJson(
-  _$GetSessionFiltersResponseDtoImpl instance,
+Map<String, dynamic> _$GetSessionFiltersResponseDtoToJson(
+  _GetSessionFiltersResponseDto instance,
 ) => <String, dynamic>{'focusSessions': instance.focusSessions};

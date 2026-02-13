@@ -144,6 +144,7 @@ statistics:
   least_productive: "Least Productive"
   average_session: "Avg Session"
   break_time: "Break Time"
+  focus_pause_ratio: "Focus/Pause"
   morning: "Morning"
   afternoon: "Afternoon"
   yesterday: "Yesterday"

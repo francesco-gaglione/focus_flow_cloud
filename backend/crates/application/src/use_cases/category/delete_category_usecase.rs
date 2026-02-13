@@ -1,8 +1,7 @@
 use std::sync::Arc;
 
-use domain::{
-    error::persistence_error::PersistenceError, traits::category_persistence::CategoryPersistence,
-};
+use crate::persistence_traits::category_persistence::CategoryPersistence;
+use crate::persistence_traits::persistence_error::PersistenceError;
 use thiserror::Error;
 
 #[derive(Debug, Error)]

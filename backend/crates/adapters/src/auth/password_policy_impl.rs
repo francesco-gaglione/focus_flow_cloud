@@ -1,8 +1,20 @@
-use crate::traits::password_policy::{PasswordPolicy, PasswordPolicyError, PasswordPolicyResult};
+use domain::traits::password_policy::{PasswordPolicy, PasswordPolicyError, PasswordPolicyResult};
 
-pub struct PasswordPolicyService;
+pub struct PasswordPolicyImpl;
 
-impl PasswordPolicy for PasswordPolicyService {
+impl PasswordPolicyImpl {
+    pub fn new() -> Self {
+        Self {}
+    }
+}
+
+impl Default for PasswordPolicyImpl {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl PasswordPolicy for PasswordPolicyImpl {
     fn validate(&self, password: &str) -> PasswordPolicyResult<()> {
         if password.len() < 8 {
             Err(PasswordPolicyError::InvalidLength(
@@ -26,7 +38,7 @@ mod tests {
 
     #[test]
     fn test_validate_password() {
-        let service = PasswordPolicyService;
+        let service = PasswordPolicyImpl::new();
         assert!(service.validate("Password1").is_ok());
         assert!(service.validate("password").is_err());
         assert!(service.validate("PASSWORD").is_err());

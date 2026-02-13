@@ -33,11 +33,13 @@ use tokio::sync::RwLock;
 
 use crate::crypto::password_hasher::Argon2Hasher;
 use crate::database::run_migrations;
-use crate::policy::password_policy_impl::PasswordPolicyImpl;
 use crate::services::jwt_service::JwtService;
+use adapters::auth::password_policy_impl::PasswordPolicyImpl;
 use adapters::config::AppConfig;
 use adapters::http::app_state::AppState;
 use adapters::persistence::persistence_impl::persistence::postgres_persistence;
+use application::auth_traits::password_hasher::PasswordHasher;
+use application::persistence_traits::user_persistence::UserPersistence;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 
 pub async fn init_app_state(
@@ -127,7 +129,6 @@ pub async fn init_app_state(
     // Seed Admin User
     if let (Some(username), Some(password)) = (&config.admin_username, &config.admin_password) {
         use domain::entities::{user::User, user_role::UserRole};
-        use domain::traits::{password_hasher::PasswordHasher, user_persistence::UserPersistence};
         use tracing::{error, info};
 
         info!("Checking for admin user: {}", username);

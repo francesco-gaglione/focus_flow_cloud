@@ -144,6 +144,7 @@ statistics:
   least_productive: "Meno Produttivo"
   average_session: "Sessione Media"
   break_time: "Tempo di Pausa"
+  focus_pause_ratio: "Focus/Pausa"
   morning: "Mattina"
   afternoon: "Pomeriggio"
   yesterday: "Ieri"

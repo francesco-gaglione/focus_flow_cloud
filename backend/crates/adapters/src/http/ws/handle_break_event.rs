@@ -68,7 +68,9 @@ pub async fn handle_break_event(
                             })
                             .await;
                     }
-                    None => todo!(),
+                    None => {
+                        tracing::error!("No last session found, cannot create focus session");
+                    }
                 }
 
                 let next_session_type = pomodoro_state.calculate_next_session_type();

@@ -1,8 +1,7 @@
 use std::sync::Arc;
 
-use domain::{
-    error::persistence_error::PersistenceError, traits::user_persistence::UserPersistence,
-};
+use crate::persistence_traits::persistence_error::PersistenceError;
+use crate::persistence_traits::user_persistence::UserPersistence;
 use thiserror::Error;
 use uuid::Uuid;
 

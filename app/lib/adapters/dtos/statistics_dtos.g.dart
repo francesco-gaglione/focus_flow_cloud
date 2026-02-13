@@ -6,23 +6,22 @@ part of 'statistics_dtos.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$GetStatsByPeriodDtoImpl _$$GetStatsByPeriodDtoImplFromJson(
-  Map<String, dynamic> json,
-) => _$GetStatsByPeriodDtoImpl(
-  startDate: (json['startDate'] as num).toInt(),
-  endDate: (json['endDate'] as num?)?.toInt(),
-);
+_GetStatsByPeriodDto _$GetStatsByPeriodDtoFromJson(Map<String, dynamic> json) =>
+    _GetStatsByPeriodDto(
+      startDate: (json['startDate'] as num).toInt(),
+      endDate: (json['endDate'] as num?)?.toInt(),
+    );
 
-Map<String, dynamic> _$$GetStatsByPeriodDtoImplToJson(
-  _$GetStatsByPeriodDtoImpl instance,
+Map<String, dynamic> _$GetStatsByPeriodDtoToJson(
+  _GetStatsByPeriodDto instance,
 ) => <String, dynamic>{
   'startDate': instance.startDate,
   'endDate': instance.endDate,
 };
 
-_$CategoryDistributionDtoImpl _$$CategoryDistributionDtoImplFromJson(
+_CategoryDistributionDto _$CategoryDistributionDtoFromJson(
   Map<String, dynamic> json,
-) => _$CategoryDistributionDtoImpl(
+) => _CategoryDistributionDto(
   categoryId: json['categoryId'] as String,
   categoryName: json['categoryName'] as String,
   totalFocusTime: (json['totalFocusTime'] as num).toInt(),
@@ -33,8 +32,8 @@ _$CategoryDistributionDtoImpl _$$CategoryDistributionDtoImplFromJson(
           .toList(),
 );
 
-Map<String, dynamic> _$$CategoryDistributionDtoImplToJson(
-  _$CategoryDistributionDtoImpl instance,
+Map<String, dynamic> _$CategoryDistributionDtoToJson(
+  _CategoryDistributionDto instance,
 ) => <String, dynamic>{
   'categoryId': instance.categoryId,
   'categoryName': instance.categoryName,
@@ -43,66 +42,64 @@ Map<String, dynamic> _$$CategoryDistributionDtoImplToJson(
   'taskDistribution': instance.taskDistribution,
 };
 
-_$TaskDistributionDtoImpl _$$TaskDistributionDtoImplFromJson(
-  Map<String, dynamic> json,
-) => _$TaskDistributionDtoImpl(
-  taskName: json['taskName'] as String,
-  totalFocusTime: (json['totalFocusTime'] as num).toInt(),
-  percentage: (json['percentage'] as num).toDouble(),
-);
+_TaskDistributionDto _$TaskDistributionDtoFromJson(Map<String, dynamic> json) =>
+    _TaskDistributionDto(
+      taskName: json['taskName'] as String,
+      totalFocusTime: (json['totalFocusTime'] as num).toInt(),
+      percentage: (json['percentage'] as num).toDouble(),
+    );
 
-Map<String, dynamic> _$$TaskDistributionDtoImplToJson(
-  _$TaskDistributionDtoImpl instance,
+Map<String, dynamic> _$TaskDistributionDtoToJson(
+  _TaskDistributionDto instance,
 ) => <String, dynamic>{
   'taskName': instance.taskName,
   'totalFocusTime': instance.totalFocusTime,
   'percentage': instance.percentage,
 };
 
-_$DailyActivityDistributionDtoImpl _$$DailyActivityDistributionDtoImplFromJson(
+_DailyActivityDistributionDto _$DailyActivityDistributionDtoFromJson(
   Map<String, dynamic> json,
-) => _$DailyActivityDistributionDtoImpl(
+) => _DailyActivityDistributionDto(
   categoryId: json['categoryId'] as String,
   categoryName: json['categoryName'] as String,
   totalFocusTime: (json['totalFocusTime'] as num).toInt(),
 );
 
-Map<String, dynamic> _$$DailyActivityDistributionDtoImplToJson(
-  _$DailyActivityDistributionDtoImpl instance,
+Map<String, dynamic> _$DailyActivityDistributionDtoToJson(
+  _DailyActivityDistributionDto instance,
 ) => <String, dynamic>{
   'categoryId': instance.categoryId,
   'categoryName': instance.categoryName,
   'totalFocusTime': instance.totalFocusTime,
 };
 
-_$DailyActivityDtoImpl _$$DailyActivityDtoImplFromJson(
-  Map<String, dynamic> json,
-) => _$DailyActivityDtoImpl(
-  date: (json['date'] as num).toInt(),
-  categoryDistribution:
-      (json['categoryDistribution'] as List<dynamic>)
-          .map(
-            (e) => DailyActivityDistributionDto.fromJson(
-              e as Map<String, dynamic>,
-            ),
-          )
-          .toList(),
-);
+_DailyActivityDto _$DailyActivityDtoFromJson(Map<String, dynamic> json) =>
+    _DailyActivityDto(
+      date: (json['date'] as num).toInt(),
+      categoryDistribution:
+          (json['categoryDistribution'] as List<dynamic>)
+              .map(
+                (e) => DailyActivityDistributionDto.fromJson(
+                  e as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
+    );
 
-Map<String, dynamic> _$$DailyActivityDtoImplToJson(
-  _$DailyActivityDtoImpl instance,
-) => <String, dynamic>{
-  'date': instance.date,
-  'categoryDistribution': instance.categoryDistribution,
-};
+Map<String, dynamic> _$DailyActivityDtoToJson(_DailyActivityDto instance) =>
+    <String, dynamic>{
+      'date': instance.date,
+      'categoryDistribution': instance.categoryDistribution,
+    };
 
-_$GetStatsByPeriodResponseDtoImpl _$$GetStatsByPeriodResponseDtoImplFromJson(
+_GetStatsByPeriodResponseDto _$GetStatsByPeriodResponseDtoFromJson(
   Map<String, dynamic> json,
-) => _$GetStatsByPeriodResponseDtoImpl(
+) => _GetStatsByPeriodResponseDto(
   totalSessions: (json['totalSessions'] as num).toInt(),
   totalBreaks: (json['totalBreaks'] as num).toInt(),
   totalFocusTime: (json['totalFocusTime'] as num).toInt(),
   totalBreakTime: (json['totalBreakTime'] as num).toInt(),
+  focusPauseRatio: (json['focusPauseRatio'] as num).toDouble(),
   mostConcentratedPeriod: json['mostConcentratedPeriod'] as String,
   lessConcentratedPeriod: json['lessConcentratedPeriod'] as String,
   concentrationDistribution:
@@ -121,13 +118,14 @@ _$GetStatsByPeriodResponseDtoImpl _$$GetStatsByPeriodResponseDtoImplFromJson(
           .toList(),
 );
 
-Map<String, dynamic> _$$GetStatsByPeriodResponseDtoImplToJson(
-  _$GetStatsByPeriodResponseDtoImpl instance,
+Map<String, dynamic> _$GetStatsByPeriodResponseDtoToJson(
+  _GetStatsByPeriodResponseDto instance,
 ) => <String, dynamic>{
   'totalSessions': instance.totalSessions,
   'totalBreaks': instance.totalBreaks,
   'totalFocusTime': instance.totalFocusTime,
   'totalBreakTime': instance.totalBreakTime,
+  'focusPauseRatio': instance.focusPauseRatio,
   'mostConcentratedPeriod': instance.mostConcentratedPeriod,
   'lessConcentratedPeriod': instance.lessConcentratedPeriod,
   'concentrationDistribution': instance.concentrationDistribution,

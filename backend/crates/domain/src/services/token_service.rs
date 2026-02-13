@@ -16,7 +16,7 @@ pub enum TokenServiceError {
 
 pub type TokenServiceResult<T> = Result<T, TokenServiceError>;
 
-#[cfg_attr(test, mockall::automock)]
+#[cfg_attr(any(test, feature = "test-utils"), mockall::automock)]
 #[async_trait]
 pub trait TokenService: Send + Sync {
     fn generate_token(&self, user: &User) -> TokenServiceResult<String>;

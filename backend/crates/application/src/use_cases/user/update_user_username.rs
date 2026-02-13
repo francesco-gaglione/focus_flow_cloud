@@ -1,8 +1,7 @@
 use std::sync::Arc;
 
-use domain::{
-    error::persistence_error::PersistenceError, traits::user_persistence::UserPersistence,
-};
+use crate::persistence_traits::persistence_error::PersistenceError;
+use crate::persistence_traits::user_persistence::UserPersistence;
 use thiserror::Error;
 use uuid::Uuid;
 
@@ -67,9 +66,9 @@ impl UpdateUserUsernameUseCase {
 mod tests {
     use std::sync::Arc;
 
+    use crate::persistence_traits::persistence_error::PersistenceError;
     use domain::entities::user::User;
     use domain::entities::user_role::UserRole;
-    use domain::error::persistence_error::PersistenceError;
     use mockall::predicate::eq;
     use uuid::Uuid;
 

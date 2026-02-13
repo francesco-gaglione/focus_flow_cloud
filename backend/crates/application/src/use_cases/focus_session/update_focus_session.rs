@@ -1,10 +1,9 @@
 use std::sync::Arc;
 
+use crate::persistence_traits::focus_session_persistence::FocusSessionPersistence;
+use crate::persistence_traits::persistence_error::PersistenceError;
 use crate::use_cases::focus_session::command::update_focus_session::UpdateFocusSessionCommand;
-use domain::{
-    entities::focus_session::FocusSessionError, error::persistence_error::PersistenceError,
-    traits::focus_session_persistence::FocusSessionPersistence,
-};
+use domain::entities::focus_session::FocusSessionError;
 use thiserror::Error;
 
 #[derive(Debug, Error, PartialEq)]

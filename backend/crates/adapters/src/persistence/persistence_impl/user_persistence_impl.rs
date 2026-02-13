@@ -1,12 +1,3 @@
-use async_trait::async_trait;
-use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper};
-use domain::{
-    entities::user::User,
-    error::persistence_error::{PersistenceError, PersistenceResult},
-    traits::user_persistence::UserPersistence,
-};
-use uuid::Uuid;
-
 use crate::{
     persistence::schema,
     persistence::{
@@ -14,6 +5,12 @@ use crate::{
         PostgresPersistence,
     },
 };
+use application::persistence_traits::persistence_error::{PersistenceError, PersistenceResult};
+use application::persistence_traits::user_persistence::UserPersistence;
+use async_trait::async_trait;
+use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper};
+use domain::entities::user::User;
+use uuid::Uuid;
 
 #[async_trait]
 impl UserPersistence for PostgresPersistence {

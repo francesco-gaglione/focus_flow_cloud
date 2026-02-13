@@ -1,12 +1,9 @@
 use chrono::{DateTime, Utc};
-use domain::{
-    entities::stats::calculators::{
-        category_analysis_calculator::CategoryAnalysisCalculator,
-        concentration_calculator::ConcentrationCalculator,
-        daily_activity_calculator::DailyActivityCalculator,
-        period_summary_calculator::PeriodSummaryCalculator,
-    },
-    error::persistence_error::PersistenceError,
+use domain::entities::stats::calculators::{
+    category_analysis_calculator::CategoryAnalysisCalculator,
+    concentration_calculator::ConcentrationCalculator,
+    daily_activity_calculator::DailyActivityCalculator,
+    period_summary_calculator::PeriodSummaryCalculator,
 };
 use futures_util::future::join_all;
 use std::{
@@ -16,13 +13,13 @@ use std::{
 use thiserror::Error;
 use uuid::Uuid;
 
+use crate::persistence_traits::category_persistence::CategoryPersistence;
+use crate::persistence_traits::focus_session_persistence::FocusSessionPersistence;
+use crate::persistence_traits::persistence_error::PersistenceError;
+use crate::persistence_traits::task_persistence::TaskPersistence;
 use crate::use_cases::stats::command::calculate_stats_by_period::StatsPeriod;
 use domain::entities::focus_session::SessionFilter;
 use domain::entities::stats::Stats;
-use domain::traits::{
-    category_persistence::CategoryPersistence, focus_session_persistence::FocusSessionPersistence,
-    task_persistence::TaskPersistence,
-};
 
 #[derive(Debug, Error, PartialEq)]
 pub enum CalculateStatsByPeriodError {
@@ -144,5 +141,143 @@ impl CalculateStatsByPeriodUseCase {
             category_distribution,
             daily_activity,
         ))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::persistence_traits::category_persistence::MockCategoryPersistence;
+    use crate::persistence_traits::focus_session_persistence::MockFocusSessionPersistence;
+    use crate::persistence_traits::task_persistence::MockTaskPersistence;
+
+    #[tokio::test]
+    async fn test_calculate_stats_success() {
+        let mut mock_focus_session_persistence = MockFocusSessionPersistence::new();
+        let mut mock_task_persistence = MockTaskPersistence::new();
+        let mut mock_category_persistence = MockCategoryPersistence::new();
+
+        mock_focus_session_persistence
+            .expect_find_by_filters()
+            .returning(|_| Ok(vec![]));
+
+        // We don't expect calls to task or category persistence if there are no sessions
+
+        let use_case = CalculateStatsByPeriodUseCase::new(
+            Arc::new(mock_category_persistence),
+            Arc::new(mock_task_persistence),
+            Arc::new(mock_focus_session_persistence),
+        );
+
+        let period = StatsPeriod {
+            user_id: Uuid::new_v4(),
+            start_date: Utc::now().timestamp(),
+            end_date: Some(Utc::now().timestamp()),
+        };
+
+        let result = use_case.execute(period).await;
+
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_calculate_stats_with_pauses() {
+        let mut mock_focus_session_persistence = MockFocusSessionPersistence::new();
+        let mut mock_task_persistence = MockTaskPersistence::new();
+        let mut mock_category_persistence = MockCategoryPersistence::new();
+
+        let user_id = Uuid::new_v4();
+        let now = Utc::now();
+
+        // Work session: 60 minutes
+        let work_session = domain::entities::focus_session::FocusSession::new(
+            user_id,
+            None,
+            None,
+            domain::entities::focus_session_type::FocusSessionType::Work,
+            Some(5),
+            Some("Work".to_string()),
+            now,
+            Some(now + chrono::Duration::minutes(60)),
+        )
+        .unwrap();
+
+        let break_category_id = Uuid::new_v4();
+
+        // Mock category persistence to return names
+        mock_category_persistence
+            .expect_find_by_id()
+            .with(mockall::predicate::always())
+            .returning(move |id| {
+                if id == break_category_id {
+                    Ok(domain::entities::category::Category::reconstitute(
+                        break_category_id,
+                        Uuid::new_v4(),
+                        "Break Category".to_string(),
+                        None,
+                        "#FF0000".to_string(),
+                    )
+                    .unwrap())
+                } else {
+                    Ok(domain::entities::category::Category::reconstitute(
+                        id,
+                        Uuid::new_v4(),
+                        "Work Category".to_string(),
+                        None,
+                        "#0000FF".to_string(),
+                    )
+                    .unwrap())
+                }
+            });
+
+        // Short break: 10 minutes with category
+        let short_break = domain::entities::focus_session::FocusSession::new(
+            user_id,
+            Some(break_category_id),
+            None,
+            domain::entities::focus_session_type::FocusSessionType::ShortBreak,
+            None,
+            Some("Break".to_string()),
+            now + chrono::Duration::minutes(60),
+            Some(now + chrono::Duration::minutes(70)),
+        )
+        .unwrap();
+
+        mock_focus_session_persistence
+            .expect_find_by_filters()
+            .returning(move |_| Ok(vec![work_session.clone(), short_break.clone()]));
+
+        mock_task_persistence.expect_find_by_id().never();
+
+        let use_case = CalculateStatsByPeriodUseCase::new(
+            Arc::new(mock_category_persistence),
+            Arc::new(mock_task_persistence),
+            Arc::new(mock_focus_session_persistence),
+        );
+
+        let period = StatsPeriod {
+            user_id,
+            start_date: now.timestamp(),
+            end_date: Some((now + chrono::Duration::hours(2)).timestamp()),
+        };
+
+        let result = use_case.execute(period).await;
+
+        assert!(result.is_ok());
+        let stats = result.unwrap();
+
+        assert_eq!(stats.total_sessions(), 1); // Only work sessions count
+        assert_eq!(stats.total_breaks(), 1);
+        assert_eq!(stats.total_focus_time(), 3600); // 60 mins
+        assert_eq!(stats.total_break_time(), 600); // 10 mins
+
+        // Ratio: 3600 / (3600 + 600) = 3600 / 4200 = 0.8571... -> 85.71%
+        assert!((stats.focus_pause_ratio() - 85.71).abs() < 0.01);
+
+        // Verify break category is NOT in category distribution
+        let category_dist = stats.category_distribution();
+        assert!(category_dist
+            .iter()
+            .all(|c| c.category_id() != break_category_id));
     }
 }

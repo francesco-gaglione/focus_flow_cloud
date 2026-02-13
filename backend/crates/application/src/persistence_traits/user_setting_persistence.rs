@@ -1,6 +1,6 @@
-use crate::entities::user_setting::UserSetting;
-use crate::error::persistence_error::PersistenceResult;
+use crate::persistence_traits::persistence_error::PersistenceResult;
 use async_trait::async_trait;
+use domain::entities::user_setting::UserSetting;
 use uuid::Uuid;
 
 #[cfg_attr(test, mockall::automock)]
@@ -25,7 +25,7 @@ pub trait UserSettingPersistence: Send + Sync {
 
 #[cfg(test)]
 mod tests {
-    use crate::error::persistence_error::PersistenceError;
+    use crate::persistence_traits::persistence_error::PersistenceError;
 
     use super::*;
 

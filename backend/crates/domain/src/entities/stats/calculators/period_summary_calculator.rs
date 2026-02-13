@@ -7,6 +7,7 @@ pub struct PeriodSummary {
     pub total_breaks: usize,
     pub total_focus_time: i64,
     pub total_break_time: i64,
+    pub focus_pause_ratio: f32,
 }
 
 pub struct PeriodSummaryCalculator;
@@ -30,11 +31,18 @@ impl PeriodSummaryCalculator {
             .filter_map(|s| s.actual_duration())
             .sum();
 
+        let focus_pause_ratio = if total_focus_time + total_break_time > 0 {
+            (total_focus_time as f32 / (total_focus_time + total_break_time) as f32) * 100.0
+        } else {
+            0.0
+        };
+
         PeriodSummary {
             total_sessions,
             total_breaks,
             total_focus_time,
             total_break_time,
+            focus_pause_ratio,
         }
     }
 }

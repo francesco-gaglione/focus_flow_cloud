@@ -45,6 +45,10 @@ impl DailyActivityCalculator {
         let mut daily_data: HashMap<NaiveDate, HashMap<Uuid, i64>> = HashMap::new();
 
         for session in sessions {
+            if session.session_type() != crate::entities::focus_session_type::FocusSessionType::Work
+            {
+                continue;
+            }
             if let (Some(category_id), Some(duration)) =
                 (session.category_id(), session.actual_duration())
             {

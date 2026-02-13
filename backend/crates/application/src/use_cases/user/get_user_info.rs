@@ -1,6 +1,5 @@
-use domain::{
-    error::persistence_error::PersistenceError, traits::user_persistence::UserPersistence,
-};
+use crate::persistence_traits::persistence_error::PersistenceError;
+use crate::persistence_traits::user_persistence::UserPersistence;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use thiserror::Error;
@@ -41,4 +40,39 @@ impl GetUserInfoUseCase {
     }
 }
 
-//TODO unit tests
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::persistence_traits::user_persistence::MockUserPersistence;
+    use domain::entities::user::User;
+    use domain::entities::user_role::UserRole;
+
+    #[tokio::test]
+    async fn test_get_user_info_success() {
+        let mut mock_persistence = MockUserPersistence::new();
+        let user_id = Uuid::new_v4();
+        let username = "testuser".to_string();
+        let role = UserRole::User;
+
+        let user = User::reconstitute(
+            user_id,
+            username.clone(),
+            "hashed_password".to_string(),
+            role.clone(),
+        );
+
+        mock_persistence
+            .expect_find_user_by_id()
+            .with(mockall::predicate::eq(user_id))
+            .returning(move |_| Ok(user.clone()));
+
+        let use_case = GetUserInfoUseCase::new(Arc::new(mock_persistence));
+        let result = use_case.execute(user_id).await;
+
+        assert!(result.is_ok());
+        let info = result.unwrap();
+        assert_eq!(info.id, user_id);
+        assert_eq!(info.username, username);
+        assert_eq!(info.role, format!("{:?}", role));
+    }
+}

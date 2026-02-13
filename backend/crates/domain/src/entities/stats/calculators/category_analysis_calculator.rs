@@ -17,6 +17,10 @@ impl CategoryAnalysisCalculator {
         let mut total_time: i64 = 0;
 
         for session in sessions {
+            if session.session_type() != crate::entities::focus_session_type::FocusSessionType::Work
+            {
+                continue;
+            }
             if let (Some(category_id), Some(duration)) =
                 (session.category_id(), session.actual_duration())
             {

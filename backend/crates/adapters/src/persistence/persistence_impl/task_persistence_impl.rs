@@ -1,11 +1,11 @@
 use crate::persistence::db_models::db_task::{DbTask, NewDbTask, UpdateDbTask};
 use crate::persistence::schema;
 use crate::persistence::PostgresPersistence;
+use application::persistence_traits::persistence_error::{PersistenceError, PersistenceResult};
+use application::persistence_traits::task_persistence::TaskPersistence;
 use async_trait::async_trait;
 use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, SelectableHelper};
 use domain::entities::task::Task;
-use domain::error::persistence_error::{PersistenceError, PersistenceResult};
-use domain::traits::task_persistence::TaskPersistence;
 use tracing::info;
 use uuid::Uuid;
 

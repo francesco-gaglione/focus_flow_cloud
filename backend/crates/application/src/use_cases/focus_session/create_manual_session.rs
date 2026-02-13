@@ -1,7 +1,7 @@
+use crate::persistence_traits::focus_session_persistence::FocusSessionPersistence;
+use crate::persistence_traits::persistence_error::PersistenceError;
 use crate::use_cases::focus_session::command::create_manual_session::CreateManualFocusSessionCommand;
 use domain::entities::focus_session::{FocusSession, FocusSessionError};
-use domain::error::persistence_error::PersistenceError;
-use domain::traits::focus_session_persistence::FocusSessionPersistence;
 use std::sync::Arc;
 use thiserror::Error;
 
@@ -116,7 +116,7 @@ mod tests {
             .expect_create_manual_session()
             .returning(|_| {
                 Err(
-                    domain::error::persistence_error::PersistenceError::Unexpected(
+                    crate::persistence_traits::persistence_error::PersistenceError::Unexpected(
                         "Invalid session data".to_string(),
                     ),
                 )

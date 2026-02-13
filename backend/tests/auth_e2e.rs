@@ -11,7 +11,7 @@ async fn test_auth_flow() {
 
     // 1. Create a new user (using Admin account from ctx)
     let new_username = "testuser";
-    let new_password = "testpassword123";
+    let new_password = "TestPassword123";
 
     let create_user_dto = CreateUserDto {
         username: new_username.to_string(),
@@ -80,7 +80,7 @@ async fn test_refresh_token_flow() {
 
     // 1. Create a new user
     let new_username = "refreshuser";
-    let new_password = "testpassword123";
+    let new_password = "TestPassword123";
 
     let create_user_dto = CreateUserDto {
         username: new_username.to_string(),
