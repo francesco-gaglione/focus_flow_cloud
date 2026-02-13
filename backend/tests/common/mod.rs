@@ -142,7 +142,7 @@ pub async fn setup() -> TestContext {
         database_url: db_url,
         jwt_secret: "test_secret".to_string(),
         admin_username: Some("admin".to_string()),
-        admin_password: Some("admin".to_string()),
+        admin_password: Some("AdminPassword123".to_string()),
     };
 
     // Initialize App State (this runs migrations)
@@ -167,7 +167,7 @@ pub async fn setup() -> TestContext {
     // Login as admin
     let login_body = serde_json::json!({
         "username": "admin",
-        "password": "admin"
+        "password": "AdminPassword123"
     });
 
     let response = client

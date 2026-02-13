@@ -425,14 +425,14 @@ async fn test_user_isolation() {
     // 2. Create User B
     let create_user_dto = CreateUserDto {
         username: "user_b".to_string(),
-        password: "password".to_string(),
+        password: "Password123!".to_string(),
     };
     context.create_user(&create_user_dto).await;
 
     // 3. Login as User B
     let login_body = serde_json::json!({
         "username": "user_b",
-        "password": "password"
+        "password": "Password123!"
     });
 
     let client = reqwest::Client::new();
