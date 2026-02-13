@@ -1,7 +1,7 @@
-use crate::entities::focus_session::FocusSession;
-use crate::entities::focus_session::SessionFilter;
-use crate::error::persistence_error::PersistenceResult;
+use crate::persistence_traits::persistence_error::PersistenceResult;
 use async_trait::async_trait;
+use domain::entities::focus_session::FocusSession;
+use domain::entities::focus_session::SessionFilter;
 use uuid::Uuid;
 
 #[cfg_attr(test, mockall::automock)]

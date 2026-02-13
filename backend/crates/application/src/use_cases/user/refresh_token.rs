@@ -1,6 +1,6 @@
-use domain::error::persistence_error::PersistenceError;
+use crate::persistence_traits::persistence_error::PersistenceError;
+use crate::persistence_traits::user_persistence::UserPersistence;
 use domain::services::token_service::{TokenService, TokenServiceError};
-use domain::traits::user_persistence::UserPersistence;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use thiserror::Error;
@@ -81,4 +81,56 @@ impl RefreshTokenUseCase {
     }
 }
 
-//TODO unit tests
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::persistence_traits::user_persistence::MockUserPersistence;
+    use domain::entities::user::User;
+    use domain::entities::user_role::UserRole;
+    use domain::services::token_service::MockTokenService;
+
+    #[tokio::test]
+    async fn test_refresh_token_success() {
+        let mut mock_persistence = MockUserPersistence::new();
+        let mut mock_token_service = MockTokenService::new();
+        let user_id = uuid::Uuid::new_v4();
+        let user = User::reconstitute(
+            user_id,
+            "username".to_string(),
+            "hashed_password".to_string(),
+            UserRole::User,
+        );
+        let user_clone = user.clone();
+
+        mock_token_service
+            .expect_verify_refresh_token()
+            .returning(move |_| Ok(user_id.to_string()));
+
+        mock_persistence
+            .expect_find_user_by_id()
+            .with(mockall::predicate::eq(user_id))
+            .returning(move |_| Ok(user_clone.clone()));
+
+        mock_token_service
+            .expect_generate_token()
+            .returning(|_| Ok("new_token".to_string()));
+
+        mock_token_service
+            .expect_generate_refresh_token()
+            .returning(|_| Ok("new_refresh_token".to_string()));
+
+        let use_case =
+            RefreshTokenUseCase::new(Arc::new(mock_persistence), Arc::new(mock_token_service));
+
+        let command = RefreshTokenCommand {
+            refresh_token: "old_refresh_token".to_string(),
+        };
+
+        let result = use_case.execute(command).await;
+
+        assert!(result.is_ok());
+        let output = result.unwrap();
+        assert_eq!(output.token, "new_token");
+        assert_eq!(output.refresh_token, "new_refresh_token");
+    }
+}

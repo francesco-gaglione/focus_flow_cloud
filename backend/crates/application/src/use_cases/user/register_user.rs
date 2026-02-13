@@ -1,14 +1,10 @@
 use std::sync::Arc;
 
-use domain::{
-    entities::{user::User, user_role::UserRole},
-    error::persistence_error::PersistenceError,
-    traits::{
-        password_hasher::{HashingError, PasswordHasher},
-        password_policy::{PasswordPolicy, PasswordPolicyError},
-        user_persistence::UserPersistence,
-    },
-};
+use crate::auth_traits::password_hasher::{HashingError, PasswordHasher};
+use crate::persistence_traits::persistence_error::PersistenceError;
+use crate::persistence_traits::user_persistence::UserPersistence;
+use domain::entities::{user::User, user_role::UserRole};
+use domain::traits::password_policy::{PasswordPolicy, PasswordPolicyError};
 use thiserror::Error;
 use uuid::Uuid;
 
@@ -91,8 +87,8 @@ impl RegisterUserUseCase {
 mod tests {
     use std::sync::Arc;
 
+    use crate::persistence_traits::persistence_error::PersistenceError;
     use domain::entities::{user::User, user_role::UserRole};
-    use domain::error::persistence_error::PersistenceError;
     use domain::traits::password_policy::PasswordPolicyError;
     use uuid::Uuid;
 

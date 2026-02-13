@@ -9,7 +9,7 @@ use thiserror::Error;
 use crate::mappers::focus_session_mapper::FocusSessionMapperError;
 use crate::mappers::task_mapper::TaskMapperError;
 
-use domain::error::persistence_error::PersistenceError;
+use application::persistence_traits::persistence_error::PersistenceError;
 
 use application::use_cases::{
     category::{

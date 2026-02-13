@@ -1,10 +1,7 @@
-use domain::error::persistence_error::PersistenceError;
-use domain::traits::password_hasher::HashingError;
-use domain::traits::password_policy::PasswordPolicyError;
-use domain::traits::{
-    password_hasher::PasswordHasher, password_policy::PasswordPolicy,
-    user_persistence::UserPersistence,
-};
+use crate::auth_traits::password_hasher::{HashingError, PasswordHasher};
+use crate::persistence_traits::persistence_error::PersistenceError;
+use crate::persistence_traits::user_persistence::UserPersistence;
+use domain::traits::password_policy::{PasswordPolicy, PasswordPolicyError};
 use std::sync::Arc;
 use thiserror::Error;
 use uuid::Uuid;
@@ -94,20 +91,18 @@ impl UpdateUserPasswordUseCase {
 mod tests {
     use std::sync::Arc;
 
-    use domain::{
-        entities::{user::User, user_role::UserRole},
-        error::persistence_error::PersistenceError,
-        traits::password_policy::PasswordPolicyError,
-    };
+    use domain::entities::{user::User, user_role::UserRole};
     use mockall::predicate::eq;
     use uuid::Uuid;
 
+    use crate::persistence_traits::persistence_error::PersistenceError;
     use crate::{
         mocks::{MockPasswordHasher, MockPasswordPolicy, MockUserPersistence},
         use_cases::user::update_password::{
             UpdatePasswordError, UpdateUserPasswordCommand, UpdateUserPasswordUseCase,
         },
     };
+    use domain::traits::password_policy::PasswordPolicyError;
 
     #[tokio::test]
     async fn test_update_user_password_success() {

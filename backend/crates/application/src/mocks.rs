@@ -1,4 +1,18 @@
 #[cfg(test)]
+use crate::auth_traits::password_hasher::{HashingResult, PasswordHasher};
+#[cfg(test)]
+use crate::persistence_traits::category_persistence::CategoryPersistence;
+#[cfg(test)]
+use crate::persistence_traits::focus_session_persistence::FocusSessionPersistence;
+#[cfg(test)]
+use crate::persistence_traits::persistence_error::PersistenceResult;
+#[cfg(test)]
+use crate::persistence_traits::task_persistence::TaskPersistence;
+#[cfg(test)]
+use crate::persistence_traits::user_persistence::UserPersistence;
+#[cfg(test)]
+use crate::persistence_traits::user_setting_persistence::UserSettingPersistence;
+#[cfg(test)]
 use domain::entities::{
     category::Category,
     focus_session::{FocusSession, SessionFilter},
@@ -7,17 +21,7 @@ use domain::entities::{
     user_setting::UserSetting,
 };
 #[cfg(test)]
-use domain::error::persistence_error::PersistenceResult;
-#[cfg(test)]
-use domain::traits::password_hasher::{HashingResult, PasswordHasher};
-#[cfg(test)]
 use domain::traits::password_policy::{PasswordPolicy, PasswordPolicyResult};
-#[cfg(test)]
-use domain::traits::{
-    category_persistence::CategoryPersistence, focus_session_persistence::FocusSessionPersistence,
-    task_persistence::TaskPersistence, user_persistence::UserPersistence,
-    user_setting_persistence::UserSettingPersistence,
-};
 #[cfg(test)]
 use mockall::mock;
 #[cfg(test)]

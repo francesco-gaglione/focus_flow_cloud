@@ -3,11 +3,11 @@ use std::sync::Arc;
 use thiserror::Error;
 use uuid::Uuid;
 
+use crate::persistence_traits::category_persistence::CategoryPersistence;
+use crate::persistence_traits::persistence_error::PersistenceError;
 use domain::{
     entities::category::{Category, CategoryError},
-    error::persistence_error::PersistenceError,
     helpers::random_hex_color,
-    traits::category_persistence::CategoryPersistence,
 };
 
 #[derive(Debug, Error)]

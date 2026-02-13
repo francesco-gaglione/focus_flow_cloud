@@ -1,12 +1,8 @@
 use std::sync::Arc;
 
-use domain::{
-    error::persistence_error::PersistenceError,
-    traits::{
-        password_hasher::{HashingError, PasswordHasher},
-        user_persistence::UserPersistence,
-    },
-};
+use crate::auth_traits::password_hasher::{HashingError, PasswordHasher};
+use crate::persistence_traits::persistence_error::PersistenceError;
+use crate::persistence_traits::user_persistence::UserPersistence;
 use thiserror::Error;
 use tracing::info;
 

@@ -1,8 +1,8 @@
+use crate::persistence_traits::focus_session_persistence::FocusSessionPersistence;
+use crate::persistence_traits::persistence_error::PersistenceError;
 use chrono::DateTime;
 use domain::entities::focus_session::{FocusSession, SessionFilter};
 use domain::entities::focus_session_type::FocusSessionType;
-use domain::error::persistence_error::PersistenceError;
-use domain::traits::focus_session_persistence::FocusSessionPersistence;
 use std::sync::Arc;
 use thiserror::Error;
 use uuid::Uuid;

@@ -1,7 +1,7 @@
+use crate::persistence_traits::persistence_error::PersistenceResult;
 use async_trait::async_trait;
+use domain::entities::category::Category;
 use uuid::Uuid;
-
-use crate::{entities::category::Category, error::persistence_error::PersistenceResult};
 
 #[cfg_attr(test, mockall::automock)]
 #[async_trait]

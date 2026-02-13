@@ -3,11 +3,11 @@ use crate::persistence::db_models::db_focus_session::{
 };
 use crate::persistence::schema;
 use crate::persistence::PostgresPersistence;
+use application::persistence_traits::focus_session_persistence::FocusSessionPersistence;
+use application::persistence_traits::persistence_error::{PersistenceError, PersistenceResult};
 use async_trait::async_trait;
 use diesel::{BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper};
 use domain::entities::focus_session::{FocusSession, SessionFilter};
-use domain::error::persistence_error::{PersistenceError, PersistenceResult};
-use domain::traits::focus_session_persistence::FocusSessionPersistence;
 use tracing::{error, info};
 use uuid::Uuid;
 
