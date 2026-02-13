@@ -9,7 +9,7 @@ part 'category_dtos.g.dart';
 // Request DTOs
 
 @freezed
-class CreateCategoryDto with _$CreateCategoryDto {
+abstract class CreateCategoryDto with _$CreateCategoryDto {
   const factory CreateCategoryDto({
     required String name,
     String? color,
@@ -21,7 +21,7 @@ class CreateCategoryDto with _$CreateCategoryDto {
 }
 
 @freezed
-class UpdateCategoryDto with _$UpdateCategoryDto {
+abstract class UpdateCategoryDto with _$UpdateCategoryDto {
   const factory UpdateCategoryDto({
     String? name,
     String? color,
@@ -35,7 +35,7 @@ class UpdateCategoryDto with _$UpdateCategoryDto {
 // Response DTOs
 
 @freezed
-class TaskDto with _$TaskDto {
+abstract class TaskDto with _$TaskDto {
   const factory TaskDto({
     required String id,
     required String name,
@@ -61,7 +61,7 @@ class TaskDto with _$TaskDto {
 }
 
 @freezed
-class CategoryDto with _$CategoryDto {
+abstract class CategoryDto with _$CategoryDto {
   const factory CategoryDto({
     required String id,
     required String name,
@@ -85,7 +85,7 @@ class CategoryDto with _$CategoryDto {
 }
 
 @freezed
-class GetCategoriesResponseDto with _$GetCategoriesResponseDto {
+abstract class GetCategoriesResponseDto with _$GetCategoriesResponseDto {
   const factory GetCategoriesResponseDto({
     required List<CategoryDto> categories,
   }) = _GetCategoriesResponseDto;
@@ -95,7 +95,7 @@ class GetCategoriesResponseDto with _$GetCategoriesResponseDto {
 }
 
 @freezed
-class CreateCategoryResponseDto with _$CreateCategoryResponseDto {
+abstract class CreateCategoryResponseDto with _$CreateCategoryResponseDto {
   const factory CreateCategoryResponseDto({required bool created}) =
       _CreateCategoryResponseDto;
 
@@ -104,7 +104,7 @@ class CreateCategoryResponseDto with _$CreateCategoryResponseDto {
 }
 
 @freezed
-class UpdateCategoryResponseDto with _$UpdateCategoryResponseDto {
+abstract class UpdateCategoryResponseDto with _$UpdateCategoryResponseDto {
   const factory UpdateCategoryResponseDto({
     required CategoryDto updatedCategory,
   }) = _UpdateCategoryResponseDto;
@@ -114,7 +114,7 @@ class UpdateCategoryResponseDto with _$UpdateCategoryResponseDto {
 }
 
 @freezed
-class DeleteCategoriesResponseDto with _$DeleteCategoriesResponseDto {
+abstract class DeleteCategoriesResponseDto with _$DeleteCategoriesResponseDto {
   const factory DeleteCategoriesResponseDto({
     @JsonKey(name: 'deleted_ids') required List<String> deletedIds,
   }) = _DeleteCategoriesResponseDto;

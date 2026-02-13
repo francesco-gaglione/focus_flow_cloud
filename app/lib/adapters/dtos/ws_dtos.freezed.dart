@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,3773 +9,3286 @@ part of 'ws_dtos.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
-);
-
-UpdateConcentrationScore _$UpdateConcentrationScoreFromJson(
-  Map<String, dynamic> json,
-) {
-  return _UpdateConcentrationScore.fromJson(json);
-}
 
 /// @nodoc
 mixin _$UpdateConcentrationScore {
-  int get concentrationScore => throw _privateConstructorUsedError;
+
+ int get concentrationScore;
+/// Create a copy of UpdateConcentrationScore
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$UpdateConcentrationScoreCopyWith<UpdateConcentrationScore> get copyWith => _$UpdateConcentrationScoreCopyWithImpl<UpdateConcentrationScore>(this as UpdateConcentrationScore, _$identity);
 
   /// Serializes this UpdateConcentrationScore to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  Map<String, dynamic> toJson();
 
-  /// Create a copy of UpdateConcentrationScore
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $UpdateConcentrationScoreCopyWith<UpdateConcentrationScore> get copyWith =>
-      throw _privateConstructorUsedError;
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UpdateConcentrationScore&&(identical(other.concentrationScore, concentrationScore) || other.concentrationScore == concentrationScore));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,concentrationScore);
+
+@override
+String toString() {
+  return 'UpdateConcentrationScore(concentrationScore: $concentrationScore)';
+}
+
+
 }
 
 /// @nodoc
-abstract class $UpdateConcentrationScoreCopyWith<$Res> {
-  factory $UpdateConcentrationScoreCopyWith(
-    UpdateConcentrationScore value,
-    $Res Function(UpdateConcentrationScore) then,
-  ) = _$UpdateConcentrationScoreCopyWithImpl<$Res, UpdateConcentrationScore>;
-  @useResult
-  $Res call({int concentrationScore});
-}
+abstract mixin class $UpdateConcentrationScoreCopyWith<$Res>  {
+  factory $UpdateConcentrationScoreCopyWith(UpdateConcentrationScore value, $Res Function(UpdateConcentrationScore) _then) = _$UpdateConcentrationScoreCopyWithImpl;
+@useResult
+$Res call({
+ int concentrationScore
+});
 
+
+
+
+}
 /// @nodoc
-class _$UpdateConcentrationScoreCopyWithImpl<
-  $Res,
-  $Val extends UpdateConcentrationScore
->
+class _$UpdateConcentrationScoreCopyWithImpl<$Res>
     implements $UpdateConcentrationScoreCopyWith<$Res> {
-  _$UpdateConcentrationScoreCopyWithImpl(this._value, this._then);
+  _$UpdateConcentrationScoreCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final UpdateConcentrationScore _self;
+  final $Res Function(UpdateConcentrationScore) _then;
 
-  /// Create a copy of UpdateConcentrationScore
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({Object? concentrationScore = null}) {
-    return _then(
-      _value.copyWith(
-            concentrationScore:
-                null == concentrationScore
-                    ? _value.concentrationScore
-                    : concentrationScore // ignore: cast_nullable_to_non_nullable
-                        as int,
-          )
-          as $Val,
-    );
-  }
+/// Create a copy of UpdateConcentrationScore
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? concentrationScore = null,}) {
+  return _then(_self.copyWith(
+concentrationScore: null == concentrationScore ? _self.concentrationScore : concentrationScore // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
 }
 
-/// @nodoc
-abstract class _$$UpdateConcentrationScoreImplCopyWith<$Res>
-    implements $UpdateConcentrationScoreCopyWith<$Res> {
-  factory _$$UpdateConcentrationScoreImplCopyWith(
-    _$UpdateConcentrationScoreImpl value,
-    $Res Function(_$UpdateConcentrationScoreImpl) then,
-  ) = __$$UpdateConcentrationScoreImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({int concentrationScore});
 }
 
-/// @nodoc
-class __$$UpdateConcentrationScoreImplCopyWithImpl<$Res>
-    extends
-        _$UpdateConcentrationScoreCopyWithImpl<
-          $Res,
-          _$UpdateConcentrationScoreImpl
-        >
-    implements _$$UpdateConcentrationScoreImplCopyWith<$Res> {
-  __$$UpdateConcentrationScoreImplCopyWithImpl(
-    _$UpdateConcentrationScoreImpl _value,
-    $Res Function(_$UpdateConcentrationScoreImpl) _then,
-  ) : super(_value, _then);
 
-  /// Create a copy of UpdateConcentrationScore
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({Object? concentrationScore = null}) {
-    return _then(
-      _$UpdateConcentrationScoreImpl(
-        concentrationScore:
-            null == concentrationScore
-                ? _value.concentrationScore
-                : concentrationScore // ignore: cast_nullable_to_non_nullable
-                    as int,
-      ),
-    );
-  }
+/// Adds pattern-matching-related methods to [UpdateConcentrationScore].
+extension UpdateConcentrationScorePatterns on UpdateConcentrationScore {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _UpdateConcentrationScore value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _UpdateConcentrationScore() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _UpdateConcentrationScore value)  $default,){
+final _that = this;
+switch (_that) {
+case _UpdateConcentrationScore():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _UpdateConcentrationScore value)?  $default,){
+final _that = this;
+switch (_that) {
+case _UpdateConcentrationScore() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int concentrationScore)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _UpdateConcentrationScore() when $default != null:
+return $default(_that.concentrationScore);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int concentrationScore)  $default,) {final _that = this;
+switch (_that) {
+case _UpdateConcentrationScore():
+return $default(_that.concentrationScore);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int concentrationScore)?  $default,) {final _that = this;
+switch (_that) {
+case _UpdateConcentrationScore() when $default != null:
+return $default(_that.concentrationScore);case _:
+  return null;
+
+}
+}
+
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$UpdateConcentrationScoreImpl implements _UpdateConcentrationScore {
-  const _$UpdateConcentrationScoreImpl({required this.concentrationScore});
 
-  factory _$UpdateConcentrationScoreImpl.fromJson(Map<String, dynamic> json) =>
-      _$$UpdateConcentrationScoreImplFromJson(json);
+class _UpdateConcentrationScore implements UpdateConcentrationScore {
+  const _UpdateConcentrationScore({required this.concentrationScore});
+  factory _UpdateConcentrationScore.fromJson(Map<String, dynamic> json) => _$UpdateConcentrationScoreFromJson(json);
 
-  @override
-  final int concentrationScore;
+@override final  int concentrationScore;
 
-  @override
-  String toString() {
-    return 'UpdateConcentrationScore(concentrationScore: $concentrationScore)';
-  }
+/// Create a copy of UpdateConcentrationScore
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$UpdateConcentrationScoreCopyWith<_UpdateConcentrationScore> get copyWith => __$UpdateConcentrationScoreCopyWithImpl<_UpdateConcentrationScore>(this, _$identity);
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$UpdateConcentrationScoreImpl &&
-            (identical(other.concentrationScore, concentrationScore) ||
-                other.concentrationScore == concentrationScore));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, concentrationScore);
-
-  /// Create a copy of UpdateConcentrationScore
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$UpdateConcentrationScoreImplCopyWith<_$UpdateConcentrationScoreImpl>
-  get copyWith => __$$UpdateConcentrationScoreImplCopyWithImpl<
-    _$UpdateConcentrationScoreImpl
-  >(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$UpdateConcentrationScoreImplToJson(this);
-  }
+@override
+Map<String, dynamic> toJson() {
+  return _$UpdateConcentrationScoreToJson(this, );
 }
 
-abstract class _UpdateConcentrationScore implements UpdateConcentrationScore {
-  const factory _UpdateConcentrationScore({
-    required final int concentrationScore,
-  }) = _$UpdateConcentrationScoreImpl;
-
-  factory _UpdateConcentrationScore.fromJson(Map<String, dynamic> json) =
-      _$UpdateConcentrationScoreImpl.fromJson;
-
-  @override
-  int get concentrationScore;
-
-  /// Create a copy of UpdateConcentrationScore
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$UpdateConcentrationScoreImplCopyWith<_$UpdateConcentrationScoreImpl>
-  get copyWith => throw _privateConstructorUsedError;
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UpdateConcentrationScore&&(identical(other.concentrationScore, concentrationScore) || other.concentrationScore == concentrationScore));
 }
 
-NoteUpdate _$NoteUpdateFromJson(Map<String, dynamic> json) {
-  return _NoteUpdate.fromJson(json);
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,concentrationScore);
+
+@override
+String toString() {
+  return 'UpdateConcentrationScore(concentrationScore: $concentrationScore)';
 }
+
+
+}
+
+/// @nodoc
+abstract mixin class _$UpdateConcentrationScoreCopyWith<$Res> implements $UpdateConcentrationScoreCopyWith<$Res> {
+  factory _$UpdateConcentrationScoreCopyWith(_UpdateConcentrationScore value, $Res Function(_UpdateConcentrationScore) _then) = __$UpdateConcentrationScoreCopyWithImpl;
+@override @useResult
+$Res call({
+ int concentrationScore
+});
+
+
+
+
+}
+/// @nodoc
+class __$UpdateConcentrationScoreCopyWithImpl<$Res>
+    implements _$UpdateConcentrationScoreCopyWith<$Res> {
+  __$UpdateConcentrationScoreCopyWithImpl(this._self, this._then);
+
+  final _UpdateConcentrationScore _self;
+  final $Res Function(_UpdateConcentrationScore) _then;
+
+/// Create a copy of UpdateConcentrationScore
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? concentrationScore = null,}) {
+  return _then(_UpdateConcentrationScore(
+concentrationScore: null == concentrationScore ? _self.concentrationScore : concentrationScore // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
+}
+
+
+}
+
 
 /// @nodoc
 mixin _$NoteUpdate {
-  String get newNote => throw _privateConstructorUsedError;
+
+ String get newNote;
+/// Create a copy of NoteUpdate
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$NoteUpdateCopyWith<NoteUpdate> get copyWith => _$NoteUpdateCopyWithImpl<NoteUpdate>(this as NoteUpdate, _$identity);
 
   /// Serializes this NoteUpdate to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  Map<String, dynamic> toJson();
 
-  /// Create a copy of NoteUpdate
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $NoteUpdateCopyWith<NoteUpdate> get copyWith =>
-      throw _privateConstructorUsedError;
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is NoteUpdate&&(identical(other.newNote, newNote) || other.newNote == newNote));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,newNote);
+
+@override
+String toString() {
+  return 'NoteUpdate(newNote: $newNote)';
+}
+
+
 }
 
 /// @nodoc
-abstract class $NoteUpdateCopyWith<$Res> {
-  factory $NoteUpdateCopyWith(
-    NoteUpdate value,
-    $Res Function(NoteUpdate) then,
-  ) = _$NoteUpdateCopyWithImpl<$Res, NoteUpdate>;
-  @useResult
-  $Res call({String newNote});
-}
+abstract mixin class $NoteUpdateCopyWith<$Res>  {
+  factory $NoteUpdateCopyWith(NoteUpdate value, $Res Function(NoteUpdate) _then) = _$NoteUpdateCopyWithImpl;
+@useResult
+$Res call({
+ String newNote
+});
 
+
+
+
+}
 /// @nodoc
-class _$NoteUpdateCopyWithImpl<$Res, $Val extends NoteUpdate>
+class _$NoteUpdateCopyWithImpl<$Res>
     implements $NoteUpdateCopyWith<$Res> {
-  _$NoteUpdateCopyWithImpl(this._value, this._then);
+  _$NoteUpdateCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final NoteUpdate _self;
+  final $Res Function(NoteUpdate) _then;
 
-  /// Create a copy of NoteUpdate
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({Object? newNote = null}) {
-    return _then(
-      _value.copyWith(
-            newNote:
-                null == newNote
-                    ? _value.newNote
-                    : newNote // ignore: cast_nullable_to_non_nullable
-                        as String,
-          )
-          as $Val,
-    );
-  }
+/// Create a copy of NoteUpdate
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? newNote = null,}) {
+  return _then(_self.copyWith(
+newNote: null == newNote ? _self.newNote : newNote // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
 }
 
-/// @nodoc
-abstract class _$$NoteUpdateImplCopyWith<$Res>
-    implements $NoteUpdateCopyWith<$Res> {
-  factory _$$NoteUpdateImplCopyWith(
-    _$NoteUpdateImpl value,
-    $Res Function(_$NoteUpdateImpl) then,
-  ) = __$$NoteUpdateImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({String newNote});
 }
 
-/// @nodoc
-class __$$NoteUpdateImplCopyWithImpl<$Res>
-    extends _$NoteUpdateCopyWithImpl<$Res, _$NoteUpdateImpl>
-    implements _$$NoteUpdateImplCopyWith<$Res> {
-  __$$NoteUpdateImplCopyWithImpl(
-    _$NoteUpdateImpl _value,
-    $Res Function(_$NoteUpdateImpl) _then,
-  ) : super(_value, _then);
 
-  /// Create a copy of NoteUpdate
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({Object? newNote = null}) {
-    return _then(
-      _$NoteUpdateImpl(
-        newNote:
-            null == newNote
-                ? _value.newNote
-                : newNote // ignore: cast_nullable_to_non_nullable
-                    as String,
-      ),
-    );
-  }
+/// Adds pattern-matching-related methods to [NoteUpdate].
+extension NoteUpdatePatterns on NoteUpdate {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _NoteUpdate value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _NoteUpdate() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _NoteUpdate value)  $default,){
+final _that = this;
+switch (_that) {
+case _NoteUpdate():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _NoteUpdate value)?  $default,){
+final _that = this;
+switch (_that) {
+case _NoteUpdate() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String newNote)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _NoteUpdate() when $default != null:
+return $default(_that.newNote);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String newNote)  $default,) {final _that = this;
+switch (_that) {
+case _NoteUpdate():
+return $default(_that.newNote);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String newNote)?  $default,) {final _that = this;
+switch (_that) {
+case _NoteUpdate() when $default != null:
+return $default(_that.newNote);case _:
+  return null;
+
+}
+}
+
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$NoteUpdateImpl implements _NoteUpdate {
-  const _$NoteUpdateImpl({required this.newNote});
 
-  factory _$NoteUpdateImpl.fromJson(Map<String, dynamic> json) =>
-      _$$NoteUpdateImplFromJson(json);
+class _NoteUpdate implements NoteUpdate {
+  const _NoteUpdate({required this.newNote});
+  factory _NoteUpdate.fromJson(Map<String, dynamic> json) => _$NoteUpdateFromJson(json);
 
-  @override
-  final String newNote;
+@override final  String newNote;
 
-  @override
-  String toString() {
-    return 'NoteUpdate(newNote: $newNote)';
-  }
+/// Create a copy of NoteUpdate
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$NoteUpdateCopyWith<_NoteUpdate> get copyWith => __$NoteUpdateCopyWithImpl<_NoteUpdate>(this, _$identity);
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$NoteUpdateImpl &&
-            (identical(other.newNote, newNote) || other.newNote == newNote));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, newNote);
-
-  /// Create a copy of NoteUpdate
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$NoteUpdateImplCopyWith<_$NoteUpdateImpl> get copyWith =>
-      __$$NoteUpdateImplCopyWithImpl<_$NoteUpdateImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$NoteUpdateImplToJson(this);
-  }
+@override
+Map<String, dynamic> toJson() {
+  return _$NoteUpdateToJson(this, );
 }
 
-abstract class _NoteUpdate implements NoteUpdate {
-  const factory _NoteUpdate({required final String newNote}) = _$NoteUpdateImpl;
-
-  factory _NoteUpdate.fromJson(Map<String, dynamic> json) =
-      _$NoteUpdateImpl.fromJson;
-
-  @override
-  String get newNote;
-
-  /// Create a copy of NoteUpdate
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$NoteUpdateImplCopyWith<_$NoteUpdateImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _NoteUpdate&&(identical(other.newNote, newNote) || other.newNote == newNote));
 }
 
-UpdatePomodoroContext _$UpdatePomodoroContextFromJson(
-  Map<String, dynamic> json,
-) {
-  return _UpdatePomodoroContext.fromJson(json);
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,newNote);
+
+@override
+String toString() {
+  return 'NoteUpdate(newNote: $newNote)';
 }
+
+
+}
+
+/// @nodoc
+abstract mixin class _$NoteUpdateCopyWith<$Res> implements $NoteUpdateCopyWith<$Res> {
+  factory _$NoteUpdateCopyWith(_NoteUpdate value, $Res Function(_NoteUpdate) _then) = __$NoteUpdateCopyWithImpl;
+@override @useResult
+$Res call({
+ String newNote
+});
+
+
+
+
+}
+/// @nodoc
+class __$NoteUpdateCopyWithImpl<$Res>
+    implements _$NoteUpdateCopyWith<$Res> {
+  __$NoteUpdateCopyWithImpl(this._self, this._then);
+
+  final _NoteUpdate _self;
+  final $Res Function(_NoteUpdate) _then;
+
+/// Create a copy of NoteUpdate
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? newNote = null,}) {
+  return _then(_NoteUpdate(
+newNote: null == newNote ? _self.newNote : newNote // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
 
 /// @nodoc
 mixin _$UpdatePomodoroContext {
-  String? get categoryId => throw _privateConstructorUsedError;
-  String? get taskId => throw _privateConstructorUsedError;
+
+ String? get categoryId; String? get taskId;
+/// Create a copy of UpdatePomodoroContext
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$UpdatePomodoroContextCopyWith<UpdatePomodoroContext> get copyWith => _$UpdatePomodoroContextCopyWithImpl<UpdatePomodoroContext>(this as UpdatePomodoroContext, _$identity);
 
   /// Serializes this UpdatePomodoroContext to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  Map<String, dynamic> toJson();
 
-  /// Create a copy of UpdatePomodoroContext
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $UpdatePomodoroContextCopyWith<UpdatePomodoroContext> get copyWith =>
-      throw _privateConstructorUsedError;
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UpdatePomodoroContext&&(identical(other.categoryId, categoryId) || other.categoryId == categoryId)&&(identical(other.taskId, taskId) || other.taskId == taskId));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,categoryId,taskId);
+
+@override
+String toString() {
+  return 'UpdatePomodoroContext(categoryId: $categoryId, taskId: $taskId)';
+}
+
+
 }
 
 /// @nodoc
-abstract class $UpdatePomodoroContextCopyWith<$Res> {
-  factory $UpdatePomodoroContextCopyWith(
-    UpdatePomodoroContext value,
-    $Res Function(UpdatePomodoroContext) then,
-  ) = _$UpdatePomodoroContextCopyWithImpl<$Res, UpdatePomodoroContext>;
-  @useResult
-  $Res call({String? categoryId, String? taskId});
-}
+abstract mixin class $UpdatePomodoroContextCopyWith<$Res>  {
+  factory $UpdatePomodoroContextCopyWith(UpdatePomodoroContext value, $Res Function(UpdatePomodoroContext) _then) = _$UpdatePomodoroContextCopyWithImpl;
+@useResult
+$Res call({
+ String? categoryId, String? taskId
+});
 
+
+
+
+}
 /// @nodoc
-class _$UpdatePomodoroContextCopyWithImpl<
-  $Res,
-  $Val extends UpdatePomodoroContext
->
+class _$UpdatePomodoroContextCopyWithImpl<$Res>
     implements $UpdatePomodoroContextCopyWith<$Res> {
-  _$UpdatePomodoroContextCopyWithImpl(this._value, this._then);
+  _$UpdatePomodoroContextCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final UpdatePomodoroContext _self;
+  final $Res Function(UpdatePomodoroContext) _then;
 
-  /// Create a copy of UpdatePomodoroContext
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({Object? categoryId = freezed, Object? taskId = freezed}) {
-    return _then(
-      _value.copyWith(
-            categoryId:
-                freezed == categoryId
-                    ? _value.categoryId
-                    : categoryId // ignore: cast_nullable_to_non_nullable
-                        as String?,
-            taskId:
-                freezed == taskId
-                    ? _value.taskId
-                    : taskId // ignore: cast_nullable_to_non_nullable
-                        as String?,
-          )
-          as $Val,
-    );
-  }
+/// Create a copy of UpdatePomodoroContext
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? categoryId = freezed,Object? taskId = freezed,}) {
+  return _then(_self.copyWith(
+categoryId: freezed == categoryId ? _self.categoryId : categoryId // ignore: cast_nullable_to_non_nullable
+as String?,taskId: freezed == taskId ? _self.taskId : taskId // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
 }
 
-/// @nodoc
-abstract class _$$UpdatePomodoroContextImplCopyWith<$Res>
-    implements $UpdatePomodoroContextCopyWith<$Res> {
-  factory _$$UpdatePomodoroContextImplCopyWith(
-    _$UpdatePomodoroContextImpl value,
-    $Res Function(_$UpdatePomodoroContextImpl) then,
-  ) = __$$UpdatePomodoroContextImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({String? categoryId, String? taskId});
 }
 
-/// @nodoc
-class __$$UpdatePomodoroContextImplCopyWithImpl<$Res>
-    extends
-        _$UpdatePomodoroContextCopyWithImpl<$Res, _$UpdatePomodoroContextImpl>
-    implements _$$UpdatePomodoroContextImplCopyWith<$Res> {
-  __$$UpdatePomodoroContextImplCopyWithImpl(
-    _$UpdatePomodoroContextImpl _value,
-    $Res Function(_$UpdatePomodoroContextImpl) _then,
-  ) : super(_value, _then);
 
-  /// Create a copy of UpdatePomodoroContext
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({Object? categoryId = freezed, Object? taskId = freezed}) {
-    return _then(
-      _$UpdatePomodoroContextImpl(
-        categoryId:
-            freezed == categoryId
-                ? _value.categoryId
-                : categoryId // ignore: cast_nullable_to_non_nullable
-                    as String?,
-        taskId:
-            freezed == taskId
-                ? _value.taskId
-                : taskId // ignore: cast_nullable_to_non_nullable
-                    as String?,
-      ),
-    );
-  }
+/// Adds pattern-matching-related methods to [UpdatePomodoroContext].
+extension UpdatePomodoroContextPatterns on UpdatePomodoroContext {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _UpdatePomodoroContext value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _UpdatePomodoroContext() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _UpdatePomodoroContext value)  $default,){
+final _that = this;
+switch (_that) {
+case _UpdatePomodoroContext():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _UpdatePomodoroContext value)?  $default,){
+final _that = this;
+switch (_that) {
+case _UpdatePomodoroContext() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? categoryId,  String? taskId)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _UpdatePomodoroContext() when $default != null:
+return $default(_that.categoryId,_that.taskId);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? categoryId,  String? taskId)  $default,) {final _that = this;
+switch (_that) {
+case _UpdatePomodoroContext():
+return $default(_that.categoryId,_that.taskId);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? categoryId,  String? taskId)?  $default,) {final _that = this;
+switch (_that) {
+case _UpdatePomodoroContext() when $default != null:
+return $default(_that.categoryId,_that.taskId);case _:
+  return null;
+
+}
+}
+
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$UpdatePomodoroContextImpl implements _UpdatePomodoroContext {
-  const _$UpdatePomodoroContextImpl({this.categoryId, this.taskId});
 
-  factory _$UpdatePomodoroContextImpl.fromJson(Map<String, dynamic> json) =>
-      _$$UpdatePomodoroContextImplFromJson(json);
+class _UpdatePomodoroContext implements UpdatePomodoroContext {
+  const _UpdatePomodoroContext({this.categoryId, this.taskId});
+  factory _UpdatePomodoroContext.fromJson(Map<String, dynamic> json) => _$UpdatePomodoroContextFromJson(json);
 
-  @override
-  final String? categoryId;
-  @override
-  final String? taskId;
+@override final  String? categoryId;
+@override final  String? taskId;
 
-  @override
-  String toString() {
-    return 'UpdatePomodoroContext(categoryId: $categoryId, taskId: $taskId)';
-  }
+/// Create a copy of UpdatePomodoroContext
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$UpdatePomodoroContextCopyWith<_UpdatePomodoroContext> get copyWith => __$UpdatePomodoroContextCopyWithImpl<_UpdatePomodoroContext>(this, _$identity);
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$UpdatePomodoroContextImpl &&
-            (identical(other.categoryId, categoryId) ||
-                other.categoryId == categoryId) &&
-            (identical(other.taskId, taskId) || other.taskId == taskId));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, categoryId, taskId);
-
-  /// Create a copy of UpdatePomodoroContext
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$UpdatePomodoroContextImplCopyWith<_$UpdatePomodoroContextImpl>
-  get copyWith =>
-      __$$UpdatePomodoroContextImplCopyWithImpl<_$UpdatePomodoroContextImpl>(
-        this,
-        _$identity,
-      );
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$UpdatePomodoroContextImplToJson(this);
-  }
+@override
+Map<String, dynamic> toJson() {
+  return _$UpdatePomodoroContextToJson(this, );
 }
 
-abstract class _UpdatePomodoroContext implements UpdatePomodoroContext {
-  const factory _UpdatePomodoroContext({
-    final String? categoryId,
-    final String? taskId,
-  }) = _$UpdatePomodoroContextImpl;
-
-  factory _UpdatePomodoroContext.fromJson(Map<String, dynamic> json) =
-      _$UpdatePomodoroContextImpl.fromJson;
-
-  @override
-  String? get categoryId;
-  @override
-  String? get taskId;
-
-  /// Create a copy of UpdatePomodoroContext
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$UpdatePomodoroContextImplCopyWith<_$UpdatePomodoroContextImpl>
-  get copyWith => throw _privateConstructorUsedError;
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UpdatePomodoroContext&&(identical(other.categoryId, categoryId) || other.categoryId == categoryId)&&(identical(other.taskId, taskId) || other.taskId == taskId));
 }
 
-UpdateWorkContext _$UpdateWorkContextFromJson(Map<String, dynamic> json) {
-  return _UpdateWorkContext.fromJson(json);
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,categoryId,taskId);
+
+@override
+String toString() {
+  return 'UpdatePomodoroContext(categoryId: $categoryId, taskId: $taskId)';
 }
+
+
+}
+
+/// @nodoc
+abstract mixin class _$UpdatePomodoroContextCopyWith<$Res> implements $UpdatePomodoroContextCopyWith<$Res> {
+  factory _$UpdatePomodoroContextCopyWith(_UpdatePomodoroContext value, $Res Function(_UpdatePomodoroContext) _then) = __$UpdatePomodoroContextCopyWithImpl;
+@override @useResult
+$Res call({
+ String? categoryId, String? taskId
+});
+
+
+
+
+}
+/// @nodoc
+class __$UpdatePomodoroContextCopyWithImpl<$Res>
+    implements _$UpdatePomodoroContextCopyWith<$Res> {
+  __$UpdatePomodoroContextCopyWithImpl(this._self, this._then);
+
+  final _UpdatePomodoroContext _self;
+  final $Res Function(_UpdatePomodoroContext) _then;
+
+/// Create a copy of UpdatePomodoroContext
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? categoryId = freezed,Object? taskId = freezed,}) {
+  return _then(_UpdatePomodoroContext(
+categoryId: freezed == categoryId ? _self.categoryId : categoryId // ignore: cast_nullable_to_non_nullable
+as String?,taskId: freezed == taskId ? _self.taskId : taskId // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+
+}
+
 
 /// @nodoc
 mixin _$UpdateWorkContext {
-  String? get categoryId => throw _privateConstructorUsedError;
-  String? get taskId => throw _privateConstructorUsedError;
+
+ String? get categoryId; String? get taskId;
+/// Create a copy of UpdateWorkContext
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$UpdateWorkContextCopyWith<UpdateWorkContext> get copyWith => _$UpdateWorkContextCopyWithImpl<UpdateWorkContext>(this as UpdateWorkContext, _$identity);
 
   /// Serializes this UpdateWorkContext to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  Map<String, dynamic> toJson();
 
-  /// Create a copy of UpdateWorkContext
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $UpdateWorkContextCopyWith<UpdateWorkContext> get copyWith =>
-      throw _privateConstructorUsedError;
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UpdateWorkContext&&(identical(other.categoryId, categoryId) || other.categoryId == categoryId)&&(identical(other.taskId, taskId) || other.taskId == taskId));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,categoryId,taskId);
+
+@override
+String toString() {
+  return 'UpdateWorkContext(categoryId: $categoryId, taskId: $taskId)';
+}
+
+
 }
 
 /// @nodoc
-abstract class $UpdateWorkContextCopyWith<$Res> {
-  factory $UpdateWorkContextCopyWith(
-    UpdateWorkContext value,
-    $Res Function(UpdateWorkContext) then,
-  ) = _$UpdateWorkContextCopyWithImpl<$Res, UpdateWorkContext>;
-  @useResult
-  $Res call({String? categoryId, String? taskId});
-}
+abstract mixin class $UpdateWorkContextCopyWith<$Res>  {
+  factory $UpdateWorkContextCopyWith(UpdateWorkContext value, $Res Function(UpdateWorkContext) _then) = _$UpdateWorkContextCopyWithImpl;
+@useResult
+$Res call({
+ String? categoryId, String? taskId
+});
 
+
+
+
+}
 /// @nodoc
-class _$UpdateWorkContextCopyWithImpl<$Res, $Val extends UpdateWorkContext>
+class _$UpdateWorkContextCopyWithImpl<$Res>
     implements $UpdateWorkContextCopyWith<$Res> {
-  _$UpdateWorkContextCopyWithImpl(this._value, this._then);
+  _$UpdateWorkContextCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final UpdateWorkContext _self;
+  final $Res Function(UpdateWorkContext) _then;
 
-  /// Create a copy of UpdateWorkContext
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({Object? categoryId = freezed, Object? taskId = freezed}) {
-    return _then(
-      _value.copyWith(
-            categoryId:
-                freezed == categoryId
-                    ? _value.categoryId
-                    : categoryId // ignore: cast_nullable_to_non_nullable
-                        as String?,
-            taskId:
-                freezed == taskId
-                    ? _value.taskId
-                    : taskId // ignore: cast_nullable_to_non_nullable
-                        as String?,
-          )
-          as $Val,
-    );
-  }
+/// Create a copy of UpdateWorkContext
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? categoryId = freezed,Object? taskId = freezed,}) {
+  return _then(_self.copyWith(
+categoryId: freezed == categoryId ? _self.categoryId : categoryId // ignore: cast_nullable_to_non_nullable
+as String?,taskId: freezed == taskId ? _self.taskId : taskId // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
 }
 
-/// @nodoc
-abstract class _$$UpdateWorkContextImplCopyWith<$Res>
-    implements $UpdateWorkContextCopyWith<$Res> {
-  factory _$$UpdateWorkContextImplCopyWith(
-    _$UpdateWorkContextImpl value,
-    $Res Function(_$UpdateWorkContextImpl) then,
-  ) = __$$UpdateWorkContextImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({String? categoryId, String? taskId});
 }
 
-/// @nodoc
-class __$$UpdateWorkContextImplCopyWithImpl<$Res>
-    extends _$UpdateWorkContextCopyWithImpl<$Res, _$UpdateWorkContextImpl>
-    implements _$$UpdateWorkContextImplCopyWith<$Res> {
-  __$$UpdateWorkContextImplCopyWithImpl(
-    _$UpdateWorkContextImpl _value,
-    $Res Function(_$UpdateWorkContextImpl) _then,
-  ) : super(_value, _then);
 
-  /// Create a copy of UpdateWorkContext
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({Object? categoryId = freezed, Object? taskId = freezed}) {
-    return _then(
-      _$UpdateWorkContextImpl(
-        categoryId:
-            freezed == categoryId
-                ? _value.categoryId
-                : categoryId // ignore: cast_nullable_to_non_nullable
-                    as String?,
-        taskId:
-            freezed == taskId
-                ? _value.taskId
-                : taskId // ignore: cast_nullable_to_non_nullable
-                    as String?,
-      ),
-    );
-  }
+/// Adds pattern-matching-related methods to [UpdateWorkContext].
+extension UpdateWorkContextPatterns on UpdateWorkContext {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _UpdateWorkContext value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _UpdateWorkContext() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _UpdateWorkContext value)  $default,){
+final _that = this;
+switch (_that) {
+case _UpdateWorkContext():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _UpdateWorkContext value)?  $default,){
+final _that = this;
+switch (_that) {
+case _UpdateWorkContext() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? categoryId,  String? taskId)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _UpdateWorkContext() when $default != null:
+return $default(_that.categoryId,_that.taskId);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? categoryId,  String? taskId)  $default,) {final _that = this;
+switch (_that) {
+case _UpdateWorkContext():
+return $default(_that.categoryId,_that.taskId);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? categoryId,  String? taskId)?  $default,) {final _that = this;
+switch (_that) {
+case _UpdateWorkContext() when $default != null:
+return $default(_that.categoryId,_that.taskId);case _:
+  return null;
+
+}
+}
+
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$UpdateWorkContextImpl implements _UpdateWorkContext {
-  const _$UpdateWorkContextImpl({this.categoryId, this.taskId});
 
-  factory _$UpdateWorkContextImpl.fromJson(Map<String, dynamic> json) =>
-      _$$UpdateWorkContextImplFromJson(json);
+class _UpdateWorkContext implements UpdateWorkContext {
+  const _UpdateWorkContext({this.categoryId, this.taskId});
+  factory _UpdateWorkContext.fromJson(Map<String, dynamic> json) => _$UpdateWorkContextFromJson(json);
 
-  @override
-  final String? categoryId;
-  @override
-  final String? taskId;
+@override final  String? categoryId;
+@override final  String? taskId;
 
-  @override
-  String toString() {
-    return 'UpdateWorkContext(categoryId: $categoryId, taskId: $taskId)';
-  }
+/// Create a copy of UpdateWorkContext
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$UpdateWorkContextCopyWith<_UpdateWorkContext> get copyWith => __$UpdateWorkContextCopyWithImpl<_UpdateWorkContext>(this, _$identity);
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$UpdateWorkContextImpl &&
-            (identical(other.categoryId, categoryId) ||
-                other.categoryId == categoryId) &&
-            (identical(other.taskId, taskId) || other.taskId == taskId));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, categoryId, taskId);
-
-  /// Create a copy of UpdateWorkContext
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$UpdateWorkContextImplCopyWith<_$UpdateWorkContextImpl> get copyWith =>
-      __$$UpdateWorkContextImplCopyWithImpl<_$UpdateWorkContextImpl>(
-        this,
-        _$identity,
-      );
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$UpdateWorkContextImplToJson(this);
-  }
+@override
+Map<String, dynamic> toJson() {
+  return _$UpdateWorkContextToJson(this, );
 }
 
-abstract class _UpdateWorkContext implements UpdateWorkContext {
-  const factory _UpdateWorkContext({
-    final String? categoryId,
-    final String? taskId,
-  }) = _$UpdateWorkContextImpl;
-
-  factory _UpdateWorkContext.fromJson(Map<String, dynamic> json) =
-      _$UpdateWorkContextImpl.fromJson;
-
-  @override
-  String? get categoryId;
-  @override
-  String? get taskId;
-
-  /// Create a copy of UpdateWorkContext
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$UpdateWorkContextImplCopyWith<_$UpdateWorkContextImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UpdateWorkContext&&(identical(other.categoryId, categoryId) || other.categoryId == categoryId)&&(identical(other.taskId, taskId) || other.taskId == taskId));
 }
 
-UpdateCurrentSession _$UpdateCurrentSessionFromJson(Map<String, dynamic> json) {
-  return _UpdateCurrentSession.fromJson(json);
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,categoryId,taskId);
+
+@override
+String toString() {
+  return 'UpdateWorkContext(categoryId: $categoryId, taskId: $taskId)';
 }
+
+
+}
+
+/// @nodoc
+abstract mixin class _$UpdateWorkContextCopyWith<$Res> implements $UpdateWorkContextCopyWith<$Res> {
+  factory _$UpdateWorkContextCopyWith(_UpdateWorkContext value, $Res Function(_UpdateWorkContext) _then) = __$UpdateWorkContextCopyWithImpl;
+@override @useResult
+$Res call({
+ String? categoryId, String? taskId
+});
+
+
+
+
+}
+/// @nodoc
+class __$UpdateWorkContextCopyWithImpl<$Res>
+    implements _$UpdateWorkContextCopyWith<$Res> {
+  __$UpdateWorkContextCopyWithImpl(this._self, this._then);
+
+  final _UpdateWorkContext _self;
+  final $Res Function(_UpdateWorkContext) _then;
+
+/// Create a copy of UpdateWorkContext
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? categoryId = freezed,Object? taskId = freezed,}) {
+  return _then(_UpdateWorkContext(
+categoryId: freezed == categoryId ? _self.categoryId : categoryId // ignore: cast_nullable_to_non_nullable
+as String?,taskId: freezed == taskId ? _self.taskId : taskId // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+
+}
+
 
 /// @nodoc
 mixin _$UpdateCurrentSession {
-  SessionTypeEnum get sessionType => throw _privateConstructorUsedError;
-  int get sessionStartTime =>
-      throw _privateConstructorUsedError; // i64 maps to int in Dart
-  String? get categoryId => throw _privateConstructorUsedError;
-  String? get taskId => throw _privateConstructorUsedError;
-  String? get note => throw _privateConstructorUsedError;
-  int? get concentrationScore => throw _privateConstructorUsedError;
+
+ SessionTypeEnum get sessionType; int get sessionStartTime;// i64 maps to int in Dart
+ String? get categoryId; String? get taskId; String? get note; int? get concentrationScore;
+/// Create a copy of UpdateCurrentSession
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$UpdateCurrentSessionCopyWith<UpdateCurrentSession> get copyWith => _$UpdateCurrentSessionCopyWithImpl<UpdateCurrentSession>(this as UpdateCurrentSession, _$identity);
 
   /// Serializes this UpdateCurrentSession to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  Map<String, dynamic> toJson();
 
-  /// Create a copy of UpdateCurrentSession
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $UpdateCurrentSessionCopyWith<UpdateCurrentSession> get copyWith =>
-      throw _privateConstructorUsedError;
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UpdateCurrentSession&&(identical(other.sessionType, sessionType) || other.sessionType == sessionType)&&(identical(other.sessionStartTime, sessionStartTime) || other.sessionStartTime == sessionStartTime)&&(identical(other.categoryId, categoryId) || other.categoryId == categoryId)&&(identical(other.taskId, taskId) || other.taskId == taskId)&&(identical(other.note, note) || other.note == note)&&(identical(other.concentrationScore, concentrationScore) || other.concentrationScore == concentrationScore));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,sessionType,sessionStartTime,categoryId,taskId,note,concentrationScore);
+
+@override
+String toString() {
+  return 'UpdateCurrentSession(sessionType: $sessionType, sessionStartTime: $sessionStartTime, categoryId: $categoryId, taskId: $taskId, note: $note, concentrationScore: $concentrationScore)';
+}
+
+
 }
 
 /// @nodoc
-abstract class $UpdateCurrentSessionCopyWith<$Res> {
-  factory $UpdateCurrentSessionCopyWith(
-    UpdateCurrentSession value,
-    $Res Function(UpdateCurrentSession) then,
-  ) = _$UpdateCurrentSessionCopyWithImpl<$Res, UpdateCurrentSession>;
-  @useResult
-  $Res call({
-    SessionTypeEnum sessionType,
-    int sessionStartTime,
-    String? categoryId,
-    String? taskId,
-    String? note,
-    int? concentrationScore,
-  });
-}
+abstract mixin class $UpdateCurrentSessionCopyWith<$Res>  {
+  factory $UpdateCurrentSessionCopyWith(UpdateCurrentSession value, $Res Function(UpdateCurrentSession) _then) = _$UpdateCurrentSessionCopyWithImpl;
+@useResult
+$Res call({
+ SessionTypeEnum sessionType, int sessionStartTime, String? categoryId, String? taskId, String? note, int? concentrationScore
+});
 
+
+
+
+}
 /// @nodoc
-class _$UpdateCurrentSessionCopyWithImpl<
-  $Res,
-  $Val extends UpdateCurrentSession
->
+class _$UpdateCurrentSessionCopyWithImpl<$Res>
     implements $UpdateCurrentSessionCopyWith<$Res> {
-  _$UpdateCurrentSessionCopyWithImpl(this._value, this._then);
+  _$UpdateCurrentSessionCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final UpdateCurrentSession _self;
+  final $Res Function(UpdateCurrentSession) _then;
 
-  /// Create a copy of UpdateCurrentSession
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? sessionType = null,
-    Object? sessionStartTime = null,
-    Object? categoryId = freezed,
-    Object? taskId = freezed,
-    Object? note = freezed,
-    Object? concentrationScore = freezed,
-  }) {
-    return _then(
-      _value.copyWith(
-            sessionType:
-                null == sessionType
-                    ? _value.sessionType
-                    : sessionType // ignore: cast_nullable_to_non_nullable
-                        as SessionTypeEnum,
-            sessionStartTime:
-                null == sessionStartTime
-                    ? _value.sessionStartTime
-                    : sessionStartTime // ignore: cast_nullable_to_non_nullable
-                        as int,
-            categoryId:
-                freezed == categoryId
-                    ? _value.categoryId
-                    : categoryId // ignore: cast_nullable_to_non_nullable
-                        as String?,
-            taskId:
-                freezed == taskId
-                    ? _value.taskId
-                    : taskId // ignore: cast_nullable_to_non_nullable
-                        as String?,
-            note:
-                freezed == note
-                    ? _value.note
-                    : note // ignore: cast_nullable_to_non_nullable
-                        as String?,
-            concentrationScore:
-                freezed == concentrationScore
-                    ? _value.concentrationScore
-                    : concentrationScore // ignore: cast_nullable_to_non_nullable
-                        as int?,
-          )
-          as $Val,
-    );
-  }
+/// Create a copy of UpdateCurrentSession
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? sessionType = null,Object? sessionStartTime = null,Object? categoryId = freezed,Object? taskId = freezed,Object? note = freezed,Object? concentrationScore = freezed,}) {
+  return _then(_self.copyWith(
+sessionType: null == sessionType ? _self.sessionType : sessionType // ignore: cast_nullable_to_non_nullable
+as SessionTypeEnum,sessionStartTime: null == sessionStartTime ? _self.sessionStartTime : sessionStartTime // ignore: cast_nullable_to_non_nullable
+as int,categoryId: freezed == categoryId ? _self.categoryId : categoryId // ignore: cast_nullable_to_non_nullable
+as String?,taskId: freezed == taskId ? _self.taskId : taskId // ignore: cast_nullable_to_non_nullable
+as String?,note: freezed == note ? _self.note : note // ignore: cast_nullable_to_non_nullable
+as String?,concentrationScore: freezed == concentrationScore ? _self.concentrationScore : concentrationScore // ignore: cast_nullable_to_non_nullable
+as int?,
+  ));
 }
 
-/// @nodoc
-abstract class _$$UpdateCurrentSessionImplCopyWith<$Res>
-    implements $UpdateCurrentSessionCopyWith<$Res> {
-  factory _$$UpdateCurrentSessionImplCopyWith(
-    _$UpdateCurrentSessionImpl value,
-    $Res Function(_$UpdateCurrentSessionImpl) then,
-  ) = __$$UpdateCurrentSessionImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({
-    SessionTypeEnum sessionType,
-    int sessionStartTime,
-    String? categoryId,
-    String? taskId,
-    String? note,
-    int? concentrationScore,
-  });
 }
 
-/// @nodoc
-class __$$UpdateCurrentSessionImplCopyWithImpl<$Res>
-    extends _$UpdateCurrentSessionCopyWithImpl<$Res, _$UpdateCurrentSessionImpl>
-    implements _$$UpdateCurrentSessionImplCopyWith<$Res> {
-  __$$UpdateCurrentSessionImplCopyWithImpl(
-    _$UpdateCurrentSessionImpl _value,
-    $Res Function(_$UpdateCurrentSessionImpl) _then,
-  ) : super(_value, _then);
 
-  /// Create a copy of UpdateCurrentSession
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? sessionType = null,
-    Object? sessionStartTime = null,
-    Object? categoryId = freezed,
-    Object? taskId = freezed,
-    Object? note = freezed,
-    Object? concentrationScore = freezed,
-  }) {
-    return _then(
-      _$UpdateCurrentSessionImpl(
-        sessionType:
-            null == sessionType
-                ? _value.sessionType
-                : sessionType // ignore: cast_nullable_to_non_nullable
-                    as SessionTypeEnum,
-        sessionStartTime:
-            null == sessionStartTime
-                ? _value.sessionStartTime
-                : sessionStartTime // ignore: cast_nullable_to_non_nullable
-                    as int,
-        categoryId:
-            freezed == categoryId
-                ? _value.categoryId
-                : categoryId // ignore: cast_nullable_to_non_nullable
-                    as String?,
-        taskId:
-            freezed == taskId
-                ? _value.taskId
-                : taskId // ignore: cast_nullable_to_non_nullable
-                    as String?,
-        note:
-            freezed == note
-                ? _value.note
-                : note // ignore: cast_nullable_to_non_nullable
-                    as String?,
-        concentrationScore:
-            freezed == concentrationScore
-                ? _value.concentrationScore
-                : concentrationScore // ignore: cast_nullable_to_non_nullable
-                    as int?,
-      ),
-    );
-  }
+/// Adds pattern-matching-related methods to [UpdateCurrentSession].
+extension UpdateCurrentSessionPatterns on UpdateCurrentSession {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _UpdateCurrentSession value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _UpdateCurrentSession() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _UpdateCurrentSession value)  $default,){
+final _that = this;
+switch (_that) {
+case _UpdateCurrentSession():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _UpdateCurrentSession value)?  $default,){
+final _that = this;
+switch (_that) {
+case _UpdateCurrentSession() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( SessionTypeEnum sessionType,  int sessionStartTime,  String? categoryId,  String? taskId,  String? note,  int? concentrationScore)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _UpdateCurrentSession() when $default != null:
+return $default(_that.sessionType,_that.sessionStartTime,_that.categoryId,_that.taskId,_that.note,_that.concentrationScore);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( SessionTypeEnum sessionType,  int sessionStartTime,  String? categoryId,  String? taskId,  String? note,  int? concentrationScore)  $default,) {final _that = this;
+switch (_that) {
+case _UpdateCurrentSession():
+return $default(_that.sessionType,_that.sessionStartTime,_that.categoryId,_that.taskId,_that.note,_that.concentrationScore);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( SessionTypeEnum sessionType,  int sessionStartTime,  String? categoryId,  String? taskId,  String? note,  int? concentrationScore)?  $default,) {final _that = this;
+switch (_that) {
+case _UpdateCurrentSession() when $default != null:
+return $default(_that.sessionType,_that.sessionStartTime,_that.categoryId,_that.taskId,_that.note,_that.concentrationScore);case _:
+  return null;
+
+}
+}
+
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$UpdateCurrentSessionImpl implements _UpdateCurrentSession {
-  const _$UpdateCurrentSessionImpl({
-    required this.sessionType,
-    required this.sessionStartTime,
-    this.categoryId,
-    this.taskId,
-    this.note,
-    this.concentrationScore,
-  });
 
-  factory _$UpdateCurrentSessionImpl.fromJson(Map<String, dynamic> json) =>
-      _$$UpdateCurrentSessionImplFromJson(json);
+class _UpdateCurrentSession implements UpdateCurrentSession {
+  const _UpdateCurrentSession({required this.sessionType, required this.sessionStartTime, this.categoryId, this.taskId, this.note, this.concentrationScore});
+  factory _UpdateCurrentSession.fromJson(Map<String, dynamic> json) => _$UpdateCurrentSessionFromJson(json);
 
-  @override
-  final SessionTypeEnum sessionType;
-  @override
-  final int sessionStartTime;
-  // i64 maps to int in Dart
-  @override
-  final String? categoryId;
-  @override
-  final String? taskId;
-  @override
-  final String? note;
-  @override
-  final int? concentrationScore;
+@override final  SessionTypeEnum sessionType;
+@override final  int sessionStartTime;
+// i64 maps to int in Dart
+@override final  String? categoryId;
+@override final  String? taskId;
+@override final  String? note;
+@override final  int? concentrationScore;
 
-  @override
-  String toString() {
-    return 'UpdateCurrentSession(sessionType: $sessionType, sessionStartTime: $sessionStartTime, categoryId: $categoryId, taskId: $taskId, note: $note, concentrationScore: $concentrationScore)';
-  }
+/// Create a copy of UpdateCurrentSession
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$UpdateCurrentSessionCopyWith<_UpdateCurrentSession> get copyWith => __$UpdateCurrentSessionCopyWithImpl<_UpdateCurrentSession>(this, _$identity);
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$UpdateCurrentSessionImpl &&
-            (identical(other.sessionType, sessionType) ||
-                other.sessionType == sessionType) &&
-            (identical(other.sessionStartTime, sessionStartTime) ||
-                other.sessionStartTime == sessionStartTime) &&
-            (identical(other.categoryId, categoryId) ||
-                other.categoryId == categoryId) &&
-            (identical(other.taskId, taskId) || other.taskId == taskId) &&
-            (identical(other.note, note) || other.note == note) &&
-            (identical(other.concentrationScore, concentrationScore) ||
-                other.concentrationScore == concentrationScore));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(
-    runtimeType,
-    sessionType,
-    sessionStartTime,
-    categoryId,
-    taskId,
-    note,
-    concentrationScore,
-  );
-
-  /// Create a copy of UpdateCurrentSession
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$UpdateCurrentSessionImplCopyWith<_$UpdateCurrentSessionImpl>
-  get copyWith =>
-      __$$UpdateCurrentSessionImplCopyWithImpl<_$UpdateCurrentSessionImpl>(
-        this,
-        _$identity,
-      );
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$UpdateCurrentSessionImplToJson(this);
-  }
+@override
+Map<String, dynamic> toJson() {
+  return _$UpdateCurrentSessionToJson(this, );
 }
 
-abstract class _UpdateCurrentSession implements UpdateCurrentSession {
-  const factory _UpdateCurrentSession({
-    required final SessionTypeEnum sessionType,
-    required final int sessionStartTime,
-    final String? categoryId,
-    final String? taskId,
-    final String? note,
-    final int? concentrationScore,
-  }) = _$UpdateCurrentSessionImpl;
-
-  factory _UpdateCurrentSession.fromJson(Map<String, dynamic> json) =
-      _$UpdateCurrentSessionImpl.fromJson;
-
-  @override
-  SessionTypeEnum get sessionType;
-  @override
-  int get sessionStartTime; // i64 maps to int in Dart
-  @override
-  String? get categoryId;
-  @override
-  String? get taskId;
-  @override
-  String? get note;
-  @override
-  int? get concentrationScore;
-
-  /// Create a copy of UpdateCurrentSession
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$UpdateCurrentSessionImplCopyWith<_$UpdateCurrentSessionImpl>
-  get copyWith => throw _privateConstructorUsedError;
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UpdateCurrentSession&&(identical(other.sessionType, sessionType) || other.sessionType == sessionType)&&(identical(other.sessionStartTime, sessionStartTime) || other.sessionStartTime == sessionStartTime)&&(identical(other.categoryId, categoryId) || other.categoryId == categoryId)&&(identical(other.taskId, taskId) || other.taskId == taskId)&&(identical(other.note, note) || other.note == note)&&(identical(other.concentrationScore, concentrationScore) || other.concentrationScore == concentrationScore));
 }
 
-UpdatePomodoroState _$UpdatePomodoroStateFromJson(Map<String, dynamic> json) {
-  return _UpdatePomodoroState.fromJson(json);
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,sessionType,sessionStartTime,categoryId,taskId,note,concentrationScore);
+
+@override
+String toString() {
+  return 'UpdateCurrentSession(sessionType: $sessionType, sessionStartTime: $sessionStartTime, categoryId: $categoryId, taskId: $taskId, note: $note, concentrationScore: $concentrationScore)';
 }
+
+
+}
+
+/// @nodoc
+abstract mixin class _$UpdateCurrentSessionCopyWith<$Res> implements $UpdateCurrentSessionCopyWith<$Res> {
+  factory _$UpdateCurrentSessionCopyWith(_UpdateCurrentSession value, $Res Function(_UpdateCurrentSession) _then) = __$UpdateCurrentSessionCopyWithImpl;
+@override @useResult
+$Res call({
+ SessionTypeEnum sessionType, int sessionStartTime, String? categoryId, String? taskId, String? note, int? concentrationScore
+});
+
+
+
+
+}
+/// @nodoc
+class __$UpdateCurrentSessionCopyWithImpl<$Res>
+    implements _$UpdateCurrentSessionCopyWith<$Res> {
+  __$UpdateCurrentSessionCopyWithImpl(this._self, this._then);
+
+  final _UpdateCurrentSession _self;
+  final $Res Function(_UpdateCurrentSession) _then;
+
+/// Create a copy of UpdateCurrentSession
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? sessionType = null,Object? sessionStartTime = null,Object? categoryId = freezed,Object? taskId = freezed,Object? note = freezed,Object? concentrationScore = freezed,}) {
+  return _then(_UpdateCurrentSession(
+sessionType: null == sessionType ? _self.sessionType : sessionType // ignore: cast_nullable_to_non_nullable
+as SessionTypeEnum,sessionStartTime: null == sessionStartTime ? _self.sessionStartTime : sessionStartTime // ignore: cast_nullable_to_non_nullable
+as int,categoryId: freezed == categoryId ? _self.categoryId : categoryId // ignore: cast_nullable_to_non_nullable
+as String?,taskId: freezed == taskId ? _self.taskId : taskId // ignore: cast_nullable_to_non_nullable
+as String?,note: freezed == note ? _self.note : note // ignore: cast_nullable_to_non_nullable
+as String?,concentrationScore: freezed == concentrationScore ? _self.concentrationScore : concentrationScore // ignore: cast_nullable_to_non_nullable
+as int?,
+  ));
+}
+
+
+}
+
 
 /// @nodoc
 mixin _$UpdatePomodoroState {
-  UpdateCurrentSession? get currentSession =>
-      throw _privateConstructorUsedError;
-  UpdateWorkContext get workContext => throw _privateConstructorUsedError;
+
+ UpdateCurrentSession? get currentSession; UpdateWorkContext get workContext;
+/// Create a copy of UpdatePomodoroState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$UpdatePomodoroStateCopyWith<UpdatePomodoroState> get copyWith => _$UpdatePomodoroStateCopyWithImpl<UpdatePomodoroState>(this as UpdatePomodoroState, _$identity);
 
   /// Serializes this UpdatePomodoroState to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  Map<String, dynamic> toJson();
 
-  /// Create a copy of UpdatePomodoroState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $UpdatePomodoroStateCopyWith<UpdatePomodoroState> get copyWith =>
-      throw _privateConstructorUsedError;
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UpdatePomodoroState&&(identical(other.currentSession, currentSession) || other.currentSession == currentSession)&&(identical(other.workContext, workContext) || other.workContext == workContext));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,currentSession,workContext);
+
+@override
+String toString() {
+  return 'UpdatePomodoroState(currentSession: $currentSession, workContext: $workContext)';
+}
+
+
 }
 
 /// @nodoc
-abstract class $UpdatePomodoroStateCopyWith<$Res> {
-  factory $UpdatePomodoroStateCopyWith(
-    UpdatePomodoroState value,
-    $Res Function(UpdatePomodoroState) then,
-  ) = _$UpdatePomodoroStateCopyWithImpl<$Res, UpdatePomodoroState>;
-  @useResult
-  $Res call({
-    UpdateCurrentSession? currentSession,
-    UpdateWorkContext workContext,
-  });
+abstract mixin class $UpdatePomodoroStateCopyWith<$Res>  {
+  factory $UpdatePomodoroStateCopyWith(UpdatePomodoroState value, $Res Function(UpdatePomodoroState) _then) = _$UpdatePomodoroStateCopyWithImpl;
+@useResult
+$Res call({
+ UpdateCurrentSession? currentSession, UpdateWorkContext workContext
+});
 
-  $UpdateCurrentSessionCopyWith<$Res>? get currentSession;
-  $UpdateWorkContextCopyWith<$Res> get workContext;
+
+$UpdateCurrentSessionCopyWith<$Res>? get currentSession;$UpdateWorkContextCopyWith<$Res> get workContext;
+
 }
-
 /// @nodoc
-class _$UpdatePomodoroStateCopyWithImpl<$Res, $Val extends UpdatePomodoroState>
+class _$UpdatePomodoroStateCopyWithImpl<$Res>
     implements $UpdatePomodoroStateCopyWith<$Res> {
-  _$UpdatePomodoroStateCopyWithImpl(this._value, this._then);
+  _$UpdatePomodoroStateCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final UpdatePomodoroState _self;
+  final $Res Function(UpdatePomodoroState) _then;
 
-  /// Create a copy of UpdatePomodoroState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({Object? currentSession = freezed, Object? workContext = null}) {
-    return _then(
-      _value.copyWith(
-            currentSession:
-                freezed == currentSession
-                    ? _value.currentSession
-                    : currentSession // ignore: cast_nullable_to_non_nullable
-                        as UpdateCurrentSession?,
-            workContext:
-                null == workContext
-                    ? _value.workContext
-                    : workContext // ignore: cast_nullable_to_non_nullable
-                        as UpdateWorkContext,
-          )
-          as $Val,
-    );
-  }
-
-  /// Create a copy of UpdatePomodoroState
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $UpdateCurrentSessionCopyWith<$Res>? get currentSession {
-    if (_value.currentSession == null) {
-      return null;
-    }
-
-    return $UpdateCurrentSessionCopyWith<$Res>(_value.currentSession!, (value) {
-      return _then(_value.copyWith(currentSession: value) as $Val);
-    });
-  }
-
-  /// Create a copy of UpdatePomodoroState
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $UpdateWorkContextCopyWith<$Res> get workContext {
-    return $UpdateWorkContextCopyWith<$Res>(_value.workContext, (value) {
-      return _then(_value.copyWith(workContext: value) as $Val);
-    });
-  }
+/// Create a copy of UpdatePomodoroState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? currentSession = freezed,Object? workContext = null,}) {
+  return _then(_self.copyWith(
+currentSession: freezed == currentSession ? _self.currentSession : currentSession // ignore: cast_nullable_to_non_nullable
+as UpdateCurrentSession?,workContext: null == workContext ? _self.workContext : workContext // ignore: cast_nullable_to_non_nullable
+as UpdateWorkContext,
+  ));
 }
+/// Create a copy of UpdatePomodoroState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UpdateCurrentSessionCopyWith<$Res>? get currentSession {
+    if (_self.currentSession == null) {
+    return null;
+  }
 
-/// @nodoc
-abstract class _$$UpdatePomodoroStateImplCopyWith<$Res>
-    implements $UpdatePomodoroStateCopyWith<$Res> {
-  factory _$$UpdatePomodoroStateImplCopyWith(
-    _$UpdatePomodoroStateImpl value,
-    $Res Function(_$UpdatePomodoroStateImpl) then,
-  ) = __$$UpdatePomodoroStateImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({
-    UpdateCurrentSession? currentSession,
-    UpdateWorkContext workContext,
+  return $UpdateCurrentSessionCopyWith<$Res>(_self.currentSession!, (value) {
+    return _then(_self.copyWith(currentSession: value));
   });
-
-  @override
-  $UpdateCurrentSessionCopyWith<$Res>? get currentSession;
-  @override
-  $UpdateWorkContextCopyWith<$Res> get workContext;
+}/// Create a copy of UpdatePomodoroState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UpdateWorkContextCopyWith<$Res> get workContext {
+  
+  return $UpdateWorkContextCopyWith<$Res>(_self.workContext, (value) {
+    return _then(_self.copyWith(workContext: value));
+  });
+}
 }
 
-/// @nodoc
-class __$$UpdatePomodoroStateImplCopyWithImpl<$Res>
-    extends _$UpdatePomodoroStateCopyWithImpl<$Res, _$UpdatePomodoroStateImpl>
-    implements _$$UpdatePomodoroStateImplCopyWith<$Res> {
-  __$$UpdatePomodoroStateImplCopyWithImpl(
-    _$UpdatePomodoroStateImpl _value,
-    $Res Function(_$UpdatePomodoroStateImpl) _then,
-  ) : super(_value, _then);
 
-  /// Create a copy of UpdatePomodoroState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({Object? currentSession = freezed, Object? workContext = null}) {
-    return _then(
-      _$UpdatePomodoroStateImpl(
-        currentSession:
-            freezed == currentSession
-                ? _value.currentSession
-                : currentSession // ignore: cast_nullable_to_non_nullable
-                    as UpdateCurrentSession?,
-        workContext:
-            null == workContext
-                ? _value.workContext
-                : workContext // ignore: cast_nullable_to_non_nullable
-                    as UpdateWorkContext,
-      ),
-    );
-  }
+/// Adds pattern-matching-related methods to [UpdatePomodoroState].
+extension UpdatePomodoroStatePatterns on UpdatePomodoroState {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _UpdatePomodoroState value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _UpdatePomodoroState() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _UpdatePomodoroState value)  $default,){
+final _that = this;
+switch (_that) {
+case _UpdatePomodoroState():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _UpdatePomodoroState value)?  $default,){
+final _that = this;
+switch (_that) {
+case _UpdatePomodoroState() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( UpdateCurrentSession? currentSession,  UpdateWorkContext workContext)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _UpdatePomodoroState() when $default != null:
+return $default(_that.currentSession,_that.workContext);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( UpdateCurrentSession? currentSession,  UpdateWorkContext workContext)  $default,) {final _that = this;
+switch (_that) {
+case _UpdatePomodoroState():
+return $default(_that.currentSession,_that.workContext);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( UpdateCurrentSession? currentSession,  UpdateWorkContext workContext)?  $default,) {final _that = this;
+switch (_that) {
+case _UpdatePomodoroState() when $default != null:
+return $default(_that.currentSession,_that.workContext);case _:
+  return null;
+
+}
+}
+
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$UpdatePomodoroStateImpl implements _UpdatePomodoroState {
-  const _$UpdatePomodoroStateImpl({
-    this.currentSession,
-    required this.workContext,
+
+class _UpdatePomodoroState implements UpdatePomodoroState {
+  const _UpdatePomodoroState({this.currentSession, required this.workContext});
+  factory _UpdatePomodoroState.fromJson(Map<String, dynamic> json) => _$UpdatePomodoroStateFromJson(json);
+
+@override final  UpdateCurrentSession? currentSession;
+@override final  UpdateWorkContext workContext;
+
+/// Create a copy of UpdatePomodoroState
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$UpdatePomodoroStateCopyWith<_UpdatePomodoroState> get copyWith => __$UpdatePomodoroStateCopyWithImpl<_UpdatePomodoroState>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$UpdatePomodoroStateToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UpdatePomodoroState&&(identical(other.currentSession, currentSession) || other.currentSession == currentSession)&&(identical(other.workContext, workContext) || other.workContext == workContext));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,currentSession,workContext);
+
+@override
+String toString() {
+  return 'UpdatePomodoroState(currentSession: $currentSession, workContext: $workContext)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$UpdatePomodoroStateCopyWith<$Res> implements $UpdatePomodoroStateCopyWith<$Res> {
+  factory _$UpdatePomodoroStateCopyWith(_UpdatePomodoroState value, $Res Function(_UpdatePomodoroState) _then) = __$UpdatePomodoroStateCopyWithImpl;
+@override @useResult
+$Res call({
+ UpdateCurrentSession? currentSession, UpdateWorkContext workContext
+});
+
+
+@override $UpdateCurrentSessionCopyWith<$Res>? get currentSession;@override $UpdateWorkContextCopyWith<$Res> get workContext;
+
+}
+/// @nodoc
+class __$UpdatePomodoroStateCopyWithImpl<$Res>
+    implements _$UpdatePomodoroStateCopyWith<$Res> {
+  __$UpdatePomodoroStateCopyWithImpl(this._self, this._then);
+
+  final _UpdatePomodoroState _self;
+  final $Res Function(_UpdatePomodoroState) _then;
+
+/// Create a copy of UpdatePomodoroState
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? currentSession = freezed,Object? workContext = null,}) {
+  return _then(_UpdatePomodoroState(
+currentSession: freezed == currentSession ? _self.currentSession : currentSession // ignore: cast_nullable_to_non_nullable
+as UpdateCurrentSession?,workContext: null == workContext ? _self.workContext : workContext // ignore: cast_nullable_to_non_nullable
+as UpdateWorkContext,
+  ));
+}
+
+/// Create a copy of UpdatePomodoroState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UpdateCurrentSessionCopyWith<$Res>? get currentSession {
+    if (_self.currentSession == null) {
+    return null;
+  }
+
+  return $UpdateCurrentSessionCopyWith<$Res>(_self.currentSession!, (value) {
+    return _then(_self.copyWith(currentSession: value));
   });
-
-  factory _$UpdatePomodoroStateImpl.fromJson(Map<String, dynamic> json) =>
-      _$$UpdatePomodoroStateImplFromJson(json);
-
-  @override
-  final UpdateCurrentSession? currentSession;
-  @override
-  final UpdateWorkContext workContext;
-
-  @override
-  String toString() {
-    return 'UpdatePomodoroState(currentSession: $currentSession, workContext: $workContext)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$UpdatePomodoroStateImpl &&
-            (identical(other.currentSession, currentSession) ||
-                other.currentSession == currentSession) &&
-            (identical(other.workContext, workContext) ||
-                other.workContext == workContext));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, currentSession, workContext);
-
-  /// Create a copy of UpdatePomodoroState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$UpdatePomodoroStateImplCopyWith<_$UpdatePomodoroStateImpl> get copyWith =>
-      __$$UpdatePomodoroStateImplCopyWithImpl<_$UpdatePomodoroStateImpl>(
-        this,
-        _$identity,
-      );
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$UpdatePomodoroStateImplToJson(this);
-  }
+}/// Create a copy of UpdatePomodoroState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UpdateWorkContextCopyWith<$Res> get workContext {
+  
+  return $UpdateWorkContextCopyWith<$Res>(_self.workContext, (value) {
+    return _then(_self.copyWith(workContext: value));
+  });
+}
 }
 
-abstract class _UpdatePomodoroState implements UpdatePomodoroState {
-  const factory _UpdatePomodoroState({
-    final UpdateCurrentSession? currentSession,
-    required final UpdateWorkContext workContext,
-  }) = _$UpdatePomodoroStateImpl;
-
-  factory _UpdatePomodoroState.fromJson(Map<String, dynamic> json) =
-      _$UpdatePomodoroStateImpl.fromJson;
-
-  @override
-  UpdateCurrentSession? get currentSession;
-  @override
-  UpdateWorkContext get workContext;
-
-  /// Create a copy of UpdatePomodoroState
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$UpdatePomodoroStateImplCopyWith<_$UpdatePomodoroStateImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-WsClientRequest _$WsClientRequestFromJson(Map<String, dynamic> json) {
-  return _WsClientRequest.fromJson(json);
-}
 
 /// @nodoc
 mixin _$WsClientRequest {
-  String? get requestId => throw _privateConstructorUsedError;
-  ClientMessage get message => throw _privateConstructorUsedError;
+
+ String? get requestId; ClientMessage get message;
+/// Create a copy of WsClientRequest
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$WsClientRequestCopyWith<WsClientRequest> get copyWith => _$WsClientRequestCopyWithImpl<WsClientRequest>(this as WsClientRequest, _$identity);
 
   /// Serializes this WsClientRequest to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  Map<String, dynamic> toJson();
 
-  /// Create a copy of WsClientRequest
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $WsClientRequestCopyWith<WsClientRequest> get copyWith =>
-      throw _privateConstructorUsedError;
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WsClientRequest&&(identical(other.requestId, requestId) || other.requestId == requestId)&&(identical(other.message, message) || other.message == message));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,requestId,message);
+
+@override
+String toString() {
+  return 'WsClientRequest(requestId: $requestId, message: $message)';
+}
+
+
 }
 
 /// @nodoc
-abstract class $WsClientRequestCopyWith<$Res> {
-  factory $WsClientRequestCopyWith(
-    WsClientRequest value,
-    $Res Function(WsClientRequest) then,
-  ) = _$WsClientRequestCopyWithImpl<$Res, WsClientRequest>;
-  @useResult
-  $Res call({String? requestId, ClientMessage message});
+abstract mixin class $WsClientRequestCopyWith<$Res>  {
+  factory $WsClientRequestCopyWith(WsClientRequest value, $Res Function(WsClientRequest) _then) = _$WsClientRequestCopyWithImpl;
+@useResult
+$Res call({
+ String? requestId, ClientMessage message
+});
 
-  $ClientMessageCopyWith<$Res> get message;
+
+$ClientMessageCopyWith<$Res> get message;
+
 }
-
 /// @nodoc
-class _$WsClientRequestCopyWithImpl<$Res, $Val extends WsClientRequest>
+class _$WsClientRequestCopyWithImpl<$Res>
     implements $WsClientRequestCopyWith<$Res> {
-  _$WsClientRequestCopyWithImpl(this._value, this._then);
+  _$WsClientRequestCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final WsClientRequest _self;
+  final $Res Function(WsClientRequest) _then;
 
-  /// Create a copy of WsClientRequest
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({Object? requestId = freezed, Object? message = null}) {
-    return _then(
-      _value.copyWith(
-            requestId:
-                freezed == requestId
-                    ? _value.requestId
-                    : requestId // ignore: cast_nullable_to_non_nullable
-                        as String?,
-            message:
-                null == message
-                    ? _value.message
-                    : message // ignore: cast_nullable_to_non_nullable
-                        as ClientMessage,
-          )
-          as $Val,
-    );
-  }
-
-  /// Create a copy of WsClientRequest
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $ClientMessageCopyWith<$Res> get message {
-    return $ClientMessageCopyWith<$Res>(_value.message, (value) {
-      return _then(_value.copyWith(message: value) as $Val);
-    });
-  }
+/// Create a copy of WsClientRequest
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? requestId = freezed,Object? message = null,}) {
+  return _then(_self.copyWith(
+requestId: freezed == requestId ? _self.requestId : requestId // ignore: cast_nullable_to_non_nullable
+as String?,message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
+as ClientMessage,
+  ));
+}
+/// Create a copy of WsClientRequest
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ClientMessageCopyWith<$Res> get message {
+  
+  return $ClientMessageCopyWith<$Res>(_self.message, (value) {
+    return _then(_self.copyWith(message: value));
+  });
+}
 }
 
-/// @nodoc
-abstract class _$$WsClientRequestImplCopyWith<$Res>
-    implements $WsClientRequestCopyWith<$Res> {
-  factory _$$WsClientRequestImplCopyWith(
-    _$WsClientRequestImpl value,
-    $Res Function(_$WsClientRequestImpl) then,
-  ) = __$$WsClientRequestImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({String? requestId, ClientMessage message});
 
-  @override
-  $ClientMessageCopyWith<$Res> get message;
+/// Adds pattern-matching-related methods to [WsClientRequest].
+extension WsClientRequestPatterns on WsClientRequest {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _WsClientRequest value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _WsClientRequest() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _WsClientRequest value)  $default,){
+final _that = this;
+switch (_that) {
+case _WsClientRequest():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _WsClientRequest value)?  $default,){
+final _that = this;
+switch (_that) {
+case _WsClientRequest() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? requestId,  ClientMessage message)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _WsClientRequest() when $default != null:
+return $default(_that.requestId,_that.message);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? requestId,  ClientMessage message)  $default,) {final _that = this;
+switch (_that) {
+case _WsClientRequest():
+return $default(_that.requestId,_that.message);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? requestId,  ClientMessage message)?  $default,) {final _that = this;
+switch (_that) {
+case _WsClientRequest() when $default != null:
+return $default(_that.requestId,_that.message);case _:
+  return null;
+
+}
 }
 
-/// @nodoc
-class __$$WsClientRequestImplCopyWithImpl<$Res>
-    extends _$WsClientRequestCopyWithImpl<$Res, _$WsClientRequestImpl>
-    implements _$$WsClientRequestImplCopyWith<$Res> {
-  __$$WsClientRequestImplCopyWithImpl(
-    _$WsClientRequestImpl _value,
-    $Res Function(_$WsClientRequestImpl) _then,
-  ) : super(_value, _then);
-
-  /// Create a copy of WsClientRequest
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({Object? requestId = freezed, Object? message = null}) {
-    return _then(
-      _$WsClientRequestImpl(
-        requestId:
-            freezed == requestId
-                ? _value.requestId
-                : requestId // ignore: cast_nullable_to_non_nullable
-                    as String?,
-        message:
-            null == message
-                ? _value.message
-                : message // ignore: cast_nullable_to_non_nullable
-                    as ClientMessage,
-      ),
-    );
-  }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$WsClientRequestImpl implements _WsClientRequest {
-  const _$WsClientRequestImpl({this.requestId, required this.message});
 
-  factory _$WsClientRequestImpl.fromJson(Map<String, dynamic> json) =>
-      _$$WsClientRequestImplFromJson(json);
+class _WsClientRequest implements WsClientRequest {
+  const _WsClientRequest({this.requestId, required this.message});
+  factory _WsClientRequest.fromJson(Map<String, dynamic> json) => _$WsClientRequestFromJson(json);
 
-  @override
-  final String? requestId;
-  @override
-  final ClientMessage message;
+@override final  String? requestId;
+@override final  ClientMessage message;
 
-  @override
-  String toString() {
-    return 'WsClientRequest(requestId: $requestId, message: $message)';
-  }
+/// Create a copy of WsClientRequest
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$WsClientRequestCopyWith<_WsClientRequest> get copyWith => __$WsClientRequestCopyWithImpl<_WsClientRequest>(this, _$identity);
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$WsClientRequestImpl &&
-            (identical(other.requestId, requestId) ||
-                other.requestId == requestId) &&
-            (identical(other.message, message) || other.message == message));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, requestId, message);
-
-  /// Create a copy of WsClientRequest
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$WsClientRequestImplCopyWith<_$WsClientRequestImpl> get copyWith =>
-      __$$WsClientRequestImplCopyWithImpl<_$WsClientRequestImpl>(
-        this,
-        _$identity,
-      );
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$WsClientRequestImplToJson(this);
-  }
+@override
+Map<String, dynamic> toJson() {
+  return _$WsClientRequestToJson(this, );
 }
 
-abstract class _WsClientRequest implements WsClientRequest {
-  const factory _WsClientRequest({
-    final String? requestId,
-    required final ClientMessage message,
-  }) = _$WsClientRequestImpl;
-
-  factory _WsClientRequest.fromJson(Map<String, dynamic> json) =
-      _$WsClientRequestImpl.fromJson;
-
-  @override
-  String? get requestId;
-  @override
-  ClientMessage get message;
-
-  /// Create a copy of WsClientRequest
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$WsClientRequestImplCopyWith<_$WsClientRequestImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WsClientRequest&&(identical(other.requestId, requestId) || other.requestId == requestId)&&(identical(other.message, message) || other.message == message));
 }
 
-ClientMessage _$ClientMessageFromJson(Map<String, dynamic> json) {
-  switch (json['type']) {
-    case 'requestSync':
-      return ClientMessageRequestSync.fromJson(json);
-    case 'startEvent':
-      return ClientMessageStartEvent.fromJson(json);
-    case 'breakEvent':
-      return ClientMessageBreakEvent.fromJson(json);
-    case 'terminateEvent':
-      return ClientMessageTerminateEvent.fromJson(json);
-    case 'updatePomodoroContext':
-      return ClientMessageUpdatePomodoroContext.fromJson(json);
-    case 'updateNote':
-      return ClientMessageUpdateNote.fromJson(json);
-    case 'updateConcentrationScore':
-      return ClientMessageUpdateConcentrationScore.fromJson(json);
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,requestId,message);
 
-    default:
-      throw CheckedFromJsonException(
-        json,
-        'type',
-        'ClientMessage',
-        'Invalid union type "${json['type']}"!',
-      );
-  }
+@override
+String toString() {
+  return 'WsClientRequest(requestId: $requestId, message: $message)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$WsClientRequestCopyWith<$Res> implements $WsClientRequestCopyWith<$Res> {
+  factory _$WsClientRequestCopyWith(_WsClientRequest value, $Res Function(_WsClientRequest) _then) = __$WsClientRequestCopyWithImpl;
+@override @useResult
+$Res call({
+ String? requestId, ClientMessage message
+});
+
+
+@override $ClientMessageCopyWith<$Res> get message;
+
+}
+/// @nodoc
+class __$WsClientRequestCopyWithImpl<$Res>
+    implements _$WsClientRequestCopyWith<$Res> {
+  __$WsClientRequestCopyWithImpl(this._self, this._then);
+
+  final _WsClientRequest _self;
+  final $Res Function(_WsClientRequest) _then;
+
+/// Create a copy of WsClientRequest
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? requestId = freezed,Object? message = null,}) {
+  return _then(_WsClientRequest(
+requestId: freezed == requestId ? _self.requestId : requestId // ignore: cast_nullable_to_non_nullable
+as String?,message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
+as ClientMessage,
+  ));
+}
+
+/// Create a copy of WsClientRequest
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ClientMessageCopyWith<$Res> get message {
+  
+  return $ClientMessageCopyWith<$Res>(_self.message, (value) {
+    return _then(_self.copyWith(message: value));
+  });
+}
+}
+
+ClientMessage _$ClientMessageFromJson(
+  Map<String, dynamic> json
+) {
+        switch (json['type']) {
+                  case 'requestSync':
+          return ClientMessageRequestSync.fromJson(
+            json
+          );
+                case 'startEvent':
+          return ClientMessageStartEvent.fromJson(
+            json
+          );
+                case 'breakEvent':
+          return ClientMessageBreakEvent.fromJson(
+            json
+          );
+                case 'terminateEvent':
+          return ClientMessageTerminateEvent.fromJson(
+            json
+          );
+                case 'updatePomodoroContext':
+          return ClientMessageUpdatePomodoroContext.fromJson(
+            json
+          );
+                case 'updateNote':
+          return ClientMessageUpdateNote.fromJson(
+            json
+          );
+                case 'updateConcentrationScore':
+          return ClientMessageUpdateConcentrationScore.fromJson(
+            json
+          );
+        
+          default:
+            throw CheckedFromJsonException(
+  json,
+  'type',
+  'ClientMessage',
+  'Invalid union type "${json['type']}"!'
+);
+        }
+      
 }
 
 /// @nodoc
 mixin _$ClientMessage {
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() requestSync,
-    required TResult Function() startEvent,
-    required TResult Function() breakEvent,
-    required TResult Function() terminateEvent,
-    required TResult Function(UpdatePomodoroContext payload)
-    updatePomodoroContext,
-    required TResult Function(NoteUpdate payload) updateNote,
-    required TResult Function(UpdateConcentrationScore payload)
-    updateConcentrationScore,
-  }) => throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? requestSync,
-    TResult? Function()? startEvent,
-    TResult? Function()? breakEvent,
-    TResult? Function()? terminateEvent,
-    TResult? Function(UpdatePomodoroContext payload)? updatePomodoroContext,
-    TResult? Function(NoteUpdate payload)? updateNote,
-    TResult? Function(UpdateConcentrationScore payload)?
-    updateConcentrationScore,
-  }) => throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? requestSync,
-    TResult Function()? startEvent,
-    TResult Function()? breakEvent,
-    TResult Function()? terminateEvent,
-    TResult Function(UpdatePomodoroContext payload)? updatePomodoroContext,
-    TResult Function(NoteUpdate payload)? updateNote,
-    TResult Function(UpdateConcentrationScore payload)?
-    updateConcentrationScore,
-    required TResult orElse(),
-  }) => throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(ClientMessageRequestSync value) requestSync,
-    required TResult Function(ClientMessageStartEvent value) startEvent,
-    required TResult Function(ClientMessageBreakEvent value) breakEvent,
-    required TResult Function(ClientMessageTerminateEvent value) terminateEvent,
-    required TResult Function(ClientMessageUpdatePomodoroContext value)
-    updatePomodoroContext,
-    required TResult Function(ClientMessageUpdateNote value) updateNote,
-    required TResult Function(ClientMessageUpdateConcentrationScore value)
-    updateConcentrationScore,
-  }) => throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(ClientMessageRequestSync value)? requestSync,
-    TResult? Function(ClientMessageStartEvent value)? startEvent,
-    TResult? Function(ClientMessageBreakEvent value)? breakEvent,
-    TResult? Function(ClientMessageTerminateEvent value)? terminateEvent,
-    TResult? Function(ClientMessageUpdatePomodoroContext value)?
-    updatePomodoroContext,
-    TResult? Function(ClientMessageUpdateNote value)? updateNote,
-    TResult? Function(ClientMessageUpdateConcentrationScore value)?
-    updateConcentrationScore,
-  }) => throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(ClientMessageRequestSync value)? requestSync,
-    TResult Function(ClientMessageStartEvent value)? startEvent,
-    TResult Function(ClientMessageBreakEvent value)? breakEvent,
-    TResult Function(ClientMessageTerminateEvent value)? terminateEvent,
-    TResult Function(ClientMessageUpdatePomodoroContext value)?
-    updatePomodoroContext,
-    TResult Function(ClientMessageUpdateNote value)? updateNote,
-    TResult Function(ClientMessageUpdateConcentrationScore value)?
-    updateConcentrationScore,
-    required TResult orElse(),
-  }) => throw _privateConstructorUsedError;
+
+
 
   /// Serializes this ClientMessage to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ClientMessage);
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'ClientMessage()';
+}
+
+
 }
 
 /// @nodoc
-abstract class $ClientMessageCopyWith<$Res> {
-  factory $ClientMessageCopyWith(
-    ClientMessage value,
-    $Res Function(ClientMessage) then,
-  ) = _$ClientMessageCopyWithImpl<$Res, ClientMessage>;
+class $ClientMessageCopyWith<$Res>  {
+$ClientMessageCopyWith(ClientMessage _, $Res Function(ClientMessage) __);
 }
 
-/// @nodoc
-class _$ClientMessageCopyWithImpl<$Res, $Val extends ClientMessage>
-    implements $ClientMessageCopyWith<$Res> {
-  _$ClientMessageCopyWithImpl(this._value, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+/// Adds pattern-matching-related methods to [ClientMessage].
+extension ClientMessagePatterns on ClientMessage {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
 
-  /// Create a copy of ClientMessage
-  /// with the given fields replaced by the non-null parameter values.
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( ClientMessageRequestSync value)?  requestSync,TResult Function( ClientMessageStartEvent value)?  startEvent,TResult Function( ClientMessageBreakEvent value)?  breakEvent,TResult Function( ClientMessageTerminateEvent value)?  terminateEvent,TResult Function( ClientMessageUpdatePomodoroContext value)?  updatePomodoroContext,TResult Function( ClientMessageUpdateNote value)?  updateNote,TResult Function( ClientMessageUpdateConcentrationScore value)?  updateConcentrationScore,required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case ClientMessageRequestSync() when requestSync != null:
+return requestSync(_that);case ClientMessageStartEvent() when startEvent != null:
+return startEvent(_that);case ClientMessageBreakEvent() when breakEvent != null:
+return breakEvent(_that);case ClientMessageTerminateEvent() when terminateEvent != null:
+return terminateEvent(_that);case ClientMessageUpdatePomodoroContext() when updatePomodoroContext != null:
+return updatePomodoroContext(_that);case ClientMessageUpdateNote() when updateNote != null:
+return updateNote(_that);case ClientMessageUpdateConcentrationScore() when updateConcentrationScore != null:
+return updateConcentrationScore(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( ClientMessageRequestSync value)  requestSync,required TResult Function( ClientMessageStartEvent value)  startEvent,required TResult Function( ClientMessageBreakEvent value)  breakEvent,required TResult Function( ClientMessageTerminateEvent value)  terminateEvent,required TResult Function( ClientMessageUpdatePomodoroContext value)  updatePomodoroContext,required TResult Function( ClientMessageUpdateNote value)  updateNote,required TResult Function( ClientMessageUpdateConcentrationScore value)  updateConcentrationScore,}){
+final _that = this;
+switch (_that) {
+case ClientMessageRequestSync():
+return requestSync(_that);case ClientMessageStartEvent():
+return startEvent(_that);case ClientMessageBreakEvent():
+return breakEvent(_that);case ClientMessageTerminateEvent():
+return terminateEvent(_that);case ClientMessageUpdatePomodoroContext():
+return updatePomodoroContext(_that);case ClientMessageUpdateNote():
+return updateNote(_that);case ClientMessageUpdateConcentrationScore():
+return updateConcentrationScore(_that);}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( ClientMessageRequestSync value)?  requestSync,TResult? Function( ClientMessageStartEvent value)?  startEvent,TResult? Function( ClientMessageBreakEvent value)?  breakEvent,TResult? Function( ClientMessageTerminateEvent value)?  terminateEvent,TResult? Function( ClientMessageUpdatePomodoroContext value)?  updatePomodoroContext,TResult? Function( ClientMessageUpdateNote value)?  updateNote,TResult? Function( ClientMessageUpdateConcentrationScore value)?  updateConcentrationScore,}){
+final _that = this;
+switch (_that) {
+case ClientMessageRequestSync() when requestSync != null:
+return requestSync(_that);case ClientMessageStartEvent() when startEvent != null:
+return startEvent(_that);case ClientMessageBreakEvent() when breakEvent != null:
+return breakEvent(_that);case ClientMessageTerminateEvent() when terminateEvent != null:
+return terminateEvent(_that);case ClientMessageUpdatePomodoroContext() when updatePomodoroContext != null:
+return updatePomodoroContext(_that);case ClientMessageUpdateNote() when updateNote != null:
+return updateNote(_that);case ClientMessageUpdateConcentrationScore() when updateConcentrationScore != null:
+return updateConcentrationScore(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  requestSync,TResult Function()?  startEvent,TResult Function()?  breakEvent,TResult Function()?  terminateEvent,TResult Function( UpdatePomodoroContext payload)?  updatePomodoroContext,TResult Function( NoteUpdate payload)?  updateNote,TResult Function( UpdateConcentrationScore payload)?  updateConcentrationScore,required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case ClientMessageRequestSync() when requestSync != null:
+return requestSync();case ClientMessageStartEvent() when startEvent != null:
+return startEvent();case ClientMessageBreakEvent() when breakEvent != null:
+return breakEvent();case ClientMessageTerminateEvent() when terminateEvent != null:
+return terminateEvent();case ClientMessageUpdatePomodoroContext() when updatePomodoroContext != null:
+return updatePomodoroContext(_that.payload);case ClientMessageUpdateNote() when updateNote != null:
+return updateNote(_that.payload);case ClientMessageUpdateConcentrationScore() when updateConcentrationScore != null:
+return updateConcentrationScore(_that.payload);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  requestSync,required TResult Function()  startEvent,required TResult Function()  breakEvent,required TResult Function()  terminateEvent,required TResult Function( UpdatePomodoroContext payload)  updatePomodoroContext,required TResult Function( NoteUpdate payload)  updateNote,required TResult Function( UpdateConcentrationScore payload)  updateConcentrationScore,}) {final _that = this;
+switch (_that) {
+case ClientMessageRequestSync():
+return requestSync();case ClientMessageStartEvent():
+return startEvent();case ClientMessageBreakEvent():
+return breakEvent();case ClientMessageTerminateEvent():
+return terminateEvent();case ClientMessageUpdatePomodoroContext():
+return updatePomodoroContext(_that.payload);case ClientMessageUpdateNote():
+return updateNote(_that.payload);case ClientMessageUpdateConcentrationScore():
+return updateConcentrationScore(_that.payload);}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  requestSync,TResult? Function()?  startEvent,TResult? Function()?  breakEvent,TResult? Function()?  terminateEvent,TResult? Function( UpdatePomodoroContext payload)?  updatePomodoroContext,TResult? Function( NoteUpdate payload)?  updateNote,TResult? Function( UpdateConcentrationScore payload)?  updateConcentrationScore,}) {final _that = this;
+switch (_that) {
+case ClientMessageRequestSync() when requestSync != null:
+return requestSync();case ClientMessageStartEvent() when startEvent != null:
+return startEvent();case ClientMessageBreakEvent() when breakEvent != null:
+return breakEvent();case ClientMessageTerminateEvent() when terminateEvent != null:
+return terminateEvent();case ClientMessageUpdatePomodoroContext() when updatePomodoroContext != null:
+return updatePomodoroContext(_that.payload);case ClientMessageUpdateNote() when updateNote != null:
+return updateNote(_that.payload);case ClientMessageUpdateConcentrationScore() when updateConcentrationScore != null:
+return updateConcentrationScore(_that.payload);case _:
+  return null;
+
+}
 }
 
-/// @nodoc
-abstract class _$$ClientMessageRequestSyncImplCopyWith<$Res> {
-  factory _$$ClientMessageRequestSyncImplCopyWith(
-    _$ClientMessageRequestSyncImpl value,
-    $Res Function(_$ClientMessageRequestSyncImpl) then,
-  ) = __$$ClientMessageRequestSyncImplCopyWithImpl<$Res>;
-}
-
-/// @nodoc
-class __$$ClientMessageRequestSyncImplCopyWithImpl<$Res>
-    extends _$ClientMessageCopyWithImpl<$Res, _$ClientMessageRequestSyncImpl>
-    implements _$$ClientMessageRequestSyncImplCopyWith<$Res> {
-  __$$ClientMessageRequestSyncImplCopyWithImpl(
-    _$ClientMessageRequestSyncImpl _value,
-    $Res Function(_$ClientMessageRequestSyncImpl) _then,
-  ) : super(_value, _then);
-
-  /// Create a copy of ClientMessage
-  /// with the given fields replaced by the non-null parameter values.
-}
-
-/// @nodoc
-@JsonSerializable()
-class _$ClientMessageRequestSyncImpl implements ClientMessageRequestSync {
-  const _$ClientMessageRequestSyncImpl({final String? $type})
-    : $type = $type ?? 'requestSync';
-
-  factory _$ClientMessageRequestSyncImpl.fromJson(Map<String, dynamic> json) =>
-      _$$ClientMessageRequestSyncImplFromJson(json);
-
-  @JsonKey(name: 'type')
-  final String $type;
-
-  @override
-  String toString() {
-    return 'ClientMessage.requestSync()';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$ClientMessageRequestSyncImpl);
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => runtimeType.hashCode;
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() requestSync,
-    required TResult Function() startEvent,
-    required TResult Function() breakEvent,
-    required TResult Function() terminateEvent,
-    required TResult Function(UpdatePomodoroContext payload)
-    updatePomodoroContext,
-    required TResult Function(NoteUpdate payload) updateNote,
-    required TResult Function(UpdateConcentrationScore payload)
-    updateConcentrationScore,
-  }) {
-    return requestSync();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? requestSync,
-    TResult? Function()? startEvent,
-    TResult? Function()? breakEvent,
-    TResult? Function()? terminateEvent,
-    TResult? Function(UpdatePomodoroContext payload)? updatePomodoroContext,
-    TResult? Function(NoteUpdate payload)? updateNote,
-    TResult? Function(UpdateConcentrationScore payload)?
-    updateConcentrationScore,
-  }) {
-    return requestSync?.call();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? requestSync,
-    TResult Function()? startEvent,
-    TResult Function()? breakEvent,
-    TResult Function()? terminateEvent,
-    TResult Function(UpdatePomodoroContext payload)? updatePomodoroContext,
-    TResult Function(NoteUpdate payload)? updateNote,
-    TResult Function(UpdateConcentrationScore payload)?
-    updateConcentrationScore,
-    required TResult orElse(),
-  }) {
-    if (requestSync != null) {
-      return requestSync();
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(ClientMessageRequestSync value) requestSync,
-    required TResult Function(ClientMessageStartEvent value) startEvent,
-    required TResult Function(ClientMessageBreakEvent value) breakEvent,
-    required TResult Function(ClientMessageTerminateEvent value) terminateEvent,
-    required TResult Function(ClientMessageUpdatePomodoroContext value)
-    updatePomodoroContext,
-    required TResult Function(ClientMessageUpdateNote value) updateNote,
-    required TResult Function(ClientMessageUpdateConcentrationScore value)
-    updateConcentrationScore,
-  }) {
-    return requestSync(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(ClientMessageRequestSync value)? requestSync,
-    TResult? Function(ClientMessageStartEvent value)? startEvent,
-    TResult? Function(ClientMessageBreakEvent value)? breakEvent,
-    TResult? Function(ClientMessageTerminateEvent value)? terminateEvent,
-    TResult? Function(ClientMessageUpdatePomodoroContext value)?
-    updatePomodoroContext,
-    TResult? Function(ClientMessageUpdateNote value)? updateNote,
-    TResult? Function(ClientMessageUpdateConcentrationScore value)?
-    updateConcentrationScore,
-  }) {
-    return requestSync?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(ClientMessageRequestSync value)? requestSync,
-    TResult Function(ClientMessageStartEvent value)? startEvent,
-    TResult Function(ClientMessageBreakEvent value)? breakEvent,
-    TResult Function(ClientMessageTerminateEvent value)? terminateEvent,
-    TResult Function(ClientMessageUpdatePomodoroContext value)?
-    updatePomodoroContext,
-    TResult Function(ClientMessageUpdateNote value)? updateNote,
-    TResult Function(ClientMessageUpdateConcentrationScore value)?
-    updateConcentrationScore,
-    required TResult orElse(),
-  }) {
-    if (requestSync != null) {
-      return requestSync(this);
-    }
-    return orElse();
-  }
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$ClientMessageRequestSyncImplToJson(this);
-  }
-}
-
-abstract class ClientMessageRequestSync implements ClientMessage {
-  const factory ClientMessageRequestSync() = _$ClientMessageRequestSyncImpl;
-
-  factory ClientMessageRequestSync.fromJson(Map<String, dynamic> json) =
-      _$ClientMessageRequestSyncImpl.fromJson;
-}
-
-/// @nodoc
-abstract class _$$ClientMessageStartEventImplCopyWith<$Res> {
-  factory _$$ClientMessageStartEventImplCopyWith(
-    _$ClientMessageStartEventImpl value,
-    $Res Function(_$ClientMessageStartEventImpl) then,
-  ) = __$$ClientMessageStartEventImplCopyWithImpl<$Res>;
-}
-
-/// @nodoc
-class __$$ClientMessageStartEventImplCopyWithImpl<$Res>
-    extends _$ClientMessageCopyWithImpl<$Res, _$ClientMessageStartEventImpl>
-    implements _$$ClientMessageStartEventImplCopyWith<$Res> {
-  __$$ClientMessageStartEventImplCopyWithImpl(
-    _$ClientMessageStartEventImpl _value,
-    $Res Function(_$ClientMessageStartEventImpl) _then,
-  ) : super(_value, _then);
-
-  /// Create a copy of ClientMessage
-  /// with the given fields replaced by the non-null parameter values.
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$ClientMessageStartEventImpl implements ClientMessageStartEvent {
-  const _$ClientMessageStartEventImpl({final String? $type})
-    : $type = $type ?? 'startEvent';
 
-  factory _$ClientMessageStartEventImpl.fromJson(Map<String, dynamic> json) =>
-      _$$ClientMessageStartEventImplFromJson(json);
+class ClientMessageRequestSync implements ClientMessage {
+  const ClientMessageRequestSync({final  String? $type}): $type = $type ?? 'requestSync';
+  factory ClientMessageRequestSync.fromJson(Map<String, dynamic> json) => _$ClientMessageRequestSyncFromJson(json);
 
-  @JsonKey(name: 'type')
-  final String $type;
 
-  @override
-  String toString() {
-    return 'ClientMessage.startEvent()';
-  }
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$ClientMessageStartEventImpl);
-  }
+@JsonKey(name: 'type')
+final String $type;
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => runtimeType.hashCode;
 
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() requestSync,
-    required TResult Function() startEvent,
-    required TResult Function() breakEvent,
-    required TResult Function() terminateEvent,
-    required TResult Function(UpdatePomodoroContext payload)
-    updatePomodoroContext,
-    required TResult Function(NoteUpdate payload) updateNote,
-    required TResult Function(UpdateConcentrationScore payload)
-    updateConcentrationScore,
-  }) {
-    return startEvent();
-  }
 
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? requestSync,
-    TResult? Function()? startEvent,
-    TResult? Function()? breakEvent,
-    TResult? Function()? terminateEvent,
-    TResult? Function(UpdatePomodoroContext payload)? updatePomodoroContext,
-    TResult? Function(NoteUpdate payload)? updateNote,
-    TResult? Function(UpdateConcentrationScore payload)?
-    updateConcentrationScore,
-  }) {
-    return startEvent?.call();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? requestSync,
-    TResult Function()? startEvent,
-    TResult Function()? breakEvent,
-    TResult Function()? terminateEvent,
-    TResult Function(UpdatePomodoroContext payload)? updatePomodoroContext,
-    TResult Function(NoteUpdate payload)? updateNote,
-    TResult Function(UpdateConcentrationScore payload)?
-    updateConcentrationScore,
-    required TResult orElse(),
-  }) {
-    if (startEvent != null) {
-      return startEvent();
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(ClientMessageRequestSync value) requestSync,
-    required TResult Function(ClientMessageStartEvent value) startEvent,
-    required TResult Function(ClientMessageBreakEvent value) breakEvent,
-    required TResult Function(ClientMessageTerminateEvent value) terminateEvent,
-    required TResult Function(ClientMessageUpdatePomodoroContext value)
-    updatePomodoroContext,
-    required TResult Function(ClientMessageUpdateNote value) updateNote,
-    required TResult Function(ClientMessageUpdateConcentrationScore value)
-    updateConcentrationScore,
-  }) {
-    return startEvent(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(ClientMessageRequestSync value)? requestSync,
-    TResult? Function(ClientMessageStartEvent value)? startEvent,
-    TResult? Function(ClientMessageBreakEvent value)? breakEvent,
-    TResult? Function(ClientMessageTerminateEvent value)? terminateEvent,
-    TResult? Function(ClientMessageUpdatePomodoroContext value)?
-    updatePomodoroContext,
-    TResult? Function(ClientMessageUpdateNote value)? updateNote,
-    TResult? Function(ClientMessageUpdateConcentrationScore value)?
-    updateConcentrationScore,
-  }) {
-    return startEvent?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(ClientMessageRequestSync value)? requestSync,
-    TResult Function(ClientMessageStartEvent value)? startEvent,
-    TResult Function(ClientMessageBreakEvent value)? breakEvent,
-    TResult Function(ClientMessageTerminateEvent value)? terminateEvent,
-    TResult Function(ClientMessageUpdatePomodoroContext value)?
-    updatePomodoroContext,
-    TResult Function(ClientMessageUpdateNote value)? updateNote,
-    TResult Function(ClientMessageUpdateConcentrationScore value)?
-    updateConcentrationScore,
-    required TResult orElse(),
-  }) {
-    if (startEvent != null) {
-      return startEvent(this);
-    }
-    return orElse();
-  }
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$ClientMessageStartEventImplToJson(this);
-  }
+@override
+Map<String, dynamic> toJson() {
+  return _$ClientMessageRequestSyncToJson(this, );
 }
 
-abstract class ClientMessageStartEvent implements ClientMessage {
-  const factory ClientMessageStartEvent() = _$ClientMessageStartEventImpl;
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ClientMessageRequestSync);
+}
 
-  factory ClientMessageStartEvent.fromJson(Map<String, dynamic> json) =
-      _$ClientMessageStartEventImpl.fromJson;
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'ClientMessage.requestSync()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+@JsonSerializable()
+
+class ClientMessageStartEvent implements ClientMessage {
+  const ClientMessageStartEvent({final  String? $type}): $type = $type ?? 'startEvent';
+  factory ClientMessageStartEvent.fromJson(Map<String, dynamic> json) => _$ClientMessageStartEventFromJson(json);
+
+
+
+@JsonKey(name: 'type')
+final String $type;
+
+
+
+@override
+Map<String, dynamic> toJson() {
+  return _$ClientMessageStartEventToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ClientMessageStartEvent);
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'ClientMessage.startEvent()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+@JsonSerializable()
+
+class ClientMessageBreakEvent implements ClientMessage {
+  const ClientMessageBreakEvent({final  String? $type}): $type = $type ?? 'breakEvent';
+  factory ClientMessageBreakEvent.fromJson(Map<String, dynamic> json) => _$ClientMessageBreakEventFromJson(json);
+
+
+
+@JsonKey(name: 'type')
+final String $type;
+
+
+
+@override
+Map<String, dynamic> toJson() {
+  return _$ClientMessageBreakEventToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ClientMessageBreakEvent);
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'ClientMessage.breakEvent()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+@JsonSerializable()
+
+class ClientMessageTerminateEvent implements ClientMessage {
+  const ClientMessageTerminateEvent({final  String? $type}): $type = $type ?? 'terminateEvent';
+  factory ClientMessageTerminateEvent.fromJson(Map<String, dynamic> json) => _$ClientMessageTerminateEventFromJson(json);
+
+
+
+@JsonKey(name: 'type')
+final String $type;
+
+
+
+@override
+Map<String, dynamic> toJson() {
+  return _$ClientMessageTerminateEventToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ClientMessageTerminateEvent);
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'ClientMessage.terminateEvent()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+@JsonSerializable()
+
+class ClientMessageUpdatePomodoroContext implements ClientMessage {
+  const ClientMessageUpdatePomodoroContext(this.payload, {final  String? $type}): $type = $type ?? 'updatePomodoroContext';
+  factory ClientMessageUpdatePomodoroContext.fromJson(Map<String, dynamic> json) => _$ClientMessageUpdatePomodoroContextFromJson(json);
+
+ final  UpdatePomodoroContext payload;
+
+@JsonKey(name: 'type')
+final String $type;
+
+
+/// Create a copy of ClientMessage
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ClientMessageUpdatePomodoroContextCopyWith<ClientMessageUpdatePomodoroContext> get copyWith => _$ClientMessageUpdatePomodoroContextCopyWithImpl<ClientMessageUpdatePomodoroContext>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$ClientMessageUpdatePomodoroContextToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ClientMessageUpdatePomodoroContext&&(identical(other.payload, payload) || other.payload == payload));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,payload);
+
+@override
+String toString() {
+  return 'ClientMessage.updatePomodoroContext(payload: $payload)';
+}
+
+
 }
 
 /// @nodoc
-abstract class _$$ClientMessageBreakEventImplCopyWith<$Res> {
-  factory _$$ClientMessageBreakEventImplCopyWith(
-    _$ClientMessageBreakEventImpl value,
-    $Res Function(_$ClientMessageBreakEventImpl) then,
-  ) = __$$ClientMessageBreakEventImplCopyWithImpl<$Res>;
+abstract mixin class $ClientMessageUpdatePomodoroContextCopyWith<$Res> implements $ClientMessageCopyWith<$Res> {
+  factory $ClientMessageUpdatePomodoroContextCopyWith(ClientMessageUpdatePomodoroContext value, $Res Function(ClientMessageUpdatePomodoroContext) _then) = _$ClientMessageUpdatePomodoroContextCopyWithImpl;
+@useResult
+$Res call({
+ UpdatePomodoroContext payload
+});
+
+
+$UpdatePomodoroContextCopyWith<$Res> get payload;
+
+}
+/// @nodoc
+class _$ClientMessageUpdatePomodoroContextCopyWithImpl<$Res>
+    implements $ClientMessageUpdatePomodoroContextCopyWith<$Res> {
+  _$ClientMessageUpdatePomodoroContextCopyWithImpl(this._self, this._then);
+
+  final ClientMessageUpdatePomodoroContext _self;
+  final $Res Function(ClientMessageUpdatePomodoroContext) _then;
+
+/// Create a copy of ClientMessage
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? payload = null,}) {
+  return _then(ClientMessageUpdatePomodoroContext(
+null == payload ? _self.payload : payload // ignore: cast_nullable_to_non_nullable
+as UpdatePomodoroContext,
+  ));
 }
 
-/// @nodoc
-class __$$ClientMessageBreakEventImplCopyWithImpl<$Res>
-    extends _$ClientMessageCopyWithImpl<$Res, _$ClientMessageBreakEventImpl>
-    implements _$$ClientMessageBreakEventImplCopyWith<$Res> {
-  __$$ClientMessageBreakEventImplCopyWithImpl(
-    _$ClientMessageBreakEventImpl _value,
-    $Res Function(_$ClientMessageBreakEventImpl) _then,
-  ) : super(_value, _then);
-
-  /// Create a copy of ClientMessage
-  /// with the given fields replaced by the non-null parameter values.
+/// Create a copy of ClientMessage
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UpdatePomodoroContextCopyWith<$Res> get payload {
+  
+  return $UpdatePomodoroContextCopyWith<$Res>(_self.payload, (value) {
+    return _then(_self.copyWith(payload: value));
+  });
+}
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$ClientMessageBreakEventImpl implements ClientMessageBreakEvent {
-  const _$ClientMessageBreakEventImpl({final String? $type})
-    : $type = $type ?? 'breakEvent';
 
-  factory _$ClientMessageBreakEventImpl.fromJson(Map<String, dynamic> json) =>
-      _$$ClientMessageBreakEventImplFromJson(json);
+class ClientMessageUpdateNote implements ClientMessage {
+  const ClientMessageUpdateNote(this.payload, {final  String? $type}): $type = $type ?? 'updateNote';
+  factory ClientMessageUpdateNote.fromJson(Map<String, dynamic> json) => _$ClientMessageUpdateNoteFromJson(json);
 
-  @JsonKey(name: 'type')
-  final String $type;
+ final  NoteUpdate payload;
 
-  @override
-  String toString() {
-    return 'ClientMessage.breakEvent()';
-  }
+@JsonKey(name: 'type')
+final String $type;
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$ClientMessageBreakEventImpl);
-  }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => runtimeType.hashCode;
+/// Create a copy of ClientMessage
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ClientMessageUpdateNoteCopyWith<ClientMessageUpdateNote> get copyWith => _$ClientMessageUpdateNoteCopyWithImpl<ClientMessageUpdateNote>(this, _$identity);
 
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() requestSync,
-    required TResult Function() startEvent,
-    required TResult Function() breakEvent,
-    required TResult Function() terminateEvent,
-    required TResult Function(UpdatePomodoroContext payload)
-    updatePomodoroContext,
-    required TResult Function(NoteUpdate payload) updateNote,
-    required TResult Function(UpdateConcentrationScore payload)
-    updateConcentrationScore,
-  }) {
-    return breakEvent();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? requestSync,
-    TResult? Function()? startEvent,
-    TResult? Function()? breakEvent,
-    TResult? Function()? terminateEvent,
-    TResult? Function(UpdatePomodoroContext payload)? updatePomodoroContext,
-    TResult? Function(NoteUpdate payload)? updateNote,
-    TResult? Function(UpdateConcentrationScore payload)?
-    updateConcentrationScore,
-  }) {
-    return breakEvent?.call();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? requestSync,
-    TResult Function()? startEvent,
-    TResult Function()? breakEvent,
-    TResult Function()? terminateEvent,
-    TResult Function(UpdatePomodoroContext payload)? updatePomodoroContext,
-    TResult Function(NoteUpdate payload)? updateNote,
-    TResult Function(UpdateConcentrationScore payload)?
-    updateConcentrationScore,
-    required TResult orElse(),
-  }) {
-    if (breakEvent != null) {
-      return breakEvent();
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(ClientMessageRequestSync value) requestSync,
-    required TResult Function(ClientMessageStartEvent value) startEvent,
-    required TResult Function(ClientMessageBreakEvent value) breakEvent,
-    required TResult Function(ClientMessageTerminateEvent value) terminateEvent,
-    required TResult Function(ClientMessageUpdatePomodoroContext value)
-    updatePomodoroContext,
-    required TResult Function(ClientMessageUpdateNote value) updateNote,
-    required TResult Function(ClientMessageUpdateConcentrationScore value)
-    updateConcentrationScore,
-  }) {
-    return breakEvent(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(ClientMessageRequestSync value)? requestSync,
-    TResult? Function(ClientMessageStartEvent value)? startEvent,
-    TResult? Function(ClientMessageBreakEvent value)? breakEvent,
-    TResult? Function(ClientMessageTerminateEvent value)? terminateEvent,
-    TResult? Function(ClientMessageUpdatePomodoroContext value)?
-    updatePomodoroContext,
-    TResult? Function(ClientMessageUpdateNote value)? updateNote,
-    TResult? Function(ClientMessageUpdateConcentrationScore value)?
-    updateConcentrationScore,
-  }) {
-    return breakEvent?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(ClientMessageRequestSync value)? requestSync,
-    TResult Function(ClientMessageStartEvent value)? startEvent,
-    TResult Function(ClientMessageBreakEvent value)? breakEvent,
-    TResult Function(ClientMessageTerminateEvent value)? terminateEvent,
-    TResult Function(ClientMessageUpdatePomodoroContext value)?
-    updatePomodoroContext,
-    TResult Function(ClientMessageUpdateNote value)? updateNote,
-    TResult Function(ClientMessageUpdateConcentrationScore value)?
-    updateConcentrationScore,
-    required TResult orElse(),
-  }) {
-    if (breakEvent != null) {
-      return breakEvent(this);
-    }
-    return orElse();
-  }
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$ClientMessageBreakEventImplToJson(this);
-  }
+@override
+Map<String, dynamic> toJson() {
+  return _$ClientMessageUpdateNoteToJson(this, );
 }
 
-abstract class ClientMessageBreakEvent implements ClientMessage {
-  const factory ClientMessageBreakEvent() = _$ClientMessageBreakEventImpl;
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ClientMessageUpdateNote&&(identical(other.payload, payload) || other.payload == payload));
+}
 
-  factory ClientMessageBreakEvent.fromJson(Map<String, dynamic> json) =
-      _$ClientMessageBreakEventImpl.fromJson;
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,payload);
+
+@override
+String toString() {
+  return 'ClientMessage.updateNote(payload: $payload)';
+}
+
+
 }
 
 /// @nodoc
-abstract class _$$ClientMessageTerminateEventImplCopyWith<$Res> {
-  factory _$$ClientMessageTerminateEventImplCopyWith(
-    _$ClientMessageTerminateEventImpl value,
-    $Res Function(_$ClientMessageTerminateEventImpl) then,
-  ) = __$$ClientMessageTerminateEventImplCopyWithImpl<$Res>;
+abstract mixin class $ClientMessageUpdateNoteCopyWith<$Res> implements $ClientMessageCopyWith<$Res> {
+  factory $ClientMessageUpdateNoteCopyWith(ClientMessageUpdateNote value, $Res Function(ClientMessageUpdateNote) _then) = _$ClientMessageUpdateNoteCopyWithImpl;
+@useResult
+$Res call({
+ NoteUpdate payload
+});
+
+
+$NoteUpdateCopyWith<$Res> get payload;
+
+}
+/// @nodoc
+class _$ClientMessageUpdateNoteCopyWithImpl<$Res>
+    implements $ClientMessageUpdateNoteCopyWith<$Res> {
+  _$ClientMessageUpdateNoteCopyWithImpl(this._self, this._then);
+
+  final ClientMessageUpdateNote _self;
+  final $Res Function(ClientMessageUpdateNote) _then;
+
+/// Create a copy of ClientMessage
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? payload = null,}) {
+  return _then(ClientMessageUpdateNote(
+null == payload ? _self.payload : payload // ignore: cast_nullable_to_non_nullable
+as NoteUpdate,
+  ));
 }
 
-/// @nodoc
-class __$$ClientMessageTerminateEventImplCopyWithImpl<$Res>
-    extends _$ClientMessageCopyWithImpl<$Res, _$ClientMessageTerminateEventImpl>
-    implements _$$ClientMessageTerminateEventImplCopyWith<$Res> {
-  __$$ClientMessageTerminateEventImplCopyWithImpl(
-    _$ClientMessageTerminateEventImpl _value,
-    $Res Function(_$ClientMessageTerminateEventImpl) _then,
-  ) : super(_value, _then);
-
-  /// Create a copy of ClientMessage
-  /// with the given fields replaced by the non-null parameter values.
+/// Create a copy of ClientMessage
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$NoteUpdateCopyWith<$Res> get payload {
+  
+  return $NoteUpdateCopyWith<$Res>(_self.payload, (value) {
+    return _then(_self.copyWith(payload: value));
+  });
+}
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$ClientMessageTerminateEventImpl implements ClientMessageTerminateEvent {
-  const _$ClientMessageTerminateEventImpl({final String? $type})
-    : $type = $type ?? 'terminateEvent';
 
-  factory _$ClientMessageTerminateEventImpl.fromJson(
-    Map<String, dynamic> json,
-  ) => _$$ClientMessageTerminateEventImplFromJson(json);
+class ClientMessageUpdateConcentrationScore implements ClientMessage {
+  const ClientMessageUpdateConcentrationScore(this.payload, {final  String? $type}): $type = $type ?? 'updateConcentrationScore';
+  factory ClientMessageUpdateConcentrationScore.fromJson(Map<String, dynamic> json) => _$ClientMessageUpdateConcentrationScoreFromJson(json);
 
-  @JsonKey(name: 'type')
-  final String $type;
+ final  UpdateConcentrationScore payload;
 
-  @override
-  String toString() {
-    return 'ClientMessage.terminateEvent()';
-  }
+@JsonKey(name: 'type')
+final String $type;
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$ClientMessageTerminateEventImpl);
-  }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => runtimeType.hashCode;
+/// Create a copy of ClientMessage
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ClientMessageUpdateConcentrationScoreCopyWith<ClientMessageUpdateConcentrationScore> get copyWith => _$ClientMessageUpdateConcentrationScoreCopyWithImpl<ClientMessageUpdateConcentrationScore>(this, _$identity);
 
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() requestSync,
-    required TResult Function() startEvent,
-    required TResult Function() breakEvent,
-    required TResult Function() terminateEvent,
-    required TResult Function(UpdatePomodoroContext payload)
-    updatePomodoroContext,
-    required TResult Function(NoteUpdate payload) updateNote,
-    required TResult Function(UpdateConcentrationScore payload)
-    updateConcentrationScore,
-  }) {
-    return terminateEvent();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? requestSync,
-    TResult? Function()? startEvent,
-    TResult? Function()? breakEvent,
-    TResult? Function()? terminateEvent,
-    TResult? Function(UpdatePomodoroContext payload)? updatePomodoroContext,
-    TResult? Function(NoteUpdate payload)? updateNote,
-    TResult? Function(UpdateConcentrationScore payload)?
-    updateConcentrationScore,
-  }) {
-    return terminateEvent?.call();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? requestSync,
-    TResult Function()? startEvent,
-    TResult Function()? breakEvent,
-    TResult Function()? terminateEvent,
-    TResult Function(UpdatePomodoroContext payload)? updatePomodoroContext,
-    TResult Function(NoteUpdate payload)? updateNote,
-    TResult Function(UpdateConcentrationScore payload)?
-    updateConcentrationScore,
-    required TResult orElse(),
-  }) {
-    if (terminateEvent != null) {
-      return terminateEvent();
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(ClientMessageRequestSync value) requestSync,
-    required TResult Function(ClientMessageStartEvent value) startEvent,
-    required TResult Function(ClientMessageBreakEvent value) breakEvent,
-    required TResult Function(ClientMessageTerminateEvent value) terminateEvent,
-    required TResult Function(ClientMessageUpdatePomodoroContext value)
-    updatePomodoroContext,
-    required TResult Function(ClientMessageUpdateNote value) updateNote,
-    required TResult Function(ClientMessageUpdateConcentrationScore value)
-    updateConcentrationScore,
-  }) {
-    return terminateEvent(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(ClientMessageRequestSync value)? requestSync,
-    TResult? Function(ClientMessageStartEvent value)? startEvent,
-    TResult? Function(ClientMessageBreakEvent value)? breakEvent,
-    TResult? Function(ClientMessageTerminateEvent value)? terminateEvent,
-    TResult? Function(ClientMessageUpdatePomodoroContext value)?
-    updatePomodoroContext,
-    TResult? Function(ClientMessageUpdateNote value)? updateNote,
-    TResult? Function(ClientMessageUpdateConcentrationScore value)?
-    updateConcentrationScore,
-  }) {
-    return terminateEvent?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(ClientMessageRequestSync value)? requestSync,
-    TResult Function(ClientMessageStartEvent value)? startEvent,
-    TResult Function(ClientMessageBreakEvent value)? breakEvent,
-    TResult Function(ClientMessageTerminateEvent value)? terminateEvent,
-    TResult Function(ClientMessageUpdatePomodoroContext value)?
-    updatePomodoroContext,
-    TResult Function(ClientMessageUpdateNote value)? updateNote,
-    TResult Function(ClientMessageUpdateConcentrationScore value)?
-    updateConcentrationScore,
-    required TResult orElse(),
-  }) {
-    if (terminateEvent != null) {
-      return terminateEvent(this);
-    }
-    return orElse();
-  }
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$ClientMessageTerminateEventImplToJson(this);
-  }
+@override
+Map<String, dynamic> toJson() {
+  return _$ClientMessageUpdateConcentrationScoreToJson(this, );
 }
 
-abstract class ClientMessageTerminateEvent implements ClientMessage {
-  const factory ClientMessageTerminateEvent() =
-      _$ClientMessageTerminateEventImpl;
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ClientMessageUpdateConcentrationScore&&(identical(other.payload, payload) || other.payload == payload));
+}
 
-  factory ClientMessageTerminateEvent.fromJson(Map<String, dynamic> json) =
-      _$ClientMessageTerminateEventImpl.fromJson;
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,payload);
+
+@override
+String toString() {
+  return 'ClientMessage.updateConcentrationScore(payload: $payload)';
+}
+
+
 }
 
 /// @nodoc
-abstract class _$$ClientMessageUpdatePomodoroContextImplCopyWith<$Res> {
-  factory _$$ClientMessageUpdatePomodoroContextImplCopyWith(
-    _$ClientMessageUpdatePomodoroContextImpl value,
-    $Res Function(_$ClientMessageUpdatePomodoroContextImpl) then,
-  ) = __$$ClientMessageUpdatePomodoroContextImplCopyWithImpl<$Res>;
-  @useResult
-  $Res call({UpdatePomodoroContext payload});
+abstract mixin class $ClientMessageUpdateConcentrationScoreCopyWith<$Res> implements $ClientMessageCopyWith<$Res> {
+  factory $ClientMessageUpdateConcentrationScoreCopyWith(ClientMessageUpdateConcentrationScore value, $Res Function(ClientMessageUpdateConcentrationScore) _then) = _$ClientMessageUpdateConcentrationScoreCopyWithImpl;
+@useResult
+$Res call({
+ UpdateConcentrationScore payload
+});
 
-  $UpdatePomodoroContextCopyWith<$Res> get payload;
+
+$UpdateConcentrationScoreCopyWith<$Res> get payload;
+
 }
-
 /// @nodoc
-class __$$ClientMessageUpdatePomodoroContextImplCopyWithImpl<$Res>
-    extends
-        _$ClientMessageCopyWithImpl<
-          $Res,
-          _$ClientMessageUpdatePomodoroContextImpl
-        >
-    implements _$$ClientMessageUpdatePomodoroContextImplCopyWith<$Res> {
-  __$$ClientMessageUpdatePomodoroContextImplCopyWithImpl(
-    _$ClientMessageUpdatePomodoroContextImpl _value,
-    $Res Function(_$ClientMessageUpdatePomodoroContextImpl) _then,
-  ) : super(_value, _then);
+class _$ClientMessageUpdateConcentrationScoreCopyWithImpl<$Res>
+    implements $ClientMessageUpdateConcentrationScoreCopyWith<$Res> {
+  _$ClientMessageUpdateConcentrationScoreCopyWithImpl(this._self, this._then);
 
-  /// Create a copy of ClientMessage
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({Object? payload = null}) {
-    return _then(
-      _$ClientMessageUpdatePomodoroContextImpl(
-        null == payload
-            ? _value.payload
-            : payload // ignore: cast_nullable_to_non_nullable
-                as UpdatePomodoroContext,
-      ),
-    );
-  }
+  final ClientMessageUpdateConcentrationScore _self;
+  final $Res Function(ClientMessageUpdateConcentrationScore) _then;
 
-  /// Create a copy of ClientMessage
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $UpdatePomodoroContextCopyWith<$Res> get payload {
-    return $UpdatePomodoroContextCopyWith<$Res>(_value.payload, (value) {
-      return _then(_value.copyWith(payload: value));
-    });
-  }
+/// Create a copy of ClientMessage
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? payload = null,}) {
+  return _then(ClientMessageUpdateConcentrationScore(
+null == payload ? _self.payload : payload // ignore: cast_nullable_to_non_nullable
+as UpdateConcentrationScore,
+  ));
 }
 
-/// @nodoc
-@JsonSerializable()
-class _$ClientMessageUpdatePomodoroContextImpl
-    implements ClientMessageUpdatePomodoroContext {
-  const _$ClientMessageUpdatePomodoroContextImpl(
-    this.payload, {
-    final String? $type,
-  }) : $type = $type ?? 'updatePomodoroContext';
-
-  factory _$ClientMessageUpdatePomodoroContextImpl.fromJson(
-    Map<String, dynamic> json,
-  ) => _$$ClientMessageUpdatePomodoroContextImplFromJson(json);
-
-  @override
-  final UpdatePomodoroContext payload;
-
-  @JsonKey(name: 'type')
-  final String $type;
-
-  @override
-  String toString() {
-    return 'ClientMessage.updatePomodoroContext(payload: $payload)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$ClientMessageUpdatePomodoroContextImpl &&
-            (identical(other.payload, payload) || other.payload == payload));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, payload);
-
-  /// Create a copy of ClientMessage
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$ClientMessageUpdatePomodoroContextImplCopyWith<
-    _$ClientMessageUpdatePomodoroContextImpl
-  >
-  get copyWith => __$$ClientMessageUpdatePomodoroContextImplCopyWithImpl<
-    _$ClientMessageUpdatePomodoroContextImpl
-  >(this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() requestSync,
-    required TResult Function() startEvent,
-    required TResult Function() breakEvent,
-    required TResult Function() terminateEvent,
-    required TResult Function(UpdatePomodoroContext payload)
-    updatePomodoroContext,
-    required TResult Function(NoteUpdate payload) updateNote,
-    required TResult Function(UpdateConcentrationScore payload)
-    updateConcentrationScore,
-  }) {
-    return updatePomodoroContext(payload);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? requestSync,
-    TResult? Function()? startEvent,
-    TResult? Function()? breakEvent,
-    TResult? Function()? terminateEvent,
-    TResult? Function(UpdatePomodoroContext payload)? updatePomodoroContext,
-    TResult? Function(NoteUpdate payload)? updateNote,
-    TResult? Function(UpdateConcentrationScore payload)?
-    updateConcentrationScore,
-  }) {
-    return updatePomodoroContext?.call(payload);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? requestSync,
-    TResult Function()? startEvent,
-    TResult Function()? breakEvent,
-    TResult Function()? terminateEvent,
-    TResult Function(UpdatePomodoroContext payload)? updatePomodoroContext,
-    TResult Function(NoteUpdate payload)? updateNote,
-    TResult Function(UpdateConcentrationScore payload)?
-    updateConcentrationScore,
-    required TResult orElse(),
-  }) {
-    if (updatePomodoroContext != null) {
-      return updatePomodoroContext(payload);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(ClientMessageRequestSync value) requestSync,
-    required TResult Function(ClientMessageStartEvent value) startEvent,
-    required TResult Function(ClientMessageBreakEvent value) breakEvent,
-    required TResult Function(ClientMessageTerminateEvent value) terminateEvent,
-    required TResult Function(ClientMessageUpdatePomodoroContext value)
-    updatePomodoroContext,
-    required TResult Function(ClientMessageUpdateNote value) updateNote,
-    required TResult Function(ClientMessageUpdateConcentrationScore value)
-    updateConcentrationScore,
-  }) {
-    return updatePomodoroContext(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(ClientMessageRequestSync value)? requestSync,
-    TResult? Function(ClientMessageStartEvent value)? startEvent,
-    TResult? Function(ClientMessageBreakEvent value)? breakEvent,
-    TResult? Function(ClientMessageTerminateEvent value)? terminateEvent,
-    TResult? Function(ClientMessageUpdatePomodoroContext value)?
-    updatePomodoroContext,
-    TResult? Function(ClientMessageUpdateNote value)? updateNote,
-    TResult? Function(ClientMessageUpdateConcentrationScore value)?
-    updateConcentrationScore,
-  }) {
-    return updatePomodoroContext?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(ClientMessageRequestSync value)? requestSync,
-    TResult Function(ClientMessageStartEvent value)? startEvent,
-    TResult Function(ClientMessageBreakEvent value)? breakEvent,
-    TResult Function(ClientMessageTerminateEvent value)? terminateEvent,
-    TResult Function(ClientMessageUpdatePomodoroContext value)?
-    updatePomodoroContext,
-    TResult Function(ClientMessageUpdateNote value)? updateNote,
-    TResult Function(ClientMessageUpdateConcentrationScore value)?
-    updateConcentrationScore,
-    required TResult orElse(),
-  }) {
-    if (updatePomodoroContext != null) {
-      return updatePomodoroContext(this);
-    }
-    return orElse();
-  }
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$ClientMessageUpdatePomodoroContextImplToJson(this);
-  }
+/// Create a copy of ClientMessage
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UpdateConcentrationScoreCopyWith<$Res> get payload {
+  
+  return $UpdateConcentrationScoreCopyWith<$Res>(_self.payload, (value) {
+    return _then(_self.copyWith(payload: value));
+  });
+}
 }
 
-abstract class ClientMessageUpdatePomodoroContext implements ClientMessage {
-  const factory ClientMessageUpdatePomodoroContext(
-    final UpdatePomodoroContext payload,
-  ) = _$ClientMessageUpdatePomodoroContextImpl;
-
-  factory ClientMessageUpdatePomodoroContext.fromJson(
-    Map<String, dynamic> json,
-  ) = _$ClientMessageUpdatePomodoroContextImpl.fromJson;
-
-  UpdatePomodoroContext get payload;
-
-  /// Create a copy of ClientMessage
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ClientMessageUpdatePomodoroContextImplCopyWith<
-    _$ClientMessageUpdatePomodoroContextImpl
-  >
-  get copyWith => throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class _$$ClientMessageUpdateNoteImplCopyWith<$Res> {
-  factory _$$ClientMessageUpdateNoteImplCopyWith(
-    _$ClientMessageUpdateNoteImpl value,
-    $Res Function(_$ClientMessageUpdateNoteImpl) then,
-  ) = __$$ClientMessageUpdateNoteImplCopyWithImpl<$Res>;
-  @useResult
-  $Res call({NoteUpdate payload});
-
-  $NoteUpdateCopyWith<$Res> get payload;
-}
-
-/// @nodoc
-class __$$ClientMessageUpdateNoteImplCopyWithImpl<$Res>
-    extends _$ClientMessageCopyWithImpl<$Res, _$ClientMessageUpdateNoteImpl>
-    implements _$$ClientMessageUpdateNoteImplCopyWith<$Res> {
-  __$$ClientMessageUpdateNoteImplCopyWithImpl(
-    _$ClientMessageUpdateNoteImpl _value,
-    $Res Function(_$ClientMessageUpdateNoteImpl) _then,
-  ) : super(_value, _then);
-
-  /// Create a copy of ClientMessage
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({Object? payload = null}) {
-    return _then(
-      _$ClientMessageUpdateNoteImpl(
-        null == payload
-            ? _value.payload
-            : payload // ignore: cast_nullable_to_non_nullable
-                as NoteUpdate,
-      ),
-    );
-  }
-
-  /// Create a copy of ClientMessage
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $NoteUpdateCopyWith<$Res> get payload {
-    return $NoteUpdateCopyWith<$Res>(_value.payload, (value) {
-      return _then(_value.copyWith(payload: value));
-    });
-  }
-}
-
-/// @nodoc
-@JsonSerializable()
-class _$ClientMessageUpdateNoteImpl implements ClientMessageUpdateNote {
-  const _$ClientMessageUpdateNoteImpl(this.payload, {final String? $type})
-    : $type = $type ?? 'updateNote';
-
-  factory _$ClientMessageUpdateNoteImpl.fromJson(Map<String, dynamic> json) =>
-      _$$ClientMessageUpdateNoteImplFromJson(json);
-
-  @override
-  final NoteUpdate payload;
-
-  @JsonKey(name: 'type')
-  final String $type;
-
-  @override
-  String toString() {
-    return 'ClientMessage.updateNote(payload: $payload)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$ClientMessageUpdateNoteImpl &&
-            (identical(other.payload, payload) || other.payload == payload));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, payload);
-
-  /// Create a copy of ClientMessage
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$ClientMessageUpdateNoteImplCopyWith<_$ClientMessageUpdateNoteImpl>
-  get copyWith => __$$ClientMessageUpdateNoteImplCopyWithImpl<
-    _$ClientMessageUpdateNoteImpl
-  >(this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() requestSync,
-    required TResult Function() startEvent,
-    required TResult Function() breakEvent,
-    required TResult Function() terminateEvent,
-    required TResult Function(UpdatePomodoroContext payload)
-    updatePomodoroContext,
-    required TResult Function(NoteUpdate payload) updateNote,
-    required TResult Function(UpdateConcentrationScore payload)
-    updateConcentrationScore,
-  }) {
-    return updateNote(payload);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? requestSync,
-    TResult? Function()? startEvent,
-    TResult? Function()? breakEvent,
-    TResult? Function()? terminateEvent,
-    TResult? Function(UpdatePomodoroContext payload)? updatePomodoroContext,
-    TResult? Function(NoteUpdate payload)? updateNote,
-    TResult? Function(UpdateConcentrationScore payload)?
-    updateConcentrationScore,
-  }) {
-    return updateNote?.call(payload);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? requestSync,
-    TResult Function()? startEvent,
-    TResult Function()? breakEvent,
-    TResult Function()? terminateEvent,
-    TResult Function(UpdatePomodoroContext payload)? updatePomodoroContext,
-    TResult Function(NoteUpdate payload)? updateNote,
-    TResult Function(UpdateConcentrationScore payload)?
-    updateConcentrationScore,
-    required TResult orElse(),
-  }) {
-    if (updateNote != null) {
-      return updateNote(payload);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(ClientMessageRequestSync value) requestSync,
-    required TResult Function(ClientMessageStartEvent value) startEvent,
-    required TResult Function(ClientMessageBreakEvent value) breakEvent,
-    required TResult Function(ClientMessageTerminateEvent value) terminateEvent,
-    required TResult Function(ClientMessageUpdatePomodoroContext value)
-    updatePomodoroContext,
-    required TResult Function(ClientMessageUpdateNote value) updateNote,
-    required TResult Function(ClientMessageUpdateConcentrationScore value)
-    updateConcentrationScore,
-  }) {
-    return updateNote(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(ClientMessageRequestSync value)? requestSync,
-    TResult? Function(ClientMessageStartEvent value)? startEvent,
-    TResult? Function(ClientMessageBreakEvent value)? breakEvent,
-    TResult? Function(ClientMessageTerminateEvent value)? terminateEvent,
-    TResult? Function(ClientMessageUpdatePomodoroContext value)?
-    updatePomodoroContext,
-    TResult? Function(ClientMessageUpdateNote value)? updateNote,
-    TResult? Function(ClientMessageUpdateConcentrationScore value)?
-    updateConcentrationScore,
-  }) {
-    return updateNote?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(ClientMessageRequestSync value)? requestSync,
-    TResult Function(ClientMessageStartEvent value)? startEvent,
-    TResult Function(ClientMessageBreakEvent value)? breakEvent,
-    TResult Function(ClientMessageTerminateEvent value)? terminateEvent,
-    TResult Function(ClientMessageUpdatePomodoroContext value)?
-    updatePomodoroContext,
-    TResult Function(ClientMessageUpdateNote value)? updateNote,
-    TResult Function(ClientMessageUpdateConcentrationScore value)?
-    updateConcentrationScore,
-    required TResult orElse(),
-  }) {
-    if (updateNote != null) {
-      return updateNote(this);
-    }
-    return orElse();
-  }
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$ClientMessageUpdateNoteImplToJson(this);
-  }
-}
-
-abstract class ClientMessageUpdateNote implements ClientMessage {
-  const factory ClientMessageUpdateNote(final NoteUpdate payload) =
-      _$ClientMessageUpdateNoteImpl;
-
-  factory ClientMessageUpdateNote.fromJson(Map<String, dynamic> json) =
-      _$ClientMessageUpdateNoteImpl.fromJson;
-
-  NoteUpdate get payload;
-
-  /// Create a copy of ClientMessage
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ClientMessageUpdateNoteImplCopyWith<_$ClientMessageUpdateNoteImpl>
-  get copyWith => throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class _$$ClientMessageUpdateConcentrationScoreImplCopyWith<$Res> {
-  factory _$$ClientMessageUpdateConcentrationScoreImplCopyWith(
-    _$ClientMessageUpdateConcentrationScoreImpl value,
-    $Res Function(_$ClientMessageUpdateConcentrationScoreImpl) then,
-  ) = __$$ClientMessageUpdateConcentrationScoreImplCopyWithImpl<$Res>;
-  @useResult
-  $Res call({UpdateConcentrationScore payload});
-
-  $UpdateConcentrationScoreCopyWith<$Res> get payload;
-}
-
-/// @nodoc
-class __$$ClientMessageUpdateConcentrationScoreImplCopyWithImpl<$Res>
-    extends
-        _$ClientMessageCopyWithImpl<
-          $Res,
-          _$ClientMessageUpdateConcentrationScoreImpl
-        >
-    implements _$$ClientMessageUpdateConcentrationScoreImplCopyWith<$Res> {
-  __$$ClientMessageUpdateConcentrationScoreImplCopyWithImpl(
-    _$ClientMessageUpdateConcentrationScoreImpl _value,
-    $Res Function(_$ClientMessageUpdateConcentrationScoreImpl) _then,
-  ) : super(_value, _then);
-
-  /// Create a copy of ClientMessage
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({Object? payload = null}) {
-    return _then(
-      _$ClientMessageUpdateConcentrationScoreImpl(
-        null == payload
-            ? _value.payload
-            : payload // ignore: cast_nullable_to_non_nullable
-                as UpdateConcentrationScore,
-      ),
-    );
-  }
-
-  /// Create a copy of ClientMessage
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $UpdateConcentrationScoreCopyWith<$Res> get payload {
-    return $UpdateConcentrationScoreCopyWith<$Res>(_value.payload, (value) {
-      return _then(_value.copyWith(payload: value));
-    });
-  }
-}
-
-/// @nodoc
-@JsonSerializable()
-class _$ClientMessageUpdateConcentrationScoreImpl
-    implements ClientMessageUpdateConcentrationScore {
-  const _$ClientMessageUpdateConcentrationScoreImpl(
-    this.payload, {
-    final String? $type,
-  }) : $type = $type ?? 'updateConcentrationScore';
-
-  factory _$ClientMessageUpdateConcentrationScoreImpl.fromJson(
-    Map<String, dynamic> json,
-  ) => _$$ClientMessageUpdateConcentrationScoreImplFromJson(json);
-
-  @override
-  final UpdateConcentrationScore payload;
-
-  @JsonKey(name: 'type')
-  final String $type;
-
-  @override
-  String toString() {
-    return 'ClientMessage.updateConcentrationScore(payload: $payload)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$ClientMessageUpdateConcentrationScoreImpl &&
-            (identical(other.payload, payload) || other.payload == payload));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, payload);
-
-  /// Create a copy of ClientMessage
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$ClientMessageUpdateConcentrationScoreImplCopyWith<
-    _$ClientMessageUpdateConcentrationScoreImpl
-  >
-  get copyWith => __$$ClientMessageUpdateConcentrationScoreImplCopyWithImpl<
-    _$ClientMessageUpdateConcentrationScoreImpl
-  >(this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() requestSync,
-    required TResult Function() startEvent,
-    required TResult Function() breakEvent,
-    required TResult Function() terminateEvent,
-    required TResult Function(UpdatePomodoroContext payload)
-    updatePomodoroContext,
-    required TResult Function(NoteUpdate payload) updateNote,
-    required TResult Function(UpdateConcentrationScore payload)
-    updateConcentrationScore,
-  }) {
-    return updateConcentrationScore(payload);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? requestSync,
-    TResult? Function()? startEvent,
-    TResult? Function()? breakEvent,
-    TResult? Function()? terminateEvent,
-    TResult? Function(UpdatePomodoroContext payload)? updatePomodoroContext,
-    TResult? Function(NoteUpdate payload)? updateNote,
-    TResult? Function(UpdateConcentrationScore payload)?
-    updateConcentrationScore,
-  }) {
-    return updateConcentrationScore?.call(payload);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? requestSync,
-    TResult Function()? startEvent,
-    TResult Function()? breakEvent,
-    TResult Function()? terminateEvent,
-    TResult Function(UpdatePomodoroContext payload)? updatePomodoroContext,
-    TResult Function(NoteUpdate payload)? updateNote,
-    TResult Function(UpdateConcentrationScore payload)?
-    updateConcentrationScore,
-    required TResult orElse(),
-  }) {
-    if (updateConcentrationScore != null) {
-      return updateConcentrationScore(payload);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(ClientMessageRequestSync value) requestSync,
-    required TResult Function(ClientMessageStartEvent value) startEvent,
-    required TResult Function(ClientMessageBreakEvent value) breakEvent,
-    required TResult Function(ClientMessageTerminateEvent value) terminateEvent,
-    required TResult Function(ClientMessageUpdatePomodoroContext value)
-    updatePomodoroContext,
-    required TResult Function(ClientMessageUpdateNote value) updateNote,
-    required TResult Function(ClientMessageUpdateConcentrationScore value)
-    updateConcentrationScore,
-  }) {
-    return updateConcentrationScore(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(ClientMessageRequestSync value)? requestSync,
-    TResult? Function(ClientMessageStartEvent value)? startEvent,
-    TResult? Function(ClientMessageBreakEvent value)? breakEvent,
-    TResult? Function(ClientMessageTerminateEvent value)? terminateEvent,
-    TResult? Function(ClientMessageUpdatePomodoroContext value)?
-    updatePomodoroContext,
-    TResult? Function(ClientMessageUpdateNote value)? updateNote,
-    TResult? Function(ClientMessageUpdateConcentrationScore value)?
-    updateConcentrationScore,
-  }) {
-    return updateConcentrationScore?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(ClientMessageRequestSync value)? requestSync,
-    TResult Function(ClientMessageStartEvent value)? startEvent,
-    TResult Function(ClientMessageBreakEvent value)? breakEvent,
-    TResult Function(ClientMessageTerminateEvent value)? terminateEvent,
-    TResult Function(ClientMessageUpdatePomodoroContext value)?
-    updatePomodoroContext,
-    TResult Function(ClientMessageUpdateNote value)? updateNote,
-    TResult Function(ClientMessageUpdateConcentrationScore value)?
-    updateConcentrationScore,
-    required TResult orElse(),
-  }) {
-    if (updateConcentrationScore != null) {
-      return updateConcentrationScore(this);
-    }
-    return orElse();
-  }
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$ClientMessageUpdateConcentrationScoreImplToJson(this);
-  }
-}
-
-abstract class ClientMessageUpdateConcentrationScore implements ClientMessage {
-  const factory ClientMessageUpdateConcentrationScore(
-    final UpdateConcentrationScore payload,
-  ) = _$ClientMessageUpdateConcentrationScoreImpl;
-
-  factory ClientMessageUpdateConcentrationScore.fromJson(
-    Map<String, dynamic> json,
-  ) = _$ClientMessageUpdateConcentrationScoreImpl.fromJson;
-
-  UpdateConcentrationScore get payload;
-
-  /// Create a copy of ClientMessage
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ClientMessageUpdateConcentrationScoreImplCopyWith<
-    _$ClientMessageUpdateConcentrationScoreImpl
-  >
-  get copyWith => throw _privateConstructorUsedError;
-}
-
-ServerResponse _$ServerResponseFromJson(Map<String, dynamic> json) {
-  switch (json['type']) {
-    case 'success':
-      return ServerResponseSuccess.fromJson(json);
-    case 'error':
-      return ServerResponseError.fromJson(json);
-    case 'syncData':
-      return ServerResponseSyncData.fromJson(json);
-
-    default:
-      throw CheckedFromJsonException(
-        json,
-        'type',
-        'ServerResponse',
-        'Invalid union type "${json['type']}"!',
-      );
-  }
+ServerResponse _$ServerResponseFromJson(
+  Map<String, dynamic> json
+) {
+        switch (json['type']) {
+                  case 'success':
+          return ServerResponseSuccess.fromJson(
+            json
+          );
+                case 'error':
+          return ServerResponseError.fromJson(
+            json
+          );
+                case 'syncData':
+          return ServerResponseSyncData.fromJson(
+            json
+          );
+        
+          default:
+            throw CheckedFromJsonException(
+  json,
+  'type',
+  'ServerResponse',
+  'Invalid union type "${json['type']}"!'
+);
+        }
+      
 }
 
 /// @nodoc
 mixin _$ServerResponse {
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function(String message, String? requestId) success,
-    required TResult Function(String code, String message, String? requestId)
-    error,
-    required TResult Function(UpdatePomodoroState payload) syncData,
-  }) => throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String message, String? requestId)? success,
-    TResult? Function(String code, String message, String? requestId)? error,
-    TResult? Function(UpdatePomodoroState payload)? syncData,
-  }) => throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String message, String? requestId)? success,
-    TResult Function(String code, String message, String? requestId)? error,
-    TResult Function(UpdatePomodoroState payload)? syncData,
-    required TResult orElse(),
-  }) => throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(ServerResponseSuccess value) success,
-    required TResult Function(ServerResponseError value) error,
-    required TResult Function(ServerResponseSyncData value) syncData,
-  }) => throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(ServerResponseSuccess value)? success,
-    TResult? Function(ServerResponseError value)? error,
-    TResult? Function(ServerResponseSyncData value)? syncData,
-  }) => throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(ServerResponseSuccess value)? success,
-    TResult Function(ServerResponseError value)? error,
-    TResult Function(ServerResponseSyncData value)? syncData,
-    required TResult orElse(),
-  }) => throw _privateConstructorUsedError;
+
+
 
   /// Serializes this ServerResponse to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ServerResponse);
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'ServerResponse()';
+}
+
+
 }
 
 /// @nodoc
-abstract class $ServerResponseCopyWith<$Res> {
-  factory $ServerResponseCopyWith(
-    ServerResponse value,
-    $Res Function(ServerResponse) then,
-  ) = _$ServerResponseCopyWithImpl<$Res, ServerResponse>;
+class $ServerResponseCopyWith<$Res>  {
+$ServerResponseCopyWith(ServerResponse _, $Res Function(ServerResponse) __);
 }
 
-/// @nodoc
-class _$ServerResponseCopyWithImpl<$Res, $Val extends ServerResponse>
-    implements $ServerResponseCopyWith<$Res> {
-  _$ServerResponseCopyWithImpl(this._value, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+/// Adds pattern-matching-related methods to [ServerResponse].
+extension ServerResponsePatterns on ServerResponse {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
 
-  /// Create a copy of ServerResponse
-  /// with the given fields replaced by the non-null parameter values.
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( ServerResponseSuccess value)?  success,TResult Function( ServerResponseError value)?  error,TResult Function( ServerResponseSyncData value)?  syncData,required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case ServerResponseSuccess() when success != null:
+return success(_that);case ServerResponseError() when error != null:
+return error(_that);case ServerResponseSyncData() when syncData != null:
+return syncData(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( ServerResponseSuccess value)  success,required TResult Function( ServerResponseError value)  error,required TResult Function( ServerResponseSyncData value)  syncData,}){
+final _that = this;
+switch (_that) {
+case ServerResponseSuccess():
+return success(_that);case ServerResponseError():
+return error(_that);case ServerResponseSyncData():
+return syncData(_that);}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( ServerResponseSuccess value)?  success,TResult? Function( ServerResponseError value)?  error,TResult? Function( ServerResponseSyncData value)?  syncData,}){
+final _that = this;
+switch (_that) {
+case ServerResponseSuccess() when success != null:
+return success(_that);case ServerResponseError() when error != null:
+return error(_that);case ServerResponseSyncData() when syncData != null:
+return syncData(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String message,  String? requestId)?  success,TResult Function( String code,  String message,  String? requestId)?  error,TResult Function( UpdatePomodoroState payload)?  syncData,required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case ServerResponseSuccess() when success != null:
+return success(_that.message,_that.requestId);case ServerResponseError() when error != null:
+return error(_that.code,_that.message,_that.requestId);case ServerResponseSyncData() when syncData != null:
+return syncData(_that.payload);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String message,  String? requestId)  success,required TResult Function( String code,  String message,  String? requestId)  error,required TResult Function( UpdatePomodoroState payload)  syncData,}) {final _that = this;
+switch (_that) {
+case ServerResponseSuccess():
+return success(_that.message,_that.requestId);case ServerResponseError():
+return error(_that.code,_that.message,_that.requestId);case ServerResponseSyncData():
+return syncData(_that.payload);}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String message,  String? requestId)?  success,TResult? Function( String code,  String message,  String? requestId)?  error,TResult? Function( UpdatePomodoroState payload)?  syncData,}) {final _that = this;
+switch (_that) {
+case ServerResponseSuccess() when success != null:
+return success(_that.message,_that.requestId);case ServerResponseError() when error != null:
+return error(_that.code,_that.message,_that.requestId);case ServerResponseSyncData() when syncData != null:
+return syncData(_that.payload);case _:
+  return null;
+
+}
 }
 
-/// @nodoc
-abstract class _$$ServerResponseSuccessImplCopyWith<$Res> {
-  factory _$$ServerResponseSuccessImplCopyWith(
-    _$ServerResponseSuccessImpl value,
-    $Res Function(_$ServerResponseSuccessImpl) then,
-  ) = __$$ServerResponseSuccessImplCopyWithImpl<$Res>;
-  @useResult
-  $Res call({String message, String? requestId});
-}
-
-/// @nodoc
-class __$$ServerResponseSuccessImplCopyWithImpl<$Res>
-    extends _$ServerResponseCopyWithImpl<$Res, _$ServerResponseSuccessImpl>
-    implements _$$ServerResponseSuccessImplCopyWith<$Res> {
-  __$$ServerResponseSuccessImplCopyWithImpl(
-    _$ServerResponseSuccessImpl _value,
-    $Res Function(_$ServerResponseSuccessImpl) _then,
-  ) : super(_value, _then);
-
-  /// Create a copy of ServerResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({Object? message = null, Object? requestId = freezed}) {
-    return _then(
-      _$ServerResponseSuccessImpl(
-        message:
-            null == message
-                ? _value.message
-                : message // ignore: cast_nullable_to_non_nullable
-                    as String,
-        requestId:
-            freezed == requestId
-                ? _value.requestId
-                : requestId // ignore: cast_nullable_to_non_nullable
-                    as String?,
-      ),
-    );
-  }
-}
-
-/// @nodoc
-@JsonSerializable()
-class _$ServerResponseSuccessImpl implements ServerResponseSuccess {
-  const _$ServerResponseSuccessImpl({
-    required this.message,
-    this.requestId,
-    final String? $type,
-  }) : $type = $type ?? 'success';
-
-  factory _$ServerResponseSuccessImpl.fromJson(Map<String, dynamic> json) =>
-      _$$ServerResponseSuccessImplFromJson(json);
-
-  @override
-  final String message;
-  @override
-  final String? requestId;
-
-  @JsonKey(name: 'type')
-  final String $type;
-
-  @override
-  String toString() {
-    return 'ServerResponse.success(message: $message, requestId: $requestId)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$ServerResponseSuccessImpl &&
-            (identical(other.message, message) || other.message == message) &&
-            (identical(other.requestId, requestId) ||
-                other.requestId == requestId));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, message, requestId);
-
-  /// Create a copy of ServerResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$ServerResponseSuccessImplCopyWith<_$ServerResponseSuccessImpl>
-  get copyWith =>
-      __$$ServerResponseSuccessImplCopyWithImpl<_$ServerResponseSuccessImpl>(
-        this,
-        _$identity,
-      );
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function(String message, String? requestId) success,
-    required TResult Function(String code, String message, String? requestId)
-    error,
-    required TResult Function(UpdatePomodoroState payload) syncData,
-  }) {
-    return success(message, requestId);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String message, String? requestId)? success,
-    TResult? Function(String code, String message, String? requestId)? error,
-    TResult? Function(UpdatePomodoroState payload)? syncData,
-  }) {
-    return success?.call(message, requestId);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String message, String? requestId)? success,
-    TResult Function(String code, String message, String? requestId)? error,
-    TResult Function(UpdatePomodoroState payload)? syncData,
-    required TResult orElse(),
-  }) {
-    if (success != null) {
-      return success(message, requestId);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(ServerResponseSuccess value) success,
-    required TResult Function(ServerResponseError value) error,
-    required TResult Function(ServerResponseSyncData value) syncData,
-  }) {
-    return success(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(ServerResponseSuccess value)? success,
-    TResult? Function(ServerResponseError value)? error,
-    TResult? Function(ServerResponseSyncData value)? syncData,
-  }) {
-    return success?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(ServerResponseSuccess value)? success,
-    TResult Function(ServerResponseError value)? error,
-    TResult Function(ServerResponseSyncData value)? syncData,
-    required TResult orElse(),
-  }) {
-    if (success != null) {
-      return success(this);
-    }
-    return orElse();
-  }
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$ServerResponseSuccessImplToJson(this);
-  }
-}
-
-abstract class ServerResponseSuccess implements ServerResponse {
-  const factory ServerResponseSuccess({
-    required final String message,
-    final String? requestId,
-  }) = _$ServerResponseSuccessImpl;
-
-  factory ServerResponseSuccess.fromJson(Map<String, dynamic> json) =
-      _$ServerResponseSuccessImpl.fromJson;
-
-  String get message;
-  String? get requestId;
-
-  /// Create a copy of ServerResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ServerResponseSuccessImplCopyWith<_$ServerResponseSuccessImpl>
-  get copyWith => throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class _$$ServerResponseErrorImplCopyWith<$Res> {
-  factory _$$ServerResponseErrorImplCopyWith(
-    _$ServerResponseErrorImpl value,
-    $Res Function(_$ServerResponseErrorImpl) then,
-  ) = __$$ServerResponseErrorImplCopyWithImpl<$Res>;
-  @useResult
-  $Res call({String code, String message, String? requestId});
-}
-
-/// @nodoc
-class __$$ServerResponseErrorImplCopyWithImpl<$Res>
-    extends _$ServerResponseCopyWithImpl<$Res, _$ServerResponseErrorImpl>
-    implements _$$ServerResponseErrorImplCopyWith<$Res> {
-  __$$ServerResponseErrorImplCopyWithImpl(
-    _$ServerResponseErrorImpl _value,
-    $Res Function(_$ServerResponseErrorImpl) _then,
-  ) : super(_value, _then);
-
-  /// Create a copy of ServerResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? code = null,
-    Object? message = null,
-    Object? requestId = freezed,
-  }) {
-    return _then(
-      _$ServerResponseErrorImpl(
-        code:
-            null == code
-                ? _value.code
-                : code // ignore: cast_nullable_to_non_nullable
-                    as String,
-        message:
-            null == message
-                ? _value.message
-                : message // ignore: cast_nullable_to_non_nullable
-                    as String,
-        requestId:
-            freezed == requestId
-                ? _value.requestId
-                : requestId // ignore: cast_nullable_to_non_nullable
-                    as String?,
-      ),
-    );
-  }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$ServerResponseErrorImpl implements ServerResponseError {
-  const _$ServerResponseErrorImpl({
-    required this.code,
-    required this.message,
-    this.requestId,
-    final String? $type,
-  }) : $type = $type ?? 'error';
 
-  factory _$ServerResponseErrorImpl.fromJson(Map<String, dynamic> json) =>
-      _$$ServerResponseErrorImplFromJson(json);
+class ServerResponseSuccess implements ServerResponse {
+  const ServerResponseSuccess({required this.message, this.requestId, final  String? $type}): $type = $type ?? 'success';
+  factory ServerResponseSuccess.fromJson(Map<String, dynamic> json) => _$ServerResponseSuccessFromJson(json);
 
-  @override
-  final String code;
-  @override
-  final String message;
-  @override
-  final String? requestId;
+ final  String message;
+ final  String? requestId;
 
-  @JsonKey(name: 'type')
-  final String $type;
+@JsonKey(name: 'type')
+final String $type;
 
-  @override
-  String toString() {
-    return 'ServerResponse.error(code: $code, message: $message, requestId: $requestId)';
-  }
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$ServerResponseErrorImpl &&
-            (identical(other.code, code) || other.code == code) &&
-            (identical(other.message, message) || other.message == message) &&
-            (identical(other.requestId, requestId) ||
-                other.requestId == requestId));
-  }
+/// Create a copy of ServerResponse
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ServerResponseSuccessCopyWith<ServerResponseSuccess> get copyWith => _$ServerResponseSuccessCopyWithImpl<ServerResponseSuccess>(this, _$identity);
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, code, message, requestId);
-
-  /// Create a copy of ServerResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$ServerResponseErrorImplCopyWith<_$ServerResponseErrorImpl> get copyWith =>
-      __$$ServerResponseErrorImplCopyWithImpl<_$ServerResponseErrorImpl>(
-        this,
-        _$identity,
-      );
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function(String message, String? requestId) success,
-    required TResult Function(String code, String message, String? requestId)
-    error,
-    required TResult Function(UpdatePomodoroState payload) syncData,
-  }) {
-    return error(code, message, requestId);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String message, String? requestId)? success,
-    TResult? Function(String code, String message, String? requestId)? error,
-    TResult? Function(UpdatePomodoroState payload)? syncData,
-  }) {
-    return error?.call(code, message, requestId);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String message, String? requestId)? success,
-    TResult Function(String code, String message, String? requestId)? error,
-    TResult Function(UpdatePomodoroState payload)? syncData,
-    required TResult orElse(),
-  }) {
-    if (error != null) {
-      return error(code, message, requestId);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(ServerResponseSuccess value) success,
-    required TResult Function(ServerResponseError value) error,
-    required TResult Function(ServerResponseSyncData value) syncData,
-  }) {
-    return error(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(ServerResponseSuccess value)? success,
-    TResult? Function(ServerResponseError value)? error,
-    TResult? Function(ServerResponseSyncData value)? syncData,
-  }) {
-    return error?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(ServerResponseSuccess value)? success,
-    TResult Function(ServerResponseError value)? error,
-    TResult Function(ServerResponseSyncData value)? syncData,
-    required TResult orElse(),
-  }) {
-    if (error != null) {
-      return error(this);
-    }
-    return orElse();
-  }
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$ServerResponseErrorImplToJson(this);
-  }
+@override
+Map<String, dynamic> toJson() {
+  return _$ServerResponseSuccessToJson(this, );
 }
 
-abstract class ServerResponseError implements ServerResponse {
-  const factory ServerResponseError({
-    required final String code,
-    required final String message,
-    final String? requestId,
-  }) = _$ServerResponseErrorImpl;
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ServerResponseSuccess&&(identical(other.message, message) || other.message == message)&&(identical(other.requestId, requestId) || other.requestId == requestId));
+}
 
-  factory ServerResponseError.fromJson(Map<String, dynamic> json) =
-      _$ServerResponseErrorImpl.fromJson;
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,message,requestId);
 
-  String get code;
-  String get message;
-  String? get requestId;
+@override
+String toString() {
+  return 'ServerResponse.success(message: $message, requestId: $requestId)';
+}
 
-  /// Create a copy of ServerResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ServerResponseErrorImplCopyWith<_$ServerResponseErrorImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+
 }
 
 /// @nodoc
-abstract class _$$ServerResponseSyncDataImplCopyWith<$Res> {
-  factory _$$ServerResponseSyncDataImplCopyWith(
-    _$ServerResponseSyncDataImpl value,
-    $Res Function(_$ServerResponseSyncDataImpl) then,
-  ) = __$$ServerResponseSyncDataImplCopyWithImpl<$Res>;
-  @useResult
-  $Res call({UpdatePomodoroState payload});
+abstract mixin class $ServerResponseSuccessCopyWith<$Res> implements $ServerResponseCopyWith<$Res> {
+  factory $ServerResponseSuccessCopyWith(ServerResponseSuccess value, $Res Function(ServerResponseSuccess) _then) = _$ServerResponseSuccessCopyWithImpl;
+@useResult
+$Res call({
+ String message, String? requestId
+});
 
-  $UpdatePomodoroStateCopyWith<$Res> get payload;
+
+
+
+}
+/// @nodoc
+class _$ServerResponseSuccessCopyWithImpl<$Res>
+    implements $ServerResponseSuccessCopyWith<$Res> {
+  _$ServerResponseSuccessCopyWithImpl(this._self, this._then);
+
+  final ServerResponseSuccess _self;
+  final $Res Function(ServerResponseSuccess) _then;
+
+/// Create a copy of ServerResponse
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? message = null,Object? requestId = freezed,}) {
+  return _then(ServerResponseSuccess(
+message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
+as String,requestId: freezed == requestId ? _self.requestId : requestId // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
 }
 
-/// @nodoc
-class __$$ServerResponseSyncDataImplCopyWithImpl<$Res>
-    extends _$ServerResponseCopyWithImpl<$Res, _$ServerResponseSyncDataImpl>
-    implements _$$ServerResponseSyncDataImplCopyWith<$Res> {
-  __$$ServerResponseSyncDataImplCopyWithImpl(
-    _$ServerResponseSyncDataImpl _value,
-    $Res Function(_$ServerResponseSyncDataImpl) _then,
-  ) : super(_value, _then);
 
-  /// Create a copy of ServerResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({Object? payload = null}) {
-    return _then(
-      _$ServerResponseSyncDataImpl(
-        null == payload
-            ? _value.payload
-            : payload // ignore: cast_nullable_to_non_nullable
-                as UpdatePomodoroState,
-      ),
-    );
-  }
-
-  /// Create a copy of ServerResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $UpdatePomodoroStateCopyWith<$Res> get payload {
-    return $UpdatePomodoroStateCopyWith<$Res>(_value.payload, (value) {
-      return _then(_value.copyWith(payload: value));
-    });
-  }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$ServerResponseSyncDataImpl implements ServerResponseSyncData {
-  const _$ServerResponseSyncDataImpl(this.payload, {final String? $type})
-    : $type = $type ?? 'syncData';
 
-  factory _$ServerResponseSyncDataImpl.fromJson(Map<String, dynamic> json) =>
-      _$$ServerResponseSyncDataImplFromJson(json);
+class ServerResponseError implements ServerResponse {
+  const ServerResponseError({required this.code, required this.message, this.requestId, final  String? $type}): $type = $type ?? 'error';
+  factory ServerResponseError.fromJson(Map<String, dynamic> json) => _$ServerResponseErrorFromJson(json);
 
-  @override
-  final UpdatePomodoroState payload;
+ final  String code;
+ final  String message;
+ final  String? requestId;
 
-  @JsonKey(name: 'type')
-  final String $type;
+@JsonKey(name: 'type')
+final String $type;
 
-  @override
-  String toString() {
-    return 'ServerResponse.syncData(payload: $payload)';
-  }
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$ServerResponseSyncDataImpl &&
-            (identical(other.payload, payload) || other.payload == payload));
-  }
+/// Create a copy of ServerResponse
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ServerResponseErrorCopyWith<ServerResponseError> get copyWith => _$ServerResponseErrorCopyWithImpl<ServerResponseError>(this, _$identity);
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, payload);
-
-  /// Create a copy of ServerResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$ServerResponseSyncDataImplCopyWith<_$ServerResponseSyncDataImpl>
-  get copyWith =>
-      __$$ServerResponseSyncDataImplCopyWithImpl<_$ServerResponseSyncDataImpl>(
-        this,
-        _$identity,
-      );
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function(String message, String? requestId) success,
-    required TResult Function(String code, String message, String? requestId)
-    error,
-    required TResult Function(UpdatePomodoroState payload) syncData,
-  }) {
-    return syncData(payload);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String message, String? requestId)? success,
-    TResult? Function(String code, String message, String? requestId)? error,
-    TResult? Function(UpdatePomodoroState payload)? syncData,
-  }) {
-    return syncData?.call(payload);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String message, String? requestId)? success,
-    TResult Function(String code, String message, String? requestId)? error,
-    TResult Function(UpdatePomodoroState payload)? syncData,
-    required TResult orElse(),
-  }) {
-    if (syncData != null) {
-      return syncData(payload);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(ServerResponseSuccess value) success,
-    required TResult Function(ServerResponseError value) error,
-    required TResult Function(ServerResponseSyncData value) syncData,
-  }) {
-    return syncData(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(ServerResponseSuccess value)? success,
-    TResult? Function(ServerResponseError value)? error,
-    TResult? Function(ServerResponseSyncData value)? syncData,
-  }) {
-    return syncData?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(ServerResponseSuccess value)? success,
-    TResult Function(ServerResponseError value)? error,
-    TResult Function(ServerResponseSyncData value)? syncData,
-    required TResult orElse(),
-  }) {
-    if (syncData != null) {
-      return syncData(this);
-    }
-    return orElse();
-  }
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$ServerResponseSyncDataImplToJson(this);
-  }
+@override
+Map<String, dynamic> toJson() {
+  return _$ServerResponseErrorToJson(this, );
 }
 
-abstract class ServerResponseSyncData implements ServerResponse {
-  const factory ServerResponseSyncData(final UpdatePomodoroState payload) =
-      _$ServerResponseSyncDataImpl;
-
-  factory ServerResponseSyncData.fromJson(Map<String, dynamic> json) =
-      _$ServerResponseSyncDataImpl.fromJson;
-
-  UpdatePomodoroState get payload;
-
-  /// Create a copy of ServerResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ServerResponseSyncDataImplCopyWith<_$ServerResponseSyncDataImpl>
-  get copyWith => throw _privateConstructorUsedError;
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ServerResponseError&&(identical(other.code, code) || other.code == code)&&(identical(other.message, message) || other.message == message)&&(identical(other.requestId, requestId) || other.requestId == requestId));
 }
 
-BroadcastEvent _$BroadcastEventFromJson(Map<String, dynamic> json) {
-  return BroadcastEventPomodoroSessionUpdate.fromJson(json);
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,code,message,requestId);
+
+@override
+String toString() {
+  return 'ServerResponse.error(code: $code, message: $message, requestId: $requestId)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ServerResponseErrorCopyWith<$Res> implements $ServerResponseCopyWith<$Res> {
+  factory $ServerResponseErrorCopyWith(ServerResponseError value, $Res Function(ServerResponseError) _then) = _$ServerResponseErrorCopyWithImpl;
+@useResult
+$Res call({
+ String code, String message, String? requestId
+});
+
+
+
+
+}
+/// @nodoc
+class _$ServerResponseErrorCopyWithImpl<$Res>
+    implements $ServerResponseErrorCopyWith<$Res> {
+  _$ServerResponseErrorCopyWithImpl(this._self, this._then);
+
+  final ServerResponseError _self;
+  final $Res Function(ServerResponseError) _then;
+
+/// Create a copy of ServerResponse
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? code = null,Object? message = null,Object? requestId = freezed,}) {
+  return _then(ServerResponseError(
+code: null == code ? _self.code : code // ignore: cast_nullable_to_non_nullable
+as String,message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
+as String,requestId: freezed == requestId ? _self.requestId : requestId // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class ServerResponseSyncData implements ServerResponse {
+  const ServerResponseSyncData(this.payload, {final  String? $type}): $type = $type ?? 'syncData';
+  factory ServerResponseSyncData.fromJson(Map<String, dynamic> json) => _$ServerResponseSyncDataFromJson(json);
+
+ final  UpdatePomodoroState payload;
+
+@JsonKey(name: 'type')
+final String $type;
+
+
+/// Create a copy of ServerResponse
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ServerResponseSyncDataCopyWith<ServerResponseSyncData> get copyWith => _$ServerResponseSyncDataCopyWithImpl<ServerResponseSyncData>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$ServerResponseSyncDataToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ServerResponseSyncData&&(identical(other.payload, payload) || other.payload == payload));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,payload);
+
+@override
+String toString() {
+  return 'ServerResponse.syncData(payload: $payload)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ServerResponseSyncDataCopyWith<$Res> implements $ServerResponseCopyWith<$Res> {
+  factory $ServerResponseSyncDataCopyWith(ServerResponseSyncData value, $Res Function(ServerResponseSyncData) _then) = _$ServerResponseSyncDataCopyWithImpl;
+@useResult
+$Res call({
+ UpdatePomodoroState payload
+});
+
+
+$UpdatePomodoroStateCopyWith<$Res> get payload;
+
+}
+/// @nodoc
+class _$ServerResponseSyncDataCopyWithImpl<$Res>
+    implements $ServerResponseSyncDataCopyWith<$Res> {
+  _$ServerResponseSyncDataCopyWithImpl(this._self, this._then);
+
+  final ServerResponseSyncData _self;
+  final $Res Function(ServerResponseSyncData) _then;
+
+/// Create a copy of ServerResponse
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? payload = null,}) {
+  return _then(ServerResponseSyncData(
+null == payload ? _self.payload : payload // ignore: cast_nullable_to_non_nullable
+as UpdatePomodoroState,
+  ));
+}
+
+/// Create a copy of ServerResponse
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UpdatePomodoroStateCopyWith<$Res> get payload {
+  
+  return $UpdatePomodoroStateCopyWith<$Res>(_self.payload, (value) {
+    return _then(_self.copyWith(payload: value));
+  });
+}
+}
+
+BroadcastEvent _$BroadcastEventFromJson(
+  Map<String, dynamic> json
+) {
+    return BroadcastEventPomodoroSessionUpdate.fromJson(
+      json
+    );
 }
 
 /// @nodoc
 mixin _$BroadcastEvent {
-  UpdatePomodoroState get payload => throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function(UpdatePomodoroState payload)
-    pomodoroSessionUpdate,
-  }) => throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(UpdatePomodoroState payload)? pomodoroSessionUpdate,
-  }) => throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function(UpdatePomodoroState payload)? pomodoroSessionUpdate,
-    required TResult orElse(),
-  }) => throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(BroadcastEventPomodoroSessionUpdate value)
-    pomodoroSessionUpdate,
-  }) => throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(BroadcastEventPomodoroSessionUpdate value)?
-    pomodoroSessionUpdate,
-  }) => throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(BroadcastEventPomodoroSessionUpdate value)?
-    pomodoroSessionUpdate,
-    required TResult orElse(),
-  }) => throw _privateConstructorUsedError;
+
+ UpdatePomodoroState get payload;
+/// Create a copy of BroadcastEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$BroadcastEventCopyWith<BroadcastEvent> get copyWith => _$BroadcastEventCopyWithImpl<BroadcastEvent>(this as BroadcastEvent, _$identity);
 
   /// Serializes this BroadcastEvent to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  Map<String, dynamic> toJson();
 
-  /// Create a copy of BroadcastEvent
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $BroadcastEventCopyWith<BroadcastEvent> get copyWith =>
-      throw _privateConstructorUsedError;
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is BroadcastEvent&&(identical(other.payload, payload) || other.payload == payload));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,payload);
+
+@override
+String toString() {
+  return 'BroadcastEvent(payload: $payload)';
+}
+
+
 }
 
 /// @nodoc
-abstract class $BroadcastEventCopyWith<$Res> {
-  factory $BroadcastEventCopyWith(
-    BroadcastEvent value,
-    $Res Function(BroadcastEvent) then,
-  ) = _$BroadcastEventCopyWithImpl<$Res, BroadcastEvent>;
-  @useResult
-  $Res call({UpdatePomodoroState payload});
+abstract mixin class $BroadcastEventCopyWith<$Res>  {
+  factory $BroadcastEventCopyWith(BroadcastEvent value, $Res Function(BroadcastEvent) _then) = _$BroadcastEventCopyWithImpl;
+@useResult
+$Res call({
+ UpdatePomodoroState payload
+});
 
-  $UpdatePomodoroStateCopyWith<$Res> get payload;
+
+$UpdatePomodoroStateCopyWith<$Res> get payload;
+
 }
-
 /// @nodoc
-class _$BroadcastEventCopyWithImpl<$Res, $Val extends BroadcastEvent>
+class _$BroadcastEventCopyWithImpl<$Res>
     implements $BroadcastEventCopyWith<$Res> {
-  _$BroadcastEventCopyWithImpl(this._value, this._then);
+  _$BroadcastEventCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final BroadcastEvent _self;
+  final $Res Function(BroadcastEvent) _then;
 
-  /// Create a copy of BroadcastEvent
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({Object? payload = null}) {
-    return _then(
-      _value.copyWith(
-            payload:
-                null == payload
-                    ? _value.payload
-                    : payload // ignore: cast_nullable_to_non_nullable
-                        as UpdatePomodoroState,
-          )
-          as $Val,
-    );
-  }
-
-  /// Create a copy of BroadcastEvent
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $UpdatePomodoroStateCopyWith<$Res> get payload {
-    return $UpdatePomodoroStateCopyWith<$Res>(_value.payload, (value) {
-      return _then(_value.copyWith(payload: value) as $Val);
-    });
-  }
+/// Create a copy of BroadcastEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? payload = null,}) {
+  return _then(_self.copyWith(
+payload: null == payload ? _self.payload : payload // ignore: cast_nullable_to_non_nullable
+as UpdatePomodoroState,
+  ));
+}
+/// Create a copy of BroadcastEvent
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UpdatePomodoroStateCopyWith<$Res> get payload {
+  
+  return $UpdatePomodoroStateCopyWith<$Res>(_self.payload, (value) {
+    return _then(_self.copyWith(payload: value));
+  });
+}
 }
 
-/// @nodoc
-abstract class _$$BroadcastEventPomodoroSessionUpdateImplCopyWith<$Res>
-    implements $BroadcastEventCopyWith<$Res> {
-  factory _$$BroadcastEventPomodoroSessionUpdateImplCopyWith(
-    _$BroadcastEventPomodoroSessionUpdateImpl value,
-    $Res Function(_$BroadcastEventPomodoroSessionUpdateImpl) then,
-  ) = __$$BroadcastEventPomodoroSessionUpdateImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({UpdatePomodoroState payload});
 
-  @override
-  $UpdatePomodoroStateCopyWith<$Res> get payload;
+/// Adds pattern-matching-related methods to [BroadcastEvent].
+extension BroadcastEventPatterns on BroadcastEvent {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( BroadcastEventPomodoroSessionUpdate value)?  pomodoroSessionUpdate,required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case BroadcastEventPomodoroSessionUpdate() when pomodoroSessionUpdate != null:
+return pomodoroSessionUpdate(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( BroadcastEventPomodoroSessionUpdate value)  pomodoroSessionUpdate,}){
+final _that = this;
+switch (_that) {
+case BroadcastEventPomodoroSessionUpdate():
+return pomodoroSessionUpdate(_that);}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( BroadcastEventPomodoroSessionUpdate value)?  pomodoroSessionUpdate,}){
+final _that = this;
+switch (_that) {
+case BroadcastEventPomodoroSessionUpdate() when pomodoroSessionUpdate != null:
+return pomodoroSessionUpdate(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( UpdatePomodoroState payload)?  pomodoroSessionUpdate,required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case BroadcastEventPomodoroSessionUpdate() when pomodoroSessionUpdate != null:
+return pomodoroSessionUpdate(_that.payload);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( UpdatePomodoroState payload)  pomodoroSessionUpdate,}) {final _that = this;
+switch (_that) {
+case BroadcastEventPomodoroSessionUpdate():
+return pomodoroSessionUpdate(_that.payload);}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( UpdatePomodoroState payload)?  pomodoroSessionUpdate,}) {final _that = this;
+switch (_that) {
+case BroadcastEventPomodoroSessionUpdate() when pomodoroSessionUpdate != null:
+return pomodoroSessionUpdate(_that.payload);case _:
+  return null;
+
+}
 }
 
-/// @nodoc
-class __$$BroadcastEventPomodoroSessionUpdateImplCopyWithImpl<$Res>
-    extends
-        _$BroadcastEventCopyWithImpl<
-          $Res,
-          _$BroadcastEventPomodoroSessionUpdateImpl
-        >
-    implements _$$BroadcastEventPomodoroSessionUpdateImplCopyWith<$Res> {
-  __$$BroadcastEventPomodoroSessionUpdateImplCopyWithImpl(
-    _$BroadcastEventPomodoroSessionUpdateImpl _value,
-    $Res Function(_$BroadcastEventPomodoroSessionUpdateImpl) _then,
-  ) : super(_value, _then);
-
-  /// Create a copy of BroadcastEvent
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({Object? payload = null}) {
-    return _then(
-      _$BroadcastEventPomodoroSessionUpdateImpl(
-        null == payload
-            ? _value.payload
-            : payload // ignore: cast_nullable_to_non_nullable
-                as UpdatePomodoroState,
-      ),
-    );
-  }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$BroadcastEventPomodoroSessionUpdateImpl
-    implements BroadcastEventPomodoroSessionUpdate {
-  const _$BroadcastEventPomodoroSessionUpdateImpl(this.payload);
 
-  factory _$BroadcastEventPomodoroSessionUpdateImpl.fromJson(
-    Map<String, dynamic> json,
-  ) => _$$BroadcastEventPomodoroSessionUpdateImplFromJson(json);
+class BroadcastEventPomodoroSessionUpdate implements BroadcastEvent {
+  const BroadcastEventPomodoroSessionUpdate(this.payload);
+  factory BroadcastEventPomodoroSessionUpdate.fromJson(Map<String, dynamic> json) => _$BroadcastEventPomodoroSessionUpdateFromJson(json);
 
-  @override
-  final UpdatePomodoroState payload;
+@override final  UpdatePomodoroState payload;
 
-  @override
-  String toString() {
-    return 'BroadcastEvent.pomodoroSessionUpdate(payload: $payload)';
-  }
+/// Create a copy of BroadcastEvent
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$BroadcastEventPomodoroSessionUpdateCopyWith<BroadcastEventPomodoroSessionUpdate> get copyWith => _$BroadcastEventPomodoroSessionUpdateCopyWithImpl<BroadcastEventPomodoroSessionUpdate>(this, _$identity);
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$BroadcastEventPomodoroSessionUpdateImpl &&
-            (identical(other.payload, payload) || other.payload == payload));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, payload);
-
-  /// Create a copy of BroadcastEvent
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$BroadcastEventPomodoroSessionUpdateImplCopyWith<
-    _$BroadcastEventPomodoroSessionUpdateImpl
-  >
-  get copyWith => __$$BroadcastEventPomodoroSessionUpdateImplCopyWithImpl<
-    _$BroadcastEventPomodoroSessionUpdateImpl
-  >(this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function(UpdatePomodoroState payload)
-    pomodoroSessionUpdate,
-  }) {
-    return pomodoroSessionUpdate(payload);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(UpdatePomodoroState payload)? pomodoroSessionUpdate,
-  }) {
-    return pomodoroSessionUpdate?.call(payload);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function(UpdatePomodoroState payload)? pomodoroSessionUpdate,
-    required TResult orElse(),
-  }) {
-    if (pomodoroSessionUpdate != null) {
-      return pomodoroSessionUpdate(payload);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(BroadcastEventPomodoroSessionUpdate value)
-    pomodoroSessionUpdate,
-  }) {
-    return pomodoroSessionUpdate(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(BroadcastEventPomodoroSessionUpdate value)?
-    pomodoroSessionUpdate,
-  }) {
-    return pomodoroSessionUpdate?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(BroadcastEventPomodoroSessionUpdate value)?
-    pomodoroSessionUpdate,
-    required TResult orElse(),
-  }) {
-    if (pomodoroSessionUpdate != null) {
-      return pomodoroSessionUpdate(this);
-    }
-    return orElse();
-  }
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$BroadcastEventPomodoroSessionUpdateImplToJson(this);
-  }
+@override
+Map<String, dynamic> toJson() {
+  return _$BroadcastEventPomodoroSessionUpdateToJson(this, );
 }
 
-abstract class BroadcastEventPomodoroSessionUpdate implements BroadcastEvent {
-  const factory BroadcastEventPomodoroSessionUpdate(
-    final UpdatePomodoroState payload,
-  ) = _$BroadcastEventPomodoroSessionUpdateImpl;
-
-  factory BroadcastEventPomodoroSessionUpdate.fromJson(
-    Map<String, dynamic> json,
-  ) = _$BroadcastEventPomodoroSessionUpdateImpl.fromJson;
-
-  @override
-  UpdatePomodoroState get payload;
-
-  /// Create a copy of BroadcastEvent
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$BroadcastEventPomodoroSessionUpdateImplCopyWith<
-    _$BroadcastEventPomodoroSessionUpdateImpl
-  >
-  get copyWith => throw _privateConstructorUsedError;
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is BroadcastEventPomodoroSessionUpdate&&(identical(other.payload, payload) || other.payload == payload));
 }
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,payload);
+
+@override
+String toString() {
+  return 'BroadcastEvent.pomodoroSessionUpdate(payload: $payload)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $BroadcastEventPomodoroSessionUpdateCopyWith<$Res> implements $BroadcastEventCopyWith<$Res> {
+  factory $BroadcastEventPomodoroSessionUpdateCopyWith(BroadcastEventPomodoroSessionUpdate value, $Res Function(BroadcastEventPomodoroSessionUpdate) _then) = _$BroadcastEventPomodoroSessionUpdateCopyWithImpl;
+@override @useResult
+$Res call({
+ UpdatePomodoroState payload
+});
+
+
+@override $UpdatePomodoroStateCopyWith<$Res> get payload;
+
+}
+/// @nodoc
+class _$BroadcastEventPomodoroSessionUpdateCopyWithImpl<$Res>
+    implements $BroadcastEventPomodoroSessionUpdateCopyWith<$Res> {
+  _$BroadcastEventPomodoroSessionUpdateCopyWithImpl(this._self, this._then);
+
+  final BroadcastEventPomodoroSessionUpdate _self;
+  final $Res Function(BroadcastEventPomodoroSessionUpdate) _then;
+
+/// Create a copy of BroadcastEvent
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? payload = null,}) {
+  return _then(BroadcastEventPomodoroSessionUpdate(
+null == payload ? _self.payload : payload // ignore: cast_nullable_to_non_nullable
+as UpdatePomodoroState,
+  ));
+}
+
+/// Create a copy of BroadcastEvent
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UpdatePomodoroStateCopyWith<$Res> get payload {
+  
+  return $UpdatePomodoroStateCopyWith<$Res>(_self.payload, (value) {
+    return _then(_self.copyWith(payload: value));
+  });
+}
+}
+
+// dart format on

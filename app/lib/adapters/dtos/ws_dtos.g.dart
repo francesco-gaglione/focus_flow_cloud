@@ -6,53 +6,51 @@ part of 'ws_dtos.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$UpdateConcentrationScoreImpl _$$UpdateConcentrationScoreImplFromJson(
+_UpdateConcentrationScore _$UpdateConcentrationScoreFromJson(
   Map<String, dynamic> json,
-) => _$UpdateConcentrationScoreImpl(
+) => _UpdateConcentrationScore(
   concentrationScore: (json['concentrationScore'] as num).toInt(),
 );
 
-Map<String, dynamic> _$$UpdateConcentrationScoreImplToJson(
-  _$UpdateConcentrationScoreImpl instance,
+Map<String, dynamic> _$UpdateConcentrationScoreToJson(
+  _UpdateConcentrationScore instance,
 ) => <String, dynamic>{'concentrationScore': instance.concentrationScore};
 
-_$NoteUpdateImpl _$$NoteUpdateImplFromJson(Map<String, dynamic> json) =>
-    _$NoteUpdateImpl(newNote: json['newNote'] as String);
+_NoteUpdate _$NoteUpdateFromJson(Map<String, dynamic> json) =>
+    _NoteUpdate(newNote: json['newNote'] as String);
 
-Map<String, dynamic> _$$NoteUpdateImplToJson(_$NoteUpdateImpl instance) =>
+Map<String, dynamic> _$NoteUpdateToJson(_NoteUpdate instance) =>
     <String, dynamic>{'newNote': instance.newNote};
 
-_$UpdatePomodoroContextImpl _$$UpdatePomodoroContextImplFromJson(
+_UpdatePomodoroContext _$UpdatePomodoroContextFromJson(
   Map<String, dynamic> json,
-) => _$UpdatePomodoroContextImpl(
+) => _UpdatePomodoroContext(
   categoryId: json['categoryId'] as String?,
   taskId: json['taskId'] as String?,
 );
 
-Map<String, dynamic> _$$UpdatePomodoroContextImplToJson(
-  _$UpdatePomodoroContextImpl instance,
+Map<String, dynamic> _$UpdatePomodoroContextToJson(
+  _UpdatePomodoroContext instance,
 ) => <String, dynamic>{
   'categoryId': instance.categoryId,
   'taskId': instance.taskId,
 };
 
-_$UpdateWorkContextImpl _$$UpdateWorkContextImplFromJson(
-  Map<String, dynamic> json,
-) => _$UpdateWorkContextImpl(
-  categoryId: json['categoryId'] as String?,
-  taskId: json['taskId'] as String?,
-);
+_UpdateWorkContext _$UpdateWorkContextFromJson(Map<String, dynamic> json) =>
+    _UpdateWorkContext(
+      categoryId: json['categoryId'] as String?,
+      taskId: json['taskId'] as String?,
+    );
 
-Map<String, dynamic> _$$UpdateWorkContextImplToJson(
-  _$UpdateWorkContextImpl instance,
-) => <String, dynamic>{
-  'categoryId': instance.categoryId,
-  'taskId': instance.taskId,
-};
+Map<String, dynamic> _$UpdateWorkContextToJson(_UpdateWorkContext instance) =>
+    <String, dynamic>{
+      'categoryId': instance.categoryId,
+      'taskId': instance.taskId,
+    };
 
-_$UpdateCurrentSessionImpl _$$UpdateCurrentSessionImplFromJson(
+_UpdateCurrentSession _$UpdateCurrentSessionFromJson(
   Map<String, dynamic> json,
-) => _$UpdateCurrentSessionImpl(
+) => _UpdateCurrentSession(
   sessionType: $enumDecode(_$SessionTypeEnumEnumMap, json['sessionType']),
   sessionStartTime: (json['sessionStartTime'] as num).toInt(),
   categoryId: json['categoryId'] as String?,
@@ -61,8 +59,8 @@ _$UpdateCurrentSessionImpl _$$UpdateCurrentSessionImplFromJson(
   concentrationScore: (json['concentrationScore'] as num?)?.toInt(),
 );
 
-Map<String, dynamic> _$$UpdateCurrentSessionImplToJson(
-  _$UpdateCurrentSessionImpl instance,
+Map<String, dynamic> _$UpdateCurrentSessionToJson(
+  _UpdateCurrentSession instance,
 ) => <String, dynamic>{
   'sessionType': _$SessionTypeEnumEnumMap[instance.sessionType]!,
   'sessionStartTime': instance.sessionStartTime,
@@ -79,134 +77,131 @@ const _$SessionTypeEnumEnumMap = {
   SessionTypeEnum.longBreak: 'LongBreak',
 };
 
-_$UpdatePomodoroStateImpl _$$UpdatePomodoroStateImplFromJson(
-  Map<String, dynamic> json,
-) => _$UpdatePomodoroStateImpl(
-  currentSession:
-      json['currentSession'] == null
-          ? null
-          : UpdateCurrentSession.fromJson(
-            json['currentSession'] as Map<String, dynamic>,
-          ),
-  workContext: UpdateWorkContext.fromJson(
-    json['workContext'] as Map<String, dynamic>,
-  ),
-);
+_UpdatePomodoroState _$UpdatePomodoroStateFromJson(Map<String, dynamic> json) =>
+    _UpdatePomodoroState(
+      currentSession:
+          json['currentSession'] == null
+              ? null
+              : UpdateCurrentSession.fromJson(
+                json['currentSession'] as Map<String, dynamic>,
+              ),
+      workContext: UpdateWorkContext.fromJson(
+        json['workContext'] as Map<String, dynamic>,
+      ),
+    );
 
-Map<String, dynamic> _$$UpdatePomodoroStateImplToJson(
-  _$UpdatePomodoroStateImpl instance,
+Map<String, dynamic> _$UpdatePomodoroStateToJson(
+  _UpdatePomodoroState instance,
 ) => <String, dynamic>{
   'currentSession': instance.currentSession,
   'workContext': instance.workContext,
 };
 
-_$WsClientRequestImpl _$$WsClientRequestImplFromJson(
-  Map<String, dynamic> json,
-) => _$WsClientRequestImpl(
-  requestId: json['requestId'] as String?,
-  message: ClientMessage.fromJson(json['message'] as Map<String, dynamic>),
-);
-
-Map<String, dynamic> _$$WsClientRequestImplToJson(
-  _$WsClientRequestImpl instance,
-) => <String, dynamic>{
-  'requestId': instance.requestId,
-  'message': instance.message,
-};
-
-_$ClientMessageRequestSyncImpl _$$ClientMessageRequestSyncImplFromJson(
-  Map<String, dynamic> json,
-) => _$ClientMessageRequestSyncImpl($type: json['type'] as String?);
-
-Map<String, dynamic> _$$ClientMessageRequestSyncImplToJson(
-  _$ClientMessageRequestSyncImpl instance,
-) => <String, dynamic>{'type': instance.$type};
-
-_$ClientMessageStartEventImpl _$$ClientMessageStartEventImplFromJson(
-  Map<String, dynamic> json,
-) => _$ClientMessageStartEventImpl($type: json['type'] as String?);
-
-Map<String, dynamic> _$$ClientMessageStartEventImplToJson(
-  _$ClientMessageStartEventImpl instance,
-) => <String, dynamic>{'type': instance.$type};
-
-_$ClientMessageBreakEventImpl _$$ClientMessageBreakEventImplFromJson(
-  Map<String, dynamic> json,
-) => _$ClientMessageBreakEventImpl($type: json['type'] as String?);
-
-Map<String, dynamic> _$$ClientMessageBreakEventImplToJson(
-  _$ClientMessageBreakEventImpl instance,
-) => <String, dynamic>{'type': instance.$type};
-
-_$ClientMessageTerminateEventImpl _$$ClientMessageTerminateEventImplFromJson(
-  Map<String, dynamic> json,
-) => _$ClientMessageTerminateEventImpl($type: json['type'] as String?);
-
-Map<String, dynamic> _$$ClientMessageTerminateEventImplToJson(
-  _$ClientMessageTerminateEventImpl instance,
-) => <String, dynamic>{'type': instance.$type};
-
-_$ClientMessageUpdatePomodoroContextImpl
-_$$ClientMessageUpdatePomodoroContextImplFromJson(Map<String, dynamic> json) =>
-    _$ClientMessageUpdatePomodoroContextImpl(
-      UpdatePomodoroContext.fromJson(json['payload'] as Map<String, dynamic>),
-      $type: json['type'] as String?,
+_WsClientRequest _$WsClientRequestFromJson(Map<String, dynamic> json) =>
+    _WsClientRequest(
+      requestId: json['requestId'] as String?,
+      message: ClientMessage.fromJson(json['message'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$$ClientMessageUpdatePomodoroContextImplToJson(
-  _$ClientMessageUpdatePomodoroContextImpl instance,
+Map<String, dynamic> _$WsClientRequestToJson(_WsClientRequest instance) =>
+    <String, dynamic>{
+      'requestId': instance.requestId,
+      'message': instance.message,
+    };
+
+ClientMessageRequestSync _$ClientMessageRequestSyncFromJson(
+  Map<String, dynamic> json,
+) => ClientMessageRequestSync($type: json['type'] as String?);
+
+Map<String, dynamic> _$ClientMessageRequestSyncToJson(
+  ClientMessageRequestSync instance,
+) => <String, dynamic>{'type': instance.$type};
+
+ClientMessageStartEvent _$ClientMessageStartEventFromJson(
+  Map<String, dynamic> json,
+) => ClientMessageStartEvent($type: json['type'] as String?);
+
+Map<String, dynamic> _$ClientMessageStartEventToJson(
+  ClientMessageStartEvent instance,
+) => <String, dynamic>{'type': instance.$type};
+
+ClientMessageBreakEvent _$ClientMessageBreakEventFromJson(
+  Map<String, dynamic> json,
+) => ClientMessageBreakEvent($type: json['type'] as String?);
+
+Map<String, dynamic> _$ClientMessageBreakEventToJson(
+  ClientMessageBreakEvent instance,
+) => <String, dynamic>{'type': instance.$type};
+
+ClientMessageTerminateEvent _$ClientMessageTerminateEventFromJson(
+  Map<String, dynamic> json,
+) => ClientMessageTerminateEvent($type: json['type'] as String?);
+
+Map<String, dynamic> _$ClientMessageTerminateEventToJson(
+  ClientMessageTerminateEvent instance,
+) => <String, dynamic>{'type': instance.$type};
+
+ClientMessageUpdatePomodoroContext _$ClientMessageUpdatePomodoroContextFromJson(
+  Map<String, dynamic> json,
+) => ClientMessageUpdatePomodoroContext(
+  UpdatePomodoroContext.fromJson(json['payload'] as Map<String, dynamic>),
+  $type: json['type'] as String?,
+);
+
+Map<String, dynamic> _$ClientMessageUpdatePomodoroContextToJson(
+  ClientMessageUpdatePomodoroContext instance,
 ) => <String, dynamic>{'payload': instance.payload, 'type': instance.$type};
 
-_$ClientMessageUpdateNoteImpl _$$ClientMessageUpdateNoteImplFromJson(
+ClientMessageUpdateNote _$ClientMessageUpdateNoteFromJson(
   Map<String, dynamic> json,
-) => _$ClientMessageUpdateNoteImpl(
+) => ClientMessageUpdateNote(
   NoteUpdate.fromJson(json['payload'] as Map<String, dynamic>),
   $type: json['type'] as String?,
 );
 
-Map<String, dynamic> _$$ClientMessageUpdateNoteImplToJson(
-  _$ClientMessageUpdateNoteImpl instance,
+Map<String, dynamic> _$ClientMessageUpdateNoteToJson(
+  ClientMessageUpdateNote instance,
 ) => <String, dynamic>{'payload': instance.payload, 'type': instance.$type};
 
-_$ClientMessageUpdateConcentrationScoreImpl
-_$$ClientMessageUpdateConcentrationScoreImplFromJson(
-  Map<String, dynamic> json,
-) => _$ClientMessageUpdateConcentrationScoreImpl(
-  UpdateConcentrationScore.fromJson(json['payload'] as Map<String, dynamic>),
-  $type: json['type'] as String?,
-);
+ClientMessageUpdateConcentrationScore
+_$ClientMessageUpdateConcentrationScoreFromJson(Map<String, dynamic> json) =>
+    ClientMessageUpdateConcentrationScore(
+      UpdateConcentrationScore.fromJson(
+        json['payload'] as Map<String, dynamic>,
+      ),
+      $type: json['type'] as String?,
+    );
 
-Map<String, dynamic> _$$ClientMessageUpdateConcentrationScoreImplToJson(
-  _$ClientMessageUpdateConcentrationScoreImpl instance,
+Map<String, dynamic> _$ClientMessageUpdateConcentrationScoreToJson(
+  ClientMessageUpdateConcentrationScore instance,
 ) => <String, dynamic>{'payload': instance.payload, 'type': instance.$type};
 
-_$ServerResponseSuccessImpl _$$ServerResponseSuccessImplFromJson(
+ServerResponseSuccess _$ServerResponseSuccessFromJson(
   Map<String, dynamic> json,
-) => _$ServerResponseSuccessImpl(
+) => ServerResponseSuccess(
   message: json['message'] as String,
   requestId: json['requestId'] as String?,
   $type: json['type'] as String?,
 );
 
-Map<String, dynamic> _$$ServerResponseSuccessImplToJson(
-  _$ServerResponseSuccessImpl instance,
+Map<String, dynamic> _$ServerResponseSuccessToJson(
+  ServerResponseSuccess instance,
 ) => <String, dynamic>{
   'message': instance.message,
   'requestId': instance.requestId,
   'type': instance.$type,
 };
 
-_$ServerResponseErrorImpl _$$ServerResponseErrorImplFromJson(
-  Map<String, dynamic> json,
-) => _$ServerResponseErrorImpl(
-  code: json['code'] as String,
-  message: json['message'] as String,
-  requestId: json['requestId'] as String?,
-  $type: json['type'] as String?,
-);
+ServerResponseError _$ServerResponseErrorFromJson(Map<String, dynamic> json) =>
+    ServerResponseError(
+      code: json['code'] as String,
+      message: json['message'] as String,
+      requestId: json['requestId'] as String?,
+      $type: json['type'] as String?,
+    );
 
-Map<String, dynamic> _$$ServerResponseErrorImplToJson(
-  _$ServerResponseErrorImpl instance,
+Map<String, dynamic> _$ServerResponseErrorToJson(
+  ServerResponseError instance,
 ) => <String, dynamic>{
   'code': instance.code,
   'message': instance.message,
@@ -214,23 +209,23 @@ Map<String, dynamic> _$$ServerResponseErrorImplToJson(
   'type': instance.$type,
 };
 
-_$ServerResponseSyncDataImpl _$$ServerResponseSyncDataImplFromJson(
+ServerResponseSyncData _$ServerResponseSyncDataFromJson(
   Map<String, dynamic> json,
-) => _$ServerResponseSyncDataImpl(
+) => ServerResponseSyncData(
   UpdatePomodoroState.fromJson(json['payload'] as Map<String, dynamic>),
   $type: json['type'] as String?,
 );
 
-Map<String, dynamic> _$$ServerResponseSyncDataImplToJson(
-  _$ServerResponseSyncDataImpl instance,
+Map<String, dynamic> _$ServerResponseSyncDataToJson(
+  ServerResponseSyncData instance,
 ) => <String, dynamic>{'payload': instance.payload, 'type': instance.$type};
 
-_$BroadcastEventPomodoroSessionUpdateImpl
-_$$BroadcastEventPomodoroSessionUpdateImplFromJson(Map<String, dynamic> json) =>
-    _$BroadcastEventPomodoroSessionUpdateImpl(
+BroadcastEventPomodoroSessionUpdate
+_$BroadcastEventPomodoroSessionUpdateFromJson(Map<String, dynamic> json) =>
+    BroadcastEventPomodoroSessionUpdate(
       UpdatePomodoroState.fromJson(json['payload'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$$BroadcastEventPomodoroSessionUpdateImplToJson(
-  _$BroadcastEventPomodoroSessionUpdateImpl instance,
+Map<String, dynamic> _$BroadcastEventPomodoroSessionUpdateToJson(
+  BroadcastEventPomodoroSessionUpdate instance,
 ) => <String, dynamic>{'payload': instance.payload};

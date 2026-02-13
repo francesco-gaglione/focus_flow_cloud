@@ -21,7 +21,7 @@ enum SessionTypeEnum {
 
 /// Mapped from `update_concentration_score.rs`
 @freezed
-class UpdateConcentrationScore with _$UpdateConcentrationScore {
+abstract class UpdateConcentrationScore with _$UpdateConcentrationScore {
   const factory UpdateConcentrationScore({required int concentrationScore}) =
       _UpdateConcentrationScore;
 
@@ -31,7 +31,7 @@ class UpdateConcentrationScore with _$UpdateConcentrationScore {
 
 /// Mapped from `note_update_ws.rs`
 @freezed
-class NoteUpdate with _$NoteUpdate {
+abstract class NoteUpdate with _$NoteUpdate {
   const factory NoteUpdate({required String newNote}) = _NoteUpdate;
 
   factory NoteUpdate.fromJson(Map<String, dynamic> json) =>
@@ -40,7 +40,7 @@ class NoteUpdate with _$NoteUpdate {
 
 /// Mapped from `update_pomodoro_context.rs`
 @freezed
-class UpdatePomodoroContext with _$UpdatePomodoroContext {
+abstract class UpdatePomodoroContext with _$UpdatePomodoroContext {
   const factory UpdatePomodoroContext({String? categoryId, String? taskId}) =
       _UpdatePomodoroContext;
 
@@ -53,7 +53,7 @@ class UpdatePomodoroContext with _$UpdatePomodoroContext {
 // -----------------------------------------------------------------------------
 
 @freezed
-class UpdateWorkContext with _$UpdateWorkContext {
+abstract class UpdateWorkContext with _$UpdateWorkContext {
   const factory UpdateWorkContext({String? categoryId, String? taskId}) =
       _UpdateWorkContext;
 
@@ -62,7 +62,7 @@ class UpdateWorkContext with _$UpdateWorkContext {
 }
 
 @freezed
-class UpdateCurrentSession with _$UpdateCurrentSession {
+abstract class UpdateCurrentSession with _$UpdateCurrentSession {
   const factory UpdateCurrentSession({
     required SessionTypeEnum sessionType,
     required int sessionStartTime, // i64 maps to int in Dart
@@ -77,7 +77,7 @@ class UpdateCurrentSession with _$UpdateCurrentSession {
 }
 
 @freezed
-class UpdatePomodoroState with _$UpdatePomodoroState {
+abstract class UpdatePomodoroState with _$UpdatePomodoroState {
   const factory UpdatePomodoroState({
     UpdateCurrentSession? currentSession,
     required UpdateWorkContext workContext,
@@ -96,7 +96,7 @@ class UpdatePomodoroState with _$UpdatePomodoroState {
 /// (request_id at the same level as message fields), you might need a custom converter.
 /// Standard mapping puts `message` as a nested object.
 @freezed
-class WsClientRequest with _$WsClientRequest {
+abstract class WsClientRequest with _$WsClientRequest {
   const factory WsClientRequest({
     String? requestId,
     required ClientMessage message,

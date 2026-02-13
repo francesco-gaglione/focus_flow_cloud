@@ -15,6 +15,7 @@ pub struct Stats {
     concentration_distribution: [u32; 5],
     category_distribution: Vec<CategoryDistributionItem>,
     daily_activity: Vec<DailyActivityItem>,
+    focus_pause_ratio: f32,
 }
 
 impl Stats {
@@ -34,7 +35,12 @@ impl Stats {
             concentration_distribution: concentration_stats.concentration_distribution,
             category_distribution,
             daily_activity,
+            focus_pause_ratio: period_summary.focus_pause_ratio,
         }
+    }
+
+    pub fn focus_pause_ratio(&self) -> f32 {
+        self.focus_pause_ratio
     }
 
     pub fn total_sessions(&self) -> usize {

@@ -69,6 +69,7 @@ class PeriodStatistics {
   final int totalBreaks;
   final int totalFocusTime;
   final int totalBreakTime;
+  final double focusPauseRatio;
   final ConcentrationPeriod mostConcentratedPeriod;
   final ConcentrationPeriod lessConcentratedPeriod;
   final List<int> concentrationDistribution;
@@ -80,6 +81,7 @@ class PeriodStatistics {
     required this.totalBreaks,
     required this.totalFocusTime,
     required this.totalBreakTime,
+    required this.focusPauseRatio,
     required this.mostConcentratedPeriod,
     required this.lessConcentratedPeriod,
     required this.concentrationDistribution,

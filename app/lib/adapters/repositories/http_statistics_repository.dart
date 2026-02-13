@@ -32,6 +32,7 @@ class HttpStatisticsRepository implements StatisticsRepository {
       totalBreaks: dto.totalBreaks,
       totalFocusTime: dto.totalFocusTime,
       totalBreakTime: dto.totalBreakTime,
+      focusPauseRatio: dto.focusPauseRatio,
       mostConcentratedPeriod: ConcentrationPeriod.fromString(
         dto.mostConcentratedPeriod,
       ),

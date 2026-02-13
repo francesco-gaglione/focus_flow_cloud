@@ -7,7 +7,7 @@ part 'session_dtos.g.dart';
 // Request DTOs
 
 @freezed
-class CreateManualSessionDto with _$CreateManualSessionDto {
+abstract class CreateManualSessionDto with _$CreateManualSessionDto {
   const CreateManualSessionDto._();
 
   const factory CreateManualSessionDto({
@@ -27,7 +27,7 @@ class CreateManualSessionDto with _$CreateManualSessionDto {
 }
 
 @freezed
-class GetSessionFiltersDto with _$GetSessionFiltersDto {
+abstract class GetSessionFiltersDto with _$GetSessionFiltersDto {
   const GetSessionFiltersDto._();
 
   const factory GetSessionFiltersDto({
@@ -47,7 +47,7 @@ class GetSessionFiltersDto with _$GetSessionFiltersDto {
 }
 
 @freezed
-class UpdateFocusSessionDto with _$UpdateFocusSessionDto {
+abstract class UpdateFocusSessionDto with _$UpdateFocusSessionDto {
   const factory UpdateFocusSessionDto({
     String? categoryId,
     String? taskId,
@@ -66,7 +66,7 @@ class UpdateFocusSessionDto with _$UpdateFocusSessionDto {
 // Response DTOs
 
 @freezed
-class FocusSessionDto with _$FocusSessionDto {
+abstract class FocusSessionDto with _$FocusSessionDto {
   const factory FocusSessionDto({
     required String id,
     required String sessionType,
@@ -100,7 +100,7 @@ class FocusSessionDto with _$FocusSessionDto {
 }
 
 @freezed
-class CreateManualSessionResponseDto with _$CreateManualSessionResponseDto {
+abstract class CreateManualSessionResponseDto with _$CreateManualSessionResponseDto {
   const factory CreateManualSessionResponseDto({required String id}) =
       _CreateManualSessionResponseDto;
 
@@ -109,7 +109,7 @@ class CreateManualSessionResponseDto with _$CreateManualSessionResponseDto {
 }
 
 @freezed
-class GetSessionFiltersResponseDto with _$GetSessionFiltersResponseDto {
+abstract class GetSessionFiltersResponseDto with _$GetSessionFiltersResponseDto {
   const factory GetSessionFiltersResponseDto({
     required List<FocusSessionDto> focusSessions,
   }) = _GetSessionFiltersResponseDto;

@@ -7,7 +7,7 @@ part 'statistics_dtos.g.dart';
 // Request DTOs
 
 @freezed
-class GetStatsByPeriodDto with _$GetStatsByPeriodDto {
+abstract class GetStatsByPeriodDto with _$GetStatsByPeriodDto {
   const factory GetStatsByPeriodDto({required int startDate, int? endDate}) =
       _GetStatsByPeriodDto;
 
@@ -18,7 +18,7 @@ class GetStatsByPeriodDto with _$GetStatsByPeriodDto {
 // Response DTOs
 
 @freezed
-class CategoryDistributionDto with _$CategoryDistributionDto {
+abstract class CategoryDistributionDto with _$CategoryDistributionDto {
   const factory CategoryDistributionDto({
     required String categoryId,
     required String categoryName,
@@ -45,7 +45,7 @@ class CategoryDistributionDto with _$CategoryDistributionDto {
 }
 
 @freezed
-class TaskDistributionDto with _$TaskDistributionDto {
+abstract class TaskDistributionDto with _$TaskDistributionDto {
   const factory TaskDistributionDto({
     required String taskName,
     required int totalFocusTime,
@@ -65,7 +65,7 @@ class TaskDistributionDto with _$TaskDistributionDto {
 }
 
 @freezed
-class DailyActivityDistributionDto with _$DailyActivityDistributionDto {
+abstract class DailyActivityDistributionDto with _$DailyActivityDistributionDto {
   const factory DailyActivityDistributionDto({
     required String categoryId,
     required String categoryName,
@@ -87,7 +87,7 @@ class DailyActivityDistributionDto with _$DailyActivityDistributionDto {
 }
 
 @freezed
-class DailyActivityDto with _$DailyActivityDto {
+abstract class DailyActivityDto with _$DailyActivityDto {
   const factory DailyActivityDto({
     required int date,
     required List<DailyActivityDistributionDto> categoryDistribution,
@@ -108,12 +108,13 @@ class DailyActivityDto with _$DailyActivityDto {
 }
 
 @freezed
-class GetStatsByPeriodResponseDto with _$GetStatsByPeriodResponseDto {
+abstract class GetStatsByPeriodResponseDto with _$GetStatsByPeriodResponseDto {
   const factory GetStatsByPeriodResponseDto({
     required int totalSessions,
     required int totalBreaks,
     required int totalFocusTime,
     required int totalBreakTime,
+    required double focusPauseRatio,
     required String mostConcentratedPeriod,
     required String lessConcentratedPeriod,
     required List<int> concentrationDistribution,
@@ -130,6 +131,7 @@ class GetStatsByPeriodResponseDto with _$GetStatsByPeriodResponseDto {
       totalBreaks: entity.totalBreaks,
       totalFocusTime: entity.totalFocusTime,
       totalBreakTime: entity.totalBreakTime,
+      focusPauseRatio: entity.focusPauseRatio,
       mostConcentratedPeriod: entity.mostConcentratedPeriod.value,
       lessConcentratedPeriod: entity.lessConcentratedPeriod.value,
       concentrationDistribution: entity.concentrationDistribution,

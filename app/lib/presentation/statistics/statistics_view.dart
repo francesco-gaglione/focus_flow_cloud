@@ -244,6 +244,12 @@ class _StatisticsViewState extends State<StatisticsView> {
         color: Colors.orange,
       ),
       _SummaryItem(
+        title: context.tr('statistics.focus_pause_ratio'),
+        value: '${stats.focusPauseRatio.toStringAsFixed(1)}%',
+        icon: Icons.percent_outlined,
+        color: Colors.teal,
+      ),
+      _SummaryItem(
         title: context.tr('statistics.average_session'),
         value: _formatDuration(avgSession),
         icon: Icons.timelapse_outlined,
