@@ -8,9 +8,9 @@ use uuid::Uuid;
 pub trait TaskPersistence: Send + Sync {
     async fn create_task(&self, task: Task) -> PersistenceResult<Uuid>;
 
-    async fn find_all(&self) -> PersistenceResult<Vec<Task>>;
+    async fn find_all(&self, completed: bool) -> PersistenceResult<Vec<Task>>;
 
-    async fn find_orphan_tasks(&self) -> PersistenceResult<Vec<Task>>;
+    async fn find_orphan_tasks(&self, completed: bool) -> PersistenceResult<Vec<Task>>;
 
     async fn find_by_category_id(&self, category_id: Uuid) -> PersistenceResult<Vec<Task>>;
 
@@ -40,8 +40,11 @@ mod tests {
     #[tokio::test]
     async fn test_find_all() {
         let mut mock = MockTaskPersistence::new();
-        mock.expect_find_all().times(1).returning(|| Ok(vec![]));
-        let result = mock.find_all().await;
+        mock.expect_find_all()
+            .with(mockall::predicate::eq(false))
+            .times(1)
+            .returning(|_| Ok(vec![]));
+        let result = mock.find_all(false).await;
         assert!(result.is_ok());
     }
 
@@ -49,9 +52,10 @@ mod tests {
     async fn test_find_orphan_tasks() {
         let mut mock = MockTaskPersistence::new();
         mock.expect_find_orphan_tasks()
+            .with(mockall::predicate::eq(true))
             .times(1)
-            .returning(|| Ok(vec![]));
-        let result = mock.find_orphan_tasks().await;
+            .returning(|_| Ok(vec![]));
+        let result = mock.find_orphan_tasks(true).await;
         assert!(result.is_ok());
     }
 

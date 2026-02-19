@@ -9,10 +9,14 @@ class GetCategoriesAndTasks {
 
   GetCategoriesAndTasks({required this.categoryRepository});
 
-  Future<GetCategoriesAndTasksResult> execute() async {
+  Future<GetCategoriesAndTasksResult> execute({
+    bool? includeCompletedTasks,
+  }) async {
     try {
       logger.i('Executing getAllCategories');
-      final categoriesWithTasks = await categoryRepository.getAllCategories();
+      final categoriesWithTasks = await categoryRepository.getAllCategories(
+        includeCompletedTasks: includeCompletedTasks,
+      );
       return GetCategoriesAndTasksResult(
         success: true,
         categoriesWithTasks: categoriesWithTasks,

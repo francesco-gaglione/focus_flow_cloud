@@ -11,6 +11,7 @@ common:
   task: Attività
   start_time: Ora di inizio
   end_time: Ora di fine
+  ok: OK
 
 # Sezione Categorie
 category:
@@ -35,6 +36,13 @@ category:
 
 # Sezione Attività
 task:
+  create_task_title: Crea Attività
+
+# Versione
+version:
+  mismatch_title: "Aggiornamento Richiesto"
+  mismatch_message: "La versione dell'app non è compatibile con il server. Aggiorna l'app e/o il server per continuare."
+
   create_orphan_title: Crea Attività Orfana
   edit_orphan_title: Modifica Attività Orfana
   name_label: Nome Attività

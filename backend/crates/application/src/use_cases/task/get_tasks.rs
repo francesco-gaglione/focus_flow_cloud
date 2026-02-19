@@ -12,6 +12,10 @@ pub enum GetTaskError {
 
 pub type GetTasksResult<T> = Result<T, GetTaskError>;
 
+pub struct GetTasksCommand {
+    pub completed: Option<bool>,
+}
+
 pub struct GetTasksUseCase {
     task_persistence: Arc<dyn TaskPersistence>,
 }
@@ -21,8 +25,11 @@ impl GetTasksUseCase {
         Self { task_persistence }
     }
 
-    pub async fn execute(&self) -> GetTasksResult<Vec<Task>> {
-        Ok(self.task_persistence.find_all().await?)
+    pub async fn execute(&self, command: GetTasksCommand) -> GetTasksResult<Vec<Task>> {
+        Ok(self
+            .task_persistence
+            .find_all(command.completed.unwrap_or(false))
+            .await?)
     }
 }
 
@@ -47,10 +54,32 @@ mod tests {
 
         mock_persistence
             .expect_find_all()
-            .returning(move || Ok(returned_tasks.clone()));
+            .with(mockall::predicate::eq(false))
+            .returning(move |_| Ok(returned_tasks.clone()));
 
         let use_case = GetTasksUseCase::new(Arc::new(mock_persistence));
-        let result = use_case.execute().await;
+        let command = GetTasksCommand { completed: None };
+        let result = use_case.execute(command).await;
+
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), expected_tasks);
+    }
+
+    #[tokio::test]
+    async fn test_get_tasks_completed() {
+        let mut mock_persistence = MockTaskPersistence::new();
+        let expected_tasks = vec![];
+
+        mock_persistence
+            .expect_find_all()
+            .with(mockall::predicate::eq(true))
+            .returning(move |_| Ok(vec![]));
+
+        let use_case = GetTasksUseCase::new(Arc::new(mock_persistence));
+        let command = GetTasksCommand {
+            completed: Some(true),
+        };
+        let result = use_case.execute(command).await;
 
         assert!(result.is_ok());
         assert_eq!(result.unwrap(), expected_tasks);

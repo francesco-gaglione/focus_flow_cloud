@@ -14,6 +14,7 @@ use crate::http::session::update_session::{UpdateFocusSessionDto, UpdateFocusSes
 use crate::http::stats::calculate_stats_by_period::{
     GetStatsByPeriodDto, GetStatsByPeriodResponseDto,
 };
+use crate::http::task::complete_task::{CompleteTaskDto, CompleteTaskResponseDto};
 use crate::http::task::create_task::CreateTaskResponseDto;
 use crate::http::task::delete_tasks::DeleteTasksDto;
 use crate::http::task::get_tasks::TasksResponseDto;
@@ -29,8 +30,12 @@ use utoipa::openapi::security::{HttpAuthScheme, HttpBuilder, SecurityScheme};
 use utoipa::{Modify, OpenApi};
 
 pub const AUTH_TAG: &str = "Auth";
-
-// ... existing tags ...
+pub const CATEGORY_TAG: &str = "Category";
+pub const TASK_TAG: &str = "Task";
+pub const SESSION_TAG: &str = "Session";
+pub const STATS_TAG: &str = "Statistics";
+pub const SETTING_TAG: &str = "User Settings";
+pub const USERS_TAG: &str = "Users";
 
 pub struct SecurityAddon;
 
@@ -49,13 +54,6 @@ impl Modify for SecurityAddon {
         }
     }
 }
-
-pub const CATEGORY_TAG: &str = "Category";
-pub const TASK_TAG: &str = "Task";
-pub const SESSION_TAG: &str = "Session";
-pub const STATS_TAG: &str = "Statistics";
-pub const SETTING_TAG: &str = "User Settings";
-pub const USERS_TAG: &str = "Users";
 
 #[derive(OpenApi)]
 #[openapi(
@@ -79,8 +77,6 @@ pub const USERS_TAG: &str = "Users";
         crate::http::category::get_categories_and_tasks::get_categories_and_tasks_api,
         crate::http::category::get_category::get_category,
         crate::http::category::delete_categories::delete_categories_api,
-        crate::http::task::orphan_tasks::fetch_orphan_tasks_api,
-        crate::http::task::create_task::create_task_api,
         crate::http::users::create_user::create_user_api,
         crate::http::users::update_password::update_password_api,
         crate::http::users::update_username::update_username_api,
@@ -91,6 +87,9 @@ pub const USERS_TAG: &str = "Users";
         crate::http::task::get_tasks::get_tasks_api,
         crate::http::task::update_task::update_task_api,
         crate::http::task::delete_tasks::delete_tasks_api,
+        crate::http::task::orphan_tasks::fetch_orphan_tasks_api,
+        crate::http::task::create_task::create_task_api,
+        crate::http::task::complete_task::complete_task_api,
         crate::http::session::create_manual_session::create_manual_session_api,
         crate::http::session::update_session::update_session_api,
         crate::http::session::get_sessions::get_sessions,
@@ -107,6 +106,7 @@ pub const USERS_TAG: &str = "Users";
         schemas(GetCategoriesResponseDto),
         schemas(OrphanTasksResponseDto),
         schemas(TasksResponseDto),
+        schemas(CompleteTaskResponseDto, CompleteTaskDto),
         schemas(UpdateTaskDto, CreateTaskResponseDto),
         schemas(DeleteTasksDto, CreateTaskResponseDto),
         schemas(CreateManualSessionDto, CreateManualSessionResponseDto),

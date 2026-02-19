@@ -5,12 +5,14 @@ import 'package:focus_flow_app/presentation/widgets/common/custom_text_field.dar
 class TaskDialog extends StatefulWidget {
   final String? initialName;
   final String? initialDescription;
+  final String? title;
   final Function(String name, String? description) onSubmit;
 
   const TaskDialog({
     super.key,
     this.initialName,
     this.initialDescription,
+    this.title,
     required this.onSubmit,
   });
 
@@ -48,7 +50,12 @@ class _TaskDialogState extends State<TaskDialog> {
         isEditMode ? Icons.edit_note : Icons.add_task,
         color: _orphanTaskColor,
       ),
-      title: Text(isEditMode ? context.tr('task.edit_orphan_title') : context.tr('task.create_orphan_title')),
+      title: Text(
+        widget.title ??
+            (isEditMode
+                ? context.tr('task.edit_orphan_title')
+                : context.tr('task.create_orphan_title')),
+      ),
       content: SizedBox(
         width: 400,
         child: SingleChildScrollView(

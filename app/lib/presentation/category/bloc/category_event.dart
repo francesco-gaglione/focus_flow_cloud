@@ -1,3 +1,5 @@
+import 'package:focus_flow_app/presentation/category/bloc/category_state.dart';
+
 abstract class CategoryEvent {}
 
 class InitState extends CategoryEvent {}
@@ -65,4 +67,17 @@ class DeleteTaskEvent extends CategoryEvent {
   final String id;
 
   DeleteTaskEvent({required this.id});
+}
+
+class SetTaskFilter extends CategoryEvent {
+  final TaskFilter filter;
+
+  SetTaskFilter(this.filter);
+}
+
+class ToggleTaskCompletion extends CategoryEvent {
+  final String taskId;
+  final bool isCompleted;
+
+  ToggleTaskCompletion({required this.taskId, required this.isCompleted});
 }

@@ -12,6 +12,10 @@ pub enum OrphanTasksError {
 
 pub type OrphanTasksResult<T> = Result<T, OrphanTasksError>;
 
+pub struct GetOrphanTasksCommand {
+    pub completed: Option<bool>,
+}
+
 pub struct OrphanTasksUseCase {
     task_persistence: Arc<dyn TaskPersistence>,
 }
@@ -21,8 +25,11 @@ impl OrphanTasksUseCase {
         Self { task_persistence }
     }
 
-    pub async fn execute(&self) -> OrphanTasksResult<Vec<Task>> {
-        Ok(self.task_persistence.find_orphan_tasks().await?)
+    pub async fn execute(&self, command: GetOrphanTasksCommand) -> OrphanTasksResult<Vec<Task>> {
+        Ok(self
+            .task_persistence
+            .find_orphan_tasks(command.completed.unwrap_or(false))
+            .await?)
     }
 }
 
@@ -47,10 +54,32 @@ mod tests {
 
         mock_persistence
             .expect_find_orphan_tasks()
-            .returning(move || Ok(returned_tasks.clone()));
+            .with(mockall::predicate::eq(false))
+            .returning(move |_| Ok(returned_tasks.clone()));
 
         let use_case = OrphanTasksUseCase::new(Arc::new(mock_persistence));
-        let result = use_case.execute().await;
+        let command = GetOrphanTasksCommand { completed: None };
+        let result = use_case.execute(command).await;
+
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), expected_tasks);
+    }
+
+    #[tokio::test]
+    async fn test_orphan_tasks_completed() {
+        let mut mock_persistence = MockTaskPersistence::new();
+        let expected_tasks = vec![];
+
+        mock_persistence
+            .expect_find_orphan_tasks()
+            .with(mockall::predicate::eq(true))
+            .returning(move |_| Ok(vec![]));
+
+        let use_case = OrphanTasksUseCase::new(Arc::new(mock_persistence));
+        let command = GetOrphanTasksCommand {
+            completed: Some(true),
+        };
+        let result = use_case.execute(command).await;
 
         assert!(result.is_ok());
         assert_eq!(result.unwrap(), expected_tasks);

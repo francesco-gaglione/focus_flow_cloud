@@ -6,6 +6,8 @@ import 'package:focus_flow_app/domain/usecases/categories_usecases/update_catego
 import 'package:focus_flow_app/domain/usecases/tasks_usecases/create_task.dart';
 import 'package:focus_flow_app/domain/usecases/tasks_usecases/delete_tasks.dart';
 import 'package:focus_flow_app/domain/usecases/tasks_usecases/fetch_orphan_tasks.dart';
+import 'package:focus_flow_app/domain/usecases/tasks_usecases/complete_task.dart';
+import 'package:focus_flow_app/domain/usecases/tasks_usecases/uncomplete_task.dart';
 import 'package:focus_flow_app/domain/usecases/tasks_usecases/update_task.dart';
 import 'package:focus_flow_app/presentation/category/bloc/category_event.dart';
 import 'package:focus_flow_app/presentation/category/bloc/category_state.dart';
@@ -22,6 +24,8 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
   final UpdateTask _updateTask;
   final DeleteCategory _deleteCategory;
   final DeleteTasks _deleteTasks;
+  final CompleteTask _completeTask;
+  final UncompleteTask _uncompleteTask;
 
   CategoryBloc({
     required GetCategoriesAndTasks getCategoriesAndTasks,
@@ -32,6 +36,8 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
     required UpdateTask updateTask,
     required DeleteCategory deleteCategory,
     required DeleteTasks deleteTasks,
+    required CompleteTask completeTask,
+    required UncompleteTask uncompleteTask,
   }) : _getCategoriesAndTasks = getCategoriesAndTasks,
        _fetchOrphanTasks = fetchOrphanTasks,
        _createCategory = createCategory,
@@ -40,6 +46,8 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
        _updateTask = updateTask,
        _deleteCategory = deleteCategory,
        _deleteTasks = deleteTasks,
+       _completeTask = completeTask,
+       _uncompleteTask = uncompleteTask,
        super(const CategoryState(isLoading: true)) {
     on<InitState>(_onInitState);
     on<LoadCategories>(_onLoadCategories);
@@ -51,6 +59,8 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
     on<UpdateTaskEvent>(_onUpdateTask);
     on<DeleteCategoryEvent>(_onDeleteCategory);
     on<DeleteTaskEvent>(_onDeleteTask);
+    on<SetTaskFilter>(_onSetTaskFilter);
+    on<ToggleTaskCompletion>(_onToggleTaskCompletion);
   }
 
   Future<void> _onInitState(
@@ -60,8 +70,10 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
     logger.d('Initializing category state...');
     emit(state.copyWith(isLoading: true, errorMessage: null));
     try {
+      final includeCompleted = state.filter == TaskFilter.all || state.filter == TaskFilter.completed;
+      
       final results = await Future.wait([
-        _getCategoriesAndTasks.execute(),
+        _getCategoriesAndTasks.execute(includeCompletedTasks: includeCompleted),
         _fetchOrphanTasks.execute(),
       ]);
 
@@ -77,6 +89,7 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
             orphanTasks: orphanTasksResult.orphanTasks ?? [],
             isLoading: false,
             errorMessage: null,
+            filter: state.filter,
           ),
         );
       } else {
@@ -102,7 +115,9 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
     logger.d('Loading categories...');
     emit(state.copyWith(isLoading: true, errorMessage: null));
     try {
-      final result = await _getCategoriesAndTasks.execute();
+      final includeCompleted = state.filter == TaskFilter.all || state.filter == TaskFilter.completed;
+      final result = await _getCategoriesAndTasks.execute(includeCompletedTasks: includeCompleted);
+      
       if (result.success && result.categoriesWithTasks != null) {
         emit(
           state.copyWith(
@@ -309,6 +324,39 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
           state.copyWith(errorMessage: result.error ?? 'Failed to delete task'),
         );
       }
+    } catch (e) {
+      emit(state.copyWith(errorMessage: e.toString()));
+    }
+  }
+
+  Future<void> _onSetTaskFilter(
+    SetTaskFilter event,
+    Emitter<CategoryState> emit,
+  ) async {
+    emit(state.copyWith(filter: event.filter));
+    add(InitState());
+  }
+
+  Future<void> _onToggleTaskCompletion(
+    ToggleTaskCompletion event,
+    Emitter<CategoryState> emit,
+  ) async {
+    try {
+      if (event.isCompleted) {
+        final result = await _completeTask.execute(taskId: event.taskId);
+        if (!result.success) {
+           emit(state.copyWith(errorMessage: result.error));
+           return;
+        }
+      } else {
+         final result = await _uncompleteTask.execute(taskId: event.taskId);
+         if (!result.success) {
+           emit(state.copyWith(errorMessage: result.error));
+           return;
+         }
+      }
+      // Reload to reflect changes (moved to completed/active list)
+      add(InitState());
     } catch (e) {
       emit(state.copyWith(errorMessage: e.toString()));
     }

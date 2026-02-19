@@ -1,4 +1,5 @@
 use application::use_cases::focus_session::update_focus_session::UpdateFocusSessionUseCase;
+use application::use_cases::task::complete_task::CompleteTaskUseCase;
 use application::use_cases::task::get_tasks::GetTasksUseCase;
 use application::use_cases::user::get_user_info::GetUserInfoUseCase;
 use application::use_cases::user::refresh_token::RefreshTokenUseCase;
@@ -73,6 +74,7 @@ pub async fn init_app_state(
     let delete_tasks_usecase = Arc::new(DeleteTasksUseCase::new(postgres_arc.clone()));
     let orphan_tasks_usecase = Arc::new(OrphanTasksUseCase::new(postgres_arc.clone()));
     let update_task_usecase = Arc::new(UpdateTaskUseCase::new(postgres_arc.clone()));
+    let complete_task_usecase = Arc::new(CompleteTaskUseCase::new(postgres_arc.clone()));
 
     // Focus Session Use Cases
     let create_manual_session_usecase =
@@ -176,6 +178,7 @@ pub async fn init_app_state(
         delete_tasks_usecase,
         orphan_tasks_usecase,
         update_task_usecase,
+        complete_task_usecase,
         create_manual_session_usecase,
         update_focus_session_usecase,
         create_session_usecase,

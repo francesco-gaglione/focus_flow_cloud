@@ -6,6 +6,7 @@ class TaskListItem extends StatelessWidget {
   final bool isCompleted;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
+  final ValueChanged<bool?> onToggleCompletion;
 
   const TaskListItem({
     super.key,
@@ -14,6 +15,7 @@ class TaskListItem extends StatelessWidget {
     required this.isCompleted,
     required this.onEdit,
     required this.onDelete,
+    required this.onToggleCompletion,
   });
 
   @override
@@ -22,6 +24,11 @@ class TaskListItem extends StatelessWidget {
 
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      leading: Checkbox(
+        value: isCompleted,
+        onChanged: onToggleCompletion,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+      ),
       title: Text(
         name,
         style: Theme.of(context).textTheme.bodyLarge?.copyWith(

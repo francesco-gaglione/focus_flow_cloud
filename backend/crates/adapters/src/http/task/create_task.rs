@@ -35,7 +35,7 @@ pub struct CreateTaskResponseDto {
 
 #[utoipa::path(
     post,
-    path = "/api/tasks",
+    path = "/api/task",
     tag = TASK_TAG,
     summary = "Create a new task",
     request_body = CreateTaskDto,

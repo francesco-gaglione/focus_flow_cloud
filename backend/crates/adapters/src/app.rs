@@ -12,6 +12,7 @@ use tower_http::cors::{AllowOrigin, CorsLayer};
 use tower_http::trace::TraceLayer;
 use tower_sessions::{MemoryStore, SessionManagerLayer};
 use utoipa::OpenApi;
+use utoipa_scalar::{Scalar, Servable};
 use utoipa_swagger_ui::SwaggerUi;
 use uuid::Uuid;
 
@@ -24,6 +25,7 @@ pub fn create_app(app_state: AppState) -> Router {
 
     Router::new()
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
+        .merge(Scalar::with_url("/scalar", ApiDoc::openapi()))
         .nest("/api", api_routes(app_state.clone()))
         .nest("/ws", ws_routes(app_state.clone()))
         .with_state(app_state.clone())

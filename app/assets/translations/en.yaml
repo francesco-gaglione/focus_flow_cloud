@@ -11,6 +11,7 @@ common:
   task: Task
   start_time: Start Time
   end_time: End Time
+  ok: OK
 
 # Category Section
 category:
@@ -35,6 +36,13 @@ category:
 
 # Task Section
 task:
+  create_task_title: Create Task
+
+# Version
+version:
+  mismatch_title: "Update Required"
+  mismatch_message: "The app version is incompatible with the server. Please update the app and/or the server to continue."
+
   create_orphan_title: Create Orphan Task
   edit_orphan_title: Edit Orphan Task
   name_label: Task Name

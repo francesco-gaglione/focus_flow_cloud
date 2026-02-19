@@ -23,7 +23,63 @@ class CategoryView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(context.tr('category.title')),
-        centerTitle: false,
+        actions: [
+          PopupMenuButton<TaskFilter>(
+            icon: const Icon(Icons.filter_list),
+            onSelected: (filter) {
+              context.read<CategoryBloc>().add(SetTaskFilter(filter));
+            },
+            itemBuilder: (context) {
+               // Access the current filter from the bloc state if possible, or just show options.
+               // Ideally we should highlight the selected one.
+               // We can get the state using context.read if we are inside a builder, but here we are in build method.
+               // We can use the BlocBuilder state if we move this inside, but AppBar is outside.
+               // However, we can use context.read<CategoryBloc>().state.filter
+              final currentFilter = context.read<CategoryBloc>().state.filter;
+              return [
+                PopupMenuItem(
+                  value: TaskFilter.active,
+                  child: Row(
+                    children: [
+                      if (currentFilter == TaskFilter.active) ...[
+                        const Icon(Icons.check, size: 16),
+                        const SizedBox(width: 8),
+                      ] else
+                        const SizedBox(width: 24),
+                      Text(context.tr('category.filter_active')),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: TaskFilter.completed,
+                  child: Row(
+                    children: [
+                      if (currentFilter == TaskFilter.completed) ...[
+                        const Icon(Icons.check, size: 16),
+                        const SizedBox(width: 8),
+                      ] else
+                        const SizedBox(width: 24),
+                      Text(context.tr('category.filter_completed')),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: TaskFilter.all,
+                  child: Row(
+                    children: [
+                      if (currentFilter == TaskFilter.all) ...[
+                        const Icon(Icons.check, size: 16),
+                        const SizedBox(width: 8),
+                      ] else
+                         const SizedBox(width: 24),
+                      Text(context.tr('category.filter_all')),
+                    ],
+                  ),
+                ),
+              ];
+            },
+          ),
+        ],
       ),
       body: BlocBuilder<CategoryBloc, CategoryState>(
         builder: (context, state) {
@@ -157,6 +213,16 @@ class CategoryView extends StatelessWidget {
             onDelete: () {
               _showDeleteTaskDialog(context, task.id);
             },
+            onToggleCompletion: (value) {
+              if (value != null) {
+                context.read<CategoryBloc>().add(
+                  ToggleTaskCompletion(
+                    taskId: task.id,
+                    isCompleted: value,
+                  ),
+                );
+              }
+            },
           );
         },
       ),
@@ -278,6 +344,7 @@ class CategoryView extends StatelessWidget {
       context: context,
       builder:
           (dialogContext) => TaskDialog(
+            title: context.tr('task.create_task_title'),
             onSubmit: (name, description) {
               context.read<CategoryBloc>().add(
                 CreateTaskEvent(

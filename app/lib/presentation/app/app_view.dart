@@ -10,7 +10,6 @@ import 'app_router.dart';
 import '../../presentation/focus/bloc/focus_bloc.dart';
 import '../../presentation/focus/bloc/focus_event.dart';
 import '../../presentation/version/cubit/version_cubit.dart';
-import '../../presentation/version/version_listener.dart';
 
 class AppView extends StatelessWidget {
   const AppView({super.key});
@@ -53,7 +52,6 @@ class AppView extends StatelessWidget {
               localizationsDelegates: context.localizationDelegates,
               supportedLocales: context.supportedLocales,
               locale: context.locale,
-              builder: (context, child) => VersionListener(child: child!),
             ),
           );
         },

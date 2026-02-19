@@ -14,9 +14,8 @@ use application::persistence_traits::persistence_error::PersistenceError;
 use application::use_cases::{
     category::{
         delete_categories_usecase::DeleteCategoriesError,
-        delete_category_usecase::DeleteCategoryError,
-        get_category_and_task_usecase::GetCategoryAndTasksError,
-        get_category_usecase::GetCategoryError, update_category_usecase::UpdateCategoryError,
+        delete_category_usecase::DeleteCategoryError, get_category_usecase::GetCategoryError,
+        update_category_usecase::UpdateCategoryError,
     },
     focus_session::{
         find_sessions_by_filters::FindSessionByFiltersError,
@@ -24,8 +23,7 @@ use application::use_cases::{
     },
     stats::calculate_stats_by_period::CalculateStatsByPeriodError,
     task::{
-        create_task::CreateTaskError, delete_tasks::DeleteTasksError, get_tasks::GetTaskError,
-        orphan_tasks::OrphanTasksError, update_task::UpdateTaskError,
+        create_task::CreateTaskError, delete_tasks::DeleteTasksError, update_task::UpdateTaskError,
     },
     user::{
         get_user_info::UserInfoError, login_user::LoginError, refresh_token::RefreshTokenError,
@@ -118,7 +116,7 @@ impl From<TaskMapperError> for HttpError {
 }
 
 // Helper to map PersistenceError to HttpError
-fn map_persistence_error(err: PersistenceError) -> HttpError {
+pub fn map_persistence_error(err: PersistenceError) -> HttpError {
     match err {
         PersistenceError::NotFound(msg) => HttpError::NotFound(msg),
         PersistenceError::AlreadyExists => {
@@ -127,8 +125,6 @@ fn map_persistence_error(err: PersistenceError) -> HttpError {
         PersistenceError::Unexpected(msg) => HttpError::GenericError(msg),
     }
 }
-
-// CreateCategoryError: Implemented in controller
 
 impl From<DeleteCategoriesError> for HttpError {
     fn from(err: DeleteCategoriesError) -> Self {
@@ -142,14 +138,6 @@ impl From<DeleteCategoryError> for HttpError {
     fn from(err: DeleteCategoryError) -> Self {
         match err {
             DeleteCategoryError::PersistenceError(e) => map_persistence_error(e),
-        }
-    }
-}
-
-impl From<GetCategoryAndTasksError> for HttpError {
-    fn from(err: GetCategoryAndTasksError) -> Self {
-        match err {
-            GetCategoryAndTasksError::PersistenceError(e) => map_persistence_error(e),
         }
     }
 }
@@ -169,8 +157,6 @@ impl From<UpdateCategoryError> for HttpError {
         }
     }
 }
-
-// CreateManualSessionError: Implemented in controller
 
 impl From<FindSessionByFiltersError> for HttpError {
     fn from(err: FindSessionByFiltersError) -> Self {
@@ -214,22 +200,6 @@ impl From<DeleteTasksError> for HttpError {
     }
 }
 
-impl From<GetTaskError> for HttpError {
-    fn from(err: GetTaskError) -> Self {
-        match err {
-            GetTaskError::PersistenceError(e) => map_persistence_error(e),
-        }
-    }
-}
-
-impl From<OrphanTasksError> for HttpError {
-    fn from(err: OrphanTasksError) -> Self {
-        match err {
-            OrphanTasksError::PersistenceError(e) => map_persistence_error(e),
-        }
-    }
-}
-
 impl From<UpdateTaskError> for HttpError {
     fn from(err: UpdateTaskError) -> Self {
         match err {
@@ -257,10 +227,6 @@ impl From<RefreshTokenError> for HttpError {
         HttpError::Unauthorized(err.to_string())
     }
 }
-
-// RegisterUserError: Implemented in controller
-
-// UpdatePasswordError: Implemented in controller
 
 impl From<UpdateUserUsernameError> for HttpError {
     fn from(err: UpdateUserUsernameError) -> Self {

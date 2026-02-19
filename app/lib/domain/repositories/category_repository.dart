@@ -2,8 +2,10 @@ import '../entities/category.dart';
 import '../entities/category_with_tasks.dart';
 
 abstract class CategoryRepository {
-  /// Get all categories with their tasks
-  Future<List<CategoryWithTasks>> getAllCategories();
+  /// Get all categories  /// Get all categories with tasks
+  Future<List<CategoryWithTasks>> getAllCategories({
+    bool? includeCompletedTasks,
+  });
 
   /// Get a category by ID
   Future<Category?> getCategoryById(String id);

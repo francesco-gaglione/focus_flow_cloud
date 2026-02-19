@@ -22,7 +22,7 @@ pub struct DeleteTasksResponseDto {
 
 #[utoipa::path(
     delete,
-    path = "/api/tasks",
+    path = "/api/task",
     tag = TASK_TAG,
     summary = "Delete one or more tasks",
     request_body = DeleteTasksDto,
