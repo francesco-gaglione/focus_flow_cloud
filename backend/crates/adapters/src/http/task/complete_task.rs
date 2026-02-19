@@ -43,7 +43,7 @@ impl From<CompleteTaskError> for HttpError {
     post,
     path = "/api/task/complete",
     tag = TASK_TAG,
-    summary = "Create a new task",
+    summary = "Complete a task",
     request_body = CompleteTaskDto,
     responses(
         (status = 201, description = "Task completed successfully", body = CompleteTaskResponseDto),

@@ -36,6 +36,7 @@ tokio = { version = "1.47.1", features = ["full"] }
 utoipa = { version = "5.4.0", features = ["axum_extras", "chrono"] }
 utoipa-axum = "0.2.0"
 utoipa-swagger-ui = { version = "9.0.2", features = ["axum"] }
+utoipa-scalar = { version = "0.3", features = ["axum"] }
 axum = { version="0.8.6", features=["ws"]}
 tokio-tungstenite = "0.28.0"
 futures-util = { version = "0.3", default-features = false, features = ["sink", "std"] }
