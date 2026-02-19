@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.0] - 2026-02-19
+
+### Features
+
+- Improved software architecture and error handling
+- Incorporate pause sessions into statistics metrics and implemented password policies
+- Implement task completion lifecycle and status filtering
+
+### Other
+
+- Update documentation and screenshots
+
+This commit makes several improvements to the project's documentation
+and screenshots:
+
+- **Renames and reorganizes screenshots**: Image files related to tasks
+  and statistics have been renamed and consolidated for better clarity.
+- **Adds new screenshots**: New screenshots for notes, alternative task
+  views, and settings variations have been added.
+- **Introduces a gallery page**: A dedicated gallery page is added to
+  showcase all available screenshots.
+- **Updates README**: The README.md file is updated to reflect the new
+  screenshot names and the addition of the gallery page.
+- **Enhances SEO metadata**: Docusaurus configuration is updated with
+  improved metadata, including JSON-LD for search engines, sitemap
+  generation, and relevant keywords.
+- **Adds robots.txt**: A robots.txt file is added to control search
+  engine crawling and provide a sitemap link.
+
 ## [2.0.1] - 2026-01-30
 
 ### Bug Fixes
