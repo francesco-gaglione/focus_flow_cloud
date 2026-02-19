@@ -15,4 +15,5 @@ mockall = { workspace = true, optional = true }
 test-utils = ["mockall"]
 
 [dev-dependencies]
+mockall.workspace = true
 tokio = { workspace = true, features = ["macros", "full"] }
