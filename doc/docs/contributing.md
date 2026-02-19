@@ -1,5 +1,7 @@
 ---
 sidebar_position: 4
+description: "Contribute to FocusFlow: development workflow, code style, commit guidelines, and pull request process."
+keywords: [focusflow, contributing, open source, rust, flutter, conventional commits]
 ---
 
 # Contributing

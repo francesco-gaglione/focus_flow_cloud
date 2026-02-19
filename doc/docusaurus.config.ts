@@ -5,7 +5,7 @@ import type * as Preset from "@docusaurus/preset-classic";
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
 const config: Config = {
-    title: "Focus Flow",
+    title: "FocusFlow – Open Source Pomodoro Tracker",
     tagline:
         "A comprehensive Pomodoro technique tracking solution featuring a Rust backend and a Flutter mobile application.",
     favicon: "img/app_icon.png",
@@ -37,6 +37,29 @@ const config: Config = {
         locales: ["en", "it"],
     },
 
+    headTags: [
+        {
+            tagName: "script",
+            attributes: { type: "application/ld+json" },
+            innerHTML: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "SoftwareApplication",
+                name: "FocusFlow",
+                applicationCategory: "ProductivityApplication",
+                operatingSystem: "iOS, Android, macOS, Windows, Linux",
+                description:
+                    "Open-source Pomodoro technique tracker with real-time sync, task management, and productivity analytics.",
+                url: "https://francesco-gaglione.github.io/focus_flow_cloud/",
+                author: {
+                    "@type": "Person",
+                    name: "Francesco Gaglione",
+                },
+                license: "https://opensource.org/licenses/MIT",
+                offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+            }),
+        },
+    ],
+
     presets: [
         [
             "classic",
@@ -50,10 +73,14 @@ const config: Config = {
                         type: ["rss", "atom"],
                         xslt: true,
                     },
-                    // Useful options to enforce blogging best practices
                     onInlineTags: "warn",
                     onInlineAuthors: "warn",
                     onUntruncatedBlogPosts: "warn",
+                },
+                sitemap: {
+                    lastmod: "date",
+                    changefreq: "weekly",
+                    priority: 0.5,
                 },
                 theme: {
                     customCss: "./src/css/custom.css",
@@ -68,8 +95,14 @@ const config: Config = {
     themes: ['@docusaurus/theme-mermaid'],
 
     themeConfig: {
-        // Replace with your project's social card
-        image: "img/docusaurus-social-card.jpg",
+        image: "img/app_icon.png",
+        metadata: [
+            { name: "keywords", content: "pomodoro, focus timer, productivity, task management, rust, flutter, open source, time tracking" },
+            { name: "author", content: "Francesco Gaglione" },
+            { name: "robots", content: "index, follow" },
+            { property: "og:type", content: "website" },
+            { name: "twitter:card", content: "summary_large_image" },
+        ],
         colorMode: {
             respectPrefersColorScheme: true,
         },

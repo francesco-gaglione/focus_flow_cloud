@@ -1,5 +1,7 @@
 ---
 sidebar_position: 2
+description: "FocusFlow backend architecture: Clean Architecture with Rust, Axum, Diesel, organized into domain, application, adapters, and infrastructure layers."
+keywords: [focusflow, backend, rust, clean architecture, axum, diesel, API, websockets]
 ---
 
 # Backend Architecture

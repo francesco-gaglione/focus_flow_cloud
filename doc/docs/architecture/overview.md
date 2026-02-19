@@ -1,5 +1,7 @@
 ---
 sidebar_position: 1
+description: "High-level architecture of FocusFlow: Rust backend (Clean Architecture) and Flutter mobile app communicating via REST API and WebSockets."
+keywords: [focusflow, architecture, clean architecture, rust, flutter, websockets]
 ---
 
 # Architecture Overview

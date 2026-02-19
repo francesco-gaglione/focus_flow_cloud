@@ -1,5 +1,7 @@
 ---
 sidebar_position: 3
+description: "FocusFlow app architecture: Flutter with Clean Architecture, BLoC state management, repository pattern, and dependency injection."
+keywords: [focusflow, app, flutter, clean architecture, BLoC, state management, mobile]
 ---
 
 # App Architecture

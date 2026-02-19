@@ -1,5 +1,7 @@
 ---
 sidebar_position: 2
+description: "Learn how to deploy FocusFlow with Docker Compose, configure the backend, and run the Flutter app locally."
+keywords: [focusflow, getting started, docker, deployment, self-hosting, flutter setup]
 ---
 
 # Getting Started
