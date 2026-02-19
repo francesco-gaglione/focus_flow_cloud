@@ -22,6 +22,8 @@ import 'package:focus_flow_app/domain/usecases/sessions_usecases/get_sessions_wi
 import 'package:focus_flow_app/domain/usecases/tasks_usecases/create_task.dart';
 import 'package:focus_flow_app/domain/usecases/tasks_usecases/delete_tasks.dart';
 import 'package:focus_flow_app/domain/usecases/tasks_usecases/fetch_orphan_tasks.dart';
+import 'package:focus_flow_app/domain/usecases/tasks_usecases/complete_task.dart';
+import 'package:focus_flow_app/domain/usecases/tasks_usecases/uncomplete_task.dart';
 import 'package:focus_flow_app/domain/usecases/tasks_usecases/update_task.dart';
 import 'package:focus_flow_app/domain/usecases/sessions_usecases/update_session.dart';
 import 'package:get_it/get_it.dart';
@@ -211,6 +213,14 @@ Future<void> setupDependencies(String baseUrl, String wsUrl) async {
 
   sl.registerLazySingleton<FetchOrphanTasks>(
     () => FetchOrphanTasks(taskRepository: sl()),
+  );
+
+  sl.registerLazySingleton<CompleteTask>(
+    () => CompleteTask(taskRepository: sl()),
+  );
+
+  sl.registerLazySingleton<UncompleteTask>(
+    () => UncompleteTask(taskRepository: sl()),
   );
 
   // Use Cases - Session

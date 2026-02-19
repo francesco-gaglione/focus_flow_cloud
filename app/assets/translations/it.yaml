@@ -35,6 +35,7 @@ category:
 
 # Sezione Attività
 task:
+  create_task_title: Crea Attività
   create_orphan_title: Crea Attività Orfana
   edit_orphan_title: Modifica Attività Orfana
   name_label: Nome Attività

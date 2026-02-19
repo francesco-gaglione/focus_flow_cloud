@@ -21,6 +21,8 @@ class CategoryPage extends StatelessWidget {
             updateTask: sl(),
             deleteCategory: sl(),
             deleteTasks: sl(),
+            completeTask: sl(),
+            uncompleteTask: sl(),
           )..add(InitState()),
       child: const CategoryView(),
     );

@@ -17,8 +17,17 @@ class HttpCategoryRepository implements CategoryRepository {
   }) : _dio = dio;
 
   @override
-  Future<List<CategoryWithTasks>> getAllCategories() async {
-    final response = await _dio.get('$baseUrl/api/category');
+  Future<List<CategoryWithTasks>> getAllCategories({
+    bool? includeCompletedTasks,
+  }) async {
+    final queryParameters = <String, dynamic>{};
+    if (includeCompletedTasks != null) {
+      queryParameters['include_completed_tasks'] = includeCompletedTasks;
+    }
+    final response = await _dio.get(
+      '$baseUrl/api/category',
+      queryParameters: queryParameters,
+    );
     final dto = GetCategoriesResponseDto.fromJson(response.data);
     return dto.categories.map((catDto) {
       final category = Category(

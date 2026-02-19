@@ -35,6 +35,7 @@ category:
 
 # Task Section
 task:
+  create_task_title: Create Task
   create_orphan_title: Create Orphan Task
   edit_orphan_title: Edit Orphan Task
   name_label: Task Name
