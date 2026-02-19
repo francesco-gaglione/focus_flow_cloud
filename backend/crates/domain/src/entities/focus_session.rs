@@ -188,6 +188,132 @@ impl FocusSession {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use chrono::Duration;
+
+    #[test]
+    fn test_new_focus_session_valid() {
+        let user_id = Uuid::new_v4();
+        let started_at = Utc::now();
+        let ended_at = Some(started_at + Duration::minutes(25));
+
+        let session = FocusSession::new(
+            user_id,
+            None,
+            None,
+            FocusSessionType::Work,
+            Some(100),
+            Some("Good session".to_string()),
+            started_at,
+            ended_at,
+        );
+
+        assert!(session.is_ok());
+        let session = session.unwrap();
+        assert_eq!(session.user_id(), user_id);
+        assert_eq!(session.actual_duration(), Some(25 * 60));
+        assert_eq!(session.concentration_score(), Some(100));
+    }
+
+    #[test]
+    fn test_new_focus_session_invalid_break_score() {
+        let user_id = Uuid::new_v4();
+        let started_at = Utc::now();
+
+        let session = FocusSession::new(
+            user_id,
+            None,
+            None,
+            FocusSessionType::ShortBreak,
+            Some(50), // Should not have score
+            None,
+            started_at,
+            None,
+        );
+
+        assert!(matches!(
+            session,
+            Err(FocusSessionError::InvalidFocusSessionParam(param)) if param == "concentration_score"
+        ));
+    }
+
+    #[test]
+    fn test_new_focus_session_empty_notes() {
+        let user_id = Uuid::new_v4();
+        let started_at = Utc::now();
+
+        let session = FocusSession::new(
+            user_id,
+            None,
+            None,
+            FocusSessionType::Work,
+            None,
+            Some("".to_string()), // Empty notes
+            started_at,
+            None,
+        );
+
+        assert!(matches!(
+            session,
+            Err(FocusSessionError::InvalidFocusSessionParam(msg)) if msg == "Notes field is empty"
+        ));
+    }
+
+    #[test]
+    fn test_update_date_range_valid() {
+        let user_id = Uuid::new_v4();
+        let started_at = Utc::now();
+        let mut session = FocusSession::new(
+            user_id,
+            None,
+            None,
+            FocusSessionType::Work,
+            None,
+            None,
+            started_at,
+            None,
+        )
+        .unwrap();
+
+        let new_started_at = started_at;
+        let new_ended_at = Some(started_at + Duration::minutes(30));
+
+        let result = session.update_date_range(new_started_at, new_ended_at);
+
+        assert!(result.is_ok());
+        assert_eq!(session.actual_duration(), Some(30 * 60));
+    }
+
+    #[test]
+    fn test_update_date_range_invalid() {
+        let user_id = Uuid::new_v4();
+        let started_at = Utc::now();
+        let mut session = FocusSession::new(
+            user_id,
+            None,
+            None,
+            FocusSessionType::Work,
+            None,
+            None,
+            started_at,
+            None,
+        )
+        .unwrap();
+
+        let new_started_at = started_at;
+        let new_ended_at = Some(started_at - Duration::minutes(10)); // Ended before start
+
+        let result = session.update_date_range(new_started_at, new_ended_at);
+
+        assert!(matches!(
+            result,
+            Err(FocusSessionError::InvalidFocusSessionDuration(_))
+        ));
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct SessionFilter {
     pub user_id: Uuid,

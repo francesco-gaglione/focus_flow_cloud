@@ -24,3 +24,21 @@ impl From<String> for UserRole {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_display() {
+        assert_eq!(UserRole::Admin.to_string(), "admin");
+        assert_eq!(UserRole::User.to_string(), "user");
+    }
+
+    #[test]
+    fn test_from_string() {
+        assert_eq!(UserRole::from("admin".to_string()), UserRole::Admin);
+        assert_eq!(UserRole::from("user".to_string()), UserRole::User);
+        assert_eq!(UserRole::from("invalid".to_string()), UserRole::User); // Default
+    }
+}
