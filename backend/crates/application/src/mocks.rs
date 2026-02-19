@@ -46,8 +46,8 @@ mock! {
     #[async_trait::async_trait]
     impl TaskPersistence for TaskPersistence {
         async fn create_task(&self, task: Task) -> PersistenceResult<Uuid>;
-        async fn find_all(&self) -> PersistenceResult<Vec<Task>>;
-        async fn find_orphan_tasks(&self) -> PersistenceResult<Vec<Task>>;
+        async fn find_all(&self, completed: bool) -> PersistenceResult<Vec<Task>>;
+        async fn find_orphan_tasks(&self, completed: bool) -> PersistenceResult<Vec<Task>>;
         async fn find_by_category_id(&self, category_id: Uuid) -> PersistenceResult<Vec<Task>>;
         async fn find_by_id(&self, task_id: Uuid) -> PersistenceResult<Task>;
         async fn update_task(&self, task: Task) -> PersistenceResult<Task>;

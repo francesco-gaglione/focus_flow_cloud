@@ -94,7 +94,7 @@ mod tests {
             });
         task_persistence
             .expect_find_orphan_tasks()
-            .returning(|| Ok(vec![]));
+            .returning(|_| Ok(vec![]));
 
         let usecase = GetCategoryAndTaskUseCases::new(
             Arc::new(category_persistence),

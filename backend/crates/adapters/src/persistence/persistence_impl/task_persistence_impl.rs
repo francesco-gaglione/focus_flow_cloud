@@ -33,7 +33,7 @@ impl TaskPersistence for PostgresPersistence {
         Ok(result.id)
     }
 
-    async fn find_all(&self) -> PersistenceResult<Vec<Task>> {
+    async fn find_all(&self, completed: bool) -> PersistenceResult<Vec<Task>> {
         let conn = self
             .pool
             .get()
@@ -42,8 +42,17 @@ impl TaskPersistence for PostgresPersistence {
 
         let result = conn
             .interact(move |conn| {
-                schema::tasks::table
+                let mut query = schema::tasks::table
                     .filter(schema::tasks::deleted_at.is_null())
+                    .into_boxed();
+
+                if completed {
+                    query = query.filter(schema::tasks::completed_at.is_not_null());
+                } else {
+                    query = query.filter(schema::tasks::completed_at.is_null());
+                }
+
+                query
                     .select(DbTask::as_select())
                     .order(schema::tasks::created_at.desc())
                     .load(conn)
@@ -56,7 +65,7 @@ impl TaskPersistence for PostgresPersistence {
         Ok(tasks)
     }
 
-    async fn find_orphan_tasks(&self) -> PersistenceResult<Vec<Task>> {
+    async fn find_orphan_tasks(&self, completed: bool) -> PersistenceResult<Vec<Task>> {
         let conn = self
             .pool
             .get()
@@ -65,7 +74,17 @@ impl TaskPersistence for PostgresPersistence {
 
         let result = conn
             .interact(move |conn| {
-                schema::tasks::table
+                let mut query = schema::tasks::table
+                    .filter(schema::tasks::deleted_at.is_null())
+                    .into_boxed();
+
+                if completed {
+                    query = query.filter(schema::tasks::completed_at.is_not_null());
+                } else {
+                    query = query.filter(schema::tasks::completed_at.is_null());
+                }
+
+                query
                     .filter(schema::tasks::category_id.is_null())
                     .select(DbTask::as_select())
                     .load(conn)

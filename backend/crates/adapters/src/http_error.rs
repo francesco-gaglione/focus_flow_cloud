@@ -24,8 +24,7 @@ use application::use_cases::{
     },
     stats::calculate_stats_by_period::CalculateStatsByPeriodError,
     task::{
-        create_task::CreateTaskError, delete_tasks::DeleteTasksError, get_tasks::GetTaskError,
-        orphan_tasks::OrphanTasksError, update_task::UpdateTaskError,
+        create_task::CreateTaskError, delete_tasks::DeleteTasksError, update_task::UpdateTaskError,
     },
     user::{
         get_user_info::UserInfoError, login_user::LoginError, refresh_token::RefreshTokenError,
@@ -118,7 +117,7 @@ impl From<TaskMapperError> for HttpError {
 }
 
 // Helper to map PersistenceError to HttpError
-fn map_persistence_error(err: PersistenceError) -> HttpError {
+pub fn map_persistence_error(err: PersistenceError) -> HttpError {
     match err {
         PersistenceError::NotFound(msg) => HttpError::NotFound(msg),
         PersistenceError::AlreadyExists => {
@@ -206,22 +205,6 @@ impl From<DeleteTasksError> for HttpError {
     fn from(err: DeleteTasksError) -> Self {
         match err {
             DeleteTasksError::PersistenceError(e) => map_persistence_error(e),
-        }
-    }
-}
-
-impl From<GetTaskError> for HttpError {
-    fn from(err: GetTaskError) -> Self {
-        match err {
-            GetTaskError::PersistenceError(e) => map_persistence_error(e),
-        }
-    }
-}
-
-impl From<OrphanTasksError> for HttpError {
-    fn from(err: OrphanTasksError) -> Self {
-        match err {
-            OrphanTasksError::PersistenceError(e) => map_persistence_error(e),
         }
     }
 }
