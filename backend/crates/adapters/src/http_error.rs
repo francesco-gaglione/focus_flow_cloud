@@ -14,9 +14,8 @@ use application::persistence_traits::persistence_error::PersistenceError;
 use application::use_cases::{
     category::{
         delete_categories_usecase::DeleteCategoriesError,
-        delete_category_usecase::DeleteCategoryError,
-        get_category_and_task_usecase::GetCategoryAndTasksError,
-        get_category_usecase::GetCategoryError, update_category_usecase::UpdateCategoryError,
+        delete_category_usecase::DeleteCategoryError, get_category_usecase::GetCategoryError,
+        update_category_usecase::UpdateCategoryError,
     },
     focus_session::{
         find_sessions_by_filters::FindSessionByFiltersError,
@@ -139,14 +138,6 @@ impl From<DeleteCategoryError> for HttpError {
     fn from(err: DeleteCategoryError) -> Self {
         match err {
             DeleteCategoryError::PersistenceError(e) => map_persistence_error(e),
-        }
-    }
-}
-
-impl From<GetCategoryAndTasksError> for HttpError {
-    fn from(err: GetCategoryAndTasksError) -> Self {
-        match err {
-            GetCategoryAndTasksError::PersistenceError(e) => map_persistence_error(e),
         }
     }
 }
