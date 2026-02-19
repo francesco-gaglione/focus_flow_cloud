@@ -13,6 +13,7 @@ import 'main_layout.dart';
 import '../../core/services/configuration_service.dart';
 import '../../core/di/service_locator.dart';
 import '../pages/onboarding/backend_config_page.dart';
+import '../../presentation/version/version_listener.dart';
 
 class AppRouter {
   final AuthCubit authCubit;
@@ -33,40 +34,47 @@ class AppRouter {
       return null;
     },
     routes: [
-      GoRoute(
-        path: '/login',
-        builder: (context, state) => const LoginPage(),
-      ),
-      GoRoute(
-        path: '/config',
-        builder: (context, state) {
-           return BackendConfigPage(
-              configService: sl<ConfigurationService>(),
-              isFirstRun: false, 
-           );
-        },
-      ),
       ShellRoute(
         builder: (context, state, child) {
-          return MainLayout(currentPath: state.uri.path, child: child);
+          return VersionListener(child: child);
         },
         routes: [
-          GoRoute(path: '/focus', builder: (context, state) => const FocusPage()),
           GoRoute(
-            path: '/categories',
-            builder: (context, state) => const CategoryPage(),
+            path: '/login',
+            builder: (context, state) => const LoginPage(),
           ),
           GoRoute(
-            path: '/stats',
-            builder: (context, state) => const StatisticsPage(),
+            path: '/config',
+            builder: (context, state) {
+               return BackendConfigPage(
+                  configService: sl<ConfigurationService>(),
+                  isFirstRun: false, 
+               );
+            },
           ),
-          GoRoute(
-            path: '/settings',
-            builder: (context, state) => const SettingsPage(),
-          ),
-          GoRoute(
-            path: '/notes',
-            builder: (context, state) => const NotesPage(),
+          ShellRoute(
+            builder: (context, state, child) {
+              return MainLayout(currentPath: state.uri.path, child: child);
+            },
+            routes: [
+              GoRoute(path: '/focus', builder: (context, state) => const FocusPage()),
+              GoRoute(
+                path: '/categories',
+                builder: (context, state) => const CategoryPage(),
+              ),
+              GoRoute(
+                path: '/stats',
+                builder: (context, state) => const StatisticsPage(),
+              ),
+              GoRoute(
+                path: '/settings',
+                builder: (context, state) => const SettingsPage(),
+              ),
+              GoRoute(
+                path: '/notes',
+                builder: (context, state) => const NotesPage(),
+              ),
+            ],
           ),
         ],
       ),
