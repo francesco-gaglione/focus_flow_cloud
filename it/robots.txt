@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://francesco-gaglione.github.io/focus_flow_cloud/sitemap.xml
