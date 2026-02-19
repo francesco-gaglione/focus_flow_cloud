@@ -12,14 +12,19 @@ pub enum CompleteTaskError {
     #[error("Task not found: {0}")]
     TaskNotFound(Uuid),
 
+    #[error("Unauthorized")]
+    Unauthorized,
+
     #[error("Persistence error: {0}")]
     PersistenceError(#[from] PersistenceError),
 }
 
 pub type CompleteTaskResult<T> = Result<T, CompleteTaskError>;
 
+#[derive(Debug)]
 pub struct CompleteTaskCommand {
     pub id: Uuid,
+    pub user_id: Uuid,
 }
 
 pub struct CompleteTaskUseCase {
@@ -33,6 +38,10 @@ impl CompleteTaskUseCase {
 
     pub async fn execute(&self, command: CompleteTaskCommand) -> CompleteTaskResult<()> {
         let mut task = self.task_persistence.find_by_id(command.id).await?;
+
+        if task.user_id() != command.user_id {
+            return Err(CompleteTaskError::Unauthorized);
+        }
 
         task.complete();
 
@@ -53,8 +62,12 @@ mod tests {
     async fn test_complete_task_success() {
         let mut mock_persistence = MockTaskPersistence::new();
         let task_id = Uuid::new_v4();
+
         let user_id = Uuid::new_v4();
-        let command = CompleteTaskCommand { id: task_id };
+        let command = CompleteTaskCommand {
+            id: task_id,
+            user_id,
+        };
 
         let task = Task::reconstitute(
             task_id,
@@ -88,7 +101,11 @@ mod tests {
     async fn test_complete_task_find_error() {
         let mut mock_persistence = MockTaskPersistence::new();
         let task_id = Uuid::new_v4();
-        let command = CompleteTaskCommand { id: task_id };
+        let user_id = Uuid::new_v4();
+        let command = CompleteTaskCommand {
+            id: task_id,
+            user_id,
+        };
 
         mock_persistence
             .expect_find_by_id()
@@ -112,7 +129,10 @@ mod tests {
         let mut mock_persistence = MockTaskPersistence::new();
         let task_id = Uuid::new_v4();
         let user_id = Uuid::new_v4();
-        let command = CompleteTaskCommand { id: task_id };
+        let command = CompleteTaskCommand {
+            id: task_id,
+            user_id,
+        };
 
         let task = Task::reconstitute(
             task_id,
@@ -151,7 +171,10 @@ mod tests {
         let mut mock_persistence = MockTaskPersistence::new();
         let task_id = Uuid::new_v4();
         let user_id = Uuid::new_v4();
-        let command = CompleteTaskCommand { id: task_id };
+        let command = CompleteTaskCommand {
+            id: task_id,
+            user_id,
+        };
 
         let old_completed_at = Utc::now() - chrono::Duration::hours(1);
         let task = Task::reconstitute(
@@ -188,7 +211,10 @@ mod tests {
         let task_id = Uuid::new_v4();
         let user_id = Uuid::new_v4();
         let category_id = Uuid::new_v4();
-        let command = CompleteTaskCommand { id: task_id };
+        let command = CompleteTaskCommand {
+            id: task_id,
+            user_id,
+        };
 
         let name = "Preserved Name".to_string();
         let description = Some("Preserved Description".to_string());
@@ -225,5 +251,38 @@ mod tests {
         let result = use_case.execute(command).await;
 
         assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_complete_task_unauthorized() {
+        let mut mock_persistence = MockTaskPersistence::new();
+        let task_id = Uuid::new_v4();
+        let owner_id = Uuid::new_v4();
+        let intruder_id = Uuid::new_v4();
+        let command = CompleteTaskCommand {
+            id: task_id,
+            user_id: intruder_id,
+        };
+
+        let task = Task::reconstitute(
+            task_id,
+            owner_id,
+            None,
+            "Private Task".to_string(),
+            None,
+            None,
+            None,
+        );
+
+        mock_persistence
+            .expect_find_by_id()
+            .with(mockall::predicate::eq(task_id))
+            .times(1)
+            .returning(move |_| Ok(task.clone()));
+
+        let use_case = CompleteTaskUseCase::new(Arc::new(mock_persistence));
+        let result = use_case.execute(command).await;
+
+        assert_eq!(result, Err(CompleteTaskError::Unauthorized));
     }
 }

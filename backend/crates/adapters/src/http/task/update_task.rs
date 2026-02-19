@@ -46,7 +46,7 @@ pub struct UpdateTaskResponseDto {
 
 #[utoipa::path(
     put,
-    path = "/api/tasks/{id}",
+    path = "/api/task/{id}",
     tag = TASK_TAG,
     summary = "Update a task",
     params(

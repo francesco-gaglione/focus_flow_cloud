@@ -16,7 +16,7 @@ pub struct OrphanTasksResponseDto {
 
 #[utoipa::path(
     get,
-    path = "/api/tasks/orphans",
+    path = "/api/task/orphans",
     tag = TASK_TAG,
     summary = "Get all orphan tasks (tasks without a category)",
     responses(

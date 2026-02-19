@@ -128,8 +128,6 @@ fn map_persistence_error(err: PersistenceError) -> HttpError {
     }
 }
 
-// CreateCategoryError: Implemented in controller
-
 impl From<DeleteCategoriesError> for HttpError {
     fn from(err: DeleteCategoriesError) -> Self {
         match err {
@@ -169,8 +167,6 @@ impl From<UpdateCategoryError> for HttpError {
         }
     }
 }
-
-// CreateManualSessionError: Implemented in controller
 
 impl From<FindSessionByFiltersError> for HttpError {
     fn from(err: FindSessionByFiltersError) -> Self {
@@ -257,10 +253,6 @@ impl From<RefreshTokenError> for HttpError {
         HttpError::Unauthorized(err.to_string())
     }
 }
-
-// RegisterUserError: Implemented in controller
-
-// UpdatePasswordError: Implemented in controller
 
 impl From<UpdateUserUsernameError> for HttpError {
     fn from(err: UpdateUserUsernameError) -> Self {

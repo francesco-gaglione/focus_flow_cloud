@@ -1,6 +1,7 @@
 use crate::config::AppConfig;
 use crate::http::pomodoro_state::PomodoroState;
 use application::use_cases::focus_session::update_focus_session::UpdateFocusSessionUseCase;
+use application::use_cases::task::complete_task::CompleteTaskUseCase;
 use application::use_cases::task::get_tasks::GetTasksUseCase;
 use application::use_cases::user::get_user_info::GetUserInfoUseCase;
 use application::use_cases::user::login_user::LoginUseCase;
@@ -58,6 +59,7 @@ pub struct AppState {
     pub orphan_tasks_usecase: Arc<OrphanTasksUseCase>,
     pub get_tasks_usecase: Arc<GetTasksUseCase>,
     pub update_task_usecase: Arc<UpdateTaskUseCase>,
+    pub complete_task_usecase: Arc<CompleteTaskUseCase>,
 
     // Focus Session Use Cases
     pub create_manual_session_usecase: Arc<CreateManualSessionUseCase>,

@@ -1,4 +1,5 @@
 use crate::http::app_state::AppState;
+use crate::http::task::complete_task::complete_task_api;
 use crate::http::task::create_task::create_task_api;
 use crate::http::task::delete_tasks::delete_tasks_api;
 use crate::http::task::get_tasks::get_tasks_api;
@@ -14,4 +15,5 @@ pub fn router() -> Router<AppState> {
         .route("/", get(get_tasks_api))
         .route("/{id}", put(update_task_api))
         .route("/orphans", get(fetch_orphan_tasks_api))
+        .route("/complete", post(complete_task_api))
 }

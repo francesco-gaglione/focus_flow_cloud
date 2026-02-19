@@ -16,7 +16,7 @@ pub struct TasksResponseDto {
 
 #[utoipa::path(
     get,
-    path = "/api/tasks",
+    path = "/api/task",
     tag = TASK_TAG,
     summary = "Get all tasks",
     responses(
