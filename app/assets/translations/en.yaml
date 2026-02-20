@@ -1,4 +1,3 @@
-# Common
 common:
   cancel: Cancel
   create: Create
@@ -13,7 +12,6 @@ common:
   end_time: End Time
   ok: OK
 
-# Category Section
 category:
   title: Categories
   empty_state_title: No categories and tasks yet
@@ -34,15 +32,8 @@ category:
   description_hint: Optional description
   name_required: Please enter a category name
 
-# Task Section
 task:
   create_task_title: Create Task
-
-# Version
-version:
-  mismatch_title: "Update Required"
-  mismatch_message: "The app version is incompatible with the server. Please update the app and/or the server to continue."
-
   create_orphan_title: Create Orphan Task
   edit_orphan_title: Edit Orphan Task
   name_label: Task Name
@@ -51,7 +42,10 @@ version:
   description_hint: Optional description
   name_required: Please enter a task name
 
-# Focus Section
+version:
+  mismatch_title: "Update Required"
+  mismatch_message: "The app version is incompatible with the server. Please update the app and/or the server to continue."
+
 focus:
   title: Focus
   session_title: Focus Session
@@ -91,7 +85,6 @@ focus:
   load_template: Load Template
   select_template: Select Template
 
-# Settings Section
 settings:
   title: Settings
   appearance: Appearance
@@ -131,7 +124,6 @@ settings:
   template_saved: Template saved
   no_templates: No templates defined
 
-# Statistics Section
 statistics:
   title: Statistics
   placeholder_message: Charts and stats will be here
@@ -160,19 +152,16 @@ statistics:
   last_7_days: "Last 7 days"
   last_30_days: "Last 30 days"
 
-# Navigation
 navigation:
   focus: Focus
   categories: Categories
   statistics: Statistics
   settings: Settings
 
-# Error Messages
 error:
   title: Something went wrong
   retry: Retry
 
-# Manual Session
 manual_session:
   title: Add Manual Session
   category: Category
@@ -184,7 +173,6 @@ manual_session:
   error_end_time: End time cannot be before start time
   error_category: Please select a category
 
-# Notes Section
 notes:
   title: Notes Archive
   no_notes_found: No notes found for this period

@@ -1,4 +1,3 @@
-# Comune
 common:
   cancel: Annulla
   create: Crea
@@ -13,7 +12,6 @@ common:
   end_time: Ora di fine
   ok: OK
 
-# Sezione Categorie
 category:
   title: Categorie
   empty_state_title: Nessuna categoria e attività ancora
@@ -34,15 +32,8 @@ category:
   description_hint: Descrizione opzionale
   name_required: Inserisci un nome per la categoria
 
-# Sezione Attività
 task:
   create_task_title: Crea Attività
-
-# Versione
-version:
-  mismatch_title: "Aggiornamento Richiesto"
-  mismatch_message: "La versione dell'app non è compatibile con il server. Aggiorna l'app e/o il server per continuare."
-
   create_orphan_title: Crea Attività Orfana
   edit_orphan_title: Modifica Attività Orfana
   name_label: Nome Attività
@@ -51,7 +42,10 @@ version:
   description_hint: Descrizione opzionale
   name_required: Inserisci un nome per l'attività
 
-# Sezione Focus
+version:
+  mismatch_title: "Aggiornamento Richiesto"
+  mismatch_message: "La versione dell'app non è compatibile con il server. Aggiorna l'app e/o il server per continuare."
+
 focus:
   title: Focus
   session_title: Sessione di Focus
@@ -91,7 +85,6 @@ focus:
   load_template: Carica Modello
   select_template: Seleziona Modello
 
-# Sezione Impostazioni
 settings:
   title: Impostazioni
   appearance: Aspetto
@@ -131,7 +124,6 @@ settings:
   template_saved: Modello salvato
   no_templates: Nessun modello definito
 
-# Sezione Statistiche
 statistics:
   title: Statistiche
   placeholder_message: Grafici e statistiche saranno qui
@@ -160,19 +152,16 @@ statistics:
   last_7_days: "Ultimi 7 giorni"
   last_30_days: "Ultimi 30 Giorni"
 
-# Navigazione
 navigation:
   focus: Focus
   categories: Categorie
   statistics: Statistiche
   settings: Impostazioni
 
-# Messaggi di Errore
 error:
   title: Qualcosa è andato storto
   retry: Riprova
 
-# Sessione Manuale
 manual_session:
   title: Aggiungi Sessione Manuale
   category: Categoria
@@ -184,7 +173,6 @@ manual_session:
   error_end_time: L'ora di fine non può essere prima dell'inizio
   error_category: Seleziona una categoria
 
-# Sezione Note
 notes:
   title: Archivio Note
   no_notes_found: Nessuna nota trovata in questo periodo
