@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.1] - 2026-02-20
+
+### Bug Fixes
+
+- Translations
+
 ## [2.1.0] - 2026-02-19
 
 ### Features
