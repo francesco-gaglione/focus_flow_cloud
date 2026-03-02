@@ -17,6 +17,14 @@ class WebsocketRepository {
   StreamSubscription? _subscription;
   bool _isConnected = false;
 
+  /// Timestamp of the last message received from the server.
+  /// Used to detect ghost (stale) connections after mobile standby.
+  DateTime? _lastMessageReceivedAt;
+
+  /// A connection is considered stale when [_isConnected] is true but no
+  /// message has been received for this duration.
+  static const _staleThreshold = Duration(seconds: 90);
+
   // Stream controllers for different message types
   final _serverResponseController =
       StreamController<ServerResponse>.broadcast();
@@ -48,6 +56,7 @@ class WebsocketRepository {
       }
 
       logger.d('Connecting to $wsUrl...');
+      _lastMessageReceivedAt = null;
       final token = _tokenService.getToken();
 
       // Pass token as query parameter instead of header to avoid server 500 errors
@@ -98,6 +107,7 @@ class WebsocketRepository {
 
   /// Handle incoming WebSocket messages
   void _handleMessage(dynamic data) {
+    _lastMessageReceivedAt = DateTime.now();
     try {
       logger.d('Received message: $data');
       final jsonData = json.decode(data as String) as Map<String, dynamic>;
@@ -284,21 +294,60 @@ class WebsocketRepository {
     return _isConnected;
   }
 
-  /// Disconnect from the WebSocket server
+  /// Returns true when the connection flag is set but no message has arrived
+  /// within [_staleThreshold]. This detects "ghost" connections that survive
+  /// OS-level TCP teardown during extended mobile standby.
+  bool isConnectionStale() {
+    if (!_isConnected) return false;
+    if (_lastMessageReceivedAt == null) return false;
+    return DateTime.now().difference(_lastMessageReceivedAt!) > _staleThreshold;
+  }
+
+  /// Tear down the current socket and open a fresh one.
+  /// Stream controllers are preserved so existing listeners keep working.
+  Future<void> forceReconnect() async {
+    logger.i('Forcing WebSocket reconnect...');
+    await disconnect();
+    await connect();
+  }
+
+  /// Disconnect from the WebSocket server.
+  /// Stream controllers are intentionally kept open so that a subsequent
+  /// [connect] or [forceReconnect] can continue delivering events to existing
+  /// listeners without them needing to re-subscribe.
   Future<void> disconnect() async {
+    _isConnected = false;
+    await _subscription?.cancel();
+    _subscription = null;
     if (_ws != null) {
-      await _subscription?.cancel();
-      await _ws!.sink.close();
+      try {
+        await _ws!.sink.close();
+      } catch (e) {
+        logger.w('Error closing WebSocket sink: $e');
+      }
       _ws = null;
-      _isConnected = false;
-      logger.i('Disconnected from websocket');
+    }
+    logger.i('Disconnected from websocket');
+    if (!_connectionStatusController.isClosed) {
       _connectionStatusController.add(false);
     }
+  }
 
-    // Close stream controllers
-    await _serverResponseController.close();
-    await _broadcastEventController.close();
-    await _pomodoroStateController.close();
-    await _connectionStatusController.close();
+  /// Permanently release all resources including stream controllers.
+  /// Call this only when the repository itself is being torn down (app exit).
+  Future<void> dispose() async {
+    await disconnect();
+    if (!_serverResponseController.isClosed) {
+      await _serverResponseController.close();
+    }
+    if (!_broadcastEventController.isClosed) {
+      await _broadcastEventController.close();
+    }
+    if (!_pomodoroStateController.isClosed) {
+      await _pomodoroStateController.close();
+    }
+    if (!_connectionStatusController.isClosed) {
+      await _connectionStatusController.close();
+    }
   }
 }

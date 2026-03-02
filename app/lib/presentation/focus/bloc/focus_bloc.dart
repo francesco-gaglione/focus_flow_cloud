@@ -444,12 +444,18 @@ class FocusBloc extends Bloc<FocusEvent, FocusState> {
     if (!_websocketRepository.isConnected()) {
       logger.d('WebSocket not connected, attempting to connect...');
       await _websocketRepository.connect();
+    } else if (_websocketRepository.isConnectionStale()) {
+      // The connection flag is set but no message has been received recently.
+      // This is a "ghost" connection left over from before mobile standby.
+      logger.w('WebSocket connection is stale after standby, forcing reconnect...');
+      await _websocketRepository.forceReconnect();
     } else {
-      logger.d('WebSocket already connected');
-      // Ensure state reflects reality
+      logger.d('WebSocket already connected and healthy');
+      // Ensure state reflects reality and get fresh data.
       if (!state.isWebSocketConnected) {
         emit(state.copyWith(isWebSocketConnected: true));
       }
+      _websocketRepository.requestSync();
     }
   }
 

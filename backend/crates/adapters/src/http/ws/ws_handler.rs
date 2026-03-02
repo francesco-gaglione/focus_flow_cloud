@@ -136,8 +136,12 @@ async fn handle_socket(ws: WebSocket, state: AppState, request_id: RequestId, us
                         debug!("Client requested close");
                         break;
                     }
-                    Ok(Message::Ping(_)) => {
-                        debug!("Received ping");
+                    Ok(Message::Ping(data)) => {
+                        debug!("Received ping, sending pong");
+                        if tx_clone.send(Message::Pong(data)).is_err() {
+                            debug!("Failed to send pong, client disconnected");
+                            break;
+                        }
                     }
                     Ok(Message::Pong(_)) => {
                         debug!("Received pong");
