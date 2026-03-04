@@ -41,6 +41,10 @@ backend-fmt-check:
 backend-lint:
     cd backend && cargo clippy --workspace -- -D warnings
 
+# Backend test coverage
+backend-cov:
+    cd backend && cargo llvm-cov --all-features --workspace --include-build-script
+
 # Run all backend checks
 backend-check: backend-fmt-check backend-lint backend-test
     @echo "Backend checks passed!"
@@ -75,6 +79,7 @@ app-check: app-pub-get app-analyze app-test
 
 # ============================================================================
 # Doc
+
 # ============================================================================
 doc-serve:
     cd doc && npx docusaurus start
@@ -127,16 +132,16 @@ bump-auto:
 _bump_semver part target:
     #!/usr/bin/env bash
     set -e
-    
+
     # Python script to handle logic
     python3 -c "
     import sys
     import re
     import subprocess
 
-    part = '{{part}}'
-    target = '{{target}}'
-    
+    part = '{{ part }}'
+    target = '{{ target }}'
+
     def get_version(file, pattern):
         with open(file, 'r') as f:
             content = f.read()
@@ -168,7 +173,7 @@ _bump_semver part target:
             return 'patch'
 
         bump_type = None
-        
+
         for msg in commits:
             msg = msg.lower()
             if 'breaking change' in msg or re.search(r'!: ', msg):
@@ -179,7 +184,7 @@ _bump_semver part target:
             if msg.startswith('fix'):
                 if bump_type is None:
                     bump_type = 'patch'
-        
+
         return bump_type
 
     def bump(version, part):
@@ -209,23 +214,23 @@ _bump_semver part target:
     # Paths
     be_cargo = 'backend/Cargo.toml'
     app_pub = 'app/pubspec.yaml'
-    
+
     files_to_commit = []
     tag_name = ''
-    
+
     # 1. Bump Backend
     if target in ['backend', 'both']:
         curr = get_version(be_cargo, r'^version = \"(.*?)\"')
         next_v = bump(curr, part)
         print(f'Bumping Backend: {curr} -> {next_v}')
-        
+
         # Sed command replacement with python regex
         with open(be_cargo, 'r') as f: s = f.read()
         s = re.sub(r'(^version = \")(.*?)(\")', f'\\\\g<1>{next_v}\\\\g<3>', s, flags=re.MULTILINE)
         with open(be_cargo, 'w') as f: f.write(s)
-        
+
         files_to_commit.append(be_cargo)
-        if target == 'backend': 
+        if target == 'backend':
             tag_name = f'backend-v{next_v}'
 
     # 2. Bump App
@@ -233,11 +238,11 @@ _bump_semver part target:
         curr = get_version(app_pub, r'^version: (.*?)\+')
         next_v = bump(curr, part)
         print(f'Bumping App: {curr} -> {next_v}')
-        
+
         with open(app_pub, 'r') as f: s = f.read()
         s = re.sub(r'(^version: )(.*?)(\+)', f'\\\\g<1>{next_v}\\\\g<3>', s, flags=re.MULTILINE)
         with open(app_pub, 'w') as f: f.write(s)
-        
+
         files_to_commit.append(app_pub)
         if target == 'app':
             tag_name = f'app-v{next_v}'
@@ -260,7 +265,7 @@ _bump_semver part target:
     run_cmd(f'git tag {tag_name}')
     print(f'Done! Created tag {tag_name}')
     "
-    
+
     echo "Push with: git push origin master --tags"
 
 # Print all available recipes

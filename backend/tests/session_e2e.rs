@@ -228,7 +228,7 @@ async fn update_session_and_list() {
 async fn find_sessions_with_filters() {
     let context = setup().await;
 
-    // 1. Create Session with Notes
+    // Create Session with Notes
     let session_with_notes = CreateManualSessionDto {
         task_id: None,
         category_id: None,
@@ -240,7 +240,7 @@ async fn find_sessions_with_filters() {
     };
     context.create_manual_session(&session_with_notes).await;
 
-    // 2. Create Session without Notes
+    // Create Session without Notes
     let session_no_notes = CreateManualSessionDto {
         task_id: None,
         category_id: None,
