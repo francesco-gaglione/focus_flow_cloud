@@ -203,6 +203,10 @@ mod tests {
         task.update_schedule_date(new_date, new_date_end_date)
             .expect("Unexpected update error");
         assert_eq!(task.scheduled_date, Some(new_date));
+
+        // Testing invalid dates (end date < start date)
+        let res = task.update_schedule_date(new_date_end_date, new_date);
+        assert!(res.is_err());
     }
 
     #[test]

@@ -43,7 +43,11 @@ backend-lint:
 
 # Backend test coverage
 backend-cov:
-    cd backend && cargo llvm-cov --all-features --workspace --include-build-script
+    cd backend && cargo llvm-cov \
+        --all-features \
+        --workspace \
+        --include-build-script \
+        --ignore-filename-regex "(src/main\.rs|mod\.rs|lib\.rs|schema\.rs|config\.rs|setup\.rs|migrations\.rs|db_models/|persistence_traits/|auth_traits/|domain/src/traits/|http_error\.rs|persistence_error\.rs|openapi\.rs)"
 
 # Run all backend checks
 backend-check: backend-fmt-check backend-lint backend-test
