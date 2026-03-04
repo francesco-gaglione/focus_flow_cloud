@@ -44,7 +44,7 @@ pub async fn get_settings_api(
     Ok(Json(UserSettingsResponseDto {
         settings: settings
             .iter()
-            .filter(|s| !s.value.is_none())
+            .filter(|s| s.value.is_some())
             .map(|s| UserSettingDto {
                 key: s.key.clone(),
                 value: s.value.as_ref().unwrap().clone(),

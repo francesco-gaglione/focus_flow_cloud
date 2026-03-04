@@ -37,7 +37,7 @@ pub async fn handle_terminate_event(
             })
             .transpose()?;
 
-        let _ = state
+        state
             .create_session_usecase
             .execute(CreateFocusSessionCommand {
                 user_id: *old_session_state.user_id(),

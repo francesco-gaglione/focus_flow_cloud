@@ -14,8 +14,8 @@ use validator::Validate;
 impl From<DeleteCategoriesError> for HttpError {
     fn from(value: DeleteCategoriesError) -> Self {
         match value {
-            DeleteCategoriesError::PersistenceError(persistence_error) => {
-                HttpError::GenericError("".to_string())
+            DeleteCategoriesError::PersistenceError(_) => {
+                HttpError::GenericError("Generic Error".to_string())
             }
         }
     }

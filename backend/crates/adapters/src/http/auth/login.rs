@@ -15,7 +15,7 @@ impl From<LoginError> for HttpError {
         match value {
             LoginError::Validation(e) => HttpError::BadRequest(e.to_string()),
             LoginError::InvalidCredentials => HttpError::Unauthorized("".to_string()),
-            LoginError::TokenError(token_service_error) => HttpError::Unauthorized("".to_string()),
+            LoginError::TokenError(_) => HttpError::Unauthorized("".to_string()),
         }
     }
 }
