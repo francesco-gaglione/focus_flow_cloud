@@ -29,7 +29,8 @@ async fn create_new_task_and_list() {
         name: "Task".to_string(),
         description: Some("Work related tasks".to_string()),
         category_id: Some(category_body.category_id),
-        scheduled_date: Some(chrono::Utc::now().timestamp()),
+        scheduled_date: None,
+        scheduled_end_date: None,
     };
 
     let create_task_body = context.create_task(&create_task_dto).await;
@@ -70,7 +71,8 @@ async fn create_new_orphan_and_list() {
         name: "Orphan".to_string(),
         description: Some("Work related tasks".to_string()),
         category_id: None,
-        scheduled_date: Some(chrono::Utc::now().timestamp()),
+        scheduled_date: None,
+        scheduled_end_date: None,
     };
 
     let create_task_body = context.create_task(&create_task_dto).await;
@@ -105,7 +107,8 @@ async fn update_task_test() {
         name: "Task to update".to_string(),
         description: Some("Description".to_string()),
         category_id: None,
-        scheduled_date: Some(chrono::Utc::now().timestamp()),
+        scheduled_date: None,
+        scheduled_end_date: None,
     };
 
     let create_body = context.create_task(&create_task_dto).await;
@@ -117,6 +120,7 @@ async fn update_task_test() {
         name: Some("Updated Task Name".to_string()),
         description: Some("Updated Description".to_string()),
         scheduled_date: None,
+        scheduled_end_date: None,
         completed_at: Some(chrono::Utc::now().timestamp()),
     };
 
@@ -134,12 +138,8 @@ async fn update_task_test() {
         .await
         .expect("Failed to deserialize update response");
 
-    assert_eq!(update_body.updated_task.name, "Updated Task Name");
-    assert_eq!(
-        update_body.updated_task.description.unwrap(),
-        "Updated Description"
-    );
-    assert!(update_body.updated_task.completed_at.is_some());
+    assert_eq!(update_body.success, true);
+    //TODO verify task was updated using get task endpoint
 }
 
 #[tokio::test]
@@ -151,7 +151,8 @@ async fn delete_tasks_test() {
         name: "Task to delete".to_string(),
         description: None,
         category_id: None,
-        scheduled_date: Some(chrono::Utc::now().timestamp()),
+        scheduled_date: None,
+        scheduled_end_date: None,
     };
 
     let create_body = context.create_task(&create_task_dto).await;

@@ -1,7 +1,16 @@
 use crate::http::app_state::AppState;
 use crate::http::model::session_model::UserSession;
-use crate::http_error::HttpResult;
+use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::SETTING_TAG;
+use application::use_cases::user_settings::update_setting::UpdateSettingsError;
+
+impl From<UpdateSettingsError> for HttpError {
+    fn from(value: UpdateSettingsError) -> Self {
+        match value {
+            UpdateSettingsError::PersistenceError(e) => HttpError::GenericError(e.to_string()),
+        }
+    }
+}
 use axum::extract::State;
 use axum::Extension;
 use axum::Json;

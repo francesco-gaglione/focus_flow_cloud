@@ -67,17 +67,14 @@ mod tests {
     use std::sync::Arc;
 
     use crate::persistence_traits::persistence_error::PersistenceError;
+    use crate::persistence_traits::user_persistence::MockUserPersistence;
+    use crate::use_cases::user::update_user_username::{
+        UpdateUserUsernameCommand, UpdateUserUsernameError, UpdateUserUsernameUseCase,
+    };
     use domain::entities::user::User;
     use domain::entities::user_role::UserRole;
     use mockall::predicate::eq;
     use uuid::Uuid;
-
-    use crate::{
-        mocks::MockUserPersistence,
-        use_cases::user::update_user_username::{
-            UpdateUserUsernameCommand, UpdateUserUsernameError, UpdateUserUsernameUseCase,
-        },
-    };
 
     #[tokio::test]
     async fn test_update_user_username() {

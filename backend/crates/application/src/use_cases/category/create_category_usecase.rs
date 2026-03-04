@@ -63,7 +63,7 @@ mod tests {
     use uuid::Uuid;
 
     use crate::{
-        mocks::MockCategoryPersistence,
+        persistence_traits::category_persistence::MockCategoryPersistence,
         use_cases::category::create_category_usecase::{
             CreateCategoryCommand, CreateCategoryUseCases,
         },

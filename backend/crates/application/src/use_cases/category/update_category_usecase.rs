@@ -2,8 +2,6 @@ use std::sync::Arc;
 
 use crate::persistence_traits::category_persistence::CategoryPersistence;
 use crate::persistence_traits::persistence_error::PersistenceError;
-use crate::use_cases::category::command::update_category::UpdateCategoryCommand;
-use domain::entities::category::Category;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -13,6 +11,14 @@ pub enum UpdateCategoryError {
 }
 
 pub type UpdateCategoryResult<T> = Result<T, UpdateCategoryError>;
+
+#[derive(Debug, Clone)]
+pub struct UpdateCategoryCommand {
+    pub id: uuid::Uuid,
+    pub name: Option<String>,
+    pub description: Option<String>,
+    pub color: Option<String>,
+}
 
 #[derive(Clone)]
 pub struct UpdateCategoryUseCases {
@@ -26,7 +32,7 @@ impl UpdateCategoryUseCases {
         }
     }
 
-    pub async fn execute(&self, command: UpdateCategoryCommand) -> UpdateCategoryResult<Category> {
+    pub async fn execute(&self, command: UpdateCategoryCommand) -> UpdateCategoryResult<()> {
         let mut category = self.category_persistence.find_by_id(command.id).await?;
 
         if let Some(name) = command.name {
@@ -39,7 +45,9 @@ impl UpdateCategoryUseCases {
             category.update_color(color);
         }
 
-        Ok(self.category_persistence.update_category(category).await?)
+        self.category_persistence.update_category(category).await?;
+
+        Ok(())
     }
 }
 
@@ -48,10 +56,9 @@ mod tests {
     use std::sync::Arc;
 
     use crate::{
-        mocks::MockCategoryPersistence,
-        use_cases::category::{
-            command::update_category::UpdateCategoryCommand,
-            update_category_usecase::UpdateCategoryUseCases,
+        persistence_traits::category_persistence::MockCategoryPersistence,
+        use_cases::category::update_category_usecase::{
+            UpdateCategoryCommand, UpdateCategoryUseCases,
         },
     };
     use domain::entities::category::Category;
@@ -65,7 +72,6 @@ mod tests {
 
         let mut category_persistence = MockCategoryPersistence::new();
 
-        // Clone variables for the closure
         let name_clone_update = category_name.clone();
         let description_clone_update = category_description.clone();
         let color_clone_update = category_color.clone();
@@ -110,12 +116,6 @@ mod tests {
             })
             .await;
 
-        let updated_category = result.unwrap();
-        assert_eq!(updated_category.name(), category_name);
-        assert_eq!(
-            updated_category.description(),
-            Some(category_description.as_str())
-        );
-        assert_eq!(updated_category.color(), category_color);
+        assert!(result.is_ok())
     }
 }

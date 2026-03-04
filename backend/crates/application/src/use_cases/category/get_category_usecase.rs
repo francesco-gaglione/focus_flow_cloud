@@ -4,6 +4,7 @@ use crate::persistence_traits::category_persistence::CategoryPersistence;
 use crate::persistence_traits::persistence_error::PersistenceError;
 use domain::entities::category::Category;
 use thiserror::Error;
+use uuid::Uuid;
 
 #[derive(Debug, Error)]
 pub enum GetCategoryError {
@@ -12,6 +13,27 @@ pub enum GetCategoryError {
 }
 
 pub type GetCategoryResult<T> = Result<T, GetCategoryError>;
+
+#[derive(Debug, Clone)]
+pub struct CategoryOutput {
+    pub id: Uuid,
+    pub user_id: Uuid,
+    pub name: String,
+    pub description: Option<String>,
+    pub color: String,
+}
+
+impl From<Category> for CategoryOutput {
+    fn from(value: Category) -> Self {
+        Self {
+            id: value.id(),
+            user_id: value.user_id(),
+            name: value.name().to_string(),
+            description: value.description().map(|d| d.to_string()),
+            color: value.color().to_string(),
+        }
+    }
+}
 
 #[derive(Clone)]
 pub struct GetCategoryUseCases {
@@ -25,8 +47,12 @@ impl GetCategoryUseCases {
         }
     }
 
-    pub async fn execute(&self, category_id: uuid::Uuid) -> GetCategoryResult<Category> {
-        Ok(self.category_persistence.find_by_id(category_id).await?)
+    pub async fn execute(&self, category_id: Uuid) -> GetCategoryResult<CategoryOutput> {
+        Ok(self
+            .category_persistence
+            .find_by_id(category_id)
+            .await?
+            .into())
     }
 }
 
@@ -37,7 +63,7 @@ mod tests {
     use uuid::Uuid;
 
     use crate::{
-        mocks::MockCategoryPersistence,
+        persistence_traits::category_persistence::MockCategoryPersistence,
         use_cases::category::get_category_usecase::GetCategoryUseCases,
     };
     use domain::entities::category::Category;
@@ -66,6 +92,8 @@ mod tests {
         let usecase = GetCategoryUseCases::new(Arc::new(mock_persistence));
         let result = usecase.execute(category_id).await;
 
-        assert_eq!(result.unwrap(), category);
+        assert!(result.is_ok());
+        let result = result.unwrap();
+        assert_eq!(result.name, category.name());
     }
 }

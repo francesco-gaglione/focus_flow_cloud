@@ -110,27 +110,19 @@ async fn update_category_and_get_by_id() {
         .expect("Failed to execute request");
 
     assert_eq!(response.status(), 200);
-    let body_response: UpdateCategoryResponseDto = response
+    let update_response: UpdateCategoryResponseDto = response
         .json()
         .await
         .expect("Failed to deserialize message");
 
-    assert_eq!(
-        body_response.updated_category.name,
-        "Updated Mandatory fields"
-    );
-    assert_eq!(
-        body_response.updated_category.description,
-        Some("Updated description".to_string())
-    );
-    assert_eq!(body_response.updated_category.color, "#00FF00".to_string());
+    assert_eq!(update_response.success, true);
 
     // Get category by id and check the response
     let response = context
         .client
         .get(format!(
             "{}/api/category/{}",
-            context.base_url, body_response.updated_category.id
+            context.base_url, body_response.category_id
         ))
         .send()
         .await

@@ -1,3 +1,4 @@
+use application::use_cases::focus_session::create_session::CreateFocusSessionCommand;
 use chrono::{DateTime, Utc};
 use tracing::debug;
 use uuid::Uuid;
@@ -6,7 +7,6 @@ use crate::http::{
     app_state::AppState, dto::common::session_type_enum::SessionTypeEnum,
     ws::update_pomodoro_state::UpdatePomodoroState,
 };
-use application::use_cases::focus_session::command::create_foucs_session::CreateFocusSessionCommand;
 
 pub async fn handle_start_event(
     state: &AppState,

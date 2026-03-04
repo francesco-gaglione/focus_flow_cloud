@@ -1,9 +1,13 @@
 use crate::persistence_traits::focus_session_persistence::FocusSessionPersistence;
 use crate::persistence_traits::persistence_error::PersistenceError;
-use crate::use_cases::focus_session::command::create_foucs_session::CreateFocusSessionCommand;
-use domain::entities::focus_session::{FocusSession, FocusSessionError};
+use chrono::{DateTime, Utc};
+use domain::entities::{
+    focus_session::{FocusSession, FocusSessionError},
+    focus_session_type::FocusSessionType,
+};
 use std::sync::Arc;
 use thiserror::Error;
+use uuid::Uuid;
 
 #[derive(Debug, Error)]
 pub enum CreateSessionError {
@@ -16,6 +20,19 @@ pub enum CreateSessionError {
 
 pub type CreateSessionResult<T> = Result<T, CreateSessionError>;
 
+#[derive(Debug, Clone)]
+pub struct CreateFocusSessionCommand {
+    pub user_id: Uuid,
+    pub category_id: Option<Uuid>,
+    pub task_id: Option<Uuid>,
+    pub session_type: FocusSessionType,
+    pub concentration_score: Option<i32>, // if none a default will be used (5)
+    pub actual_duration: i64,
+    pub notes: Option<String>,
+    pub started_at: DateTime<Utc>,
+    pub ended_at: DateTime<Utc>,
+}
+
 pub struct CreateSessionUseCase {
     session_persistence: Arc<dyn FocusSessionPersistence>,
 }
@@ -27,10 +44,7 @@ impl CreateSessionUseCase {
         }
     }
 
-    pub async fn execute(
-        &self,
-        session_cmd: CreateFocusSessionCommand,
-    ) -> CreateSessionResult<FocusSession> {
+    pub async fn execute(&self, session_cmd: CreateFocusSessionCommand) -> CreateSessionResult<()> {
         let session = FocusSession::new(
             session_cmd.user_id,
             session_cmd.category_id,
@@ -42,14 +56,17 @@ impl CreateSessionUseCase {
             Some(session_cmd.ended_at),
         )?;
 
-        Ok(self.session_persistence.create_session(session).await?)
+        self.session_persistence.create_session(session).await?;
+
+        Ok(())
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use crate::persistence_traits::focus_session_persistence::MockFocusSessionPersistence;
+
     use super::*;
-    use crate::mocks::MockFocusSessionPersistence;
     use chrono::DateTime;
     use domain::entities::focus_session_type::FocusSessionType;
     use std::sync::Arc;
@@ -99,9 +116,6 @@ mod tests {
         let result = use_case.execute(cmd).await;
 
         assert!(result.is_ok());
-        let session = result.unwrap();
-        assert_eq!(session.id(), id);
-        assert_eq!(session.actual_duration(), Some(51));
     }
 
     #[tokio::test]

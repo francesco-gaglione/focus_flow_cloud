@@ -1,11 +1,20 @@
 use crate::http::app_state::AppState;
-use crate::http::dto::common::task_dto::TaskDto;
 use crate::http::dto::validators::validate_uuid::validate_uuid;
 use crate::http_error::{HttpError, HttpResult};
-use crate::mappers::task_mapper::TaskMapper;
 use crate::openapi::TASK_TAG;
+use application::use_cases::task::update_task::{UpdateTaskCommand, UpdateTaskError};
+
+impl From<UpdateTaskError> for HttpError {
+    fn from(value: UpdateTaskError) -> Self {
+        match value {
+            UpdateTaskError::PersistenceError(e) => HttpError::GenericError(e.to_string()),
+            UpdateTaskError::TaskError(e) => HttpError::BadRequest(e.to_string()),
+        }
+    }
+}
 use axum::extract::{Path, State};
 use axum::Json;
+use chrono::DateTime;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use uuid::Uuid;
@@ -35,13 +44,15 @@ pub struct UpdateTaskDto {
 
     pub scheduled_date: Option<i64>, //timestamp in seconds
 
+    pub scheduled_end_date: Option<i64>, //timestamp in seconds
+
     pub completed_at: Option<i64>,
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateTaskResponseDto {
-    pub updated_task: TaskDto,
+    pub success: bool,
 }
 
 #[utoipa::path(
@@ -79,13 +90,46 @@ pub async fn update_task_api(
     let task_id = Uuid::parse_str(&path.id)
         .map_err(|_| HttpError::BadRequest("Task id malformed".to_string()))?;
 
-    let command = TaskMapper::update_dto_to_command(task_id, payload)?;
+    let category_id = payload
+        .category_id
+        .map(|id| Uuid::parse_str(&id))
+        .transpose()
+        .map_err(|_| HttpError::BadRequest("Invalid category id".to_string()))?;
 
-    let task = state.update_task_usecase.execute(command).await?;
+    let scheduled_date = payload
+        .scheduled_date
+        .map(|s| {
+            DateTime::from_timestamp(s, 0)
+                .ok_or_else(|| HttpError::BadRequest("Invalid scheduled date".to_string()))
+        })
+        .transpose()?;
+    let scheduled_end_date = payload
+        .scheduled_end_date
+        .map(|s| {
+            DateTime::from_timestamp(s, 0)
+                .ok_or_else(|| HttpError::BadRequest("Invalid scheduled end date".to_string()))
+        })
+        .transpose()?;
 
-    let task_dto = TaskMapper::entity_to_dto(task);
+    let completed_at = payload
+        .completed_at
+        .map(|s| {
+            DateTime::from_timestamp(s, 0)
+                .ok_or_else(|| HttpError::BadRequest("Invalid scheduled end date".to_string()))
+        })
+        .transpose()?;
 
-    Ok(Json(UpdateTaskResponseDto {
-        updated_task: task_dto,
-    }))
+    let command = UpdateTaskCommand {
+        id: task_id,
+        category_id,
+        name: payload.name,
+        description: payload.description,
+        scheduled_date,
+        scheduled_end_date,
+        completed_at,
+    };
+
+    state.update_task_usecase.execute(command).await?;
+
+    Ok(Json(UpdateTaskResponseDto { success: true }))
 }

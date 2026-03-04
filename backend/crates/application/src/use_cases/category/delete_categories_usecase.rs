@@ -3,6 +3,7 @@ use std::sync::Arc;
 use crate::persistence_traits::category_persistence::CategoryPersistence;
 use crate::persistence_traits::persistence_error::PersistenceError;
 use thiserror::Error;
+use uuid::Uuid;
 
 #[derive(Debug, Error, PartialEq)]
 pub enum DeleteCategoriesError {
@@ -24,10 +25,7 @@ impl DeleteCategoriesUseCases {
         }
     }
 
-    pub async fn execute(
-        &self,
-        category_ids: Vec<uuid::Uuid>,
-    ) -> DeleteCategoriesResult<Vec<uuid::Uuid>> {
+    pub async fn execute(&self, category_ids: Vec<Uuid>) -> DeleteCategoriesResult<Vec<Uuid>> {
         let mut deleted_ids: Vec<uuid::Uuid> = Vec::new();
         for category_id in category_ids {
             self.category_persistence
@@ -44,7 +42,7 @@ mod tests {
     use std::sync::Arc;
 
     use crate::{
-        mocks::MockCategoryPersistence,
+        persistence_traits::category_persistence::MockCategoryPersistence,
         use_cases::category::delete_categories_usecase::DeleteCategoriesUseCases,
     };
 

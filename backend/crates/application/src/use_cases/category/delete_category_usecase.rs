@@ -34,8 +34,9 @@ impl DeleteCategoryUseCases {
 
 #[cfg(test)]
 mod tests {
+    use crate::persistence_traits::category_persistence::MockCategoryPersistence;
+
     use super::*;
-    use crate::mocks::MockCategoryPersistence;
     use mockall::predicate::*;
 
     #[tokio::test]

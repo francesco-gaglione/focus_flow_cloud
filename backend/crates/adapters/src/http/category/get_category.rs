@@ -1,11 +1,20 @@
 use crate::http::app_state::AppState;
 use crate::http::dto::common::category_dto::CategoryDto;
-use crate::http_error::{HttpError, HttpResult};
+use crate::http_error::{map_persistence_error, HttpError, HttpResult};
 use crate::openapi::CATEGORY_TAG;
+use application::use_cases::category::get_category_usecase::GetCategoryError;
 use axum::extract::{Path, State};
 use axum::Json;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
+
+impl From<GetCategoryError> for HttpError {
+    fn from(value: GetCategoryError) -> Self {
+        match value {
+            GetCategoryError::PersistenceError(e) => map_persistence_error(e),
+        }
+    }
+}
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
@@ -43,10 +52,10 @@ pub async fn get_category(
 
     let response = GetCategoryResponseDto {
         category: CategoryDto {
-            id: category.id().to_string(),
-            name: category.name().to_string(),
-            description: category.description().map(|s| s.to_string()),
-            color: category.color().to_string(),
+            id: category.id.to_string(),
+            name: category.name.to_string(),
+            description: category.description.map(|s| s.to_string()),
+            color: category.color.to_string(),
             tasks: vec![],
         },
     };

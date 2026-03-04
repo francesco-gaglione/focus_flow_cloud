@@ -1,11 +1,20 @@
 use crate::http::app_state::AppState;
 use crate::http::model::session_model::UserSession;
-use crate::http_error::HttpResult;
+use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::USERS_TAG;
+use application::use_cases::user::get_user_info::UserInfoError;
 use axum::extract::{Extension, State};
 use axum::Json;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
+
+impl From<UserInfoError> for HttpError {
+    fn from(value: UserInfoError) -> Self {
+        match value {
+            UserInfoError::PersistenceError(e) => HttpError::GenericError(e.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct UserInfoResponseDto {

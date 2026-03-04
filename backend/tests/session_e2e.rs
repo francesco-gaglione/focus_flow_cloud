@@ -32,7 +32,8 @@ async fn create_new_session_and_list() {
         name: "Task".to_string(),
         description: Some("Work related tasks".to_string()),
         category_id: Some(category_body.category_id.clone()),
-        scheduled_date: Some(chrono::Utc::now().timestamp()),
+        scheduled_date: None,
+        scheduled_end_date: None,
     };
 
     let create_task_body = context.create_task(&create_task_dto).await;
@@ -86,7 +87,7 @@ async fn create_new_session_and_list() {
         .json()
         .await
         .expect("Failed to deserialize response");
-    assert!(body.focus_sessions.len() == 1);
+    assert_eq!(body.focus_sessions.len(), 1);
     assert!(body
         .focus_sessions
         .iter()
@@ -145,7 +146,8 @@ async fn update_session_and_list() {
         name: "Task".to_string(),
         description: Some("Work related tasks".to_string()),
         category_id: Some(category_body.category_id.clone()),
-        scheduled_date: Some(chrono::Utc::now().timestamp()),
+        scheduled_date: None,
+        scheduled_end_date: None,
     };
 
     let create_task_body = context.create_task(&create_task_dto).await;
@@ -154,7 +156,8 @@ async fn update_session_and_list() {
         name: "Task".to_string(),
         description: Some("Work related tasks".to_string()),
         category_id: Some(category_body.category_id.clone()),
-        scheduled_date: Some(chrono::Utc::now().timestamp()),
+        scheduled_date: None,
+        scheduled_end_date: None,
     };
 
     let create_task_body_2 = context.create_task(&create_task_dto).await;
@@ -361,7 +364,8 @@ async fn find_sessions_by_task_category() {
         name: "Task 1".to_string(),
         description: None,
         category_id: Some(category.category_id.clone()),
-        scheduled_date: Some(Utc::now().timestamp()),
+        scheduled_date: None,
+        scheduled_end_date: None,
     };
     let task = context.create_task(&create_task_dto).await;
 

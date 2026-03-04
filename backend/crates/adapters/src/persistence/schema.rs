@@ -41,10 +41,11 @@ diesel::table! {
         #[max_length = 255]
         name -> Varchar,
         description -> Nullable<Text>,
-        scheduled_date -> Nullable<Date>,
+        scheduled_date -> Nullable<Timestamptz>,
         created_at -> Timestamptz,
         completed_at -> Nullable<Timestamptz>,
         deleted_at -> Nullable<Timestamptz>,
+        scheduled_end_date -> Nullable<Timestamptz>,
     }
 }
 

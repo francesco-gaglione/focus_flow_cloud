@@ -17,7 +17,6 @@ use crate::persistence_traits::category_persistence::CategoryPersistence;
 use crate::persistence_traits::focus_session_persistence::FocusSessionPersistence;
 use crate::persistence_traits::persistence_error::PersistenceError;
 use crate::persistence_traits::task_persistence::TaskPersistence;
-use crate::use_cases::stats::command::calculate_stats_by_period::StatsPeriod;
 use domain::entities::focus_session::SessionFilter;
 use domain::entities::stats::Stats;
 
@@ -28,6 +27,12 @@ pub enum CalculateStatsByPeriodError {
 }
 
 pub type CalculateStatsByPeriodResult<T> = Result<T, CalculateStatsByPeriodError>;
+
+pub struct StatsPeriod {
+    pub user_id: Uuid,
+    pub start_date: i64,
+    pub end_date: Option<i64>,
+}
 
 pub struct CalculateStatsByPeriodUseCase {
     category_persistence: Arc<dyn CategoryPersistence>,
@@ -154,14 +159,12 @@ mod tests {
     #[tokio::test]
     async fn test_calculate_stats_success() {
         let mut mock_focus_session_persistence = MockFocusSessionPersistence::new();
-        let mut mock_task_persistence = MockTaskPersistence::new();
-        let mut mock_category_persistence = MockCategoryPersistence::new();
+        let mock_task_persistence = MockTaskPersistence::new();
+        let mock_category_persistence = MockCategoryPersistence::new();
 
         mock_focus_session_persistence
             .expect_find_by_filters()
             .returning(|_| Ok(vec![]));
-
-        // We don't expect calls to task or category persistence if there are no sessions
 
         let use_case = CalculateStatsByPeriodUseCase::new(
             Arc::new(mock_category_persistence),
@@ -268,8 +271,8 @@ mod tests {
 
         assert_eq!(stats.total_sessions(), 1); // Only work sessions count
         assert_eq!(stats.total_breaks(), 1);
-        assert_eq!(stats.total_focus_time(), 3600); // 60 mins
-        assert_eq!(stats.total_break_time(), 600); // 10 mins
+        assert_eq!(stats.total_focus_time(), 3600);
+        assert_eq!(stats.total_break_time(), 600);
 
         // Ratio: 3600 / (3600 + 600) = 3600 / 4200 = 0.8571... -> 85.71%
         assert!((stats.focus_pause_ratio() - 85.71).abs() < 0.01);
