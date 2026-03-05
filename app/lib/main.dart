@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 
 import 'core/services/configuration_service.dart';
+import 'core/services/notification_service.dart';
 import 'core/di/service_locator.dart' as di;
 import 'domain/usecases/get_theme_settings.dart';
 import 'domain/usecases/toggle_theme.dart';
@@ -103,6 +104,9 @@ class _AppLoaderState extends State<_AppLoader> {
       final wsUrl = '$wsScheme://$cleanBaseUrl/ws/session';
       
       await di.setupDependencies(baseUrl, wsUrl);
+
+      // Initialize notification service (requests permissions on macOS/iOS)
+      await di.sl<NotificationService>().initialize();
       
       if (mounted) {
         widget.onInitialized();

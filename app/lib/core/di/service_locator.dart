@@ -55,6 +55,7 @@ import '../../presentation/settings/cubit/account_cubit.dart';
 import '../../presentation/app/app_router.dart';
 import '../../presentation/settings/bloc/settings_bloc.dart';
 import '../services/version_service.dart';
+import '../services/notification_service.dart';
 import '../../presentation/version/cubit/version_cubit.dart';
 
 
@@ -76,6 +77,9 @@ Future<void> setupDependencies(String baseUrl, String wsUrl) async {
   sl.registerLazySingleton<TokenService>(() => TokenService(sl()));
   sl.registerLazySingleton<ConfigurationService>(
     () => ConfigurationService(sl()),
+  );
+  sl.registerLazySingleton<NotificationService>(
+    () => NotificationService(),
   );
 
   // Dio
