@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:focus_flow_app/core/services/notification_service.dart';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:focus_flow_app/adapters/dtos/ws_dtos.dart';
 import 'package:focus_flow_app/adapters/ws/ws_repository.dart';
@@ -35,10 +37,13 @@ class FocusBloc extends Bloc<FocusEvent, FocusState> {
   final GetScheduledTasks _getScheduledTasks;
   final SessionRepository _sessionRepository;
   final UserSettingsRepository _userSettingsRepository;
+  final NotificationService _notificationService;
   StreamSubscription? _serverResponsesSubscription;
   StreamSubscription? _broadcastEventsSubscription;
   StreamSubscription? _pomodoroStateUpdatesSubscription;
   StreamSubscription? _connectionStatusSubscription;
+  Timer? _expiryTimer;
+  bool _notificationSentForCurrentSession = false;
 
   FocusBloc({
     required GetCategoriesAndTasks getCategoriesAndTask,
@@ -48,6 +53,7 @@ class FocusBloc extends Bloc<FocusEvent, FocusState> {
     required GetScheduledTasks getScheduledTasks,
     required SessionRepository sessionRepository,
     required UserSettingsRepository userSettingsRepository,
+    required NotificationService notificationService,
   }) : _getCategoriesAndTasks = getCategoriesAndTask,
        _fetchOrphanTasks = fetchOrphanTasks,
        _websocketRepository = websocketRepository,
@@ -55,6 +61,7 @@ class FocusBloc extends Bloc<FocusEvent, FocusState> {
        _getScheduledTasks = getScheduledTasks,
        _sessionRepository = sessionRepository,
        _userSettingsRepository = userSettingsRepository,
+       _notificationService = notificationService,
        super(const FocusState()) {
     on<InitState>(_onInitState);
     on<CategorySelected>(_onCategorySelected);
@@ -81,6 +88,7 @@ class FocusBloc extends Bloc<FocusEvent, FocusState> {
 
   @override
   Future<void> close() {
+    _expiryTimer?.cancel();
     _serverResponsesSubscription?.cancel();
     _broadcastEventsSubscription?.cancel();
     _pomodoroStateUpdatesSubscription?.cancel();
@@ -409,7 +417,16 @@ class FocusBloc extends Bloc<FocusEvent, FocusState> {
         selectedFocusLevel: pomodoroState.currentSession!.concentrationScore,
       );
 
-
+      // Schedule a local notification when the session timer expires
+      _scheduleExpiryNotification(
+        pomodoroState.currentSession!.sessionType,
+        pomodoroState.currentSession!.sessionStartTime,
+      );
+    } else {
+      // Session ended — cancel any pending timer
+      _expiryTimer?.cancel();
+      _expiryTimer = null;
+      _notificationSentForCurrentSession = false;
     }
     
     // Original ReloadTodaySessions call
@@ -512,5 +529,56 @@ class FocusBloc extends Bloc<FocusEvent, FocusState> {
     } catch (e) {
       logger.e('Error reloading categories and tasks', error: e);
     }
+  }
+
+  // ── Timer expiry notification ──────────────────────────────────────
+
+  int _getTotalSecondsForSession(SessionTypeEnum sessionType) {
+    switch (sessionType) {
+      case SessionTypeEnum.focus:
+      case SessionTypeEnum.work:
+        return 25 * 60;
+      case SessionTypeEnum.shortBreak:
+        return 5 * 60;
+      case SessionTypeEnum.longBreak:
+        return 15 * 60;
+    }
+  }
+
+  void _scheduleExpiryNotification(
+    SessionTypeEnum sessionType,
+    int sessionStartTimeEpoch,
+  ) {
+    // Cancel any previously scheduled timer
+    _expiryTimer?.cancel();
+
+    final totalSeconds = _getTotalSecondsForSession(sessionType);
+    final startDate = DateTime.fromMillisecondsSinceEpoch(
+      sessionStartTimeEpoch * 1000,
+    );
+    final elapsed = DateTime.now().difference(startDate).inSeconds;
+    final remaining = totalSeconds - elapsed;
+
+    if (remaining <= 0) {
+      // Already expired — fire immediately (only once)
+      if (!_notificationSentForCurrentSession) {
+        _notificationSentForCurrentSession = true;
+        _notificationService.showTimerExpiredNotification(sessionType);
+      }
+      return;
+    }
+
+    // Reset the flag for a new / ongoing session
+    _notificationSentForCurrentSession = false;
+
+    _expiryTimer = Timer(Duration(seconds: remaining), () {
+      if (!isClosed && !_notificationSentForCurrentSession) {
+        _notificationSentForCurrentSession = true;
+        _notificationService.showTimerExpiredNotification(sessionType);
+        logger.i('Timer expired — notification triggered');
+      }
+    });
+
+    logger.d('Expiry timer scheduled in $remaining seconds');
   }
 }
