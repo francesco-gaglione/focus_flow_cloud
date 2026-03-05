@@ -14,6 +14,7 @@ class UpdateTask {
     String? description,
     String? categoryId,
     int? scheduledDate,
+    int? scheduledEndDate,
     int? completedAt,
   }) async {
     try {
@@ -47,6 +48,7 @@ class UpdateTask {
         description: description,
         categoryId: categoryId,
         scheduledDate: scheduledDate,
+        scheduledEndDate: scheduledEndDate,
         completedAt: completedAt,
       );
 

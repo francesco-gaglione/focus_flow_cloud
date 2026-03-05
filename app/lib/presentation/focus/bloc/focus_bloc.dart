@@ -14,6 +14,7 @@ import 'package:focus_flow_app/domain/repositories/user_settings_repository.dart
 import 'package:focus_flow_app/domain/usecases/categories_usecases/get_categories_and_tasks.dart';
 import 'package:focus_flow_app/domain/usecases/sessions_usecases/get_sessions_with_filters.dart';
 import 'package:focus_flow_app/domain/usecases/tasks_usecases/fetch_orphan_tasks.dart';
+import 'package:focus_flow_app/domain/usecases/tasks_usecases/get_scheduled_tasks.dart';
 import 'package:focus_flow_app/presentation/focus/bloc/focus_event.dart';
 import 'package:focus_flow_app/presentation/focus/bloc/focus_state.dart';
 import 'package:logger/logger.dart';
@@ -31,6 +32,7 @@ class FocusBloc extends Bloc<FocusEvent, FocusState> {
   final FetchOrphanTasks _fetchOrphanTasks;
   final WebsocketRepository _websocketRepository;
   final GetSessionsWithFilters _getSessionsWithFilters;
+  final GetScheduledTasks _getScheduledTasks;
   final SessionRepository _sessionRepository;
   final UserSettingsRepository _userSettingsRepository;
   StreamSubscription? _serverResponsesSubscription;
@@ -43,12 +45,14 @@ class FocusBloc extends Bloc<FocusEvent, FocusState> {
     required FetchOrphanTasks fetchOrphanTasks,
     required WebsocketRepository websocketRepository,
     required GetSessionsWithFilters getSessionsWithFilters,
+    required GetScheduledTasks getScheduledTasks,
     required SessionRepository sessionRepository,
     required UserSettingsRepository userSettingsRepository,
   }) : _getCategoriesAndTasks = getCategoriesAndTask,
        _fetchOrphanTasks = fetchOrphanTasks,
        _websocketRepository = websocketRepository,
        _getSessionsWithFilters = getSessionsWithFilters,
+       _getScheduledTasks = getScheduledTasks,
        _sessionRepository = sessionRepository,
        _userSettingsRepository = userSettingsRepository,
        super(const FocusState()) {
@@ -68,6 +72,7 @@ class FocusBloc extends Bloc<FocusEvent, FocusState> {
       _onReloadTodaySessions,
       transformer: debounce(const Duration(milliseconds: 500)),
     );
+    on<ReloadTodayScheduledTasks>(_onReloadTodayScheduledTasks);
     on<WebSocketConnectionUpdated>(_onWebSocketConnectionUpdated);
     on<CheckConnection>(_onCheckConnection);
     on<AddManualSession>(_onAddManualSession);
@@ -129,6 +134,7 @@ class FocusBloc extends Bloc<FocusEvent, FocusState> {
       );
 
       add(ReloadTodaySessions());
+      add(ReloadTodayScheduledTasks());
 
       // Setup WebSocket message handlers
       _handleWsMessage();
@@ -183,6 +189,26 @@ class FocusBloc extends Bloc<FocusEvent, FocusState> {
       );
     } catch (e) {
       emit(state.copyWith(isLoading: false, errorMessage: e.toString()));
+    }
+  }
+
+  Future<void> _onReloadTodayScheduledTasks(
+    ReloadTodayScheduledTasks event,
+    Emitter<FocusState> emit,
+  ) async {
+    try {
+      final now = DateTime.now();
+      final startOfDay = DateTime(now.year, now.month, now.day);
+      final endOfDay = startOfDay.add(const Duration(days: 1));
+
+      final result = await _getScheduledTasks.execute(
+        from: startOfDay.millisecondsSinceEpoch ~/ 1000,
+        to: endOfDay.millisecondsSinceEpoch ~/ 1000,
+      );
+
+      emit(state.copyWith(todayScheduledTasks: result.tasks));
+    } catch (e) {
+      logger.w('Failed to load today scheduled tasks: $e');
     }
   }
 

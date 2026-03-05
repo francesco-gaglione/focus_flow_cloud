@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$CreateTaskDto {
 
- String get name; String? get description; String? get categoryId; int? get scheduledDate;
+ String get name; String? get description; String? get categoryId; int? get scheduledDate; int? get scheduledEndDate;
 /// Create a copy of CreateTaskDto
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $CreateTaskDtoCopyWith<CreateTaskDto> get copyWith => _$CreateTaskDtoCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CreateTaskDto&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.categoryId, categoryId) || other.categoryId == categoryId)&&(identical(other.scheduledDate, scheduledDate) || other.scheduledDate == scheduledDate));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CreateTaskDto&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.categoryId, categoryId) || other.categoryId == categoryId)&&(identical(other.scheduledDate, scheduledDate) || other.scheduledDate == scheduledDate)&&(identical(other.scheduledEndDate, scheduledEndDate) || other.scheduledEndDate == scheduledEndDate));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,description,categoryId,scheduledDate);
+int get hashCode => Object.hash(runtimeType,name,description,categoryId,scheduledDate,scheduledEndDate);
 
 @override
 String toString() {
-  return 'CreateTaskDto(name: $name, description: $description, categoryId: $categoryId, scheduledDate: $scheduledDate)';
+  return 'CreateTaskDto(name: $name, description: $description, categoryId: $categoryId, scheduledDate: $scheduledDate, scheduledEndDate: $scheduledEndDate)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $CreateTaskDtoCopyWith<$Res>  {
   factory $CreateTaskDtoCopyWith(CreateTaskDto value, $Res Function(CreateTaskDto) _then) = _$CreateTaskDtoCopyWithImpl;
 @useResult
 $Res call({
- String name, String? description, String? categoryId, int? scheduledDate
+ String name, String? description, String? categoryId, int? scheduledDate, int? scheduledEndDate
 });
 
 
@@ -65,12 +65,13 @@ class _$CreateTaskDtoCopyWithImpl<$Res>
 
 /// Create a copy of CreateTaskDto
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? description = freezed,Object? categoryId = freezed,Object? scheduledDate = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? description = freezed,Object? categoryId = freezed,Object? scheduledDate = freezed,Object? scheduledEndDate = freezed,}) {
   return _then(_self.copyWith(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,categoryId: freezed == categoryId ? _self.categoryId : categoryId // ignore: cast_nullable_to_non_nullable
 as String?,scheduledDate: freezed == scheduledDate ? _self.scheduledDate : scheduledDate // ignore: cast_nullable_to_non_nullable
+as int?,scheduledEndDate: freezed == scheduledEndDate ? _self.scheduledEndDate : scheduledEndDate // ignore: cast_nullable_to_non_nullable
 as int?,
   ));
 }
@@ -156,10 +157,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String name,  String? description,  String? categoryId,  int? scheduledDate)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String name,  String? description,  String? categoryId,  int? scheduledDate,  int? scheduledEndDate)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CreateTaskDto() when $default != null:
-return $default(_that.name,_that.description,_that.categoryId,_that.scheduledDate);case _:
+return $default(_that.name,_that.description,_that.categoryId,_that.scheduledDate,_that.scheduledEndDate);case _:
   return orElse();
 
 }
@@ -177,10 +178,10 @@ return $default(_that.name,_that.description,_that.categoryId,_that.scheduledDat
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String name,  String? description,  String? categoryId,  int? scheduledDate)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String name,  String? description,  String? categoryId,  int? scheduledDate,  int? scheduledEndDate)  $default,) {final _that = this;
 switch (_that) {
 case _CreateTaskDto():
-return $default(_that.name,_that.description,_that.categoryId,_that.scheduledDate);case _:
+return $default(_that.name,_that.description,_that.categoryId,_that.scheduledDate,_that.scheduledEndDate);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -197,10 +198,10 @@ return $default(_that.name,_that.description,_that.categoryId,_that.scheduledDat
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String name,  String? description,  String? categoryId,  int? scheduledDate)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String name,  String? description,  String? categoryId,  int? scheduledDate,  int? scheduledEndDate)?  $default,) {final _that = this;
 switch (_that) {
 case _CreateTaskDto() when $default != null:
-return $default(_that.name,_that.description,_that.categoryId,_that.scheduledDate);case _:
+return $default(_that.name,_that.description,_that.categoryId,_that.scheduledDate,_that.scheduledEndDate);case _:
   return null;
 
 }
@@ -212,13 +213,14 @@ return $default(_that.name,_that.description,_that.categoryId,_that.scheduledDat
 @JsonSerializable()
 
 class _CreateTaskDto implements CreateTaskDto {
-  const _CreateTaskDto({required this.name, this.description, this.categoryId, this.scheduledDate});
+  const _CreateTaskDto({required this.name, this.description, this.categoryId, this.scheduledDate, this.scheduledEndDate});
   factory _CreateTaskDto.fromJson(Map<String, dynamic> json) => _$CreateTaskDtoFromJson(json);
 
 @override final  String name;
 @override final  String? description;
 @override final  String? categoryId;
 @override final  int? scheduledDate;
+@override final  int? scheduledEndDate;
 
 /// Create a copy of CreateTaskDto
 /// with the given fields replaced by the non-null parameter values.
@@ -233,16 +235,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CreateTaskDto&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.categoryId, categoryId) || other.categoryId == categoryId)&&(identical(other.scheduledDate, scheduledDate) || other.scheduledDate == scheduledDate));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CreateTaskDto&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.categoryId, categoryId) || other.categoryId == categoryId)&&(identical(other.scheduledDate, scheduledDate) || other.scheduledDate == scheduledDate)&&(identical(other.scheduledEndDate, scheduledEndDate) || other.scheduledEndDate == scheduledEndDate));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,description,categoryId,scheduledDate);
+int get hashCode => Object.hash(runtimeType,name,description,categoryId,scheduledDate,scheduledEndDate);
 
 @override
 String toString() {
-  return 'CreateTaskDto(name: $name, description: $description, categoryId: $categoryId, scheduledDate: $scheduledDate)';
+  return 'CreateTaskDto(name: $name, description: $description, categoryId: $categoryId, scheduledDate: $scheduledDate, scheduledEndDate: $scheduledEndDate)';
 }
 
 
@@ -253,7 +255,7 @@ abstract mixin class _$CreateTaskDtoCopyWith<$Res> implements $CreateTaskDtoCopy
   factory _$CreateTaskDtoCopyWith(_CreateTaskDto value, $Res Function(_CreateTaskDto) _then) = __$CreateTaskDtoCopyWithImpl;
 @override @useResult
 $Res call({
- String name, String? description, String? categoryId, int? scheduledDate
+ String name, String? description, String? categoryId, int? scheduledDate, int? scheduledEndDate
 });
 
 
@@ -270,12 +272,13 @@ class __$CreateTaskDtoCopyWithImpl<$Res>
 
 /// Create a copy of CreateTaskDto
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? name = null,Object? description = freezed,Object? categoryId = freezed,Object? scheduledDate = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? name = null,Object? description = freezed,Object? categoryId = freezed,Object? scheduledDate = freezed,Object? scheduledEndDate = freezed,}) {
   return _then(_CreateTaskDto(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,categoryId: freezed == categoryId ? _self.categoryId : categoryId // ignore: cast_nullable_to_non_nullable
 as String?,scheduledDate: freezed == scheduledDate ? _self.scheduledDate : scheduledDate // ignore: cast_nullable_to_non_nullable
+as int?,scheduledEndDate: freezed == scheduledEndDate ? _self.scheduledEndDate : scheduledEndDate // ignore: cast_nullable_to_non_nullable
 as int?,
   ));
 }
@@ -287,7 +290,7 @@ as int?,
 /// @nodoc
 mixin _$UpdateTaskDto {
 
- String? get name; String? get description; String? get categoryId; int? get scheduledDate; int? get completedAt;
+ String? get name; String? get description; String? get categoryId; int? get scheduledDate; int? get scheduledEndDate; int? get completedAt;
 /// Create a copy of UpdateTaskDto
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -300,16 +303,16 @@ $UpdateTaskDtoCopyWith<UpdateTaskDto> get copyWith => _$UpdateTaskDtoCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is UpdateTaskDto&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.categoryId, categoryId) || other.categoryId == categoryId)&&(identical(other.scheduledDate, scheduledDate) || other.scheduledDate == scheduledDate)&&(identical(other.completedAt, completedAt) || other.completedAt == completedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UpdateTaskDto&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.categoryId, categoryId) || other.categoryId == categoryId)&&(identical(other.scheduledDate, scheduledDate) || other.scheduledDate == scheduledDate)&&(identical(other.scheduledEndDate, scheduledEndDate) || other.scheduledEndDate == scheduledEndDate)&&(identical(other.completedAt, completedAt) || other.completedAt == completedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,description,categoryId,scheduledDate,completedAt);
+int get hashCode => Object.hash(runtimeType,name,description,categoryId,scheduledDate,scheduledEndDate,completedAt);
 
 @override
 String toString() {
-  return 'UpdateTaskDto(name: $name, description: $description, categoryId: $categoryId, scheduledDate: $scheduledDate, completedAt: $completedAt)';
+  return 'UpdateTaskDto(name: $name, description: $description, categoryId: $categoryId, scheduledDate: $scheduledDate, scheduledEndDate: $scheduledEndDate, completedAt: $completedAt)';
 }
 
 
@@ -320,7 +323,7 @@ abstract mixin class $UpdateTaskDtoCopyWith<$Res>  {
   factory $UpdateTaskDtoCopyWith(UpdateTaskDto value, $Res Function(UpdateTaskDto) _then) = _$UpdateTaskDtoCopyWithImpl;
 @useResult
 $Res call({
- String? name, String? description, String? categoryId, int? scheduledDate, int? completedAt
+ String? name, String? description, String? categoryId, int? scheduledDate, int? scheduledEndDate, int? completedAt
 });
 
 
@@ -337,12 +340,13 @@ class _$UpdateTaskDtoCopyWithImpl<$Res>
 
 /// Create a copy of UpdateTaskDto
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? name = freezed,Object? description = freezed,Object? categoryId = freezed,Object? scheduledDate = freezed,Object? completedAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? name = freezed,Object? description = freezed,Object? categoryId = freezed,Object? scheduledDate = freezed,Object? scheduledEndDate = freezed,Object? completedAt = freezed,}) {
   return _then(_self.copyWith(
 name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,categoryId: freezed == categoryId ? _self.categoryId : categoryId // ignore: cast_nullable_to_non_nullable
 as String?,scheduledDate: freezed == scheduledDate ? _self.scheduledDate : scheduledDate // ignore: cast_nullable_to_non_nullable
+as int?,scheduledEndDate: freezed == scheduledEndDate ? _self.scheduledEndDate : scheduledEndDate // ignore: cast_nullable_to_non_nullable
 as int?,completedAt: freezed == completedAt ? _self.completedAt : completedAt // ignore: cast_nullable_to_non_nullable
 as int?,
   ));
@@ -429,10 +433,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? name,  String? description,  String? categoryId,  int? scheduledDate,  int? completedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? name,  String? description,  String? categoryId,  int? scheduledDate,  int? scheduledEndDate,  int? completedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UpdateTaskDto() when $default != null:
-return $default(_that.name,_that.description,_that.categoryId,_that.scheduledDate,_that.completedAt);case _:
+return $default(_that.name,_that.description,_that.categoryId,_that.scheduledDate,_that.scheduledEndDate,_that.completedAt);case _:
   return orElse();
 
 }
@@ -450,10 +454,10 @@ return $default(_that.name,_that.description,_that.categoryId,_that.scheduledDat
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? name,  String? description,  String? categoryId,  int? scheduledDate,  int? completedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? name,  String? description,  String? categoryId,  int? scheduledDate,  int? scheduledEndDate,  int? completedAt)  $default,) {final _that = this;
 switch (_that) {
 case _UpdateTaskDto():
-return $default(_that.name,_that.description,_that.categoryId,_that.scheduledDate,_that.completedAt);case _:
+return $default(_that.name,_that.description,_that.categoryId,_that.scheduledDate,_that.scheduledEndDate,_that.completedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -470,10 +474,10 @@ return $default(_that.name,_that.description,_that.categoryId,_that.scheduledDat
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? name,  String? description,  String? categoryId,  int? scheduledDate,  int? completedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? name,  String? description,  String? categoryId,  int? scheduledDate,  int? scheduledEndDate,  int? completedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _UpdateTaskDto() when $default != null:
-return $default(_that.name,_that.description,_that.categoryId,_that.scheduledDate,_that.completedAt);case _:
+return $default(_that.name,_that.description,_that.categoryId,_that.scheduledDate,_that.scheduledEndDate,_that.completedAt);case _:
   return null;
 
 }
@@ -485,13 +489,14 @@ return $default(_that.name,_that.description,_that.categoryId,_that.scheduledDat
 @JsonSerializable()
 
 class _UpdateTaskDto implements UpdateTaskDto {
-  const _UpdateTaskDto({this.name, this.description, this.categoryId, this.scheduledDate, this.completedAt});
+  const _UpdateTaskDto({this.name, this.description, this.categoryId, this.scheduledDate, this.scheduledEndDate, this.completedAt});
   factory _UpdateTaskDto.fromJson(Map<String, dynamic> json) => _$UpdateTaskDtoFromJson(json);
 
 @override final  String? name;
 @override final  String? description;
 @override final  String? categoryId;
 @override final  int? scheduledDate;
+@override final  int? scheduledEndDate;
 @override final  int? completedAt;
 
 /// Create a copy of UpdateTaskDto
@@ -507,16 +512,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UpdateTaskDto&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.categoryId, categoryId) || other.categoryId == categoryId)&&(identical(other.scheduledDate, scheduledDate) || other.scheduledDate == scheduledDate)&&(identical(other.completedAt, completedAt) || other.completedAt == completedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UpdateTaskDto&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.categoryId, categoryId) || other.categoryId == categoryId)&&(identical(other.scheduledDate, scheduledDate) || other.scheduledDate == scheduledDate)&&(identical(other.scheduledEndDate, scheduledEndDate) || other.scheduledEndDate == scheduledEndDate)&&(identical(other.completedAt, completedAt) || other.completedAt == completedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,description,categoryId,scheduledDate,completedAt);
+int get hashCode => Object.hash(runtimeType,name,description,categoryId,scheduledDate,scheduledEndDate,completedAt);
 
 @override
 String toString() {
-  return 'UpdateTaskDto(name: $name, description: $description, categoryId: $categoryId, scheduledDate: $scheduledDate, completedAt: $completedAt)';
+  return 'UpdateTaskDto(name: $name, description: $description, categoryId: $categoryId, scheduledDate: $scheduledDate, scheduledEndDate: $scheduledEndDate, completedAt: $completedAt)';
 }
 
 
@@ -527,7 +532,7 @@ abstract mixin class _$UpdateTaskDtoCopyWith<$Res> implements $UpdateTaskDtoCopy
   factory _$UpdateTaskDtoCopyWith(_UpdateTaskDto value, $Res Function(_UpdateTaskDto) _then) = __$UpdateTaskDtoCopyWithImpl;
 @override @useResult
 $Res call({
- String? name, String? description, String? categoryId, int? scheduledDate, int? completedAt
+ String? name, String? description, String? categoryId, int? scheduledDate, int? scheduledEndDate, int? completedAt
 });
 
 
@@ -544,12 +549,13 @@ class __$UpdateTaskDtoCopyWithImpl<$Res>
 
 /// Create a copy of UpdateTaskDto
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? name = freezed,Object? description = freezed,Object? categoryId = freezed,Object? scheduledDate = freezed,Object? completedAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? name = freezed,Object? description = freezed,Object? categoryId = freezed,Object? scheduledDate = freezed,Object? scheduledEndDate = freezed,Object? completedAt = freezed,}) {
   return _then(_UpdateTaskDto(
 name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,categoryId: freezed == categoryId ? _self.categoryId : categoryId // ignore: cast_nullable_to_non_nullable
 as String?,scheduledDate: freezed == scheduledDate ? _self.scheduledDate : scheduledDate // ignore: cast_nullable_to_non_nullable
+as int?,scheduledEndDate: freezed == scheduledEndDate ? _self.scheduledEndDate : scheduledEndDate // ignore: cast_nullable_to_non_nullable
 as int?,completedAt: freezed == completedAt ? _self.completedAt : completedAt // ignore: cast_nullable_to_non_nullable
 as int?,
   ));
@@ -831,7 +837,7 @@ as List<String>,
 /// @nodoc
 mixin _$TaskResponseDto {
 
- String get id; String get name; String? get description; String? get categoryId; int? get scheduledDate; int? get completedAt;
+ String get id; String get name; String? get description; String? get categoryId; int? get scheduledDate; int? get scheduledEndDate; int? get completedAt;
 /// Create a copy of TaskResponseDto
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -844,16 +850,16 @@ $TaskResponseDtoCopyWith<TaskResponseDto> get copyWith => _$TaskResponseDtoCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TaskResponseDto&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.categoryId, categoryId) || other.categoryId == categoryId)&&(identical(other.scheduledDate, scheduledDate) || other.scheduledDate == scheduledDate)&&(identical(other.completedAt, completedAt) || other.completedAt == completedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TaskResponseDto&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.categoryId, categoryId) || other.categoryId == categoryId)&&(identical(other.scheduledDate, scheduledDate) || other.scheduledDate == scheduledDate)&&(identical(other.scheduledEndDate, scheduledEndDate) || other.scheduledEndDate == scheduledEndDate)&&(identical(other.completedAt, completedAt) || other.completedAt == completedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,categoryId,scheduledDate,completedAt);
+int get hashCode => Object.hash(runtimeType,id,name,description,categoryId,scheduledDate,scheduledEndDate,completedAt);
 
 @override
 String toString() {
-  return 'TaskResponseDto(id: $id, name: $name, description: $description, categoryId: $categoryId, scheduledDate: $scheduledDate, completedAt: $completedAt)';
+  return 'TaskResponseDto(id: $id, name: $name, description: $description, categoryId: $categoryId, scheduledDate: $scheduledDate, scheduledEndDate: $scheduledEndDate, completedAt: $completedAt)';
 }
 
 
@@ -864,7 +870,7 @@ abstract mixin class $TaskResponseDtoCopyWith<$Res>  {
   factory $TaskResponseDtoCopyWith(TaskResponseDto value, $Res Function(TaskResponseDto) _then) = _$TaskResponseDtoCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, String? description, String? categoryId, int? scheduledDate, int? completedAt
+ String id, String name, String? description, String? categoryId, int? scheduledDate, int? scheduledEndDate, int? completedAt
 });
 
 
@@ -881,13 +887,14 @@ class _$TaskResponseDtoCopyWithImpl<$Res>
 
 /// Create a copy of TaskResponseDto
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? description = freezed,Object? categoryId = freezed,Object? scheduledDate = freezed,Object? completedAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? description = freezed,Object? categoryId = freezed,Object? scheduledDate = freezed,Object? scheduledEndDate = freezed,Object? completedAt = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,categoryId: freezed == categoryId ? _self.categoryId : categoryId // ignore: cast_nullable_to_non_nullable
 as String?,scheduledDate: freezed == scheduledDate ? _self.scheduledDate : scheduledDate // ignore: cast_nullable_to_non_nullable
+as int?,scheduledEndDate: freezed == scheduledEndDate ? _self.scheduledEndDate : scheduledEndDate // ignore: cast_nullable_to_non_nullable
 as int?,completedAt: freezed == completedAt ? _self.completedAt : completedAt // ignore: cast_nullable_to_non_nullable
 as int?,
   ));
@@ -974,10 +981,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String? description,  String? categoryId,  int? scheduledDate,  int? completedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String? description,  String? categoryId,  int? scheduledDate,  int? scheduledEndDate,  int? completedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _TaskResponseDto() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.categoryId,_that.scheduledDate,_that.completedAt);case _:
+return $default(_that.id,_that.name,_that.description,_that.categoryId,_that.scheduledDate,_that.scheduledEndDate,_that.completedAt);case _:
   return orElse();
 
 }
@@ -995,10 +1002,10 @@ return $default(_that.id,_that.name,_that.description,_that.categoryId,_that.sch
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String? description,  String? categoryId,  int? scheduledDate,  int? completedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String? description,  String? categoryId,  int? scheduledDate,  int? scheduledEndDate,  int? completedAt)  $default,) {final _that = this;
 switch (_that) {
 case _TaskResponseDto():
-return $default(_that.id,_that.name,_that.description,_that.categoryId,_that.scheduledDate,_that.completedAt);case _:
+return $default(_that.id,_that.name,_that.description,_that.categoryId,_that.scheduledDate,_that.scheduledEndDate,_that.completedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1015,10 +1022,10 @@ return $default(_that.id,_that.name,_that.description,_that.categoryId,_that.sch
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String? description,  String? categoryId,  int? scheduledDate,  int? completedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String? description,  String? categoryId,  int? scheduledDate,  int? scheduledEndDate,  int? completedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _TaskResponseDto() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.categoryId,_that.scheduledDate,_that.completedAt);case _:
+return $default(_that.id,_that.name,_that.description,_that.categoryId,_that.scheduledDate,_that.scheduledEndDate,_that.completedAt);case _:
   return null;
 
 }
@@ -1030,7 +1037,7 @@ return $default(_that.id,_that.name,_that.description,_that.categoryId,_that.sch
 @JsonSerializable()
 
 class _TaskResponseDto implements TaskResponseDto {
-  const _TaskResponseDto({required this.id, required this.name, this.description, this.categoryId, this.scheduledDate, this.completedAt});
+  const _TaskResponseDto({required this.id, required this.name, this.description, this.categoryId, this.scheduledDate, this.scheduledEndDate, this.completedAt});
   factory _TaskResponseDto.fromJson(Map<String, dynamic> json) => _$TaskResponseDtoFromJson(json);
 
 @override final  String id;
@@ -1038,6 +1045,7 @@ class _TaskResponseDto implements TaskResponseDto {
 @override final  String? description;
 @override final  String? categoryId;
 @override final  int? scheduledDate;
+@override final  int? scheduledEndDate;
 @override final  int? completedAt;
 
 /// Create a copy of TaskResponseDto
@@ -1053,16 +1061,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TaskResponseDto&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.categoryId, categoryId) || other.categoryId == categoryId)&&(identical(other.scheduledDate, scheduledDate) || other.scheduledDate == scheduledDate)&&(identical(other.completedAt, completedAt) || other.completedAt == completedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TaskResponseDto&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.categoryId, categoryId) || other.categoryId == categoryId)&&(identical(other.scheduledDate, scheduledDate) || other.scheduledDate == scheduledDate)&&(identical(other.scheduledEndDate, scheduledEndDate) || other.scheduledEndDate == scheduledEndDate)&&(identical(other.completedAt, completedAt) || other.completedAt == completedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,categoryId,scheduledDate,completedAt);
+int get hashCode => Object.hash(runtimeType,id,name,description,categoryId,scheduledDate,scheduledEndDate,completedAt);
 
 @override
 String toString() {
-  return 'TaskResponseDto(id: $id, name: $name, description: $description, categoryId: $categoryId, scheduledDate: $scheduledDate, completedAt: $completedAt)';
+  return 'TaskResponseDto(id: $id, name: $name, description: $description, categoryId: $categoryId, scheduledDate: $scheduledDate, scheduledEndDate: $scheduledEndDate, completedAt: $completedAt)';
 }
 
 
@@ -1073,7 +1081,7 @@ abstract mixin class _$TaskResponseDtoCopyWith<$Res> implements $TaskResponseDto
   factory _$TaskResponseDtoCopyWith(_TaskResponseDto value, $Res Function(_TaskResponseDto) _then) = __$TaskResponseDtoCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, String? description, String? categoryId, int? scheduledDate, int? completedAt
+ String id, String name, String? description, String? categoryId, int? scheduledDate, int? scheduledEndDate, int? completedAt
 });
 
 
@@ -1090,13 +1098,14 @@ class __$TaskResponseDtoCopyWithImpl<$Res>
 
 /// Create a copy of TaskResponseDto
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? description = freezed,Object? categoryId = freezed,Object? scheduledDate = freezed,Object? completedAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? description = freezed,Object? categoryId = freezed,Object? scheduledDate = freezed,Object? scheduledEndDate = freezed,Object? completedAt = freezed,}) {
   return _then(_TaskResponseDto(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,categoryId: freezed == categoryId ? _self.categoryId : categoryId // ignore: cast_nullable_to_non_nullable
 as String?,scheduledDate: freezed == scheduledDate ? _self.scheduledDate : scheduledDate // ignore: cast_nullable_to_non_nullable
+as int?,scheduledEndDate: freezed == scheduledEndDate ? _self.scheduledEndDate : scheduledEndDate // ignore: cast_nullable_to_non_nullable
 as int?,completedAt: freezed == completedAt ? _self.completedAt : completedAt // ignore: cast_nullable_to_non_nullable
 as int?,
   ));
@@ -1372,7 +1381,7 @@ as String,
 /// @nodoc
 mixin _$UpdateTaskResponseDto {
 
- TaskResponseDto get updatedTask;
+ bool get success;
 /// Create a copy of UpdateTaskResponseDto
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1385,16 +1394,16 @@ $UpdateTaskResponseDtoCopyWith<UpdateTaskResponseDto> get copyWith => _$UpdateTa
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is UpdateTaskResponseDto&&(identical(other.updatedTask, updatedTask) || other.updatedTask == updatedTask));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UpdateTaskResponseDto&&(identical(other.success, success) || other.success == success));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,updatedTask);
+int get hashCode => Object.hash(runtimeType,success);
 
 @override
 String toString() {
-  return 'UpdateTaskResponseDto(updatedTask: $updatedTask)';
+  return 'UpdateTaskResponseDto(success: $success)';
 }
 
 
@@ -1405,11 +1414,11 @@ abstract mixin class $UpdateTaskResponseDtoCopyWith<$Res>  {
   factory $UpdateTaskResponseDtoCopyWith(UpdateTaskResponseDto value, $Res Function(UpdateTaskResponseDto) _then) = _$UpdateTaskResponseDtoCopyWithImpl;
 @useResult
 $Res call({
- TaskResponseDto updatedTask
+ bool success
 });
 
 
-$TaskResponseDtoCopyWith<$Res> get updatedTask;
+
 
 }
 /// @nodoc
@@ -1422,22 +1431,13 @@ class _$UpdateTaskResponseDtoCopyWithImpl<$Res>
 
 /// Create a copy of UpdateTaskResponseDto
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? updatedTask = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? success = null,}) {
   return _then(_self.copyWith(
-updatedTask: null == updatedTask ? _self.updatedTask : updatedTask // ignore: cast_nullable_to_non_nullable
-as TaskResponseDto,
+success: null == success ? _self.success : success // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
-/// Create a copy of UpdateTaskResponseDto
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$TaskResponseDtoCopyWith<$Res> get updatedTask {
-  
-  return $TaskResponseDtoCopyWith<$Res>(_self.updatedTask, (value) {
-    return _then(_self.copyWith(updatedTask: value));
-  });
-}
+
 }
 
 
@@ -1519,10 +1519,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( TaskResponseDto updatedTask)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool success)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UpdateTaskResponseDto() when $default != null:
-return $default(_that.updatedTask);case _:
+return $default(_that.success);case _:
   return orElse();
 
 }
@@ -1540,10 +1540,10 @@ return $default(_that.updatedTask);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( TaskResponseDto updatedTask)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool success)  $default,) {final _that = this;
 switch (_that) {
 case _UpdateTaskResponseDto():
-return $default(_that.updatedTask);case _:
+return $default(_that.success);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1560,10 +1560,10 @@ return $default(_that.updatedTask);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( TaskResponseDto updatedTask)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool success)?  $default,) {final _that = this;
 switch (_that) {
 case _UpdateTaskResponseDto() when $default != null:
-return $default(_that.updatedTask);case _:
+return $default(_that.success);case _:
   return null;
 
 }
@@ -1575,10 +1575,10 @@ return $default(_that.updatedTask);case _:
 @JsonSerializable()
 
 class _UpdateTaskResponseDto implements UpdateTaskResponseDto {
-  const _UpdateTaskResponseDto({required this.updatedTask});
+  const _UpdateTaskResponseDto({required this.success});
   factory _UpdateTaskResponseDto.fromJson(Map<String, dynamic> json) => _$UpdateTaskResponseDtoFromJson(json);
 
-@override final  TaskResponseDto updatedTask;
+@override final  bool success;
 
 /// Create a copy of UpdateTaskResponseDto
 /// with the given fields replaced by the non-null parameter values.
@@ -1593,16 +1593,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UpdateTaskResponseDto&&(identical(other.updatedTask, updatedTask) || other.updatedTask == updatedTask));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UpdateTaskResponseDto&&(identical(other.success, success) || other.success == success));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,updatedTask);
+int get hashCode => Object.hash(runtimeType,success);
 
 @override
 String toString() {
-  return 'UpdateTaskResponseDto(updatedTask: $updatedTask)';
+  return 'UpdateTaskResponseDto(success: $success)';
 }
 
 
@@ -1613,11 +1613,11 @@ abstract mixin class _$UpdateTaskResponseDtoCopyWith<$Res> implements $UpdateTas
   factory _$UpdateTaskResponseDtoCopyWith(_UpdateTaskResponseDto value, $Res Function(_UpdateTaskResponseDto) _then) = __$UpdateTaskResponseDtoCopyWithImpl;
 @override @useResult
 $Res call({
- TaskResponseDto updatedTask
+ bool success
 });
 
 
-@override $TaskResponseDtoCopyWith<$Res> get updatedTask;
+
 
 }
 /// @nodoc
@@ -1630,23 +1630,14 @@ class __$UpdateTaskResponseDtoCopyWithImpl<$Res>
 
 /// Create a copy of UpdateTaskResponseDto
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? updatedTask = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? success = null,}) {
   return _then(_UpdateTaskResponseDto(
-updatedTask: null == updatedTask ? _self.updatedTask : updatedTask // ignore: cast_nullable_to_non_nullable
-as TaskResponseDto,
+success: null == success ? _self.success : success // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
-/// Create a copy of UpdateTaskResponseDto
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$TaskResponseDtoCopyWith<$Res> get updatedTask {
-  
-  return $TaskResponseDtoCopyWith<$Res>(_self.updatedTask, (value) {
-    return _then(_self.copyWith(updatedTask: value));
-  });
-}
+
 }
 
 
@@ -2180,6 +2171,275 @@ class __$OrphanTasksResponseDtoCopyWithImpl<$Res>
 @override @pragma('vm:prefer-inline') $Res call({Object? orphanTasks = null,}) {
   return _then(_OrphanTasksResponseDto(
 orphanTasks: null == orphanTasks ? _self._orphanTasks : orphanTasks // ignore: cast_nullable_to_non_nullable
+as List<TaskResponseDto>,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$ScheduledTasksResponseDto {
+
+ List<TaskResponseDto> get tasks;
+/// Create a copy of ScheduledTasksResponseDto
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ScheduledTasksResponseDtoCopyWith<ScheduledTasksResponseDto> get copyWith => _$ScheduledTasksResponseDtoCopyWithImpl<ScheduledTasksResponseDto>(this as ScheduledTasksResponseDto, _$identity);
+
+  /// Serializes this ScheduledTasksResponseDto to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ScheduledTasksResponseDto&&const DeepCollectionEquality().equals(other.tasks, tasks));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(tasks));
+
+@override
+String toString() {
+  return 'ScheduledTasksResponseDto(tasks: $tasks)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ScheduledTasksResponseDtoCopyWith<$Res>  {
+  factory $ScheduledTasksResponseDtoCopyWith(ScheduledTasksResponseDto value, $Res Function(ScheduledTasksResponseDto) _then) = _$ScheduledTasksResponseDtoCopyWithImpl;
+@useResult
+$Res call({
+ List<TaskResponseDto> tasks
+});
+
+
+
+
+}
+/// @nodoc
+class _$ScheduledTasksResponseDtoCopyWithImpl<$Res>
+    implements $ScheduledTasksResponseDtoCopyWith<$Res> {
+  _$ScheduledTasksResponseDtoCopyWithImpl(this._self, this._then);
+
+  final ScheduledTasksResponseDto _self;
+  final $Res Function(ScheduledTasksResponseDto) _then;
+
+/// Create a copy of ScheduledTasksResponseDto
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? tasks = null,}) {
+  return _then(_self.copyWith(
+tasks: null == tasks ? _self.tasks : tasks // ignore: cast_nullable_to_non_nullable
+as List<TaskResponseDto>,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [ScheduledTasksResponseDto].
+extension ScheduledTasksResponseDtoPatterns on ScheduledTasksResponseDto {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _ScheduledTasksResponseDto value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _ScheduledTasksResponseDto() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _ScheduledTasksResponseDto value)  $default,){
+final _that = this;
+switch (_that) {
+case _ScheduledTasksResponseDto():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _ScheduledTasksResponseDto value)?  $default,){
+final _that = this;
+switch (_that) {
+case _ScheduledTasksResponseDto() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<TaskResponseDto> tasks)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _ScheduledTasksResponseDto() when $default != null:
+return $default(_that.tasks);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<TaskResponseDto> tasks)  $default,) {final _that = this;
+switch (_that) {
+case _ScheduledTasksResponseDto():
+return $default(_that.tasks);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<TaskResponseDto> tasks)?  $default,) {final _that = this;
+switch (_that) {
+case _ScheduledTasksResponseDto() when $default != null:
+return $default(_that.tasks);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _ScheduledTasksResponseDto implements ScheduledTasksResponseDto {
+  const _ScheduledTasksResponseDto({required final  List<TaskResponseDto> tasks}): _tasks = tasks;
+  factory _ScheduledTasksResponseDto.fromJson(Map<String, dynamic> json) => _$ScheduledTasksResponseDtoFromJson(json);
+
+ final  List<TaskResponseDto> _tasks;
+@override List<TaskResponseDto> get tasks {
+  if (_tasks is EqualUnmodifiableListView) return _tasks;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_tasks);
+}
+
+
+/// Create a copy of ScheduledTasksResponseDto
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ScheduledTasksResponseDtoCopyWith<_ScheduledTasksResponseDto> get copyWith => __$ScheduledTasksResponseDtoCopyWithImpl<_ScheduledTasksResponseDto>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$ScheduledTasksResponseDtoToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ScheduledTasksResponseDto&&const DeepCollectionEquality().equals(other._tasks, _tasks));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_tasks));
+
+@override
+String toString() {
+  return 'ScheduledTasksResponseDto(tasks: $tasks)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$ScheduledTasksResponseDtoCopyWith<$Res> implements $ScheduledTasksResponseDtoCopyWith<$Res> {
+  factory _$ScheduledTasksResponseDtoCopyWith(_ScheduledTasksResponseDto value, $Res Function(_ScheduledTasksResponseDto) _then) = __$ScheduledTasksResponseDtoCopyWithImpl;
+@override @useResult
+$Res call({
+ List<TaskResponseDto> tasks
+});
+
+
+
+
+}
+/// @nodoc
+class __$ScheduledTasksResponseDtoCopyWithImpl<$Res>
+    implements _$ScheduledTasksResponseDtoCopyWith<$Res> {
+  __$ScheduledTasksResponseDtoCopyWithImpl(this._self, this._then);
+
+  final _ScheduledTasksResponseDto _self;
+  final $Res Function(_ScheduledTasksResponseDto) _then;
+
+/// Create a copy of ScheduledTasksResponseDto
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? tasks = null,}) {
+  return _then(_ScheduledTasksResponseDto(
+tasks: null == tasks ? _self._tasks : tasks // ignore: cast_nullable_to_non_nullable
 as List<TaskResponseDto>,
   ));
 }

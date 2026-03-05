@@ -14,6 +14,7 @@ class FocusTimerWidget extends StatefulWidget {
   final VoidCallback onBreak;
   final VoidCallback onTerminate;
   final SessionTypeEnum? sessionType;
+  final bool isCompact;
 
   const FocusTimerWidget({
     super.key,
@@ -22,6 +23,7 @@ class FocusTimerWidget extends StatefulWidget {
     required this.onBreak,
     required this.onTerminate,
     this.sessionType,
+    this.isCompact = false,
   });
 
   @override
@@ -123,6 +125,16 @@ class _FocusTimerWidgetState extends State<FocusTimerWidget>
     final textColor = colorScheme.onSurface;
     final errorColor = colorScheme.error;
 
+    final compact = widget.isCompact;
+    final circleSz = compact ? 200.0 : 300.0;
+    final timerFontSz = compact ? 52.0 : 72.0;
+    final outerPad = compact ? 16.0 : 32.0;
+    final spacerTop = compact ? 16.0 : 40.0;
+    final spacerBottom = compact ? 24.0 : 48.0;
+    final btnHeight = compact ? 52.0 : 64.0;
+    final btnFontSz = compact ? 16.0 : 18.0;
+    final startBtnFontSz = compact ? 16.0 : 20.0;
+
     return StreamBuilder<int>(
       stream:
           isRunning
@@ -182,7 +194,7 @@ class _FocusTimerWidgetState extends State<FocusTimerWidget>
             ],
           ),
           child: Padding(
-            padding: const EdgeInsets.all(32),
+            padding: EdgeInsets.all(outerPad),
             child: Column(
               children: [
                 Text(
@@ -193,19 +205,19 @@ class _FocusTimerWidgetState extends State<FocusTimerWidget>
                     letterSpacing: 0.5,
                   ),
                 ),
-                const SizedBox(height: 40),
+                SizedBox(height: spacerTop),
                 SizedBox(
-                  width: 300,
-                  height: 300,
+                  width: circleSz,
+                  height: circleSz,
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
                       // Water Wave Timer
                       ClipOval(
                         child: Container(
-                          width: 300,
-                          height: 300,
-                          color: trackColor, // Background color for empty part
+                          width: circleSz,
+                          height: circleSz,
+                          color: trackColor,
                           child: AnimatedBuilder(
                             animation: _controller,
                             builder: (context, child) {
@@ -222,8 +234,8 @@ class _FocusTimerWidgetState extends State<FocusTimerWidget>
                       ),
                       // Border Ring
                       Container(
-                        width: 300,
-                        height: 300,
+                        width: circleSz,
+                        height: circleSz,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
@@ -242,7 +254,7 @@ class _FocusTimerWidgetState extends State<FocusTimerWidget>
                               context,
                             ).textTheme.displayLarge?.copyWith(
                               fontWeight: FontWeight.w900,
-                              fontSize: 72,
+                              fontSize: timerFontSz,
                               color: timerColor,
                               letterSpacing: -2.0,
                               height: 1.0,
@@ -273,6 +285,7 @@ class _FocusTimerWidgetState extends State<FocusTimerWidget>
                               ).textTheme.titleMedium?.copyWith(
                                 color: isOvertime ? errorColor : indicatorColor,
                                 fontWeight: FontWeight.bold,
+                                fontSize: compact ? 13 : null,
                                 shadows: [
                                   Shadow(
                                     color: Colors.black.withValues(alpha: 0.2),
@@ -288,12 +301,12 @@ class _FocusTimerWidgetState extends State<FocusTimerWidget>
                     ],
                   ),
                 ),
-                const SizedBox(height: 48),
+                SizedBox(height: spacerBottom),
 
                 if (!isRunning)
                   SizedBox(
                     width: double.infinity,
-                    height: 64,
+                    height: btnHeight,
                     child: FilledButton(
                       onPressed: widget.onStart,
                       style: FilledButton.styleFrom(
@@ -304,8 +317,8 @@ class _FocusTimerWidgetState extends State<FocusTimerWidget>
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(24),
                         ),
-                        textStyle: const TextStyle(
-                          fontSize: 20,
+                        textStyle: TextStyle(
+                          fontSize: startBtnFontSz,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 1.0,
                         ),
@@ -319,7 +332,7 @@ class _FocusTimerWidgetState extends State<FocusTimerWidget>
                     children: [
                       Expanded(
                         child: SizedBox(
-                          height: 64,
+                          height: btnHeight,
                           child: FilledButton(
                             onPressed: widget.onStart,
                             style: FilledButton.styleFrom(
@@ -332,8 +345,8 @@ class _FocusTimerWidgetState extends State<FocusTimerWidget>
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(24),
                               ),
-                              textStyle: const TextStyle(
-                                fontSize: 18,
+                              textStyle: TextStyle(
+                                fontSize: btnFontSz,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -343,10 +356,10 @@ class _FocusTimerWidgetState extends State<FocusTimerWidget>
                           ),
                         ),
                       ),
-                      const SizedBox(width: 16),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: SizedBox(
-                          height: 64,
+                          height: btnHeight,
                           child: OutlinedButton(
                             onPressed: widget.onTerminate,
                             style: OutlinedButton.styleFrom(
@@ -362,8 +375,8 @@ class _FocusTimerWidgetState extends State<FocusTimerWidget>
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(24),
                               ),
-                              textStyle: const TextStyle(
-                                fontSize: 18,
+                              textStyle: TextStyle(
+                                fontSize: btnFontSz,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -378,7 +391,7 @@ class _FocusTimerWidgetState extends State<FocusTimerWidget>
                     children: [
                       Expanded(
                         child: SizedBox(
-                          height: 64,
+                          height: btnHeight,
                           child: FilledButton(
                             onPressed: widget.onBreak,
                             style: FilledButton.styleFrom(
@@ -391,8 +404,8 @@ class _FocusTimerWidgetState extends State<FocusTimerWidget>
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(24),
                               ),
-                              textStyle: const TextStyle(
-                                fontSize: 18,
+                              textStyle: TextStyle(
+                                fontSize: btnFontSz,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -402,10 +415,10 @@ class _FocusTimerWidgetState extends State<FocusTimerWidget>
                           ),
                         ),
                       ),
-                      const SizedBox(width: 16),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: SizedBox(
-                          height: 64,
+                          height: btnHeight,
                           child: OutlinedButton(
                             onPressed: widget.onTerminate,
                             style: OutlinedButton.styleFrom(
@@ -421,8 +434,8 @@ class _FocusTimerWidgetState extends State<FocusTimerWidget>
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(24),
                               ),
-                              textStyle: const TextStyle(
-                                fontSize: 18,
+                              textStyle: TextStyle(
+                                fontSize: btnFontSz,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),

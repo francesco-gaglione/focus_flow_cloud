@@ -39,6 +39,7 @@ class AppView extends StatelessWidget {
                       fetchOrphanTasks: sl(),
                       websocketRepository: sl(),
                       getSessionsWithFilters: sl(),
+                      getScheduledTasks: sl(),
                       sessionRepository: sl(),
                       userSettingsRepository: sl(),
                     )..add(InitState()),

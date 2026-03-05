@@ -10,12 +10,20 @@ abstract class TaskRepository {
   /// Get orphan tasks (tasks without a category)
   Future<List<Task>> getOrphanTasks();
 
+  /// Get scheduled tasks with optional filters
+  Future<List<Task>> getScheduledTasks({
+    bool? completed,
+    int? from,
+    int? to,
+  });
+
   /// Create a new task
   Future<Task> createTask({
     required String name,
     String? description,
     String? categoryId,
     int? scheduledDate,
+    int? scheduledEndDate,
   });
 
   /// Update an existing task
@@ -25,6 +33,7 @@ abstract class TaskRepository {
     String? description,
     String? categoryId,
     int? scheduledDate,
+    int? scheduledEndDate,
     int? completedAt,
   });
 

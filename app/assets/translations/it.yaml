@@ -156,6 +156,7 @@ navigation:
   focus: Focus
   categories: Categorie
   statistics: Statistiche
+  calendar: Calendario
   settings: Impostazioni
 
 error:
@@ -186,3 +187,20 @@ notes:
   edit_note: Modifica Nota
   editing: Modifica in corso
   clear_filters: Pulisci filtri
+
+calendar:
+  title: Calendario
+  view_daily: Giorno
+  view_weekly: Settimana
+  view_monthly: Mese
+  create_task: Pianifica Attività
+  edit_task: Modifica Attività Pianificata
+  date_label: Data
+  date_required: Seleziona una data
+  pick_date: Scegli una data
+  no_category: Nessuna categoria
+  no_tasks_day: Nessuna attività pianificata per questo giorno
+  scheduled_tasks: Attività Pianificate
+  mark_complete: Segna come Completata
+  mark_incomplete: Segna come Non Completata
+  end_before_start: L'ora di fine deve essere successiva all'ora di inizio

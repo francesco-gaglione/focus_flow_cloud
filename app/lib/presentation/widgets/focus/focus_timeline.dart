@@ -8,16 +8,20 @@ import 'package:focus_flow_app/presentation/widgets/focus/session_details_modal.
 
 class FocusTimelineWidget extends StatefulWidget {
   final List<FocusSession> sessions;
+  final List<Task> scheduledTasks;
   final List<CategoryWithTasks> categories;
   final List<Task> orphanTasks;
   final VoidCallback? onSessionUpdated;
+  final void Function(Task task)? onScheduledTaskTap;
 
   const FocusTimelineWidget({
     super.key,
     this.sessions = const [],
+    this.scheduledTasks = const [],
     this.categories = const [],
     this.orphanTasks = const [],
     this.onSessionUpdated,
+    this.onScheduledTaskTap,
   });
 
   @override
@@ -46,8 +50,9 @@ class _FocusTimelineWidgetState extends State<FocusTimelineWidget> {
   @override
   void didUpdateWidget(FocusTimelineWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // If we transition from empty to having sessions, try scrolling
-    if (oldWidget.sessions.isEmpty && widget.sessions.isNotEmpty) {
+    final wasEmpty = oldWidget.sessions.isEmpty && oldWidget.scheduledTasks.isEmpty;
+    final hasContent = widget.sessions.isNotEmpty || widget.scheduledTasks.isNotEmpty;
+    if (wasEmpty && hasContent) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _scrollToCurrentTime();
       });
@@ -58,17 +63,17 @@ class _FocusTimelineWidgetState extends State<FocusTimelineWidget> {
     if (!_scrollController.hasClients) return;
     final now = DateTime.now();
     final currentMinute = now.hour * 60 + now.minute;
-    // Calculate the top position of the current time line
     final topPosition = ((currentMinute / 60) - _startHour) * _hourHeight;
-    // Center it in the 600px container (subtract half height = 300)
     final offset = topPosition - 300;
-    
+
     _scrollController.animateTo(
       offset.clamp(0.0, _scrollController.position.maxScrollExtent),
       duration: const Duration(milliseconds: 500),
       curve: Curves.easeInOut,
     );
   }
+
+  bool get _hasContent => widget.sessions.isNotEmpty || widget.scheduledTasks.isNotEmpty;
 
   @override
   Widget build(BuildContext context) {
@@ -122,7 +127,7 @@ class _FocusTimelineWidgetState extends State<FocusTimelineWidget> {
             ),
             const SizedBox(height: 24),
 
-            if (widget.sessions.isEmpty)
+            if (!_hasContent)
               Center(
                 child: Padding(
                   padding: const EdgeInsets.all(32),
@@ -242,219 +247,19 @@ class _FocusTimelineWidgetState extends State<FocusTimelineWidget> {
                           },
                         ),
 
-                        // Sessions
-                        ...widget.sessions.map((session) {
-                          final startTime = DateTime.fromMillisecondsSinceEpoch(
-                            session.startedAt * 1000,
-                          );
-                          final endTime =
-                              session.endedAt != null
-                                  ? DateTime.fromMillisecondsSinceEpoch(
-                                    session.endedAt! * 1000,
-                                  )
-                                  : DateTime.now();
+                        // Scheduled Tasks (ghost items - lower opacity, right column)
+                        ..._buildScheduledTaskItems(
+                          context,
+                          timeLabelWidth,
+                          colorScheme,
+                        ),
 
-                          final startMinuteOfDay =
-                              startTime.hour * 60 + startTime.minute;
-                          final endMinuteOfDay =
-                              endTime.hour * 60 + endTime.minute;
-
-                          final relativeStartMinute =
-                              startMinuteOfDay - (_startHour * 60);
-                          final durationMinutes =
-                              endMinuteOfDay - startMinuteOfDay;
-
-                          // Ensure visible minimum height (e.g., 5 mins = 15px at 3px/min)
-                          final displayDuration =
-                              durationMinutes < 5 ? 5 : durationMinutes;
-
-                          final top =
-                              (relativeStartMinute / 60) * _hourHeight;
-                          final height =
-                              (displayDuration / 60) * _hourHeight;
-
-                          Category? category;
-                          Task? task;
-                          String title;
-                          Color color;
-                          IconData icon;
-
-                          if (session.sessionType == SessionType.work) {
-                            if (session.categoryId != null) {
-                              try {
-                                category =
-                                    widget.categories
-                                        .firstWhere(
-                                          (CategoryWithTasks c) =>
-                                              c.category.id ==
-                                              session.categoryId,
-                                        )
-                                        .category;
-                              } catch (e) {
-                                category = null;
-                              }
-                            }
-
-                            if (session.taskId != null) {
-                              if (category != null) {
-                                try {
-                                  task = widget.categories
-                                      .firstWhere(
-                                        (CategoryWithTasks c) =>
-                                            c.category.id == session.categoryId,
-                                      )
-                                      .tasks
-                                      .firstWhere(
-                                        (t) => t.id == session.taskId,
-                                      );
-                                } catch (e) {
-                                  task = null;
-                                }
-                              } else {
-                                try {
-                                  task = widget.orphanTasks.firstWhere(
-                                    (t) => t.id == session.taskId,
-                                  );
-                                } catch (e) {
-                                  task = null;
-                                }
-                              }
-                            }
-
-                            title = category?.name ?? 'Uncategorized';
-                            color =
-                                category != null
-                                    ? Color(
-                                      int.parse(
-                                        category.color.replaceFirst(
-                                          '#',
-                                          '0xFF',
-                                        ),
-                                      ),
-                                    )
-                                    : Colors.grey;
-                            icon = Icons.work;
-                          } else if (session.sessionType ==
-                              SessionType.shortBreak) {
-                            title = context.tr('focus.short_break_title');
-                            color = Colors.green;
-                            icon = Icons.coffee;
-                          } else {
-                            title = context.tr('focus.long_break_title');
-                            color = Colors.blue;
-                            icon = Icons.weekend;
-                          }
-
-                          final showTimeRange = height > 40;
-
-                          return Positioned(
-                            top: top,
-                            left: timeLabelWidth + 12,
-                            right: 16,
-                            height: height,
-                            child: InkWell(
-                              onTap: () {
-                                showModalBottomSheet(
-                                  context: context,
-                                  isScrollControlled: true,
-                                  backgroundColor: Colors.transparent,
-                                  builder:
-                                      (context) => SessionDetailsModal(
-                                        session: session,
-                                        category: category,
-                                        task: task,
-                                        categories: widget.categories,
-                                        orphanTasks: widget.orphanTasks,
-                                        onSessionUpdated: widget.onSessionUpdated,
-                                      ),
-                                );
-                              },
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child: Container(
-                                  color: color.withValues(alpha: 0.2),
-                                  child: Row(
-                                    children: [
-                                      // Left colored strip (simulates left border)
-                                      Container(
-                                        width: 4,
-                                        color: color,
-                                      ),
-                                      Expanded(
-                                        child: Padding(
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: 8,
-                                            // Remove vertical padding for small items to ensure centering works
-                                            vertical: 0,
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              if (height >= 20) ...[
-                                                Icon(
-                                                  icon,
-                                                  size: 14,
-                                                  color: color,
-                                                ),
-                                                const SizedBox(width: 8),
-                                              ],
-                                              Expanded(
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    Text(
-                                                      '$title • ${durationMinutes}m',
-                                                      style: Theme.of(
-                                                        context,
-                                                      ).textTheme.labelSmall
-                                                          ?.copyWith(
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            color:
-                                                                colorScheme
-                                                                    .onSurface,
-                                                            fontSize:
-                                                                height < 20
-                                                                    ? 10
-                                                                    : null,
-                                                          ),
-                                                      maxLines: 1,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
-                                                    if (showTimeRange)
-                                                      Text(
-                                                        '${DateFormat('HH:mm').format(startTime)} - ${DateFormat('HH:mm').format(endTime)}',
-                                                        style: Theme.of(
-                                                          context,
-                                                        ).textTheme.bodySmall
-                                                            ?.copyWith(
-                                                              fontSize: 10,
-                                                              color:
-                                                                  colorScheme
-                                                                      .onSurfaceVariant,
-                                                            ),
-                                                        maxLines: 1,
-                                                        overflow:
-                                                            TextOverflow
-                                                                .ellipsis,
-                                                      ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          );
-                        }),
+                        // Focus Sessions
+                        ..._buildSessionItems(
+                          context,
+                          timeLabelWidth,
+                          colorScheme,
+                        ),
                       ],
                     ),
                   ),
@@ -464,5 +269,304 @@ class _FocusTimelineWidgetState extends State<FocusTimelineWidget> {
         ),
       ),
     );
+  }
+
+  List<Widget> _buildScheduledTaskItems(
+    BuildContext context,
+    double timeLabelWidth,
+    ColorScheme colorScheme,
+  ) {
+    return widget.scheduledTasks
+        .where((task) => task.scheduledDate != null)
+        .map((task) {
+          final startTime = DateTime.fromMillisecondsSinceEpoch(
+            task.scheduledDate! * 1000,
+          );
+          DateTime endTime;
+          if (task.scheduledEndDate != null) {
+            endTime = DateTime.fromMillisecondsSinceEpoch(
+              task.scheduledEndDate! * 1000,
+            );
+          } else {
+            endTime = startTime.add(const Duration(minutes: 30));
+          }
+
+          final startMinuteOfDay = startTime.hour * 60 + startTime.minute;
+          final endMinuteOfDay = endTime.hour * 60 + endTime.minute;
+          final relativeStartMinute = startMinuteOfDay - (_startHour * 60);
+          final durationMinutes = endMinuteOfDay - startMinuteOfDay;
+          final displayDuration = durationMinutes < 5 ? 5 : durationMinutes;
+
+          final top = (relativeStartMinute / 60) * _hourHeight;
+          final height = (displayDuration / 60) * _hourHeight;
+
+          // Determine color from category
+          Color taskColor;
+          if (task.categoryId != null) {
+            try {
+              final cat = widget.categories
+                  .firstWhere((c) => c.category.id == task.categoryId)
+                  .category;
+              taskColor = Color(
+                int.parse(cat.color.replaceFirst('#', '0xFF')),
+              );
+            } catch (_) {
+              taskColor = colorScheme.primary;
+            }
+          } else {
+            taskColor = const Color(0xFFFFA726); // orphan task color
+          }
+
+          return Positioned(
+            top: top,
+            // Shift slightly right to avoid overlap with sessions
+            left: timeLabelWidth + 12 + 8,
+            right: 8,
+            height: height,
+            child: Opacity(
+              opacity: 0.55,
+              child: InkWell(
+                onTap: () => widget.onScheduledTaskTap?.call(task),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: taskColor.withValues(alpha: 0.15),
+                      border: Border(
+                        left: BorderSide(color: taskColor, width: 3),
+                        top: BorderSide(
+                          color: taskColor.withValues(alpha: 0.4),
+                          width: 1,
+                        ),
+                        bottom: BorderSide(
+                          color: taskColor.withValues(alpha: 0.4),
+                          width: 1,
+                        ),
+                        right: BorderSide(
+                          color: taskColor.withValues(alpha: 0.4),
+                          width: 1,
+                        ),
+                      ),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
+                      child: Row(
+                        children: [
+                          if (height >= 20) ...[
+                            Icon(
+                              Icons.schedule,
+                              size: 12,
+                              color: taskColor,
+                            ),
+                            const SizedBox(width: 4),
+                          ],
+                          Expanded(
+                            child: Text(
+                              task.name,
+                              style: Theme.of(
+                                context,
+                              ).textTheme.labelSmall?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: colorScheme.onSurface,
+                                fontSize: height < 20 ? 9 : 11,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        })
+        .toList();
+  }
+
+  List<Widget> _buildSessionItems(
+    BuildContext context,
+    double timeLabelWidth,
+    ColorScheme colorScheme,
+  ) {
+    return widget.sessions.map((session) {
+      final startTime = DateTime.fromMillisecondsSinceEpoch(
+        session.startedAt * 1000,
+      );
+      final endTime =
+          session.endedAt != null
+              ? DateTime.fromMillisecondsSinceEpoch(session.endedAt! * 1000)
+              : DateTime.now();
+
+      final startMinuteOfDay = startTime.hour * 60 + startTime.minute;
+      final endMinuteOfDay = endTime.hour * 60 + endTime.minute;
+
+      final relativeStartMinute = startMinuteOfDay - (_startHour * 60);
+      final durationMinutes = endMinuteOfDay - startMinuteOfDay;
+
+      final displayDuration = durationMinutes < 5 ? 5 : durationMinutes;
+
+      final top = (relativeStartMinute / 60) * _hourHeight;
+      final height = (displayDuration / 60) * _hourHeight;
+
+      Category? category;
+      Task? task;
+      String title;
+      Color color;
+      IconData icon;
+
+      if (session.sessionType == SessionType.work) {
+        if (session.categoryId != null) {
+          try {
+            category =
+                widget.categories
+                    .firstWhere(
+                      (CategoryWithTasks c) =>
+                          c.category.id == session.categoryId,
+                    )
+                    .category;
+          } catch (e) {
+            category = null;
+          }
+        }
+
+        if (session.taskId != null) {
+          if (category != null) {
+            try {
+              task = widget.categories
+                  .firstWhere(
+                    (CategoryWithTasks c) =>
+                        c.category.id == session.categoryId,
+                  )
+                  .tasks
+                  .firstWhere((t) => t.id == session.taskId);
+            } catch (e) {
+              task = null;
+            }
+          } else {
+            try {
+              task = widget.orphanTasks.firstWhere(
+                (t) => t.id == session.taskId,
+              );
+            } catch (e) {
+              task = null;
+            }
+          }
+        }
+
+        title = category?.name ?? 'Uncategorized';
+        color =
+            category != null
+                ? Color(
+                  int.parse(
+                    category.color.replaceFirst('#', '0xFF'),
+                  ),
+                )
+                : Colors.grey;
+        icon = Icons.work;
+      } else if (session.sessionType == SessionType.shortBreak) {
+        title = context.tr('focus.short_break_title');
+        color = Colors.green;
+        icon = Icons.coffee;
+      } else {
+        title = context.tr('focus.long_break_title');
+        color = Colors.blue;
+        icon = Icons.weekend;
+      }
+
+      final showTimeRange = height > 40;
+
+      return Positioned(
+        top: top,
+        left: timeLabelWidth + 12,
+        right: 16,
+        height: height,
+        child: InkWell(
+          onTap: () {
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              backgroundColor: Colors.transparent,
+              builder:
+                  (context) => SessionDetailsModal(
+                    session: session,
+                    category: category,
+                    task: task,
+                    categories: widget.categories,
+                    orphanTasks: widget.orphanTasks,
+                    onSessionUpdated: widget.onSessionUpdated,
+                  ),
+            );
+          },
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Container(
+              color: color.withValues(alpha: 0.2),
+              child: Row(
+                children: [
+                  Container(
+                    width: 4,
+                    color: color,
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 0,
+                      ),
+                      child: Row(
+                        children: [
+                          if (height >= 20) ...[
+                            Icon(icon, size: 14, color: color),
+                            const SizedBox(width: 8),
+                          ],
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  '$title • ${durationMinutes}m',
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.labelSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: colorScheme.onSurface,
+                                    fontSize: height < 20 ? 10 : null,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                if (showTimeRange)
+                                  Text(
+                                    '${DateFormat('HH:mm').format(startTime)} - ${DateFormat('HH:mm').format(endTime)}',
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.bodySmall?.copyWith(
+                                      fontSize: 10,
+                                      color: colorScheme.onSurfaceVariant,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }).toList();
   }
 }

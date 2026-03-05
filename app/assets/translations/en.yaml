@@ -156,6 +156,7 @@ navigation:
   focus: Focus
   categories: Categories
   statistics: Statistics
+  calendar: Calendar
   settings: Settings
 
 error:
@@ -186,3 +187,20 @@ notes:
   edit_note: Edit Note
   editing: Editing
   clear_filters: Clear all filters
+
+calendar:
+  title: Calendar
+  view_daily: Day
+  view_weekly: Week
+  view_monthly: Month
+  create_task: Schedule Task
+  edit_task: Edit Scheduled Task
+  date_label: Date
+  date_required: Please select a date
+  pick_date: Pick a date
+  no_category: No category
+  no_tasks_day: No tasks scheduled for this day
+  scheduled_tasks: Scheduled Tasks
+  mark_complete: Mark as Complete
+  mark_incomplete: Mark as Incomplete
+  end_before_start: End time must be after start time

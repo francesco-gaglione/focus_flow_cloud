@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:logger/logger.dart';
 import '../../adapters/network/auth_interceptor.dart';
+import '../../adapters/network/error_interceptor.dart';
 import 'package:focus_flow_app/adapters/repositories/http_category_repository.dart';
 import 'package:focus_flow_app/adapters/repositories/http_session_repository.dart';
 import 'package:focus_flow_app/adapters/repositories/http_statistics_repository.dart';
@@ -25,7 +26,9 @@ import 'package:focus_flow_app/domain/usecases/tasks_usecases/fetch_orphan_tasks
 import 'package:focus_flow_app/domain/usecases/tasks_usecases/complete_task.dart';
 import 'package:focus_flow_app/domain/usecases/tasks_usecases/uncomplete_task.dart';
 import 'package:focus_flow_app/domain/usecases/tasks_usecases/update_task.dart';
+import 'package:focus_flow_app/domain/usecases/tasks_usecases/get_scheduled_tasks.dart';
 import 'package:focus_flow_app/domain/usecases/sessions_usecases/update_session.dart';
+import 'package:focus_flow_app/presentation/calendar/bloc/calendar_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -223,6 +226,10 @@ Future<void> setupDependencies(String baseUrl, String wsUrl) async {
     () => UncompleteTask(taskRepository: sl()),
   );
 
+  sl.registerLazySingleton<GetScheduledTasks>(
+    () => GetScheduledTasks(taskRepository: sl()),
+  );
+
   // Use Cases - Session
   sl.registerLazySingleton<GetSessionsWithFilters>(
     () => GetSessionsWithFilters(sessionRepository: sl()),
@@ -251,10 +258,22 @@ Future<void> setupDependencies(String baseUrl, String wsUrl) async {
   // Cubits - Settings
   sl.registerFactory(() => SettingsBloc(userSettingsRepository: sl()));
 
+  // Bloc - Calendar
+  sl.registerFactory(
+    () => CalendarBloc(
+      getScheduledTasks: sl(),
+      getCategoriesAndTasks: sl(),
+      createTask: sl(),
+      updateTask: sl(),
+      deleteTasks: sl(),
+      completeTask: sl(),
+      uncompleteTask: sl(),
+    ),
+  );
+
   // Cubits - Notes
 
 
-  // Interceptors
   // Interceptors
   try {
     sl.registerLazySingleton<AuthInterceptor>(
@@ -266,8 +285,14 @@ Future<void> setupDependencies(String baseUrl, String wsUrl) async {
       ),
     );
 
+    sl.registerLazySingleton<ErrorInterceptor>(() => ErrorInterceptor());
+
     final dio = sl<Dio>();
+    // AuthInterceptor is added first; ErrorInterceptor is added after.
+    // Dio processes onError in reverse order, so ErrorInterceptor fires first
+    // (converting raw errors to ApiException), then AuthInterceptor handles 401s.
     dio.interceptors.add(sl<AuthInterceptor>());
+    dio.interceptors.add(sl<ErrorInterceptor>());
   } catch (e) {
     logger.e('Error setting up interceptors: $e');
   }

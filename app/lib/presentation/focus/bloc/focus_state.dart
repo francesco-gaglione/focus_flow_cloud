@@ -14,6 +14,7 @@ class FocusState extends Equatable {
   final Category? selectedCategory;
   final Task? selectedTask;
   final List<FocusSession> todaySessions;
+  final List<Task> todayScheduledTasks;
   final SessionState? sessionState;
 
   final bool isWebSocketConnected;
@@ -28,6 +29,7 @@ class FocusState extends Equatable {
     this.selectedTask,
     this.sessionState,
     this.todaySessions = const [],
+    this.todayScheduledTasks = const [],
     this.isWebSocketConnected = false,
     this.noteTemplates = const [],
   });
@@ -45,6 +47,7 @@ class FocusState extends Equatable {
     SessionState? sessionState,
     bool clearSessionState = false,
     List<FocusSession>? todaySessions,
+    List<Task>? todayScheduledTasks,
     bool? isWebSocketConnected,
     List<NoteTemplate>? noteTemplates,
   }) {
@@ -62,6 +65,7 @@ class FocusState extends Equatable {
       sessionState:
           clearSessionState ? null : sessionState ?? this.sessionState,
       todaySessions: todaySessions ?? this.todaySessions,
+      todayScheduledTasks: todayScheduledTasks ?? this.todayScheduledTasks,
       isWebSocketConnected: isWebSocketConnected ?? this.isWebSocketConnected,
       noteTemplates: noteTemplates ?? this.noteTemplates,
     );
@@ -77,7 +81,7 @@ class FocusState extends Equatable {
     selectedTask,
     sessionState,
     todaySessions,
-    isWebSocketConnected,
+    todayScheduledTasks,
     isWebSocketConnected,
     noteTemplates,
   ];

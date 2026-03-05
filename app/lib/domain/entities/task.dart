@@ -6,6 +6,7 @@ class Task extends Equatable {
   final String? description;
   final String? categoryId;
   final int? scheduledDate;
+  final int? scheduledEndDate;
   final int? completedAt;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -16,6 +17,7 @@ class Task extends Equatable {
     this.description,
     this.categoryId,
     this.scheduledDate,
+    this.scheduledEndDate,
     this.completedAt,
     required this.createdAt,
     required this.updatedAt,
@@ -27,6 +29,7 @@ class Task extends Equatable {
     String? description,
     String? categoryId,
     int? scheduledDate,
+    int? scheduledEndDate,
     int? completedAt,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -37,6 +40,7 @@ class Task extends Equatable {
       description: description ?? this.description,
       categoryId: categoryId ?? this.categoryId,
       scheduledDate: scheduledDate ?? this.scheduledDate,
+      scheduledEndDate: scheduledEndDate ?? this.scheduledEndDate,
       completedAt: completedAt ?? this.completedAt,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -47,9 +51,11 @@ class Task extends Equatable {
 
   bool get isOrphan => categoryId == null;
 
+  bool get isScheduled => scheduledDate != null;
+
   @override
   String toString() {
-    return 'Task(id: $id, name: $name, description: $description, categoryId: $categoryId, scheduledDate: $scheduledDate, completedAt: $completedAt, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'Task(id: $id, name: $name, description: $description, categoryId: $categoryId, scheduledDate: $scheduledDate, scheduledEndDate: $scheduledEndDate, completedAt: $completedAt, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -59,6 +65,7 @@ class Task extends Equatable {
     description,
     categoryId,
     scheduledDate,
+    scheduledEndDate,
     completedAt,
     createdAt,
     updatedAt,
