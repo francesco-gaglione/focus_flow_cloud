@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.0.0] - 2026-03-05
+
+### Bug Fixes
+
+- Refactor websocket handling for stale connections
+
+### Features
+
+- [**breaking**] Added support for scheduled tasks and calendar views
+- Add notification service for timer expiry
+
+### Miscellaneous Tasks
+
+- Trigger pipeline
+
+### Other
+
+- Delete MEMORY.md
+- Delete swagger.json
+- Update build.gradle.kts
+
 ## [2.1.1] - 2026-02-20
 
 ### Bug Fixes
