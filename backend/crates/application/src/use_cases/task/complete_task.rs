@@ -77,6 +77,7 @@ mod tests {
             None,
             None,
             None,
+            None,
         );
 
         mock_persistence
@@ -142,6 +143,7 @@ mod tests {
             None,
             None,
             None,
+            None,
         );
 
         mock_persistence
@@ -182,6 +184,7 @@ mod tests {
             user_id,
             None,
             "Already Completed Task".to_string(),
+            None,
             None,
             None,
             Some(old_completed_at),
@@ -227,6 +230,7 @@ mod tests {
             description.clone(),
             None,
             None,
+            None,
         );
 
         mock_persistence
@@ -269,6 +273,7 @@ mod tests {
             owner_id,
             None,
             "Private Task".to_string(),
+            None,
             None,
             None,
             None,

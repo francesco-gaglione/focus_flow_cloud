@@ -1,13 +1,26 @@
 use crate::http::app_state::AppState;
 use crate::http::dto::validators::validate_uuid::validate_uuid;
 use crate::http_error::{HttpError, HttpResult};
-use crate::mappers::focus_session_mapper::FocusSessionMapper;
 use crate::openapi::SESSION_TAG;
+use application::use_cases::focus_session::update_focus_session::{
+    UpdateFocusSessionCommand, UpdateFocusSessionError,
+};
+
+impl From<UpdateFocusSessionError> for HttpError {
+    fn from(value: UpdateFocusSessionError) -> Self {
+        match value {
+            UpdateFocusSessionError::PersistenceError(e) => HttpError::GenericError(e.to_string()),
+            UpdateFocusSessionError::FocusSessionError(e) => HttpError::BadRequest(e.to_string()),
+        }
+    }
+}
 use axum::extract::{Path, State};
 use axum::Json;
+use chrono::DateTime;
 use serde::{Deserialize, Serialize};
 use tracing::debug;
 use utoipa::ToSchema;
+use uuid::Uuid;
 use validator::Validate;
 
 #[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
@@ -70,12 +83,40 @@ pub async fn update_session_api(
         .validate()
         .map_err(|e| HttpError::BadRequest(e.to_string()))?;
 
-    state
-        .update_focus_session_usecase
-        .execute(FocusSessionMapper::session_update_dto_to_command(
-            path.id, &payload,
-        )?)
-        .await?;
+    let session_id = Uuid::parse_str(&path.id)
+        .map_err(|_| HttpError::BadRequest("Invalid session id".to_string()))?;
+    let category_id = payload
+        .category_id
+        .as_ref()
+        .map(|id| Uuid::parse_str(id))
+        .transpose()
+        .map_err(|_| HttpError::BadRequest("Invalid category id".to_string()))?;
+    let task_id = payload
+        .task_id
+        .as_ref()
+        .map(|id| Uuid::parse_str(id))
+        .transpose()
+        .map_err(|_| HttpError::BadRequest("Invalid task id".to_string()))?;
+    let started_at = payload
+        .started_at
+        .and_then(|s| DateTime::from_timestamp(s, 0))
+        .ok_or_else(|| HttpError::BadRequest("Invalid started at timestamp".to_string()))?;
+    let ended_at = payload
+        .ended_at
+        .and_then(|s| DateTime::from_timestamp(s, 0))
+        .ok_or_else(|| HttpError::BadRequest("Invalid ended at timestamp".to_string()))?;
+
+    let command = UpdateFocusSessionCommand {
+        session_id,
+        category_id,
+        task_id,
+        concentration_score: payload.concentration_score,
+        notes: payload.notes,
+        started_at: Some(started_at),
+        ended_at: Some(ended_at),
+    };
+
+    state.update_focus_session_uc.execute(command).await?;
 
     Ok(Json(UpdateFocusSessionResponseDto {}))
 }

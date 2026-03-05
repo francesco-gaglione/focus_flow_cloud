@@ -13,6 +13,7 @@ class CreateTask {
     String? description,
     String? categoryId,
     int? scheduledDate,
+    int? scheduledEndDate,
   }) async {
     try {
       // Validate inputs
@@ -44,6 +45,7 @@ class CreateTask {
         description: description,
         categoryId: categoryId,
         scheduledDate: scheduledDate,
+        scheduledEndDate: scheduledEndDate,
       );
 
       return CreateTaskResult(success: true, task: task);

@@ -3,10 +3,10 @@ use std::sync::Arc;
 use crate::persistence_traits::category_persistence::CategoryPersistence;
 use crate::persistence_traits::persistence_error::PersistenceError;
 use crate::persistence_traits::task_persistence::TaskPersistence;
-use crate::use_cases::category::command::category_with_tasks::{
-    CategoryAndTasks, CategoryWithTasks,
-};
+use chrono::{DateTime, Utc};
+use domain::entities::{category::Category, task::Task};
 use thiserror::Error;
+use uuid::Uuid;
 
 #[derive(Debug, Error)]
 pub enum GetCategoryAndTasksError {
@@ -18,6 +18,65 @@ pub type GetCategoryAndTasksResult<T> = Result<T, GetCategoryAndTasksError>;
 
 pub struct GetCategoryAndTasksCommand {
     pub include_completed_tasks: Option<bool>,
+}
+
+#[derive(Debug, Clone)]
+pub struct GetCategoryAndTaskDto {
+    pub category_with_tasks: Vec<CategoryWithTaskDto>,
+}
+
+#[derive(Debug, Clone)]
+pub struct CategoryWithTaskDto {
+    pub category: CategoryDto,
+    pub tasks: Vec<TaskDto>,
+}
+
+#[derive(Debug, Clone)]
+pub struct CategoryDto {
+    pub id: Uuid,
+    pub user_id: Uuid,
+    pub name: String,
+    pub description: Option<String>,
+    pub color: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct TaskDto {
+    pub id: Uuid,
+    pub user_id: Uuid,
+    pub category_id: Option<Uuid>,
+    pub name: String,
+    pub description: Option<String>,
+    pub scheduled_date: Option<DateTime<Utc>>,
+    pub scheduled_end_date: Option<DateTime<Utc>>,
+    pub completed_at: Option<DateTime<Utc>>,
+}
+
+impl From<&Category> for CategoryDto {
+    fn from(value: &Category) -> Self {
+        Self {
+            id: value.id(),
+            user_id: value.user_id(),
+            name: value.name().to_string(),
+            description: value.description().map(|d| d.to_string()),
+            color: value.color().to_string(),
+        }
+    }
+}
+
+impl From<&Task> for TaskDto {
+    fn from(value: &Task) -> Self {
+        Self {
+            id: value.id(),
+            user_id: value.user_id(),
+            category_id: value.category_id(),
+            name: value.name().to_string(),
+            description: value.description().map(|d| d.to_string()),
+            scheduled_date: value.scheduled_date(),
+            scheduled_end_date: value.scheduled_end_date(),
+            completed_at: value.completed_at(),
+        }
+    }
 }
 
 #[derive(Clone)]
@@ -40,14 +99,14 @@ impl GetCategoryAndTaskUseCases {
     pub async fn execute(
         &self,
         command: GetCategoryAndTasksCommand,
-    ) -> GetCategoryAndTasksResult<CategoryAndTasks> {
-        let mut categories = self.category_persistence.find_all().await?;
+    ) -> GetCategoryAndTasksResult<GetCategoryAndTaskDto> {
+        let categories = self.category_persistence.find_all().await?;
 
-        let mut categories_with_tasks: Vec<CategoryWithTasks> = Vec::new();
+        let mut categories_with_tasks: Vec<CategoryWithTaskDto> = Vec::new();
 
         let include_completed_tasks = command.include_completed_tasks.unwrap_or(false);
 
-        for c in &mut categories {
+        for c in &categories {
             let tasks = self.task_persistence.find_by_category_id(c.id()).await?;
 
             let filtered_tasks = if include_completed_tasks {
@@ -56,13 +115,13 @@ impl GetCategoryAndTaskUseCases {
                 tasks.into_iter().filter(|t| !t.is_completed()).collect()
             };
 
-            categories_with_tasks.push(CategoryWithTasks {
-                category: c.clone(),
-                tasks: filtered_tasks,
+            categories_with_tasks.push(CategoryWithTaskDto {
+                category: c.into(),
+                tasks: filtered_tasks.iter().map(|t| t.into()).collect(),
             });
         }
 
-        Ok(CategoryAndTasks {
+        Ok(GetCategoryAndTaskDto {
             category_with_tasks: categories_with_tasks,
         })
     }
@@ -75,7 +134,9 @@ mod tests {
     use uuid::Uuid;
 
     use crate::{
-        mocks::{MockCategoryPersistence, MockTaskPersistence},
+        persistence_traits::{
+            category_persistence::MockCategoryPersistence, task_persistence::MockTaskPersistence,
+        },
         use_cases::category::get_category_and_task_usecase::{
             GetCategoryAndTaskUseCases, GetCategoryAndTasksCommand,
         },
@@ -112,6 +173,7 @@ mod tests {
                     None,
                     None,
                     None,
+                    None,
                 );
                 completed_task.complete(); // Mark as completed
 
@@ -122,6 +184,7 @@ mod tests {
                         Some(category_id),
                         "Active Task".to_string(),
                         Some("description".to_string()),
+                        None,
                         None,
                         None,
                     ),
@@ -149,7 +212,7 @@ mod tests {
         assert_eq!(categories.len(), 1);
         // Should only have the active task
         assert_eq!(categories[0].tasks.len(), 1);
-        assert_eq!(categories[0].tasks[0].name(), "Active Task");
+        assert_eq!(categories[0].tasks[0].name, "Active Task");
     }
 
     #[tokio::test]
@@ -180,6 +243,7 @@ mod tests {
                     None,
                     None,
                     None,
+                    None,
                 );
                 completed_task.complete();
 
@@ -189,6 +253,7 @@ mod tests {
                         Uuid::new_v4(),
                         Some(category_id),
                         "Active Task".to_string(),
+                        None,
                         None,
                         None,
                         None,

@@ -14,6 +14,7 @@ abstract class CreateTaskDto with _$CreateTaskDto {
     String? description,
     String? categoryId,
     int? scheduledDate,
+    int? scheduledEndDate,
   }) = _CreateTaskDto;
 
   factory CreateTaskDto.fromJson(Map<String, dynamic> json) =>
@@ -27,6 +28,7 @@ abstract class UpdateTaskDto with _$UpdateTaskDto {
     String? description,
     String? categoryId,
     int? scheduledDate,
+    int? scheduledEndDate,
     int? completedAt,
   }) = _UpdateTaskDto;
 
@@ -53,6 +55,7 @@ abstract class TaskResponseDto with _$TaskResponseDto {
     String? description,
     String? categoryId,
     int? scheduledDate,
+    int? scheduledEndDate,
     int? completedAt,
   }) = _TaskResponseDto;
 
@@ -66,6 +69,7 @@ abstract class TaskResponseDto with _$TaskResponseDto {
       description: task.description,
       categoryId: task.categoryId,
       scheduledDate: task.scheduledDate,
+      scheduledEndDate: task.scheduledEndDate,
       completedAt: task.completedAt,
     );
   }
@@ -82,7 +86,7 @@ abstract class CreateTaskResponseDto with _$CreateTaskResponseDto {
 
 @freezed
 abstract class UpdateTaskResponseDto with _$UpdateTaskResponseDto {
-  const factory UpdateTaskResponseDto({required TaskResponseDto updatedTask}) =
+  const factory UpdateTaskResponseDto({required bool success}) =
       _UpdateTaskResponseDto;
 
   factory UpdateTaskResponseDto.fromJson(Map<String, dynamic> json) =>
@@ -107,4 +111,14 @@ abstract class OrphanTasksResponseDto with _$OrphanTasksResponseDto {
 
   factory OrphanTasksResponseDto.fromJson(Map<String, dynamic> json) =>
       _$OrphanTasksResponseDtoFromJson(json);
+}
+
+@freezed
+abstract class ScheduledTasksResponseDto with _$ScheduledTasksResponseDto {
+  const factory ScheduledTasksResponseDto({
+    required List<TaskResponseDto> tasks,
+  }) = _ScheduledTasksResponseDto;
+
+  factory ScheduledTasksResponseDto.fromJson(Map<String, dynamic> json) =>
+      _$ScheduledTasksResponseDtoFromJson(json);
 }

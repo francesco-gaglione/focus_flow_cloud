@@ -51,14 +51,12 @@ impl DeleteUserUseCase {
 
 #[cfg(test)]
 mod tests {
-    use std::sync::Arc;
-
-    use uuid::Uuid;
-
     use crate::{
-        mocks::MockUserPersistence,
+        persistence_traits::user_persistence::MockUserPersistence,
         use_cases::user::delete_user::{DeleteUserCommand, DeleteUserUseCase},
     };
+    use std::sync::Arc;
+    use uuid::Uuid;
 
     #[tokio::test]
     async fn test_delete_user_by_admin() {

@@ -1,8 +1,24 @@
 use crate::http::app_state::AppState;
 use crate::http::model::session_model::UserSession;
-use crate::http_error::HttpResult;
+use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::USERS_TAG;
-use application::use_cases::user::update_user_username::UpdateUserUsernameCommand;
+use application::use_cases::user::update_user_username::{
+    UpdateUserUsernameCommand, UpdateUserUsernameError,
+};
+
+impl From<UpdateUserUsernameError> for HttpError {
+    fn from(value: UpdateUserUsernameError) -> Self {
+        match value {
+            UpdateUserUsernameError::InvalidCredentials => {
+                HttpError::BadRequest("Invalid credentials".to_string())
+            }
+            UpdateUserUsernameError::UsernameAlreadyExists => {
+                HttpError::ResourceAlreadyExist("Username already exists".to_string())
+            }
+            UpdateUserUsernameError::PersistenceError(e) => HttpError::GenericError(e.to_string()),
+        }
+    }
+}
 use axum::extract::{Extension, State};
 use axum::Json;
 use serde::{Deserialize, Serialize};
@@ -41,7 +57,7 @@ pub async fn update_username_api(
         new_username: payload.new_username,
     };
 
-    state.update_user_username_usecase.execute(cmd).await?;
+    state.update_user_username_uc.execute(cmd).await?;
 
     Ok(())
 }

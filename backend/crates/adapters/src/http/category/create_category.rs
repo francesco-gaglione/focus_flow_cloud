@@ -74,7 +74,7 @@ pub async fn create_category_api(
         .map_err(|e| HttpError::BadRequest(e.to_string()))?;
 
     let category_id = state
-        .create_category_usecase
+        .create_category_uc
         .execute(CreateCategoryCommand {
             user_id: user.user_id,
             name: payload.name,

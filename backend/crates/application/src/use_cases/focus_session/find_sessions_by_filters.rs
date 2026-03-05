@@ -1,6 +1,6 @@
 use crate::persistence_traits::focus_session_persistence::FocusSessionPersistence;
 use crate::persistence_traits::persistence_error::PersistenceError;
-use chrono::DateTime;
+use chrono::{DateTime, Utc};
 use domain::entities::focus_session::{FocusSession, SessionFilter};
 use domain::entities::focus_session_type::FocusSessionType;
 use std::sync::Arc;
@@ -44,6 +44,39 @@ pub struct ConcentrationScoreFilter {
     pub max: i32,
 }
 
+#[derive(Debug, Clone)]
+pub struct FocusSessionOutput {
+    pub id: Uuid,
+    pub user_id: Uuid,
+    pub category_id: Option<Uuid>,
+    pub task_id: Option<Uuid>,
+    pub session_type: FocusSessionType,
+    pub actual_duration: Option<i64>,
+    pub concentration_score: Option<i32>,
+    pub notes: Option<String>,
+    pub started_at: DateTime<Utc>,
+    pub ended_at: Option<DateTime<Utc>>,
+    pub created_at: DateTime<Utc>,
+}
+
+impl From<&FocusSession> for FocusSessionOutput {
+    fn from(value: &FocusSession) -> Self {
+        Self {
+            id: value.id(),
+            user_id: value.user_id(),
+            category_id: value.category_id(),
+            task_id: value.task_id(),
+            session_type: value.session_type(),
+            actual_duration: value.actual_duration(),
+            concentration_score: value.concentration_score(),
+            notes: value.notes(),
+            started_at: value.started_at(),
+            ended_at: value.ended_at(),
+            created_at: value.created_at(),
+        }
+    }
+}
+
 pub struct FindSessionsByFiltersUseCase {
     session_persistence: Arc<dyn FocusSessionPersistence>,
 }
@@ -58,7 +91,7 @@ impl FindSessionsByFiltersUseCase {
     pub async fn execute(
         &self,
         filters: FindSessionFiltersCommand,
-    ) -> FindSessionByFiltersResult<Vec<FocusSession>> {
+    ) -> FindSessionByFiltersResult<Vec<FocusSessionOutput>> {
         let (start_date, end_date) = filters
             .date_range
             .as_ref()
@@ -111,14 +144,21 @@ impl FindSessionsByFiltersUseCase {
             has_notes: filters.has_notes,
         };
 
-        Ok(self.session_persistence.find_by_filters(filter).await?)
+        Ok(self
+            .session_persistence
+            .find_by_filters(filter)
+            .await?
+            .iter()
+            .map(|s| s.into())
+            .collect())
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use crate::persistence_traits::focus_session_persistence::MockFocusSessionPersistence;
+
     use super::*;
-    use crate::mocks::MockFocusSessionPersistence;
     use chrono::DateTime;
     use domain::entities::focus_session_type::FocusSessionType;
     use std::sync::Arc;
@@ -171,8 +211,8 @@ mod tests {
         assert!(result.is_ok());
         let sessions = result.unwrap();
         assert_eq!(sessions.len(), 1);
-        assert_eq!(sessions[0].id(), session_id);
-        assert_eq!(sessions[0].concentration_score(), Some(5));
+        assert_eq!(sessions[0].id, session_id);
+        assert_eq!(sessions[0].concentration_score, Some(5));
     }
 
     #[tokio::test]
@@ -223,7 +263,7 @@ mod tests {
         assert!(result.is_ok());
         let sessions = result.unwrap();
         assert_eq!(sessions.len(), 1);
-        assert_eq!(sessions[0].id(), session_id);
+        assert_eq!(sessions[0].id, session_id);
     }
 
     #[tokio::test]

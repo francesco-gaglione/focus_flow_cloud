@@ -2,13 +2,23 @@ use crate::http::model::session_model::{UserSession, SESSION_KEY};
 use crate::http_error::HttpResult;
 use crate::openapi::AUTH_TAG;
 use crate::{http::app_state::AppState, http_error::HttpError};
-use application::use_cases::user::login_user::LoginCommand;
+use application::use_cases::user::login_user::{LoginCommand, LoginError};
 use axum::extract::State;
 use axum::Json;
 use serde::{Deserialize, Serialize};
 use tower_sessions::Session;
 use utoipa::ToSchema;
 use validator::Validate;
+
+impl From<LoginError> for HttpError {
+    fn from(value: LoginError) -> Self {
+        match value {
+            LoginError::Validation(e) => HttpError::BadRequest(e.to_string()),
+            LoginError::InvalidCredentials => HttpError::Unauthorized("".to_string()),
+            LoginError::TokenError(_) => HttpError::Unauthorized("".to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
 pub struct LoginDto {
@@ -47,7 +57,7 @@ pub async fn login_api(
         password: payload.password,
     };
 
-    let result = state.login_usecase.execute(cmd).await?;
+    let result = state.login_uc.execute(cmd).await?;
 
     let session_data = UserSession {
         user_id: result.user_id,

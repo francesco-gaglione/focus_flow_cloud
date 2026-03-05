@@ -27,15 +27,23 @@ jobs:
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
         with:
-          components: rustfmt, clippy
+          components: rustfmt, clippy, llvm-tools-preview
       - uses: swatinem/rust-cache@v2
         with:
           workspaces: "backend"
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@cargo-llvm-cov
       - name: Check formatting
         run: cargo fmt -- --check
       - name: Lint
         run: cargo clippy -- -D warnings
-      - name: Test
-        run: cargo test
+      - name: Test with coverage
+        run: cargo llvm-cov --workspace --lcov --output-path lcov.info
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: backend/lcov.info
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
       - name: Build
         run: cargo build

@@ -2,11 +2,20 @@ use crate::http::app_state::AppState;
 use crate::http::dto::validators::validate_uuids::validate_uuids;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::TASK_TAG;
+use application::use_cases::task::delete_tasks::DeleteTasksError;
 use axum::extract::State;
 use axum::Json;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use validator::Validate;
+
+impl From<DeleteTasksError> for HttpError {
+    fn from(value: DeleteTasksError) -> Self {
+        match value {
+            DeleteTasksError::PersistenceError(e) => HttpError::GenericError(e.to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
 #[serde(rename_all = "camelCase")]
@@ -45,7 +54,7 @@ pub async fn delete_tasks_api(
         .map_err(|e| HttpError::BadRequest(e.to_string()))?;
 
     let res = state
-        .delete_tasks_usecase
+        .delete_tasks_uc
         .execute(
             payload
                 .task_ids

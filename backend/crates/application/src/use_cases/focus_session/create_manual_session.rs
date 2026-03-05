@@ -1,9 +1,13 @@
 use crate::persistence_traits::focus_session_persistence::FocusSessionPersistence;
 use crate::persistence_traits::persistence_error::PersistenceError;
-use crate::use_cases::focus_session::command::create_manual_session::CreateManualFocusSessionCommand;
-use domain::entities::focus_session::{FocusSession, FocusSessionError};
+use chrono::{DateTime, Utc};
+use domain::entities::{
+    focus_session::{FocusSession, FocusSessionError},
+    focus_session_type::FocusSessionType,
+};
 use std::sync::Arc;
 use thiserror::Error;
+use uuid::Uuid;
 
 #[derive(Debug, Error)]
 pub enum CreateManualSessionError {
@@ -15,6 +19,18 @@ pub enum CreateManualSessionError {
 }
 
 pub type CreateManualSessionResult<T> = Result<T, CreateManualSessionError>;
+
+#[derive(Debug, Clone)]
+pub struct CreateManualFocusSessionCommand {
+    pub user_id: Uuid,
+    pub category_id: Option<Uuid>,
+    pub task_id: Option<Uuid>,
+    pub session_type: FocusSessionType,
+    pub concentration_score: Option<i32>, // if none a default will be used (5)
+    pub notes: Option<String>,
+    pub started_at: DateTime<Utc>,
+    pub ended_at: DateTime<Utc>,
+}
 
 #[derive(Clone)]
 pub struct CreateManualSessionUseCase {
@@ -52,8 +68,9 @@ impl CreateManualSessionUseCase {
 
 #[cfg(test)]
 mod tests {
+    use crate::persistence_traits::focus_session_persistence::MockFocusSessionPersistence;
+
     use super::*;
-    use crate::mocks::MockFocusSessionPersistence;
     use chrono::DateTime;
     use domain::entities::focus_session_type::FocusSessionType;
     use std::sync::Arc;

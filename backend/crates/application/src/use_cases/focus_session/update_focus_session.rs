@@ -2,9 +2,10 @@ use std::sync::Arc;
 
 use crate::persistence_traits::focus_session_persistence::FocusSessionPersistence;
 use crate::persistence_traits::persistence_error::PersistenceError;
-use crate::use_cases::focus_session::command::update_focus_session::UpdateFocusSessionCommand;
+use chrono::{DateTime, Utc};
 use domain::entities::focus_session::FocusSessionError;
 use thiserror::Error;
+use uuid::Uuid;
 
 #[derive(Debug, Error, PartialEq)]
 pub enum UpdateFocusSessionError {
@@ -16,6 +17,17 @@ pub enum UpdateFocusSessionError {
 }
 
 pub type UpdateFocusSessionResult<T> = Result<T, UpdateFocusSessionError>;
+
+#[derive(Debug, Clone)]
+pub struct UpdateFocusSessionCommand {
+    pub session_id: Uuid,
+    pub category_id: Option<Uuid>,
+    pub task_id: Option<Uuid>,
+    pub concentration_score: Option<i32>,
+    pub notes: Option<String>,
+    pub started_at: Option<DateTime<Utc>>,
+    pub ended_at: Option<DateTime<Utc>>,
+}
 
 pub struct UpdateFocusSessionUseCase {
     session_persistence: Arc<dyn FocusSessionPersistence>,
@@ -65,11 +77,9 @@ impl UpdateFocusSessionUseCase {
 mod tests {
     use std::sync::Arc;
 
-    use crate::mocks::MockFocusSessionPersistence;
-    use crate::use_cases::focus_session::{
-        command::update_focus_session::UpdateFocusSessionCommand,
-        update_focus_session::UpdateFocusSessionUseCase,
-    };
+    use crate::persistence_traits::focus_session_persistence::MockFocusSessionPersistence;
+    use crate::use_cases::focus_session::update_focus_session::UpdateFocusSessionCommand;
+    use crate::use_cases::focus_session::update_focus_session::UpdateFocusSessionUseCase;
     use domain::entities::{focus_session::FocusSession, focus_session_type::FocusSessionType};
 
     #[tokio::test]

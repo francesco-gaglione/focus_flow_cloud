@@ -87,16 +87,15 @@ impl RegisterUserUseCase {
 mod tests {
     use std::sync::Arc;
 
+    use crate::auth_traits::password_hasher::MockPasswordHasher;
     use crate::persistence_traits::persistence_error::PersistenceError;
+    use crate::persistence_traits::user_persistence::MockUserPersistence;
     use domain::entities::{user::User, user_role::UserRole};
-    use domain::traits::password_policy::PasswordPolicyError;
+    use domain::traits::password_policy::{MockPasswordPolicy, PasswordPolicyError};
     use uuid::Uuid;
 
-    use crate::{
-        mocks::{MockPasswordHasher, MockPasswordPolicy, MockUserPersistence},
-        use_cases::user::register_user::{
-            RegisterUserCommand, RegisterUserError, RegisterUserUseCase,
-        },
+    use crate::use_cases::user::register_user::{
+        RegisterUserCommand, RegisterUserError, RegisterUserUseCase,
     };
 
     #[tokio::test]

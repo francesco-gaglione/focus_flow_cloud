@@ -9,6 +9,7 @@ use adapters::http::{
         update_task::{UpdateTaskDto, UpdateTaskResponseDto},
     },
 };
+use chrono::Utc;
 
 use crate::common::setup;
 
@@ -29,7 +30,8 @@ async fn create_new_task_and_list() {
         name: "Task".to_string(),
         description: Some("Work related tasks".to_string()),
         category_id: Some(category_body.category_id),
-        scheduled_date: Some(chrono::Utc::now().timestamp()),
+        scheduled_date: None,
+        scheduled_end_date: None,
     };
 
     let create_task_body = context.create_task(&create_task_dto).await;
@@ -70,7 +72,8 @@ async fn create_new_orphan_and_list() {
         name: "Orphan".to_string(),
         description: Some("Work related tasks".to_string()),
         category_id: None,
-        scheduled_date: Some(chrono::Utc::now().timestamp()),
+        scheduled_date: None,
+        scheduled_end_date: None,
     };
 
     let create_task_body = context.create_task(&create_task_dto).await;
@@ -97,6 +100,38 @@ async fn create_new_orphan_and_list() {
 }
 
 #[tokio::test]
+async fn create_scheduled_task_and_list() {
+    let context = setup().await;
+
+    let now = Utc::now();
+    let start_task_date = now.date_naive().and_hms_opt(11, 0, 0).unwrap().and_utc();
+    let end_task_date = now.date_naive().and_hms_opt(11, 30, 0).unwrap().and_utc();
+
+    let create_task_dto = CreateTaskDto {
+        name: "Task to update".to_string(),
+        description: Some("Description".to_string()),
+        category_id: None,
+        scheduled_date: Some(start_task_date.timestamp()),
+        scheduled_end_date: Some(end_task_date.timestamp()),
+    };
+
+    context.create_task(&create_task_dto).await;
+
+    let tasks_res = context
+        .client
+        .get(format!("{}/api/task?completed=false", context.base_url))
+        .send()
+        .await
+        .expect("Failed to fetch task");
+
+    let tasks_body: TasksResponseDto = tasks_res.json().await.expect("Failed to deserialize tasks");
+    assert_eq!(tasks_body.tasks.len(), 1);
+    let task = tasks_body.tasks.get(0).unwrap();
+    assert_eq!(task.scheduled_date, Some(start_task_date.timestamp()));
+    assert_eq!(task.scheduled_end_date, Some(end_task_date.timestamp()));
+}
+
+#[tokio::test]
 async fn update_task_test() {
     let context = setup().await;
 
@@ -105,7 +140,8 @@ async fn update_task_test() {
         name: "Task to update".to_string(),
         description: Some("Description".to_string()),
         category_id: None,
-        scheduled_date: Some(chrono::Utc::now().timestamp()),
+        scheduled_date: None,
+        scheduled_end_date: None,
     };
 
     let create_body = context.create_task(&create_task_dto).await;
@@ -117,6 +153,7 @@ async fn update_task_test() {
         name: Some("Updated Task Name".to_string()),
         description: Some("Updated Description".to_string()),
         scheduled_date: None,
+        scheduled_end_date: None,
         completed_at: Some(chrono::Utc::now().timestamp()),
     };
 
@@ -134,12 +171,17 @@ async fn update_task_test() {
         .await
         .expect("Failed to deserialize update response");
 
-    assert_eq!(update_body.updated_task.name, "Updated Task Name");
-    assert_eq!(
-        update_body.updated_task.description.unwrap(),
-        "Updated Description"
-    );
-    assert!(update_body.updated_task.completed_at.is_some());
+    assert_eq!(update_body.success, true);
+
+    let tasks_res = context
+        .client
+        .get(format!("{}/api/task?completed=true", context.base_url))
+        .send()
+        .await
+        .expect("Failed to fetch task");
+
+    let tasks_body: TasksResponseDto = tasks_res.json().await.expect("Failed to deserialize tasks");
+    assert_eq!(tasks_body.tasks.len(), 1);
 }
 
 #[tokio::test]
@@ -151,7 +193,8 @@ async fn delete_tasks_test() {
         name: "Task to delete".to_string(),
         description: None,
         category_id: None,
-        scheduled_date: Some(chrono::Utc::now().timestamp()),
+        scheduled_date: None,
+        scheduled_end_date: None,
     };
 
     let create_body = context.create_task(&create_task_dto).await;

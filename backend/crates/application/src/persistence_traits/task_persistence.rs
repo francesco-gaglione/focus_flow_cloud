@@ -1,5 +1,6 @@
 use crate::persistence_traits::persistence_error::PersistenceResult;
 use async_trait::async_trait;
+use chrono::{DateTime, Utc};
 use domain::entities::task::Task;
 use uuid::Uuid;
 
@@ -16,6 +17,21 @@ pub trait TaskPersistence: Send + Sync {
 
     async fn find_by_id(&self, task_id: Uuid) -> PersistenceResult<Task>;
 
+    /// Finds tasks that have a scheduled date.
+    ///
+    ///# Arguments
+    ///
+    ///* `from` - If provided, only returns tasks scheduled at or after this time.
+    ///* `to` - If provided, only returns tasks scheduled at or before this time.
+    ///* `completed` - Filters by completion status. `None` returns all tasks,
+    ///  `Some(true)` only completed ones, `Some(false)` only pending ones.
+    async fn find_scheduled_tasks(
+        &self,
+        from: Option<DateTime<Utc>>,
+        to: Option<DateTime<Utc>>,
+        completed: Option<bool>,
+    ) -> PersistenceResult<Vec<Task>>;
+
     async fn update_task(&self, task: Task) -> PersistenceResult<Task>;
 
     async fn delete_task(&self, task_id: Uuid) -> PersistenceResult<()>;
@@ -24,6 +40,7 @@ pub trait TaskPersistence: Send + Sync {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use chrono::Duration;
     use uuid::Uuid;
 
     #[tokio::test]
@@ -32,7 +49,15 @@ mod tests {
         mock.expect_create_task()
             .times(1)
             .returning(|_| Ok(Uuid::new_v4()));
-        let task = Task::create(Uuid::new_v4(), None, "Test Task".to_string(), None, None);
+        let task = Task::create(
+            Uuid::new_v4(),
+            None,
+            "Test Task".to_string(),
+            None,
+            None,
+            None,
+        )
+        .unwrap();
         let result = mock.create_task(task).await;
         assert!(result.is_ok());
     }
@@ -81,9 +106,31 @@ mod tests {
                 None,
                 None,
                 None,
+                None,
             ))
         });
         let result = mock.find_by_id(Uuid::new_v4()).await;
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_find_scheduled_tasks() {
+        let mut mock = MockTaskPersistence::new();
+        mock.expect_find_scheduled_tasks()
+            .times(1)
+            .returning(|_, _, _| {
+                Ok(vec![Task::reconstitute(
+                    Uuid::new_v4(),
+                    Uuid::new_v4(),
+                    None,
+                    "name".to_string(),
+                    None,
+                    Some(Utc::now()),
+                    Some(Utc::now() + Duration::minutes(5)),
+                    None,
+                )])
+            });
+        let result = mock.find_scheduled_tasks(None, None, None).await;
         assert!(result.is_ok());
     }
 
@@ -99,9 +146,18 @@ mod tests {
                 None,
                 None,
                 None,
+                None,
             ))
         });
-        let task = Task::create(Uuid::new_v4(), None, "Updated".to_string(), None, None);
+        let task = Task::create(
+            Uuid::new_v4(),
+            None,
+            "Updated".to_string(),
+            None,
+            None,
+            None,
+        )
+        .unwrap();
         let result = mock.update_task(task).await;
         assert!(result.is_ok());
     }

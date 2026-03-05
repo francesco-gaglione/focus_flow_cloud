@@ -4,6 +4,7 @@ use crate::persistence::PostgresPersistence;
 use application::persistence_traits::persistence_error::{PersistenceError, PersistenceResult};
 use application::persistence_traits::task_persistence::TaskPersistence;
 use async_trait::async_trait;
+use chrono::{DateTime, Utc};
 use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, SelectableHelper};
 use domain::entities::task::Task;
 use tracing::info;
@@ -149,6 +150,51 @@ impl TaskPersistence for PostgresPersistence {
         }
     }
 
+    async fn find_scheduled_tasks(
+        &self,
+        from: Option<DateTime<Utc>>,
+        to: Option<DateTime<Utc>>,
+        completed: Option<bool>,
+    ) -> PersistenceResult<Vec<Task>> {
+        let conn = self
+            .pool
+            .get()
+            .await
+            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?;
+
+        let result = conn
+            .interact(move |conn| {
+                let mut query = schema::tasks::table
+                    .filter(schema::tasks::deleted_at.is_null())
+                    .filter(schema::tasks::scheduled_date.is_not_null())
+                    .into_boxed();
+
+                if let Some(from) = from {
+                    query = query.filter(schema::tasks::scheduled_date.ge(from));
+                }
+                if let Some(to) = to {
+                    query = query.filter(schema::tasks::scheduled_date.le(to));
+                }
+
+                match completed {
+                    Some(true) => query = query.filter(schema::tasks::completed_at.is_not_null()),
+                    Some(false) => query = query.filter(schema::tasks::completed_at.is_null()),
+                    None => {}
+                }
+
+                query
+                    .select(DbTask::as_select())
+                    .order(schema::tasks::scheduled_date.asc())
+                    .load(conn)
+            })
+            .await
+            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?
+            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?;
+
+        let tasks: Vec<Task> = result.into_iter().map(|c| c.into()).collect();
+        Ok(tasks)
+    }
+
     async fn update_task(&self, task: Task) -> PersistenceResult<Task> {
         let conn = self
             .pool
@@ -197,7 +243,7 @@ impl TaskPersistence for PostgresPersistence {
 
         match affected_rows > 0 {
             true => Ok(()),
-            false => Err(PersistenceError::NotFound("Task not found".to_string())), // Changed to NotFound or Unexpected
+            false => Err(PersistenceError::NotFound("Task not found".to_string())),
         }
     }
 }

@@ -174,7 +174,7 @@ async fn test_update_username_taken() {
         .await
         .expect("Failed to update username");
 
-    assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+    assert_eq!(response.status(), StatusCode::CONFLICT);
 }
 
 #[tokio::test]

@@ -59,11 +59,16 @@ class MainLayout extends StatelessWidget {
                 NavigationRailDestination(
                   icon: Icon(Icons.play_circle_outline),
                   selectedIcon: Icon(Icons.play_circle),
-                  label: Text(""),
+                  label: Text(''),
                 ),
                 NavigationRailDestination(
                   icon: Icon(Icons.category_outlined),
                   selectedIcon: Icon(Icons.category),
+                  label: Text(''),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.calendar_month_outlined),
+                  selectedIcon: Icon(Icons.calendar_month),
                   label: Text(''),
                 ),
                 NavigationRailDestination(
@@ -85,11 +90,11 @@ class MainLayout extends StatelessWidget {
       );
     }
 
-    // Mobile Layout - Solo icone, centrate verticalmente
+    // Mobile Layout
     return Scaffold(
       body: child,
       bottomNavigationBar: Container(
-        height: 60,
+        // Background + shadow extend behind the system navigation bar.
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
           boxShadow: [
@@ -100,46 +105,61 @@ class MainLayout extends StatelessWidget {
             ),
           ],
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.center, // Aggiungi questo!
-          children: [
-            _buildNavItem(
-              context,
-              icon: Icons.play_circle_outline,
-              selectedIcon: Icons.play_circle,
-              isSelected: currentPath.startsWith('/focus'),
-              onTap: () => context.go('/focus'),
+        child: SafeArea(
+          top: false,
+          left: false,
+          right: false,
+          child: SizedBox(
+            height: 60,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                _buildNavItem(
+                  context,
+                  icon: Icons.play_circle_outline,
+                  selectedIcon: Icons.play_circle,
+                  isSelected: currentPath.startsWith('/focus'),
+                  onTap: () => context.go('/focus'),
+                ),
+                _buildNavItem(
+                  context,
+                  icon: Icons.category_outlined,
+                  selectedIcon: Icons.category,
+                  isSelected: currentPath.startsWith('/categories'),
+                  onTap: () => context.go('/categories'),
+                ),
+                _buildNavItem(
+                  context,
+                  icon: Icons.calendar_month_outlined,
+                  selectedIcon: Icons.calendar_month,
+                  isSelected: currentPath.startsWith('/calendar'),
+                  onTap: () => context.go('/calendar'),
+                ),
+                _buildNavItem(
+                  context,
+                  icon: Icons.bar_chart_outlined,
+                  selectedIcon: Icons.bar_chart,
+                  isSelected: currentPath.startsWith('/stats'),
+                  onTap: () => context.go('/stats'),
+                ),
+                _buildNavItem(
+                  context,
+                  icon: Icons.note_alt_outlined,
+                  selectedIcon: Icons.note_alt,
+                  isSelected: currentPath.startsWith('/notes'),
+                  onTap: () => context.go('/notes'),
+                ),
+                _buildNavItem(
+                  context,
+                  icon: Icons.settings_outlined,
+                  selectedIcon: Icons.settings,
+                  isSelected: currentPath.startsWith('/settings'),
+                  onTap: () => context.go('/settings'),
+                ),
+              ],
             ),
-            _buildNavItem(
-              context,
-              icon: Icons.category_outlined,
-              selectedIcon: Icons.category,
-              isSelected: currentPath.startsWith('/categories'),
-              onTap: () => context.go('/categories'),
-            ),
-            _buildNavItem(
-              context,
-              icon: Icons.bar_chart_outlined,
-              selectedIcon: Icons.bar_chart,
-              isSelected: currentPath.startsWith('/stats'),
-              onTap: () => context.go('/stats'),
-            ),
-            _buildNavItem(
-              context,
-              icon: Icons.note_alt_outlined,
-              selectedIcon: Icons.note_alt,
-              isSelected: currentPath.startsWith('/notes'),
-              onTap: () => context.go('/notes'),
-            ),
-            _buildNavItem(
-              context,
-              icon: Icons.settings_outlined,
-              selectedIcon: Icons.settings,
-              isSelected: currentPath.startsWith('/settings'),
-              onTap: () => context.go('/settings'),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -162,16 +182,15 @@ class MainLayout extends StatelessWidget {
           context,
         ).colorScheme.primary.withAlpha((255 * 0.05).round()),
         child: SizedBox(
-          height: double.infinity, // Occupa tutta l'altezza
+          height: double.infinity,
           child: Center(
-            // Center garantisce il centraggio verticale
             child: Icon(
               isSelected ? selectedIcon : icon,
               color:
                   isSelected
                       ? Theme.of(context).colorScheme.primary
                       : Theme.of(context).colorScheme.onSurfaceVariant,
-              size: 28,
+              size: 26,
             ),
           ),
         ),
@@ -182,8 +201,9 @@ class MainLayout extends StatelessWidget {
   int _getSelectedIndexForRail() {
     if (currentPath.startsWith('/focus')) return 0;
     if (currentPath.startsWith('/categories')) return 1;
-    if (currentPath.startsWith('/stats')) return 2;
-    if (currentPath.startsWith('/notes')) return 3;
+    if (currentPath.startsWith('/calendar')) return 2;
+    if (currentPath.startsWith('/stats')) return 3;
+    if (currentPath.startsWith('/notes')) return 4;
     return 0;
   }
 
@@ -196,12 +216,15 @@ class MainLayout extends StatelessWidget {
         context.go('/categories');
         break;
       case 2:
-        context.go('/stats');
+        context.go('/calendar');
         break;
       case 3:
-        context.go('/notes');
+        context.go('/stats');
         break;
       case 4:
+        context.go('/notes');
+        break;
+      case 5:
         context.go('/settings');
         break;
     }

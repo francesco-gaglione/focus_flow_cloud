@@ -1,11 +1,28 @@
 use crate::http::app_state::AppState;
 use crate::http::dto::validators::validate_uuids::validate_uuids;
 use crate::http_error::{HttpError, HttpResult};
-use crate::mappers::focus_session_mapper::FocusSessionMapper;
 use crate::openapi::SESSION_TAG;
 use application::use_cases::focus_session::find_sessions_by_filters::{
-    ConcentrationScoreFilter, FindSessionFiltersCommand, FocusSessionDateFilter,
+    ConcentrationScoreFilter, FindSessionByFiltersError, FindSessionFiltersCommand,
+    FocusSessionDateFilter, FocusSessionOutput,
 };
+
+impl From<FindSessionByFiltersError> for HttpError {
+    fn from(value: FindSessionByFiltersError) -> Self {
+        match value {
+            FindSessionByFiltersError::InvalidDateRange(e) => HttpError::BadRequest(e),
+            FindSessionByFiltersError::InvalidCategoryId => {
+                HttpError::BadRequest("Invalid category id".to_string())
+            }
+            FindSessionByFiltersError::InvalidTaskId => {
+                HttpError::BadRequest("Invalid task id".to_string())
+            }
+            FindSessionByFiltersError::PersistenceError(e) => {
+                HttpError::GenericError(e.to_string())
+            }
+        }
+    }
+}
 use axum::extract::{Extension, Query, State};
 use axum::Json;
 use domain::entities::focus_session_type::FocusSessionType;
@@ -70,6 +87,23 @@ pub struct GetSessionFiltersDto {
 #[serde(rename_all = "camelCase")]
 pub struct GetSessionFiltersResponseDto {
     pub focus_sessions: Vec<FocusSessionDto>,
+}
+
+impl From<FocusSessionOutput> for FocusSessionDto {
+    fn from(value: FocusSessionOutput) -> Self {
+        Self {
+            id: value.id.to_string(),
+            category_id: value.category_id.map(|id| id.to_string()),
+            task_id: value.task_id.map(|id| id.to_string()),
+            session_type: value.session_type.into(),
+            actual_duration: value.actual_duration,
+            concentration_score: value.concentration_score,
+            notes: value.notes,
+            started_at: value.started_at.timestamp(),
+            ended_at: value.ended_at.map(|e| e.timestamp()),
+            created_at: value.created_at.timestamp(),
+        }
+    }
 }
 
 #[utoipa::path(
@@ -148,16 +182,10 @@ pub async fn get_sessions(
         has_notes: query.has_notes,
     };
 
-    let sessions = state
-        .find_sessions_by_filters_usecase
-        .execute(filters)
-        .await?;
+    let sessions = state.find_sessions_by_filters_uc.execute(filters).await?;
 
     let response_dto = GetSessionFiltersResponseDto {
-        focus_sessions: sessions
-            .into_iter()
-            .map(|session| FocusSessionMapper::to_dto(&session))
-            .collect(),
+        focus_sessions: sessions.into_iter().map(|session| session.into()).collect(),
     };
 
     Ok(Json(response_dto))

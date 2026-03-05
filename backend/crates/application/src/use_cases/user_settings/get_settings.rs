@@ -16,6 +16,21 @@ pub struct GetSettingsUseCase {
     setting_persistence: Arc<dyn UserSettingPersistence>,
 }
 
+#[derive(Debug, Clone)]
+pub struct UserSettingOutput {
+    pub key: String,
+    pub value: Option<String>,
+}
+
+impl From<&UserSetting> for UserSettingOutput {
+    fn from(value: &UserSetting) -> Self {
+        Self {
+            key: value.key(),
+            value: value.value(),
+        }
+    }
+}
+
 impl GetSettingsUseCase {
     pub fn new(setting_persistence: Arc<dyn UserSettingPersistence>) -> Self {
         Self {
@@ -23,8 +38,14 @@ impl GetSettingsUseCase {
         }
     }
 
-    pub async fn execute(&self) -> GetSettingsResult<Vec<UserSetting>> {
-        Ok(self.setting_persistence.find_all().await?)
+    pub async fn execute(&self) -> GetSettingsResult<Vec<UserSettingOutput>> {
+        Ok(self
+            .setting_persistence
+            .find_all()
+            .await?
+            .iter()
+            .map(|s| s.into())
+            .collect())
     }
 }
 
@@ -51,7 +72,9 @@ mod tests {
         let result = use_case.execute().await;
 
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), expected_settings);
+        let result = result.unwrap().get(0).unwrap().clone();
+        assert_eq!(result.key, expected_settings.get(0).unwrap().key());
+        assert_eq!(result.value, expected_settings.get(0).unwrap().value());
     }
 
     #[tokio::test]

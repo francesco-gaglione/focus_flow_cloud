@@ -40,6 +40,16 @@ Here you can browse all the screens of FocusFlow.
 
 ---
 
+## Scheduled tasks & calendar
+
+![Month view](/img/screenshots/calendar_month_view.png)
+
+![Week view](/img/screenshots/calendar_week_view.png)
+
+![Day view](/img/screenshots/calendar_day_view.png)
+
+---
+
 ## Statistics & Notes
 
 **Light Mode**

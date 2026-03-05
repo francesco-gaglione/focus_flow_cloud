@@ -1,6 +1,5 @@
 use crate::http::dto::common::task_dto::TaskDto;
 use crate::http_error::{map_persistence_error, HttpResult};
-use crate::mappers::task_mapper::TaskMapper;
 use crate::openapi::TASK_TAG;
 use crate::{http::app_state::AppState, http_error::HttpError};
 use application::use_cases::task::get_tasks::{GetTaskError, GetTasksCommand};
@@ -51,15 +50,12 @@ pub async fn get_tasks_api(
     Query(params): Query<GetTasksParams>,
 ) -> HttpResult<Json<TasksResponseDto>> {
     let res = state
-        .get_tasks_usecase
+        .get_tasks_uc
         .execute(GetTasksCommand {
             completed: params.completed,
         })
         .await?;
     Ok(Json(TasksResponseDto {
-        tasks: res
-            .iter()
-            .map(|task| TaskMapper::entity_to_dto(task.clone()))
-            .collect(),
+        tasks: res.iter().map(|task| task.into()).collect(),
     }))
 }

@@ -1,6 +1,5 @@
 use crate::http::dto::common::task_dto::TaskDto;
 use crate::http_error::{map_persistence_error, HttpResult};
-use crate::mappers::task_mapper::TaskMapper;
 use crate::openapi::TASK_TAG;
 use crate::{http::app_state::AppState, http_error::HttpError};
 use application::use_cases::task::orphan_tasks::{GetOrphanTasksCommand, OrphanTasksError};
@@ -51,15 +50,12 @@ pub async fn fetch_orphan_tasks_api(
     Query(params): Query<GetOrphanTasksParams>,
 ) -> HttpResult<Json<OrphanTasksResponseDto>> {
     let res = state
-        .orphan_tasks_usecase
+        .orphan_tasks_uc
         .execute(GetOrphanTasksCommand {
             completed: params.completed,
         })
         .await?;
     Ok(Json(OrphanTasksResponseDto {
-        orphan_tasks: res
-            .iter()
-            .map(|task| TaskMapper::entity_to_dto(task.clone()))
-            .collect(),
+        orphan_tasks: res.iter().map(|task| task.into()).collect(),
     }))
 }

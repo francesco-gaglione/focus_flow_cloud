@@ -14,7 +14,7 @@ mod common;
 async fn test_calculate_stats_scenarios() {
     let ctx = setup().await;
 
-    // 1. Initial Empty Stats
+    // Initial Empty Stats
     let now = Utc::now();
     let start_of_day = now.date_naive().and_hms_opt(0, 0, 0).unwrap().and_utc();
     let end_of_day = now.date_naive().and_hms_opt(23, 59, 59).unwrap().and_utc();
@@ -34,10 +34,11 @@ async fn test_calculate_stats_scenarios() {
     let stats: GetStatsByPeriodResponseDto = response.json().await.unwrap();
 
     assert_eq!(stats.total_sessions, 0);
+    assert_eq!(stats.total_breaks, 0);
     assert_eq!(stats.total_focus_time, 0);
     assert!(stats.category_distribution.is_empty());
 
-    // 2. Setup Data: Categories and Tasks
+    // Setup Data: Categories and Tasks
     let work_cat = ctx
         .create_category(&CreateCategoryDto {
             name: "Work".to_string(),
@@ -60,10 +61,11 @@ async fn test_calculate_stats_scenarios() {
             category_id: Some(work_cat.category_id.clone()),
             description: None,
             scheduled_date: None,
+            scheduled_end_date: None,
         })
         .await;
 
-    // 3. Create Sessions
+    // Create Sessions
     // Session 1: Work, Morning, 25 mins, Work Category, Coding Task, Score 5
     // Use a fixed morning time: 09:00 AM
     let morning_start = start_of_day + Duration::hours(9);
@@ -105,7 +107,7 @@ async fn test_calculate_stats_scenarios() {
     })
     .await;
 
-    // 4. Verify Stats
+    // Verify Stats
     let response = ctx
         .client
         .get(format!("{}/api/stats/period", ctx.base_url))

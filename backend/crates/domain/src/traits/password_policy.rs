@@ -17,6 +17,7 @@ pub enum PasswordPolicyError {
 
 pub type PasswordPolicyResult<T> = Result<T, PasswordPolicyError>;
 
+#[cfg_attr(feature = "test-utils", mockall::automock)]
 pub trait PasswordPolicy: Send + Sync {
     fn validate(&self, password: &str) -> PasswordPolicyResult<()>;
 }

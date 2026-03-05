@@ -2,9 +2,19 @@ use crate::http::app_state::AppState;
 use crate::http::dto::validators::validate_uuid::validate_uuid;
 use crate::http::model::session_model::UserSession;
 use crate::http_error::{HttpError, HttpResult};
-use crate::mappers::task_mapper::TaskMapper;
 use crate::openapi::TASK_TAG;
+use application::use_cases::task::create_task::{CreateTaskCommand, CreateTaskError};
+
+impl From<CreateTaskError> for HttpError {
+    fn from(value: CreateTaskError) -> Self {
+        match value {
+            CreateTaskError::PersistenceError(e) => HttpError::GenericError(e.to_string()),
+            CreateTaskError::TaskError(e) => HttpError::BadRequest(e.to_string()),
+        }
+    }
+}
 use axum::{extract::State, Extension, Json};
+use chrono::DateTime;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use validator::Validate;
@@ -26,6 +36,8 @@ pub struct CreateTaskDto {
     pub description: Option<String>,
 
     pub scheduled_date: Option<i64>, //timestamp in seconds
+
+    pub scheduled_end_date: Option<i64>, //timestamp in seconds
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
@@ -59,9 +71,38 @@ pub async fn create_task_api(
         .validate()
         .map_err(|e| HttpError::BadRequest(e.to_string()))?;
 
-    let command = TaskMapper::create_dto_to_command(user.user_id, payload)?;
+    let category_id = payload
+        .category_id
+        .as_ref()
+        .map(|id| id.parse::<uuid::Uuid>())
+        .transpose()
+        .map_err(|_| HttpError::BadRequest("Invalid category id".to_string()))?;
 
-    let id = state.create_task_usecase.execute(command).await?;
+    let scheduled_date = payload
+        .scheduled_date
+        .map(|s| {
+            DateTime::from_timestamp(s, 0)
+                .ok_or_else(|| HttpError::BadRequest("Invalid scheduled date".to_string()))
+        })
+        .transpose()?;
+    let scheduled_end_date = payload
+        .scheduled_end_date
+        .map(|s| {
+            DateTime::from_timestamp(s, 0)
+                .ok_or_else(|| HttpError::BadRequest("Invalid scheduled end date".to_string()))
+        })
+        .transpose()?;
+
+    let command = CreateTaskCommand {
+        user_id: user.user_id,
+        name: payload.name,
+        description: payload.description,
+        category_id,
+        scheduled_date,
+        scheduled_end_date,
+    };
+
+    let id = state.create_task_uc.execute(command).await?;
 
     Ok(Json(CreateTaskResponseDto { id: id.to_string() }))
 }

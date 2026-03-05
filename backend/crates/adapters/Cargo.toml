@@ -36,3 +36,8 @@ lazy_static.workspace = true
 regex.workspace = true
 dotenvy.workspace = true
 serde_urlencoded = "0.7.1"
+
+[dev-dependencies]
+testcontainers.workspace = true
+testcontainers-modules = { workspace = true, features = ["postgres"] }
+tokio = { workspace = true, features = ["full"] }

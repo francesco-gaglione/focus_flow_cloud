@@ -35,6 +35,7 @@ class FocusViewState extends State<FocusView> with WidgetsBindingObserver {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final state = context.read<FocusBloc>().state;
       context.read<FocusBloc>().add(ReloadCategoriesAndTasks());
+      context.read<FocusBloc>().add(ReloadTodayScheduledTasks());
       if (state.selectedCategory != null) {
         try {
           int colorInt = int.parse(
@@ -244,9 +245,23 @@ class FocusViewState extends State<FocusView> with WidgetsBindingObserver {
 
             final timelineWidget = FocusTimelineWidget(
               sessions: state.todaySessions,
+              scheduledTasks: state.todayScheduledTasks,
               categories: state.categories,
               orphanTasks: state.orphanTasks,
               onSessionUpdated: _refreshSessions,
+              onScheduledTaskTap: (task) {
+                if (task.categoryId != null) {
+                  final catWithTasks = state.categories.where(
+                    (c) => c.category.id == task.categoryId,
+                  ).firstOrNull;
+                  if (catWithTasks != null) {
+                    context.read<FocusBloc>().add(
+                      CategorySelected(category: catWithTasks.category),
+                    );
+                  }
+                }
+                context.read<FocusBloc>().add(TaskSelected(task: task));
+              },
             );
 
             final focusTimerWidget = FocusTimerWidget(
@@ -260,6 +275,7 @@ class FocusViewState extends State<FocusView> with WidgetsBindingObserver {
               onStart: _onStart,
               onBreak: _onBreak,
               onTerminate: _onTerminate,
+              isCompact: !isDesktop,
             );
 
             if (isDesktop) {
@@ -300,20 +316,20 @@ class FocusViewState extends State<FocusView> with WidgetsBindingObserver {
               );
             } else {
               return SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     focusTimerWidget,
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 16),
                     categoryTaskSelector,
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 16),
                     focusLevelSelector,
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 16),
                     notesWidget,
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 16),
                     timelineWidget,
-                    const SizedBox(height: 80), // Bottom padding for FAB or navigation
+                    const SizedBox(height: 80),
                   ],
                 ),
               );

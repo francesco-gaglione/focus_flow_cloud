@@ -1,9 +1,18 @@
 use crate::http::app_state::AppState;
-use crate::http::dto::common::category_dto::CategoryDto;
 use crate::http::dto::validators::validate_uuid::validate_uuid;
-use crate::http_error::{HttpError, HttpResult};
+use crate::http_error::{map_persistence_error, HttpError, HttpResult};
 use crate::openapi::CATEGORY_TAG;
-use application::use_cases::category::command::update_category::UpdateCategoryCommand;
+use application::use_cases::category::update_category_usecase::{
+    UpdateCategoryCommand, UpdateCategoryError,
+};
+
+impl From<UpdateCategoryError> for HttpError {
+    fn from(value: UpdateCategoryError) -> Self {
+        match value {
+            UpdateCategoryError::PersistenceError(e) => map_persistence_error(e),
+        }
+    }
+}
 use axum::extract::{Path, State};
 use axum::Json;
 use lazy_static::lazy_static;
@@ -43,7 +52,7 @@ pub struct UpdateCategoryDto {
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateCategoryResponseDto {
-    pub updated_category: CategoryDto,
+    pub success: bool,
 }
 
 #[utoipa::path(
@@ -81,8 +90,8 @@ pub async fn update_category_api(
     let category_id = Uuid::parse_str(&path.id)
         .map_err(|_| HttpError::BadRequest("Category id malformed".to_string()))?;
 
-    let category = state
-        .update_category_usecase
+    state
+        .update_category_uc
         .execute(UpdateCategoryCommand {
             id: category_id,
             name: payload.name,
@@ -91,13 +100,5 @@ pub async fn update_category_api(
         })
         .await?;
 
-    Ok(Json(UpdateCategoryResponseDto {
-        updated_category: CategoryDto {
-            id: category.id().to_string(),
-            name: category.name().to_string(),
-            description: category.description().map(|s| s.to_string()),
-            color: category.color().to_string(),
-            tasks: Vec::new(), //TODO should return tasks?
-        },
-    }))
+    Ok(Json(UpdateCategoryResponseDto { success: true }))
 }

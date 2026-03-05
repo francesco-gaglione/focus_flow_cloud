@@ -75,7 +75,7 @@ pub async fn complete_task_api(
 
     debug!("Executing complete task command: {:?}", command);
 
-    state.complete_task_usecase.execute(command).await?;
+    state.complete_task_uc.execute(command).await?;
 
     Ok(Json(CompleteTaskResponseDto {
         id: task_id.to_string(),

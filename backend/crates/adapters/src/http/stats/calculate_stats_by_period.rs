@@ -1,8 +1,20 @@
 use crate::http::app_state::AppState;
 use crate::http::model::session_model::UserSession;
-use crate::http_error::HttpResult;
+use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::STATS_TAG;
-use application::use_cases::stats::command::calculate_stats_by_period::StatsPeriod;
+use application::use_cases::stats::calculate_stats_by_period::{
+    CalculateStatsByPeriodError, StatsPeriod,
+};
+
+impl From<CalculateStatsByPeriodError> for HttpError {
+    fn from(value: CalculateStatsByPeriodError) -> Self {
+        match value {
+            CalculateStatsByPeriodError::PersistenceError(e) => {
+                HttpError::GenericError(e.to_string())
+            }
+        }
+    }
+}
 use axum::extract::{Extension, Query, State};
 use axum::Json;
 use domain::entities::stats::calculators::daily_activity_calculator::{
@@ -202,7 +214,7 @@ pub async fn calculate_stats_by_period_api(
     };
 
     let stats = state
-        .calculate_stats_by_period_usecase
+        .calculate_stats_by_period_uc
         .execute(stats_period)
         .await?;
 

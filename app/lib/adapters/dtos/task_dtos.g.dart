@@ -12,6 +12,7 @@ _CreateTaskDto _$CreateTaskDtoFromJson(Map<String, dynamic> json) =>
       description: json['description'] as String?,
       categoryId: json['categoryId'] as String?,
       scheduledDate: (json['scheduledDate'] as num?)?.toInt(),
+      scheduledEndDate: (json['scheduledEndDate'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$CreateTaskDtoToJson(_CreateTaskDto instance) =>
@@ -20,6 +21,7 @@ Map<String, dynamic> _$CreateTaskDtoToJson(_CreateTaskDto instance) =>
       'description': instance.description,
       'categoryId': instance.categoryId,
       'scheduledDate': instance.scheduledDate,
+      'scheduledEndDate': instance.scheduledEndDate,
     };
 
 _UpdateTaskDto _$UpdateTaskDtoFromJson(Map<String, dynamic> json) =>
@@ -28,6 +30,7 @@ _UpdateTaskDto _$UpdateTaskDtoFromJson(Map<String, dynamic> json) =>
       description: json['description'] as String?,
       categoryId: json['categoryId'] as String?,
       scheduledDate: (json['scheduledDate'] as num?)?.toInt(),
+      scheduledEndDate: (json['scheduledEndDate'] as num?)?.toInt(),
       completedAt: (json['completedAt'] as num?)?.toInt(),
     );
 
@@ -37,6 +40,7 @@ Map<String, dynamic> _$UpdateTaskDtoToJson(_UpdateTaskDto instance) =>
       'description': instance.description,
       'categoryId': instance.categoryId,
       'scheduledDate': instance.scheduledDate,
+      'scheduledEndDate': instance.scheduledEndDate,
       'completedAt': instance.completedAt,
     };
 
@@ -56,6 +60,7 @@ _TaskResponseDto _$TaskResponseDtoFromJson(Map<String, dynamic> json) =>
       description: json['description'] as String?,
       categoryId: json['categoryId'] as String?,
       scheduledDate: (json['scheduledDate'] as num?)?.toInt(),
+      scheduledEndDate: (json['scheduledEndDate'] as num?)?.toInt(),
       completedAt: (json['completedAt'] as num?)?.toInt(),
     );
 
@@ -66,6 +71,7 @@ Map<String, dynamic> _$TaskResponseDtoToJson(_TaskResponseDto instance) =>
       'description': instance.description,
       'categoryId': instance.categoryId,
       'scheduledDate': instance.scheduledDate,
+      'scheduledEndDate': instance.scheduledEndDate,
       'completedAt': instance.completedAt,
     };
 
@@ -79,15 +85,11 @@ Map<String, dynamic> _$CreateTaskResponseDtoToJson(
 
 _UpdateTaskResponseDto _$UpdateTaskResponseDtoFromJson(
   Map<String, dynamic> json,
-) => _UpdateTaskResponseDto(
-  updatedTask: TaskResponseDto.fromJson(
-    json['updatedTask'] as Map<String, dynamic>,
-  ),
-);
+) => _UpdateTaskResponseDto(success: json['success'] as bool);
 
 Map<String, dynamic> _$UpdateTaskResponseDtoToJson(
   _UpdateTaskResponseDto instance,
-) => <String, dynamic>{'updatedTask': instance.updatedTask};
+) => <String, dynamic>{'success': instance.success};
 
 _DeleteTasksResponseDto _$DeleteTasksResponseDtoFromJson(
   Map<String, dynamic> json,
@@ -112,3 +114,16 @@ _OrphanTasksResponseDto _$OrphanTasksResponseDtoFromJson(
 Map<String, dynamic> _$OrphanTasksResponseDtoToJson(
   _OrphanTasksResponseDto instance,
 ) => <String, dynamic>{'orphanTasks': instance.orphanTasks};
+
+_ScheduledTasksResponseDto _$ScheduledTasksResponseDtoFromJson(
+  Map<String, dynamic> json,
+) => _ScheduledTasksResponseDto(
+  tasks:
+      (json['tasks'] as List<dynamic>)
+          .map((e) => TaskResponseDto.fromJson(e as Map<String, dynamic>))
+          .toList(),
+);
+
+Map<String, dynamic> _$ScheduledTasksResponseDtoToJson(
+  _ScheduledTasksResponseDto instance,
+) => <String, dynamic>{'tasks': instance.tasks};

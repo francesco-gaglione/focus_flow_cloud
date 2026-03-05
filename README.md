@@ -5,34 +5,39 @@
 [![App CI](https://github.com/francesco-gaglione/focus_flow_cloud/actions/workflows/ci-app.yaml/badge.svg)](https://github.com/francesco-gaglione/focus_flow_cloud/actions)
 [![Documentation](https://img.shields.io/badge/docs-focusflow-brightgreen)](https://francesco-gaglione.github.io/focus_flow_cloud/)
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=flat&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/francescogaglione)
+[![codecov](https://codecov.io/gh/francesco-gaglione/focus_flow_cloud/branch/master/graph/badge.svg)](https://codecov.io/gh/francesco-gaglione/focus_flow_cloud)
 
 A comprehensive Pomodoro technique tracking solution featuring a Rust backend and a Flutter mobile application. This monorepo contains both the cloud infrastructure and the client application.
 
-> 📚 **Full Documentation**: [https://francesco-gaglione.github.io/focus_flow_cloud/](https://francesco-gaglione.github.io/focus_flow_cloud/)
+> **Full Documentation**: [https://francesco-gaglione.github.io/focus_flow_cloud/](https://francesco-gaglione.github.io/focus_flow_cloud/)
 
-## 📸 Demo
+## Screenshots
 
+<table>
   <tr>
     <td align="center" width="25%"><b>Focus Session</b></td>
     <td align="center" width="25%"><b>Task Management</b></td>
+    <td align="center" width="25%"><b>Task scheduling</b></td>
     <td align="center" width="25%"><b>Notes & Statistics</b></td>
     <td align="center" width="25%"><b>Settings</b></td>
   </tr>
   <tr>
     <td><img src="doc/static/img/screenshots/focus_light.png" alt="Focus Session Light" width="100%" /></td>
     <td><img src="doc/static/img/screenshots/tasks_light.png" alt="Tasks Light" width="100%" /></td>
+    <td><img src="doc/static/img/screenshots/calendar_month_view.png" alt="Notes Light" width="100%" /></td>
     <td><img src="doc/static/img/screenshots/notes_light.png" alt="Notes Light" width="100%" /></td>
     <td><img src="doc/static/img/screenshots/settings_light.png" alt="Settings Light" width="100%" /></td>
   </tr>
   <tr>
     <td><img src="doc/static/img/screenshots/focus_dark.png" alt="Focus Session Dark" width="100%" /></td>
     <td><img src="doc/static/img/screenshots/tasks_dark.png" alt="Tasks Dark" width="100%" /></td>
+    <td><img src="doc/static/img/screenshots/calendar_day_view.png" alt="Notes Light" width="100%" /></td>
     <td><img src="doc/static/img/screenshots/stats_week_dark.png" alt="Statistics Dark" width="100%" /></td>
     <td><img src="doc/static/img/screenshots/settings_dark.png" alt="Settings Dark" width="100%" /></td>
   </tr>
 </table>
 
-## 🎯 What is FocusFlow?
+## What is FocusFlow?
 
 FocusFlow is a complete ecosystem for time management using the Pomodoro technique. It allows you to:
 
@@ -43,14 +48,14 @@ FocusFlow is a complete ecosystem for time management using the Pomodoro techniq
 
 I built this project for my personal use to optimize my daily workflow and decided to share it as an open-source project.
 
-## 📂 Project Structure
+## Project Structure
 
 This is a monorepo containing:
 
 - **[`backend/`](backend/)**: The server-side application built with Rust (Axum, Diesel, Tokio).
 - **[`app/`](app/)**: The client-side mobile application built with Flutter (Bloc, Dio, GoRouter).
 
-## 🚀 Features
+## Features
 
 ### Backend
 
@@ -66,9 +71,9 @@ This is a monorepo containing:
 - **Statistics**: Visual insights into your productivity.
 - **Multi-platform**: Runs on iOS, Android, and Web.
 
-## 🛠️ Getting Started
+## Getting Started
 
-### 🐳 Self-Hosting with Docker
+### Self-Hosting with Docker
 
 The easiest way to run FocusFlow is using Docker Compose.
 
@@ -97,7 +102,7 @@ services:
       - POSTGRES_DB=focusflow
 ```
 
-### 💻 Development Setup
+### Development Setup
 
 We use [`just`](https://github.com/casey/just) to manage commands for the entire repository.
 
@@ -105,11 +110,11 @@ We use [`just`](https://github.com/casey/just) to manage commands for the entire
 
 **Quick Commands**:
 
-| Command | Description |
-| :--- | :--- |
+| Command            | Description                  |
+| :----------------- | :--------------------------- |
 | `just backend-run` | Run the Rust backend locally |
-| `just app-run` | Run the Flutter app |
-| `just test-all` | Run all tests |
+| `just app-run`     | Run the Flutter app          |
+| `just test-all`    | Run all tests                |
 
 #### 1. Setup Backend (Local)
 
@@ -126,7 +131,7 @@ We use [`just`](https://github.com/casey/just) to manage commands for the entire
 1.  **Install**: `just app-pub-get`
 2.  **Run**: `cd app && flutter run`
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! This monorepo allows you to work on the full stack.
 
@@ -159,6 +164,6 @@ We strictly follow **[Conventional Commits](https://www.conventionalcommits.org/
 > feat!: remove legacy API endpoints
 > ```
 
-## 📝 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
