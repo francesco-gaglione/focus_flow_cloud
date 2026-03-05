@@ -112,7 +112,7 @@ pub async fn create_manual_session_api(
         ended_at,
     };
 
-    let res = state.create_manual_session_usecase.execute(command).await?;
+    let res = state.create_manual_session_uc.execute(command).await?;
 
     Ok(Json(CreateManualSessionResponseDto {
         id: res.id().to_string(),

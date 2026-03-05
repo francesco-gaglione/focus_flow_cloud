@@ -39,7 +39,7 @@ pub struct UserSettingsResponseDto {
 pub async fn get_settings_api(
     State(state): State<AppState>,
 ) -> HttpResult<Json<UserSettingsResponseDto>> {
-    let settings = state.get_user_settings_usecase.execute().await?;
+    let settings = state.get_user_settings_uc.execute().await?;
 
     Ok(Json(UserSettingsResponseDto {
         settings: settings

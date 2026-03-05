@@ -49,7 +49,7 @@ pub async fn handle_break_event(
                             .transpose()?;
 
                         let _ = state
-                            .create_session_usecase
+                            .create_session_uc
                             .execute(CreateFocusSessionCommand {
                                 user_id,
                                 task_id,

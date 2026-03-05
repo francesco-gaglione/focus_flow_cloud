@@ -50,7 +50,7 @@ pub async fn get_tasks_api(
     Query(params): Query<GetTasksParams>,
 ) -> HttpResult<Json<TasksResponseDto>> {
     let res = state
-        .get_tasks_usecase
+        .get_tasks_uc
         .execute(GetTasksCommand {
             completed: params.completed,
         })

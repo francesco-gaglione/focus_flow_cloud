@@ -129,7 +129,7 @@ pub async fn update_task_api(
         completed_at,
     };
 
-    state.update_task_usecase.execute(command).await?;
+    state.update_task_uc.execute(command).await?;
 
     Ok(Json(UpdateTaskResponseDto { success: true }))
 }

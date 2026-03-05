@@ -2,6 +2,7 @@ use crate::config::AppConfig;
 use crate::http::pomodoro_state::PomodoroState;
 use application::use_cases::focus_session::update_focus_session::UpdateFocusSessionUseCase;
 use application::use_cases::task::complete_task::CompleteTaskUseCase;
+use application::use_cases::task::get_scheduled_tasks::GetScheduledTasksUseCase;
 use application::use_cases::task::get_tasks::GetTasksUseCase;
 use application::use_cases::user::get_user_info::GetUserInfoUseCase;
 use application::use_cases::user::login_user::LoginUseCase;
@@ -46,41 +47,42 @@ pub struct AppState {
     pub config: AppConfig,
 
     // Category Use Cases
-    pub create_category_usecase: Arc<CreateCategoryUseCases>,
-    pub delete_categories_usecase: Arc<DeleteCategoriesUseCases>,
-    pub delete_category_usecase: Arc<DeleteCategoryUseCases>,
-    pub get_category_and_task_usecase: Arc<GetCategoryAndTaskUseCases>,
-    pub get_category_usecase: Arc<GetCategoryUseCases>,
-    pub update_category_usecase: Arc<UpdateCategoryUseCases>,
+    pub create_category_uc: Arc<CreateCategoryUseCases>,
+    pub delete_categories_uc: Arc<DeleteCategoriesUseCases>,
+    pub delete_category_uc: Arc<DeleteCategoryUseCases>,
+    pub get_category_and_task_uc: Arc<GetCategoryAndTaskUseCases>,
+    pub get_category_uc: Arc<GetCategoryUseCases>,
+    pub update_category_uc: Arc<UpdateCategoryUseCases>,
 
     // Task Use Cases
-    pub create_task_usecase: Arc<CreateTaskUseCase>,
-    pub delete_tasks_usecase: Arc<DeleteTasksUseCase>,
-    pub orphan_tasks_usecase: Arc<OrphanTasksUseCase>,
-    pub get_tasks_usecase: Arc<GetTasksUseCase>,
-    pub update_task_usecase: Arc<UpdateTaskUseCase>,
-    pub complete_task_usecase: Arc<CompleteTaskUseCase>,
+    pub create_task_uc: Arc<CreateTaskUseCase>,
+    pub delete_tasks_uc: Arc<DeleteTasksUseCase>,
+    pub orphan_tasks_uc: Arc<OrphanTasksUseCase>,
+    pub get_tasks_uc: Arc<GetTasksUseCase>,
+    pub update_task_uc: Arc<UpdateTaskUseCase>,
+    pub complete_task_uc: Arc<CompleteTaskUseCase>,
+    pub get_scheduled_task_uc: Arc<GetScheduledTasksUseCase>,
 
     // Focus Session Use Cases
-    pub create_manual_session_usecase: Arc<CreateManualSessionUseCase>,
-    pub update_focus_session_usecase: Arc<UpdateFocusSessionUseCase>,
-    pub create_session_usecase: Arc<CreateSessionUseCase>,
-    pub find_sessions_by_filters_usecase: Arc<FindSessionsByFiltersUseCase>,
+    pub create_manual_session_uc: Arc<CreateManualSessionUseCase>,
+    pub update_focus_session_uc: Arc<UpdateFocusSessionUseCase>,
+    pub create_session_uc: Arc<CreateSessionUseCase>,
+    pub find_sessions_by_filters_uc: Arc<FindSessionsByFiltersUseCase>,
 
     // Stats Use Cases
-    pub calculate_stats_by_period_usecase: Arc<CalculateStatsByPeriodUseCase>,
+    pub calculate_stats_by_period_uc: Arc<CalculateStatsByPeriodUseCase>,
 
     // User Setting Use Cases
-    pub update_user_setting_usecase: Arc<UpdateSettingUseCase>,
-    pub get_user_settings_usecase: Arc<GetSettingsUseCase>,
+    pub update_user_setting_uc: Arc<UpdateSettingUseCase>,
+    pub get_user_settings_uc: Arc<GetSettingsUseCase>,
 
     // User Use Cases
-    pub register_user_usecase: Arc<RegisterUserUseCase>,
-    pub login_usecase: Arc<LoginUseCase>,
-    pub refresh_token_usecase: Arc<RefreshTokenUseCase>,
-    pub update_password_usecase: Arc<UpdateUserPasswordUseCase>,
-    pub update_user_username_usecase: Arc<UpdateUserUsernameUseCase>,
-    pub get_user_info_usecase: Arc<GetUserInfoUseCase>,
+    pub register_user_uc: Arc<RegisterUserUseCase>,
+    pub login_uc: Arc<LoginUseCase>,
+    pub refresh_token_uc: Arc<RefreshTokenUseCase>,
+    pub update_password_uc: Arc<UpdateUserPasswordUseCase>,
+    pub update_user_username_uc: Arc<UpdateUserUsernameUseCase>,
+    pub get_user_info_uc: Arc<GetUserInfoUseCase>,
 
     // Services
     pub token_service: Arc<dyn TokenService>,

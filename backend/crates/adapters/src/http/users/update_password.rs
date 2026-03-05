@@ -66,7 +66,7 @@ pub async fn update_password_api(
         new_password: payload.new_password,
     };
 
-    state.update_password_usecase.execute(cmd).await?;
+    state.update_password_uc.execute(cmd).await?;
 
     Ok(())
 }

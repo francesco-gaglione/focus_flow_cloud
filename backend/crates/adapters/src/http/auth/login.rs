@@ -57,7 +57,7 @@ pub async fn login_api(
         password: payload.password,
     };
 
-    let result = state.login_usecase.execute(cmd).await?;
+    let result = state.login_uc.execute(cmd).await?;
 
     let session_data = UserSession {
         user_id: result.user_id,

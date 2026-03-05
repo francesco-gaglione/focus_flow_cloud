@@ -34,7 +34,7 @@ pub async fn handle_start_event(
 
                 if let Some(last_session) = session_state.last_session() {
                     let _ = state
-                        .create_session_usecase
+                        .create_session_uc
                         .execute(CreateFocusSessionCommand {
                             user_id,
                             // Break session should not have a task or category

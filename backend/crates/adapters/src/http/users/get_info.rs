@@ -41,10 +41,7 @@ pub async fn get_user_info_api(
     State(state): State<AppState>,
     Extension(user_session): Extension<UserSession>,
 ) -> HttpResult<Json<UserInfoResponseDto>> {
-    let result = state
-        .get_user_info_usecase
-        .execute(user_session.user_id)
-        .await?;
+    let result = state.get_user_info_uc.execute(user_session.user_id).await?;
 
     Ok(Json(UserInfoResponseDto {
         id: result.id,

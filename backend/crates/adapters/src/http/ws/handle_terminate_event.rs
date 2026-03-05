@@ -38,7 +38,7 @@ pub async fn handle_terminate_event(
             .transpose()?;
 
         state
-            .create_session_usecase
+            .create_session_uc
             .execute(CreateFocusSessionCommand {
                 user_id: *old_session_state.user_id(),
                 task_id,

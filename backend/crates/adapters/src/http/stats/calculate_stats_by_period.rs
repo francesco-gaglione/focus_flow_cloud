@@ -214,7 +214,7 @@ pub async fn calculate_stats_by_period_api(
     };
 
     let stats = state
-        .calculate_stats_by_period_usecase
+        .calculate_stats_by_period_uc
         .execute(stats_period)
         .await?;
 

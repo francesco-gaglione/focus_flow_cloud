@@ -46,7 +46,7 @@ pub async fn update_setting_api(
     Json(payload): Json<UpdateUserSettingDto>,
 ) -> HttpResult<()> {
     state
-        .update_user_setting_usecase
+        .update_user_setting_uc
         .execute(user.user_id, payload.key, payload.value)
         .await?;
 

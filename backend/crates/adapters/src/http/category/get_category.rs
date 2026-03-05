@@ -48,7 +48,7 @@ pub async fn get_category(
     let id = id
         .parse()
         .map_err(|_| HttpError::BadRequest("Invalid id".to_string()))?;
-    let category = state.get_category_usecase.execute(id).await?;
+    let category = state.get_category_uc.execute(id).await?;
 
     let response = GetCategoryResponseDto {
         category: CategoryDto {

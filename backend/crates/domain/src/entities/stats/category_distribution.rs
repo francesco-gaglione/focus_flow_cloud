@@ -218,7 +218,10 @@ mod tests {
         let id = Uuid::new_v4();
         let err =
             CategoryDistributionItem::new("Cat".to_string(), id, 100, 100.002, vec![]).unwrap_err();
-        assert!(matches!(err, CategoryDistributionError::InvalidStatsParam(_)));
+        assert!(matches!(
+            err,
+            CategoryDistributionError::InvalidStatsParam(_)
+        ));
         assert!(err.to_string().contains("100.002"));
     }
 
@@ -227,14 +230,16 @@ mod tests {
         let id = Uuid::new_v4();
         let err =
             CategoryDistributionItem::new("Cat".to_string(), id, 100, -1.0, vec![]).unwrap_err();
-        assert!(matches!(err, CategoryDistributionError::InvalidStatsParam(_)));
+        assert!(matches!(
+            err,
+            CategoryDistributionError::InvalidStatsParam(_)
+        ));
     }
 
     #[test]
     fn category_clone() {
         let id = Uuid::new_v4();
-        let item =
-            CategoryDistributionItem::new("Cat".to_string(), id, 100, 50.0, vec![]).unwrap();
+        let item = CategoryDistributionItem::new("Cat".to_string(), id, 100, 50.0, vec![]).unwrap();
         let cloned = item.clone();
         assert_eq!(cloned.category_name(), item.category_name());
         assert_eq!(cloned.category_id(), item.category_id());
@@ -245,8 +250,7 @@ mod tests {
     #[test]
     fn category_debug() {
         let id = Uuid::new_v4();
-        let item =
-            CategoryDistributionItem::new("Cat".to_string(), id, 100, 50.0, vec![]).unwrap();
+        let item = CategoryDistributionItem::new("Cat".to_string(), id, 100, 50.0, vec![]).unwrap();
         assert!(format!("{:?}", item).contains("Cat"));
     }
 

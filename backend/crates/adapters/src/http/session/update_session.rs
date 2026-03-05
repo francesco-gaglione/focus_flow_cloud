@@ -116,7 +116,7 @@ pub async fn update_session_api(
         ended_at: Some(ended_at),
     };
 
-    state.update_focus_session_usecase.execute(command).await?;
+    state.update_focus_session_uc.execute(command).await?;
 
     Ok(Json(UpdateFocusSessionResponseDto {}))
 }

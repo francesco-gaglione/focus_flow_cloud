@@ -91,7 +91,7 @@ pub async fn update_category_api(
         .map_err(|_| HttpError::BadRequest("Category id malformed".to_string()))?;
 
     state
-        .update_category_usecase
+        .update_category_uc
         .execute(UpdateCategoryCommand {
             id: category_id,
             name: payload.name,

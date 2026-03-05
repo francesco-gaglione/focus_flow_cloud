@@ -17,6 +17,7 @@ use crate::http::stats::calculate_stats_by_period::{
 use crate::http::task::complete_task::{CompleteTaskDto, CompleteTaskResponseDto};
 use crate::http::task::create_task::CreateTaskResponseDto;
 use crate::http::task::delete_tasks::DeleteTasksDto;
+use crate::http::task::get_scheduled_tasks::ScheduledTasksResponseDto;
 use crate::http::task::get_tasks::TasksResponseDto;
 use crate::http::task::orphan_tasks::OrphanTasksResponseDto;
 use crate::http::task::update_task::UpdateTaskDto;
@@ -90,6 +91,7 @@ impl Modify for SecurityAddon {
         crate::http::task::orphan_tasks::fetch_orphan_tasks_api,
         crate::http::task::create_task::create_task_api,
         crate::http::task::complete_task::complete_task_api,
+        crate::http::task::get_scheduled_tasks::get_scheduled_tasks_api,
         crate::http::session::create_manual_session::create_manual_session_api,
         crate::http::session::update_session::update_session_api,
         crate::http::session::get_sessions::get_sessions,
@@ -109,6 +111,7 @@ impl Modify for SecurityAddon {
         schemas(CompleteTaskResponseDto, CompleteTaskDto),
         schemas(UpdateTaskDto, CreateTaskResponseDto),
         schemas(DeleteTasksDto, CreateTaskResponseDto),
+        schemas(ScheduledTasksResponseDto),
         schemas(CreateManualSessionDto, CreateManualSessionResponseDto),
         schemas(UpdateFocusSessionDto, UpdateFocusSessionResponseDto),
         schemas(GetSessionFiltersDto, GetSessionFiltersResponseDto),

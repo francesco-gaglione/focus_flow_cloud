@@ -182,10 +182,7 @@ pub async fn get_sessions(
         has_notes: query.has_notes,
     };
 
-    let sessions = state
-        .find_sessions_by_filters_usecase
-        .execute(filters)
-        .await?;
+    let sessions = state.find_sessions_by_filters_uc.execute(filters).await?;
 
     let response_dto = GetSessionFiltersResponseDto {
         focus_sessions: sessions.into_iter().map(|session| session.into()).collect(),

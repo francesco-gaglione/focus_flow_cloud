@@ -50,7 +50,7 @@ pub async fn fetch_orphan_tasks_api(
     Query(params): Query<GetOrphanTasksParams>,
 ) -> HttpResult<Json<OrphanTasksResponseDto>> {
     let res = state
-        .orphan_tasks_usecase
+        .orphan_tasks_uc
         .execute(GetOrphanTasksCommand {
             completed: params.completed,
         })

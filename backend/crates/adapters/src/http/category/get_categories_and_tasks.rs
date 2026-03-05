@@ -52,7 +52,7 @@ pub async fn get_categories_and_tasks_api(
     Query(params): Query<GetCategoryTasksParams>,
 ) -> HttpResult<Json<GetCategoriesResponseDto>> {
     let categories_and_tasks = state
-        .get_category_and_task_usecase
+        .get_category_and_task_uc
         .execute(GetCategoryAndTasksCommand {
             include_completed_tasks: params.include_completed_tasks,
         })
