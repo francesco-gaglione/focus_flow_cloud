@@ -1,5 +1,5 @@
-use crate::persistence_traits::persistence_error::PersistenceError;
-use crate::persistence_traits::task_persistence::TaskPersistence;
+use crate::repository_traits::persistence_error::PersistenceError;
+use crate::repository_traits::task_persistence::TaskPersistence;
 use std::sync::Arc;
 use thiserror::Error;
 use uuid::Uuid;
@@ -34,7 +34,7 @@ impl DeleteTasksUseCase {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::persistence_traits::task_persistence::MockTaskPersistence;
+    use crate::repository_traits::task_persistence::MockTaskPersistence;
 
     #[tokio::test]
     async fn test_delete_tasks_success() {

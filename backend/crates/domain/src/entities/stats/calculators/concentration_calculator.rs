@@ -1,4 +1,4 @@
-use crate::entities::focus_session::FocusSession;
+use crate::entities::focus_session::{FocusSession, TerminatedSession};
 use crate::entities::stats::concentration_period::ConcentrationPeriod;
 
 use chrono::Timelike;
@@ -13,7 +13,7 @@ pub struct ConcentrationStats {
 pub struct ConcentrationCalculator;
 
 impl ConcentrationCalculator {
-    pub fn calculate(sessions: &[FocusSession]) -> ConcentrationStats {
+    pub fn calculate(sessions: &[FocusSession<TerminatedSession>]) -> ConcentrationStats {
         ConcentrationStats {
             most_concentrated_period: Self::calculate_most_concentrated_period(sessions),
             less_concentrated_period: Self::calculate_least_concentrated_period(sessions),
@@ -21,7 +21,9 @@ impl ConcentrationCalculator {
         }
     }
 
-    fn calculate_concentration_distribution(sessions: &[FocusSession]) -> [u32; 5] {
+    fn calculate_concentration_distribution(
+        sessions: &[FocusSession<TerminatedSession>],
+    ) -> [u32; 5] {
         let mut distribution = [0u32; 5];
 
         for session in sessions {
@@ -38,7 +40,9 @@ impl ConcentrationCalculator {
         distribution
     }
 
-    fn calculate_most_concentrated_period(sessions: &[FocusSession]) -> ConcentrationPeriod {
+    fn calculate_most_concentrated_period(
+        sessions: &[FocusSession<TerminatedSession>],
+    ) -> ConcentrationPeriod {
         let (morning_total, morning_count, afternoon_total, afternoon_count) =
             sessions.iter().fold((0, 0, 0, 0), |acc, session| {
                 if let Some(score) = session.concentration_score() {
@@ -72,7 +76,9 @@ impl ConcentrationCalculator {
         }
     }
 
-    fn calculate_least_concentrated_period(sessions: &[FocusSession]) -> ConcentrationPeriod {
+    fn calculate_least_concentrated_period(
+        sessions: &[FocusSession<TerminatedSession>],
+    ) -> ConcentrationPeriod {
         let (morning_total, morning_count, afternoon_total, afternoon_count) =
             sessions.iter().fold((0, 0, 0, 0), |acc, session| {
                 if let Some(score) = session.concentration_score() {

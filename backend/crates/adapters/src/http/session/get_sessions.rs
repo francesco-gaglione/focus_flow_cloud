@@ -96,12 +96,11 @@ impl From<FocusSessionOutput> for FocusSessionDto {
             category_id: value.category_id.map(|id| id.to_string()),
             task_id: value.task_id.map(|id| id.to_string()),
             session_type: value.session_type.into(),
-            actual_duration: value.actual_duration,
+            actual_duration: Some(value.actual_duration),
             concentration_score: value.concentration_score,
             notes: value.notes,
             started_at: value.started_at.timestamp(),
-            ended_at: value.ended_at.map(|e| e.timestamp()),
-            created_at: value.created_at.timestamp(),
+            ended_at: Some(value.ended_at.timestamp()),
         }
     }
 }

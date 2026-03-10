@@ -1,7 +1,9 @@
-use crate::persistence_traits::focus_session_persistence::FocusSessionPersistence;
-use crate::persistence_traits::persistence_error::PersistenceError;
+use crate::repository_traits::focus_session_repository::{
+    FindByFiltersCommand, FocusSessionRepository,
+};
+use crate::repository_traits::persistence_error::PersistenceError;
 use chrono::{DateTime, Utc};
-use domain::entities::focus_session::{FocusSession, SessionFilter};
+use domain::entities::focus_session::{FocusSession, TerminatedSession};
 use domain::entities::focus_session_type::FocusSessionType;
 use std::sync::Arc;
 use thiserror::Error;
@@ -51,16 +53,15 @@ pub struct FocusSessionOutput {
     pub category_id: Option<Uuid>,
     pub task_id: Option<Uuid>,
     pub session_type: FocusSessionType,
-    pub actual_duration: Option<i64>,
+    pub actual_duration: i64,
     pub concentration_score: Option<i32>,
     pub notes: Option<String>,
     pub started_at: DateTime<Utc>,
-    pub ended_at: Option<DateTime<Utc>>,
-    pub created_at: DateTime<Utc>,
+    pub ended_at: DateTime<Utc>,
 }
 
-impl From<&FocusSession> for FocusSessionOutput {
-    fn from(value: &FocusSession) -> Self {
+impl From<&FocusSession<TerminatedSession>> for FocusSessionOutput {
+    fn from(value: &FocusSession<TerminatedSession>) -> Self {
         Self {
             id: value.id(),
             user_id: value.user_id(),
@@ -69,20 +70,19 @@ impl From<&FocusSession> for FocusSessionOutput {
             session_type: value.session_type(),
             actual_duration: value.actual_duration(),
             concentration_score: value.concentration_score(),
-            notes: value.notes(),
+            notes: value.note(),
             started_at: value.started_at(),
             ended_at: value.ended_at(),
-            created_at: value.created_at(),
         }
     }
 }
 
 pub struct FindSessionsByFiltersUseCase {
-    session_persistence: Arc<dyn FocusSessionPersistence>,
+    session_persistence: Arc<dyn FocusSessionRepository>,
 }
 
 impl FindSessionsByFiltersUseCase {
-    pub fn new(session_persistence: Arc<dyn FocusSessionPersistence>) -> Self {
+    pub fn new(session_persistence: Arc<dyn FocusSessionRepository>) -> Self {
         Self {
             session_persistence,
         }
@@ -132,7 +132,7 @@ impl FindSessionsByFiltersUseCase {
             .map(|s| (s.min, s.max))
             .unzip();
 
-        let filter = SessionFilter {
+        let filter = FindByFiltersCommand {
             user_id: filters.user_id,
             start_date,
             end_date,
@@ -156,7 +156,7 @@ impl FindSessionsByFiltersUseCase {
 
 #[cfg(test)]
 mod tests {
-    use crate::persistence_traits::focus_session_persistence::MockFocusSessionPersistence;
+    use crate::repository_traits::focus_session_repository::MockFocusSessionRepository;
 
     use super::*;
     use chrono::DateTime;
@@ -166,7 +166,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_find_session_by_filters_success() {
-        let mut mock_session_persistence = MockFocusSessionPersistence::new();
+        let mut mock_session_persistence = MockFocusSessionRepository::new();
 
         let category_id = Uuid::new_v4();
         let task_id = Uuid::new_v4();
@@ -185,7 +185,6 @@ mod tests {
             Some("note".to_string()),
             started_at,
             Some(ended_at),
-            started_at,
         );
 
         mock_session_persistence
@@ -217,7 +216,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_find_session_by_filters_has_notes() {
-        let mut mock_session_persistence = MockFocusSessionPersistence::new();
+        let mut mock_session_persistence = MockFocusSessionRepository::new();
 
         let session_id = Uuid::new_v4();
         let started_at = DateTime::from_timestamp(1761118663, 0).unwrap();
@@ -234,7 +233,6 @@ mod tests {
             Some("note".to_string()),
             started_at,
             Some(ended_at),
-            started_at,
         );
 
         mock_session_persistence
@@ -268,7 +266,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_find_session_by_filters_empty_result() {
-        let mut mock_session_persistence = MockFocusSessionPersistence::new();
+        let mut mock_session_persistence = MockFocusSessionRepository::new();
 
         mock_session_persistence
             .expect_find_by_filters()
@@ -294,7 +292,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_find_session_by_filters_invalid_date_error() {
-        let mock_session_persistence = MockFocusSessionPersistence::new();
+        let mock_session_persistence = MockFocusSessionRepository::new();
 
         // Test invalid start date (would cause DateTime::from_timestamp_secs to return None)
         let filters = FindSessionFiltersCommand {

@@ -1,4 +1,4 @@
-use crate::persistence_traits::persistence_error::PersistenceResult;
+use crate::repository_traits::persistence_error::PersistenceResult;
 use async_trait::async_trait;
 use domain::entities::user_setting::UserSetting;
 use uuid::Uuid;
@@ -25,7 +25,7 @@ pub trait UserSettingPersistence: Send + Sync {
 
 #[cfg(test)]
 mod tests {
-    use crate::persistence_traits::persistence_error::PersistenceError;
+    use crate::repository_traits::persistence_error::PersistenceError;
 
     use super::*;
 

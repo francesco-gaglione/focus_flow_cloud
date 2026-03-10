@@ -1,8 +1,8 @@
 use std::sync::Arc;
 
-use crate::persistence_traits::category_persistence::CategoryPersistence;
-use crate::persistence_traits::persistence_error::PersistenceError;
-use crate::persistence_traits::task_persistence::TaskPersistence;
+use crate::repository_traits::category_persistence::CategoryPersistence;
+use crate::repository_traits::persistence_error::PersistenceError;
+use crate::repository_traits::task_persistence::TaskPersistence;
 use chrono::{DateTime, Utc};
 use domain::entities::{category::Category, task::Task};
 use thiserror::Error;
@@ -134,7 +134,7 @@ mod tests {
     use uuid::Uuid;
 
     use crate::{
-        persistence_traits::{
+        repository_traits::{
             category_persistence::MockCategoryPersistence, task_persistence::MockTaskPersistence,
         },
         use_cases::category::get_category_and_task_usecase::{

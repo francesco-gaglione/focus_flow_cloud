@@ -100,7 +100,7 @@ pub async fn get_scheduled_tasks_api(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use application::persistence_traits::persistence_error::PersistenceError;
+    use application::repository_traits::persistence_error::PersistenceError;
     use application::use_cases::task::get_scheduled_tasks::ScheduledTaskOutput;
     use chrono::Utc;
     use uuid::Uuid;

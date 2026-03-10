@@ -1,9 +1,9 @@
-use std::sync::Arc;
-
-use crate::persistence_traits::focus_session_persistence::FocusSessionPersistence;
-use crate::persistence_traits::persistence_error::PersistenceError;
+use crate::repository_traits::{
+    focus_session_repository::FocusSessionRepository, persistence_error::PersistenceError,
+};
 use chrono::{DateTime, Utc};
 use domain::entities::focus_session::FocusSessionError;
+use std::sync::Arc;
 use thiserror::Error;
 use uuid::Uuid;
 
@@ -30,11 +30,11 @@ pub struct UpdateFocusSessionCommand {
 }
 
 pub struct UpdateFocusSessionUseCase {
-    session_persistence: Arc<dyn FocusSessionPersistence>,
+    session_persistence: Arc<dyn FocusSessionRepository>,
 }
 
 impl UpdateFocusSessionUseCase {
-    pub fn new(session_persistence: Arc<dyn FocusSessionPersistence>) -> Self {
+    pub fn new(session_persistence: Arc<dyn FocusSessionRepository>) -> Self {
         Self {
             session_persistence,
         }
@@ -50,23 +50,23 @@ impl UpdateFocusSessionUseCase {
             .await?;
 
         if let Some(category_id) = update_session.category_id {
-            session.update_category_id(Some(category_id));
+            session.update_category_id(category_id);
         }
 
         if let Some(task_id) = update_session.task_id {
-            session.update_task_id(Some(task_id));
+            session.update_task_id(task_id);
         }
 
         if let Some(concentration_score) = update_session.concentration_score {
-            session.update_concentration_score(Some(concentration_score));
+            session.update_concentration_score(concentration_score)?;
         }
 
         if let Some(notes) = update_session.notes {
-            session.update_notes(Some(notes));
+            session.update_note(notes);
         }
 
         if let (Some(start), Some(end)) = (update_session.started_at, update_session.ended_at) {
-            session.update_date_range(start, Some(end))?;
+            session.update_date_range(start, end)?;
         }
 
         Ok(self.session_persistence.update_session(session).await?)
@@ -77,9 +77,10 @@ impl UpdateFocusSessionUseCase {
 mod tests {
     use std::sync::Arc;
 
-    use crate::persistence_traits::focus_session_persistence::MockFocusSessionPersistence;
+    use crate::repository_traits::focus_session_repository::MockFocusSessionRepository;
     use crate::use_cases::focus_session::update_focus_session::UpdateFocusSessionCommand;
     use crate::use_cases::focus_session::update_focus_session::UpdateFocusSessionUseCase;
+    use domain::entities::focus_session::TerminatedSession;
     use domain::entities::{focus_session::FocusSession, focus_session_type::FocusSessionType};
 
     #[tokio::test]
@@ -87,19 +88,19 @@ mod tests {
         let session_id = uuid::Uuid::new_v4();
         let task_id = uuid::Uuid::new_v4();
         let category_id = uuid::Uuid::new_v4();
-        let concentration_score = 80;
+        let concentration_score = 4;
         let notes = "Test notes".to_string();
         let started_at = chrono::Utc::now();
         let ended_at = chrono::Utc::now();
 
-        let mut session_persistence = MockFocusSessionPersistence::new();
+        let mut session_persistence = MockFocusSessionRepository::new();
         session_persistence
             .expect_update_session()
             .returning(|_| Ok(()));
         session_persistence
             .expect_find_session_by_id()
             .returning(move |_| {
-                Ok(FocusSession::new(
+                Ok(FocusSession::<TerminatedSession>::new(
                     uuid::Uuid::new_v4(),
                     Some(category_id.clone()),
                     Some(task_id.clone()),
@@ -107,7 +108,7 @@ mod tests {
                     Some(3600),
                     Some("Test notes".to_string()),
                     started_at,
-                    Some(ended_at),
+                    ended_at,
                 )
                 .unwrap())
             });

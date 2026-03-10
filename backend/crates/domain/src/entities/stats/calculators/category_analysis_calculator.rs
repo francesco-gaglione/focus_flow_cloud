@@ -1,4 +1,4 @@
-use crate::entities::focus_session::FocusSession;
+use crate::entities::focus_session::{FocusSession, TerminatedSession};
 use crate::entities::stats::category_distribution::{
     CategoryDistributionItem, TaskDistributionItem,
 };
@@ -9,7 +9,7 @@ pub struct CategoryAnalysisCalculator;
 
 impl CategoryAnalysisCalculator {
     pub fn calculate(
-        sessions: &[FocusSession],
+        sessions: &[FocusSession<TerminatedSession>],
         category_names: &HashMap<Uuid, String>,
         task_details: &HashMap<Uuid, String>,
     ) -> Vec<CategoryDistributionItem> {
@@ -21,7 +21,7 @@ impl CategoryAnalysisCalculator {
             {
                 continue;
             }
-            if let (Some(category_id), Some(duration)) =
+            if let (Some(category_id), duration) =
                 (session.category_id(), session.actual_duration())
             {
                 *category_times.entry(category_id).or_insert(0) += duration;
@@ -39,7 +39,7 @@ impl CategoryAnalysisCalculator {
                         0.0
                     };
 
-                    let category_sessions: Vec<FocusSession> = sessions
+                    let category_sessions: Vec<FocusSession<TerminatedSession>> = sessions
                         .iter()
                         .filter(|s| s.category_id() == Some(category_id))
                         .cloned()
@@ -69,15 +69,14 @@ impl CategoryAnalysisCalculator {
     }
 
     fn calculate_task_distribution(
-        sessions: &[FocusSession],
+        sessions: &[FocusSession<TerminatedSession>],
         task_details: &HashMap<Uuid, String>,
         total_time: i64,
     ) -> Vec<TaskDistributionItem> {
         let mut task_times: HashMap<Uuid, i64> = HashMap::new();
 
         for session in sessions {
-            if let (Some(task_id), Some(duration)) = (session.task_id(), session.actual_duration())
-            {
+            if let (Some(task_id), duration) = (session.task_id(), session.actual_duration()) {
                 *task_times.entry(task_id).or_insert(0) += duration;
             }
         }

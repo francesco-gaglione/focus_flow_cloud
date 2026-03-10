@@ -1,3 +1,4 @@
+use application::use_cases::pomodoro_state::fetch_user_pomodoro_state::UserSessionType;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
@@ -45,6 +46,16 @@ impl From<SessionTypeEnum> for FocusSessionType {
             SessionTypeEnum::Work => FocusSessionType::Work,
             SessionTypeEnum::ShortBreak => FocusSessionType::ShortBreak,
             SessionTypeEnum::LongBreak => FocusSessionType::LongBreak,
+        }
+    }
+}
+
+impl From<UserSessionType> for SessionTypeEnum {
+    fn from(value: UserSessionType) -> Self {
+        match value {
+            UserSessionType::Work => Self::Work,
+            UserSessionType::ShortBreak => Self::ShortBreak,
+            UserSessionType::LongBreak => Self::LongBreak,
         }
     }
 }

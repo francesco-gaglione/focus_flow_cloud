@@ -15,5 +15,4 @@ pub struct FocusSessionDto {
     pub notes: Option<String>,
     pub started_at: i64,
     pub ended_at: Option<i64>,
-    pub created_at: i64,
 }

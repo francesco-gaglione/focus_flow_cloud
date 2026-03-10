@@ -1,6 +1,11 @@
 use crate::config::AppConfig;
-use crate::http::pomodoro_state::PomodoroState;
 use application::use_cases::focus_session::update_focus_session::UpdateFocusSessionUseCase;
+use application::use_cases::pomodoro_state::fetch_user_pomodoro_state::FetchUserPomodoroStateUseCase;
+use application::use_cases::pomodoro_state::pause_session::PauseSessionUseCase;
+use application::use_cases::pomodoro_state::start_session::StartSessionUseCase;
+use application::use_cases::pomodoro_state::terminate_session::TerminateSessionUseCase;
+use application::use_cases::pomodoro_state::update_current_session::UpdateSessionUseCase;
+use application::use_cases::pomodoro_state::update_pomodoro_context::UpdatePomodoroContextUseCase;
 use application::use_cases::task::complete_task::CompleteTaskUseCase;
 use application::use_cases::task::get_scheduled_tasks::GetScheduledTasksUseCase;
 use application::use_cases::task::get_tasks::GetTasksUseCase;
@@ -21,7 +26,7 @@ use application::use_cases::{
         get_category_usecase::GetCategoryUseCases, update_category_usecase::UpdateCategoryUseCases,
     },
     focus_session::{
-        create_manual_session::CreateManualSessionUseCase, create_session::CreateSessionUseCase,
+        create_manual_session::CreateManualSessionUseCase,
         find_sessions_by_filters::FindSessionsByFiltersUseCase,
     },
     stats::calculate_stats_by_period::CalculateStatsByPeriodUseCase,
@@ -36,14 +41,12 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::mpsc::UnboundedSender;
 use tokio::sync::RwLock;
-use uuid::Uuid;
 
 pub type Clients = Arc<RwLock<HashMap<usize, UnboundedSender<Message>>>>;
 
 #[derive(Clone)]
 pub struct AppState {
     pub ws_clients: Clients,
-    pub pomodoro_states: Arc<RwLock<HashMap<Uuid, Arc<RwLock<PomodoroState>>>>>,
     pub config: AppConfig,
 
     // Category Use Cases
@@ -53,6 +56,14 @@ pub struct AppState {
     pub get_category_and_task_uc: Arc<GetCategoryAndTaskUseCases>,
     pub get_category_uc: Arc<GetCategoryUseCases>,
     pub update_category_uc: Arc<UpdateCategoryUseCases>,
+
+    // Pomodoro state use cases
+    pub pause_pomo_session_uc: Arc<PauseSessionUseCase>,
+    pub fetch_pomo_session_uc: Arc<FetchUserPomodoroStateUseCase>,
+    pub update_pomodoro_context_uc: Arc<UpdatePomodoroContextUseCase>,
+    pub start_session_uc: Arc<StartSessionUseCase>,
+    pub terminate_session_uc: Arc<TerminateSessionUseCase>,
+    pub update_current_session_uc: Arc<UpdateSessionUseCase>,
 
     // Task Use Cases
     pub create_task_uc: Arc<CreateTaskUseCase>,
@@ -66,7 +77,6 @@ pub struct AppState {
     // Focus Session Use Cases
     pub create_manual_session_uc: Arc<CreateManualSessionUseCase>,
     pub update_focus_session_uc: Arc<UpdateFocusSessionUseCase>,
-    pub create_session_uc: Arc<CreateSessionUseCase>,
     pub find_sessions_by_filters_uc: Arc<FindSessionsByFiltersUseCase>,
 
     // Stats Use Cases

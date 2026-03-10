@@ -3,7 +3,7 @@ use std::sync::Arc;
 use thiserror::Error;
 use uuid::Uuid;
 
-use crate::persistence_traits::{
+use crate::repository_traits::{
     persistence_error::PersistenceError, task_persistence::TaskPersistence,
 };
 
@@ -54,7 +54,7 @@ impl CompleteTaskUseCase {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::persistence_traits::task_persistence::MockTaskPersistence;
+    use crate::repository_traits::task_persistence::MockTaskPersistence;
     use chrono::Utc;
     use domain::entities::task::Task;
 

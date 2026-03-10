@@ -1,6 +1,6 @@
 use crate::auth_traits::password_hasher::{HashingError, PasswordHasher};
-use crate::persistence_traits::persistence_error::PersistenceError;
-use crate::persistence_traits::user_persistence::UserPersistence;
+use crate::repository_traits::persistence_error::PersistenceError;
+use crate::repository_traits::user_persistence::UserPersistence;
 use domain::traits::password_policy::{PasswordPolicy, PasswordPolicyError};
 use std::sync::Arc;
 use thiserror::Error;
@@ -92,8 +92,8 @@ mod tests {
     use std::sync::Arc;
 
     use crate::auth_traits::password_hasher::MockPasswordHasher;
-    use crate::persistence_traits::persistence_error::PersistenceError;
-    use crate::persistence_traits::user_persistence::MockUserPersistence;
+    use crate::repository_traits::persistence_error::PersistenceError;
+    use crate::repository_traits::user_persistence::MockUserPersistence;
     use crate::use_cases::user::update_password::{
         UpdatePasswordError, UpdateUserPasswordCommand, UpdateUserPasswordUseCase,
     };

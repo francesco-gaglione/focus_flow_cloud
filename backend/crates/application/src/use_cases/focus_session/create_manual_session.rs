@@ -1,8 +1,8 @@
-use crate::persistence_traits::focus_session_persistence::FocusSessionPersistence;
-use crate::persistence_traits::persistence_error::PersistenceError;
+use crate::repository_traits::focus_session_repository::FocusSessionRepository;
+use crate::repository_traits::persistence_error::PersistenceError;
 use chrono::{DateTime, Utc};
 use domain::entities::{
-    focus_session::{FocusSession, FocusSessionError},
+    focus_session::{FocusSession, FocusSessionError, TerminatedSession},
     focus_session_type::FocusSessionType,
 };
 use std::sync::Arc;
@@ -34,11 +34,11 @@ pub struct CreateManualFocusSessionCommand {
 
 #[derive(Clone)]
 pub struct CreateManualSessionUseCase {
-    session_persistence: Arc<dyn FocusSessionPersistence>,
+    session_persistence: Arc<dyn FocusSessionRepository>,
 }
 
 impl CreateManualSessionUseCase {
-    pub fn new(session_persistence: Arc<dyn FocusSessionPersistence>) -> Self {
+    pub fn new(session_persistence: Arc<dyn FocusSessionRepository>) -> Self {
         Self {
             session_persistence,
         }
@@ -47,8 +47,8 @@ impl CreateManualSessionUseCase {
     pub async fn execute(
         &self,
         session_cmd: CreateManualFocusSessionCommand,
-    ) -> CreateManualSessionResult<FocusSession> {
-        let session = FocusSession::new(
+    ) -> CreateManualSessionResult<Uuid> {
+        let session = FocusSession::<TerminatedSession>::new(
             session_cmd.user_id,
             session_cmd.category_id,
             session_cmd.task_id,
@@ -56,19 +56,21 @@ impl CreateManualSessionUseCase {
             session_cmd.concentration_score,
             session_cmd.notes,
             session_cmd.started_at,
-            Some(session_cmd.ended_at),
+            session_cmd.ended_at,
         )?;
 
-        Ok(self
-            .session_persistence
+        let session_id = session.id();
+        self.session_persistence
             .create_manual_session(session)
-            .await?)
+            .await?;
+
+        Ok(session_id)
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::persistence_traits::focus_session_persistence::MockFocusSessionPersistence;
+    use crate::repository_traits::focus_session_repository::MockFocusSessionRepository;
 
     use super::*;
     use chrono::DateTime;
@@ -78,32 +80,16 @@ mod tests {
 
     #[tokio::test]
     async fn test_create_manual_session_success() {
-        let mut mock_session_persistence = MockFocusSessionPersistence::new();
+        let mut mock_session_persistence = MockFocusSessionRepository::new();
 
         let category_id = Uuid::new_v4();
         let task_id = Uuid::new_v4();
-        let id = Uuid::new_v4();
         let started_at = DateTime::from_timestamp(1761118663, 0).unwrap();
         let ended_at = DateTime::from_timestamp(1761118714, 0).unwrap();
-        let duration = ended_at.timestamp() - started_at.timestamp();
-
-        let focus_session = FocusSession::reconstitute(
-            id,
-            Uuid::new_v4(), // user_id
-            Some(category_id),
-            Some(task_id),
-            FocusSessionType::Work,
-            Some(duration),
-            Some(4),
-            Some("manual session notes".to_string()),
-            started_at,
-            Some(ended_at),
-            started_at,
-        );
 
         mock_session_persistence
             .expect_create_manual_session()
-            .returning(move |_| Ok(focus_session.clone()));
+            .returning(|_| Ok(()));
 
         let cmd = CreateManualFocusSessionCommand {
             user_id: Uuid::new_v4(),
@@ -120,20 +106,17 @@ mod tests {
         let result = use_case.execute(cmd).await;
 
         assert!(result.is_ok());
-        let session = result.unwrap();
-        assert_eq!(session.actual_duration(), Some(duration));
-        assert_eq!(session.concentration_score(), Some(4));
     }
 
     #[tokio::test]
     async fn test_create_manual_session_error() {
-        let mut mock_session_persistence = MockFocusSessionPersistence::new();
+        let mut mock_session_persistence = MockFocusSessionRepository::new();
 
         mock_session_persistence
             .expect_create_manual_session()
             .returning(|_| {
                 Err(
-                    crate::persistence_traits::persistence_error::PersistenceError::Unexpected(
+                    crate::repository_traits::persistence_error::PersistenceError::Unexpected(
                         "Invalid session data".to_string(),
                     ),
                 )

@@ -3,8 +3,8 @@ use std::sync::Arc;
 use thiserror::Error;
 use uuid::Uuid;
 
-use crate::persistence_traits::category_persistence::CategoryPersistence;
-use crate::persistence_traits::persistence_error::PersistenceError;
+use crate::repository_traits::category_persistence::CategoryPersistence;
+use crate::repository_traits::persistence_error::PersistenceError;
 use domain::{
     entities::category::{Category, CategoryError},
     helpers::random_hex_color,
@@ -63,7 +63,7 @@ mod tests {
     use uuid::Uuid;
 
     use crate::{
-        persistence_traits::category_persistence::MockCategoryPersistence,
+        repository_traits::category_persistence::MockCategoryPersistence,
         use_cases::category::create_category_usecase::{
             CreateCategoryCommand, CreateCategoryUseCases,
         },

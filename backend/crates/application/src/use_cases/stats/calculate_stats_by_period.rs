@@ -13,11 +13,12 @@ use std::{
 use thiserror::Error;
 use uuid::Uuid;
 
-use crate::persistence_traits::category_persistence::CategoryPersistence;
-use crate::persistence_traits::focus_session_persistence::FocusSessionPersistence;
-use crate::persistence_traits::persistence_error::PersistenceError;
-use crate::persistence_traits::task_persistence::TaskPersistence;
-use domain::entities::focus_session::SessionFilter;
+use crate::repository_traits::category_persistence::CategoryPersistence;
+use crate::repository_traits::focus_session_repository::{
+    FindByFiltersCommand, FocusSessionRepository,
+};
+use crate::repository_traits::persistence_error::PersistenceError;
+use crate::repository_traits::task_persistence::TaskPersistence;
 use domain::entities::stats::Stats;
 
 #[derive(Debug, Error, PartialEq)]
@@ -37,14 +38,14 @@ pub struct StatsPeriod {
 pub struct CalculateStatsByPeriodUseCase {
     category_persistence: Arc<dyn CategoryPersistence>,
     task_persistence: Arc<dyn TaskPersistence>,
-    focus_session_persistence: Arc<dyn FocusSessionPersistence>,
+    focus_session_persistence: Arc<dyn FocusSessionRepository>,
 }
 
 impl CalculateStatsByPeriodUseCase {
     pub fn new(
         category_persistence: Arc<dyn CategoryPersistence>,
         task_persistence: Arc<dyn TaskPersistence>,
-        focus_session_persistence: Arc<dyn FocusSessionPersistence>,
+        focus_session_persistence: Arc<dyn FocusSessionRepository>,
     ) -> Self {
         Self {
             category_persistence,
@@ -61,7 +62,7 @@ impl CalculateStatsByPeriodUseCase {
 
         let sessions = self
             .focus_session_persistence
-            .find_by_filters(SessionFilter {
+            .find_by_filters(FindByFiltersCommand {
                 user_id: period.user_id,
                 start_date,
                 end_date,
@@ -152,13 +153,13 @@ impl CalculateStatsByPeriodUseCase {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::persistence_traits::category_persistence::MockCategoryPersistence;
-    use crate::persistence_traits::focus_session_persistence::MockFocusSessionPersistence;
-    use crate::persistence_traits::task_persistence::MockTaskPersistence;
+    use crate::repository_traits::category_persistence::MockCategoryPersistence;
+    use crate::repository_traits::focus_session_repository::MockFocusSessionRepository;
+    use crate::repository_traits::task_persistence::MockTaskPersistence;
 
     #[tokio::test]
     async fn test_calculate_stats_success() {
-        let mut mock_focus_session_persistence = MockFocusSessionPersistence::new();
+        let mut mock_focus_session_persistence = MockFocusSessionRepository::new();
         let mock_task_persistence = MockTaskPersistence::new();
         let mock_category_persistence = MockCategoryPersistence::new();
 
@@ -185,7 +186,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_calculate_stats_with_pauses() {
-        let mut mock_focus_session_persistence = MockFocusSessionPersistence::new();
+        let mut mock_focus_session_persistence = MockFocusSessionRepository::new();
         let mut mock_task_persistence = MockTaskPersistence::new();
         let mut mock_category_persistence = MockCategoryPersistence::new();
 
@@ -193,7 +194,9 @@ mod tests {
         let now = Utc::now();
 
         // Work session: 60 minutes
-        let work_session = domain::entities::focus_session::FocusSession::new(
+        let work_session = domain::entities::focus_session::FocusSession::<
+            domain::entities::focus_session::TerminatedSession,
+        >::new(
             user_id,
             None,
             None,
@@ -201,7 +204,7 @@ mod tests {
             Some(5),
             Some("Work".to_string()),
             now,
-            Some(now + chrono::Duration::minutes(60)),
+            now + chrono::Duration::minutes(60),
         )
         .unwrap();
 
@@ -234,7 +237,9 @@ mod tests {
             });
 
         // Short break: 10 minutes with category
-        let short_break = domain::entities::focus_session::FocusSession::new(
+        let short_break = domain::entities::focus_session::FocusSession::<
+            domain::entities::focus_session::TerminatedSession,
+        >::new(
             user_id,
             Some(break_category_id),
             None,
@@ -242,7 +247,7 @@ mod tests {
             None,
             Some("Break".to_string()),
             now + chrono::Duration::minutes(60),
-            Some(now + chrono::Duration::minutes(70)),
+            now + chrono::Duration::minutes(70),
         )
         .unwrap();
 

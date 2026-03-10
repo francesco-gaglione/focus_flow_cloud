@@ -1,4 +1,4 @@
-use crate::persistence_traits::persistence_error::PersistenceResult;
+use crate::repository_traits::persistence_error::PersistenceResult;
 use async_trait::async_trait;
 use domain::entities::user::User;
 use uuid::Uuid;

@@ -41,3 +41,4 @@ serde_urlencoded = "0.7.1"
 testcontainers.workspace = true
 testcontainers-modules = { workspace = true, features = ["postgres"] }
 tokio = { workspace = true, features = ["full"] }
+futures = "0.3"

@@ -1,5 +1,5 @@
-use crate::persistence_traits::persistence_error::PersistenceError;
-use crate::persistence_traits::user_setting_persistence::UserSettingPersistence;
+use crate::repository_traits::persistence_error::PersistenceError;
+use crate::repository_traits::user_setting_persistence::UserSettingPersistence;
 use std::sync::Arc;
 use thiserror::Error;
 use uuid::Uuid;
@@ -48,7 +48,7 @@ impl UpdateSettingUseCase {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::persistence_traits::user_setting_persistence::MockUserSettingPersistence;
+    use crate::repository_traits::user_setting_persistence::MockUserSettingPersistence;
     use domain::entities::user_setting::UserSetting;
 
     #[tokio::test]

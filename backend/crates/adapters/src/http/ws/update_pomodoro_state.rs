@@ -1,25 +1,28 @@
+use application::use_cases::pomodoro_state::fetch_user_pomodoro_state::{
+    FetchUserPomodoroStateOutput, UserCurrentSession,
+};
 use serde::{Deserialize, Serialize};
 
-use crate::http::{
-    dto::common::session_type_enum::SessionTypeEnum,
-    pomodoro_state::{FocusSessionState, PomodoroState, WorkContext},
-};
+use crate::http::dto::common::session_type_enum::SessionTypeEnum;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdatePomodoroState {
     current_session: Option<UpdateCurrentSession>,
-    work_context: UpdateWorkContext,
+    category_id: Option<String>,
+    task_id: Option<String>,
 }
 
 impl UpdatePomodoroState {
     pub fn new(
-        work_context: UpdateWorkContext,
+        category_id: Option<String>,
+        task_id: Option<String>,
         current_session: Option<UpdateCurrentSession>,
     ) -> Self {
         UpdatePomodoroState {
             current_session,
-            work_context,
+            category_id,
+            task_id,
         }
     }
 }
@@ -55,52 +58,25 @@ impl UpdateCurrentSession {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct UpdateWorkContext {
-    category_id: Option<String>,
-    task_id: Option<String>,
-}
-
-impl UpdateWorkContext {
-    pub fn new(category_id: Option<String>, task_id: Option<String>) -> Self {
-        UpdateWorkContext {
-            category_id,
-            task_id,
-        }
-    }
-}
-
-impl From<PomodoroState> for UpdatePomodoroState {
-    fn from(value: PomodoroState) -> Self {
+impl From<FetchUserPomodoroStateOutput> for UpdatePomodoroState {
+    fn from(value: FetchUserPomodoroStateOutput) -> Self {
         Self {
-            current_session: value
-                .current_session()
-                .cloned()
-                .map(|session| session.into()),
-            work_context: value.current_work_context().into(),
+            current_session: value.user_current_session.map(|s| s.into()),
+            category_id: value.category_id,
+            task_id: value.task_id,
         }
     }
 }
 
-impl From<FocusSessionState> for UpdateCurrentSession {
-    fn from(value: FocusSessionState) -> Self {
-        UpdateCurrentSession {
-            session_type: value.session_type().clone(),
-            session_start_time: value.start_date(),
-            category_id: value.category_id().cloned(),
-            task_id: value.task_id().cloned(),
-            note: value.note(),
-            concentration_score: value.concentration_score(),
-        }
-    }
-}
-
-impl From<WorkContext> for UpdateWorkContext {
-    fn from(value: WorkContext) -> Self {
+impl From<UserCurrentSession> for UpdateCurrentSession {
+    fn from(value: UserCurrentSession) -> Self {
         Self {
-            category_id: value.category_id().cloned(),
-            task_id: value.task_id().cloned(),
+            session_type: value.session_type.into(),
+            session_start_time: value.session_start_time,
+            category_id: value.category_id,
+            task_id: value.task_id,
+            note: value.note,
+            concentration_score: Some(value.concentration_score),
         }
     }
 }

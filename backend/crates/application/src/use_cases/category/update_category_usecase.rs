@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
-use crate::persistence_traits::category_persistence::CategoryPersistence;
-use crate::persistence_traits::persistence_error::PersistenceError;
+use crate::repository_traits::category_persistence::CategoryPersistence;
+use crate::repository_traits::persistence_error::PersistenceError;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -56,7 +56,7 @@ mod tests {
     use std::sync::Arc;
 
     use crate::{
-        persistence_traits::category_persistence::MockCategoryPersistence,
+        repository_traits::category_persistence::MockCategoryPersistence,
         use_cases::category::update_category_usecase::{
             UpdateCategoryCommand, UpdateCategoryUseCases,
         },

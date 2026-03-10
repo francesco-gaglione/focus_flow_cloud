@@ -1,4 +1,9 @@
 use application::use_cases::focus_session::update_focus_session::UpdateFocusSessionUseCase;
+use application::use_cases::pomodoro_state::fetch_user_pomodoro_state::FetchUserPomodoroStateUseCase;
+use application::use_cases::pomodoro_state::start_session::StartSessionUseCase;
+use application::use_cases::pomodoro_state::terminate_session::TerminateSessionUseCase;
+use application::use_cases::pomodoro_state::update_current_session::UpdateSessionUseCase;
+use application::use_cases::pomodoro_state::update_pomodoro_context::UpdatePomodoroContextUseCase;
 use application::use_cases::task::complete_task::CompleteTaskUseCase;
 use application::use_cases::task::get_scheduled_tasks::GetScheduledTasksUseCase;
 use application::use_cases::task::get_tasks::GetTasksUseCase;
@@ -18,7 +23,7 @@ use application::use_cases::{
         get_category_usecase::GetCategoryUseCases, update_category_usecase::UpdateCategoryUseCases,
     },
     focus_session::{
-        create_manual_session::CreateManualSessionUseCase, create_session::CreateSessionUseCase,
+        create_manual_session::CreateManualSessionUseCase,
         find_sessions_by_filters::FindSessionsByFiltersUseCase,
     },
     stats::calculate_stats_by_period::CalculateStatsByPeriodUseCase,
@@ -40,8 +45,10 @@ use adapters::auth::password_policy_impl::PasswordPolicyImpl;
 use adapters::config::AppConfig;
 use adapters::http::app_state::AppState;
 use adapters::persistence::persistence_impl::persistence::postgres_persistence;
+use adapters::persistence::persistence_impl::pomodoro_state_in_memory_impl::PomodoroStateInMermoryImpl;
 use application::auth_traits::password_hasher::PasswordHasher;
-use application::persistence_traits::user_persistence::UserPersistence;
+use application::repository_traits::user_persistence::UserPersistence;
+use application::use_cases::pomodoro_state::pause_session::PauseSessionUseCase;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 
 pub async fn init_app_state(
@@ -51,12 +58,34 @@ pub async fn init_app_state(
     let persistence = postgres_persistence(&config.database_url).await;
     run_migrations(&persistence.pool).await;
     let postgres_arc = Arc::new(persistence);
+    let pomodoro_state_arc = Arc::new(PomodoroStateInMermoryImpl::new());
 
     // Password Hasher
     let argon_hasher = Arc::new(Argon2Hasher::new());
 
     // Policy
     let password_policy = Arc::new(PasswordPolicyImpl::new());
+
+    // Pomodoro state use cases
+    let pause_pomo_session_uc = Arc::new(PauseSessionUseCase::new(
+        pomodoro_state_arc.clone(),
+        postgres_arc.clone(),
+    ));
+    let fetch_pomo_session_uc = Arc::new(FetchUserPomodoroStateUseCase::new(
+        pomodoro_state_arc.clone(),
+    ));
+    let update_pomodoro_context_uc = Arc::new(UpdatePomodoroContextUseCase::new(
+        pomodoro_state_arc.clone(),
+    ));
+    let start_session_uc = Arc::new(StartSessionUseCase::new(
+        pomodoro_state_arc.clone(),
+        postgres_arc.clone(),
+    ));
+    let terminate_session_uc = Arc::new(TerminateSessionUseCase::new(
+        pomodoro_state_arc.clone(),
+        postgres_arc.clone(),
+    ));
+    let update_current_session_uc = Arc::new(UpdateSessionUseCase::new(pomodoro_state_arc.clone()));
 
     // Category Use Cases
     let create_category_uc = Arc::new(CreateCategoryUseCases::new(postgres_arc.clone()));
@@ -80,7 +109,6 @@ pub async fn init_app_state(
 
     // Focus Session Use Cases
     let create_manual_session_uc = Arc::new(CreateManualSessionUseCase::new(postgres_arc.clone()));
-    let create_session_uc = Arc::new(CreateSessionUseCase::new(postgres_arc.clone()));
     let update_focus_session_uc = Arc::new(UpdateFocusSessionUseCase::new(postgres_arc.clone()));
     let find_sessions_by_filters_uc =
         Arc::new(FindSessionsByFiltersUseCase::new(postgres_arc.clone()));
@@ -164,8 +192,13 @@ pub async fn init_app_state(
 
     Ok(AppState {
         ws_clients: Arc::new(RwLock::new(HashMap::new())),
-        pomodoro_states: Arc::new(RwLock::new(HashMap::new())),
         config: config.clone(),
+        pause_pomo_session_uc,
+        fetch_pomo_session_uc,
+        update_pomodoro_context_uc,
+        start_session_uc,
+        terminate_session_uc,
+        update_current_session_uc,
         create_category_uc,
         delete_categories_uc,
         delete_category_uc,
@@ -181,7 +214,6 @@ pub async fn init_app_state(
         get_scheduled_task_uc,
         create_manual_session_uc,
         update_focus_session_uc,
-        create_session_uc,
         find_sessions_by_filters_uc,
         calculate_stats_by_period_uc,
         update_user_setting_uc,

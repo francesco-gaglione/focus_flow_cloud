@@ -1,5 +1,5 @@
-use crate::persistence_traits::persistence_error::PersistenceError;
-use crate::persistence_traits::task_persistence::TaskPersistence;
+use crate::repository_traits::persistence_error::PersistenceError;
+use crate::repository_traits::task_persistence::TaskPersistence;
 use chrono::{DateTime, Utc};
 use domain::entities::task::TaskError;
 use std::sync::Arc;
@@ -76,7 +76,7 @@ mod tests {
     use domain::entities::task::Task;
 
     use super::*;
-    use crate::persistence_traits::task_persistence::MockTaskPersistence;
+    use crate::repository_traits::task_persistence::MockTaskPersistence;
 
     #[tokio::test]
     async fn test_update_task_success() {

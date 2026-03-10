@@ -1,7 +1,7 @@
 use crate::persistence::schema;
 use chrono::{DateTime, Utc};
 use diesel::{AsChangeset, Insertable, Queryable, Selectable};
-use domain::entities::focus_session::FocusSession;
+use domain::entities::focus_session::{FocusSession, TerminatedSession};
 use domain::entities::focus_session_type::FocusSessionType;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -50,7 +50,7 @@ pub struct UpdateDbFocusSession {
     pub ended_at: Option<DateTime<Utc>>,
 }
 
-impl From<DbFocusSession> for FocusSession {
+impl From<DbFocusSession> for FocusSession<TerminatedSession> {
     fn from(value: DbFocusSession) -> Self {
         Self::reconstitute(
             value.id,
@@ -63,13 +63,12 @@ impl From<DbFocusSession> for FocusSession {
             value.notes,
             value.started_at,
             value.ended_at,
-            value.created_at,
         )
     }
 }
 
-impl From<FocusSession> for NewDbFocusSession {
-    fn from(value: FocusSession) -> Self {
+impl From<FocusSession<TerminatedSession>> for NewDbFocusSession {
+    fn from(value: FocusSession<TerminatedSession>) -> Self {
         Self {
             id: value.id(),
             user_id: value.user_id(),
@@ -77,24 +76,24 @@ impl From<FocusSession> for NewDbFocusSession {
             category_id: value.category_id(),
             session_type: value.session_type().to_string(),
             concentration_score: value.concentration_score(),
-            notes: value.notes(),
-            actual_duration: value.actual_duration(),
+            notes: value.note(),
+            actual_duration: Some(value.actual_duration()),
             started_at: value.started_at(),
-            ended_at: value.ended_at(),
+            ended_at: Some(value.ended_at()),
         }
     }
 }
 
-impl From<FocusSession> for UpdateDbFocusSession {
-    fn from(value: FocusSession) -> Self {
+impl From<FocusSession<TerminatedSession>> for UpdateDbFocusSession {
+    fn from(value: FocusSession<TerminatedSession>) -> Self {
         Self {
             task_id: value.task_id(),
             category_id: value.category_id(),
-            actual_duration: value.actual_duration(),
+            actual_duration: Some(value.actual_duration()),
             concentration_score: value.concentration_score(),
-            notes: value.notes(),
+            notes: value.note(),
             started_at: Some(value.started_at()),
-            ended_at: value.ended_at(),
+            ended_at: Some(value.ended_at()),
         }
     }
 }

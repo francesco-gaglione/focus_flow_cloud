@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
-use crate::persistence_traits::category_persistence::CategoryPersistence;
-use crate::persistence_traits::persistence_error::PersistenceError;
+use crate::repository_traits::category_persistence::CategoryPersistence;
+use crate::repository_traits::persistence_error::PersistenceError;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -34,7 +34,7 @@ impl DeleteCategoryUseCases {
 
 #[cfg(test)]
 mod tests {
-    use crate::persistence_traits::category_persistence::MockCategoryPersistence;
+    use crate::repository_traits::category_persistence::MockCategoryPersistence;
 
     use super::*;
     use mockall::predicate::*;

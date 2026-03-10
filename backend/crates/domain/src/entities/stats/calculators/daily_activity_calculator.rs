@@ -1,4 +1,4 @@
-use crate::entities::focus_session::FocusSession;
+use crate::entities::focus_session::{FocusSession, TerminatedSession};
 use chrono::NaiveDate;
 use std::collections::HashMap;
 use uuid::Uuid;
@@ -39,7 +39,7 @@ pub struct DailyActivityCalculator;
 
 impl DailyActivityCalculator {
     pub fn calculate(
-        sessions: &[FocusSession],
+        sessions: &[FocusSession<TerminatedSession>],
         category_names: &HashMap<Uuid, String>,
     ) -> Vec<DailyActivityItem> {
         let mut daily_data: HashMap<NaiveDate, HashMap<Uuid, i64>> = HashMap::new();
@@ -49,7 +49,7 @@ impl DailyActivityCalculator {
             {
                 continue;
             }
-            if let (Some(category_id), Some(duration)) =
+            if let (Some(category_id), duration) =
                 (session.category_id(), session.actual_duration())
             {
                 let date = session.started_at().date_naive();

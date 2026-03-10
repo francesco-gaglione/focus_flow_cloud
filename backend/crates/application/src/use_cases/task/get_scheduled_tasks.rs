@@ -5,7 +5,7 @@ use domain::entities::task::Task;
 use thiserror::Error;
 use uuid::Uuid;
 
-use crate::persistence_traits::{
+use crate::repository_traits::{
     persistence_error::PersistenceError, task_persistence::TaskPersistence,
 };
 
@@ -82,7 +82,7 @@ impl GetScheduledTasksUseCase {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::persistence_traits::{
+    use crate::repository_traits::{
         persistence_error::PersistenceError, task_persistence::MockTaskPersistence,
     };
     use chrono::Duration;

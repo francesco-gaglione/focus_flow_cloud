@@ -15,6 +15,7 @@ dependencies = [
  "diesel_migrations",
  "domain",
  "dotenvy",
+ "futures",
  "futures-util",
  "http",
  "lazy_static",
@@ -781,6 +782,7 @@ dependencies = [
  "rand 0.8.5",
  "thiserror",
  "tokio",
+ "tracing",
  "uuid",
 ]
 

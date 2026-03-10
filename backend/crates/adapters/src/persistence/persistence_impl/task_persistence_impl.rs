@@ -1,8 +1,8 @@
 use crate::persistence::db_models::db_task::{DbTask, NewDbTask, UpdateDbTask};
 use crate::persistence::schema;
 use crate::persistence::PostgresPersistence;
-use application::persistence_traits::persistence_error::{PersistenceError, PersistenceResult};
-use application::persistence_traits::task_persistence::TaskPersistence;
+use application::repository_traits::persistence_error::{PersistenceError, PersistenceResult};
+use application::repository_traits::task_persistence::TaskPersistence;
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, SelectableHelper};

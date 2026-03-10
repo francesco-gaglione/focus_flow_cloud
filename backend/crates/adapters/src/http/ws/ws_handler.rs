@@ -1,5 +1,7 @@
-use crate::http::model::session_model::UserSession;
 use crate::http::request_id::RequestId;
+use crate::http::ws::error::WsHandlerResult;
+use crate::http::ws::handle_update_pomodoro_context::handle_update_pomodoro_context;
+use crate::http::{model::session_model::UserSession, ws::error::WsHandlerError};
 use axum::{
     extract::{
         ws::{Message, WebSocket, WebSocketUpgrade},
@@ -10,27 +12,23 @@ use axum::{
 use futures_util::{SinkExt, StreamExt};
 use serde_json;
 use tokio::sync::Mutex;
-use tracing::{debug, error, warn, Instrument};
+use tracing::{debug, error, info, warn, Instrument};
 use uuid::Uuid;
 use validator::Validate;
 
-use crate::http::pomodoro_state::PomodoroState;
 use crate::http::{
     app_state::{AppState, Clients},
     ws::{
         handle_break_event::handle_break_event,
+        handle_note_update::handle_note_update,
         handle_start_event::handle_start_event,
         handle_terminate_event::handle_terminate_event,
         handle_update_concentration_score::handle_update_concentration_score,
-        note_update::note_update,
         sync_pomodoro_state::sync_pomodoro_state,
-        update_pomodoro_context::update_pomodoro_context,
         update_pomodoro_state::UpdatePomodoroState,
         ws_message::{BroadcastEvent, ClientMessage, ServerResponse, WsClientRequest},
     },
 };
-use std::sync::Arc;
-use tokio::sync::RwLock;
 
 pub async fn session_handler(
     ws: WebSocketUpgrade,
@@ -55,14 +53,6 @@ async fn handle_socket(ws: WebSocket, state: AppState, request_id: RequestId, us
     let span = tracing::info_span!("websocket-connection", request_id = %request_id, client_id = my_id, user_id = %user_id);
     async move {
         debug!("Client connected");
-
-        // Ensure user has a state
-        {
-            let mut states = state.pomodoro_states.write().await;
-            states
-                .entry(user_id)
-                .or_insert_with(|| Arc::new(RwLock::new(PomodoroState::default())));
-        }
 
         let (mut sender_ws, mut receiver_ws) = ws.split();
         let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel();
@@ -98,13 +88,8 @@ async fn handle_socket(ws: WebSocket, state: AppState, request_id: RequestId, us
                                 {
                                     error!("Validation failed: {}", validation_errors);
 
-                                    send_error_to_client(
-                                        &tx_clone,
-                                        "VALIDATION_ERROR",
-                                        validation_errors.as_ref(),
-                                        request_id,
-                                    )
-                                    .await;
+                                    send_error_to_client(&tx_clone, &validation_errors, request_id)
+                                        .await;
                                     continue;
                                 }
 
@@ -124,8 +109,9 @@ async fn handle_socket(ws: WebSocket, state: AppState, request_id: RequestId, us
 
                                 send_error_to_client(
                                     &tx_clone,
-                                    "PARSE_ERROR",
-                                    "Failed to parse request",
+                                    &WsHandlerError::BadRequest(
+                                        "Failed to parse request".to_string(),
+                                    ),
                                     None,
                                 )
                                 .await;
@@ -186,60 +172,61 @@ async fn handle_message(
             }
             Err(e) => {
                 error!("Failed to sync clients: {:?}", e);
-                send_error_to_client(tx, "ERROR", e.as_ref(), request_id).await;
+                send_error_to_client(tx, &e, request_id).await;
             }
         },
         ClientMessage::UpdatePomodoroContext(context) => {
-            match update_pomodoro_context(&context, state, user_id).await {
+            match handle_update_pomodoro_context(&context, state, user_id).await {
                 Ok(msg) => {
-                    debug!("Workspace updated: {:?}", msg);
                     send_success_to_client(tx, "Workspace updated", request_id.clone()).await;
                     broadcast_message(
                         clients,
                         my_id,
-                        &BroadcastEvent::PomodoroSessionUpdate(msg),
+                        &BroadcastEvent::PomodoroSessionUpdate(msg.clone()),
                         true,
                     )
                     .await;
+                    info!("Workspace updated: {:?}", msg);
                 }
                 Err(e) => {
                     error!("Failed to update workspace: {:?}", e);
-                    send_error_to_client(tx, "ERROR", e.as_ref(), request_id).await;
+                    send_error_to_client(tx, &e, request_id).await;
                 }
             }
         }
         ClientMessage::StartEvent => match handle_start_event(state, user_id).await {
             Ok(msg) => {
-                debug!("Session started: {:?}", msg);
                 send_success_to_client(tx, "Session started", request_id.clone()).await;
                 broadcast_message(
                     clients,
                     my_id,
-                    &BroadcastEvent::PomodoroSessionUpdate(msg),
+                    &BroadcastEvent::PomodoroSessionUpdate(msg.clone()),
                     true,
                 )
                 .await;
+                info!("Session started: {:?}", msg);
             }
             Err(e) => {
                 error!("Failed to start session: {:?}", e);
-                send_error_to_client(tx, "ERROR", e.as_ref(), request_id).await;
+                send_error_to_client(tx, &e, request_id).await;
             }
         },
         ClientMessage::BreakEvent => match handle_break_event(state, user_id).await {
             Ok(msg) => {
-                debug!("Break session started: {:?}", msg);
+                debug!("Break event detected");
                 send_success_to_client(tx, "Break session started", request_id.clone()).await;
                 broadcast_message(
                     clients,
                     my_id,
-                    &BroadcastEvent::PomodoroSessionUpdate(msg),
+                    &BroadcastEvent::PomodoroSessionUpdate(msg.clone()),
                     true,
                 )
                 .await;
+                info!("Break session started: {:?}", msg);
             }
             Err(e) => {
                 error!("Failed to start break session: {:?}", e);
-                send_error_to_client(tx, "ERROR", e.as_ref(), request_id).await;
+                send_error_to_client(tx, &e, request_id).await;
             }
         },
         ClientMessage::TerminateEvent => match handle_terminate_event(state, user_id).await {
@@ -256,13 +243,12 @@ async fn handle_message(
             }
             Err(e) => {
                 error!("Failed to terminate session: {:?}", e);
-                send_error_to_client(tx, "ERROR", e.as_ref(), request_id).await;
+                send_error_to_client(tx, &e, request_id).await;
             }
         },
         ClientMessage::UpdateNote(note_update_dto) => {
-            match note_update(&note_update_dto, state, user_id).await {
+            match handle_note_update(&note_update_dto, state, user_id).await {
                 Ok(msg) => {
-                    debug!("Note updated");
                     send_success_to_client(tx, "Note updated", request_id.clone()).await;
                     broadcast_message(
                         clients,
@@ -271,10 +257,11 @@ async fn handle_message(
                         false,
                     )
                     .await;
+                    info!("Note updated");
                 }
                 Err(e) => {
                     error!("Failed to update note: {}", e);
-                    send_error_to_client(tx, "ERROR", e.as_ref(), request_id).await;
+                    send_error_to_client(tx, &e, request_id).await;
                 }
             }
         }
@@ -296,27 +283,21 @@ async fn handle_message(
                 }
                 Err(e) => {
                     error!("Failed to update concentration score: {}", e);
-                    send_error_to_client(tx, "ERROR", e.as_ref(), request_id).await;
+                    send_error_to_client(tx, &e, request_id).await;
                 }
             }
         }
     }
 }
 
-// ============================================
 // Validation Macro
-// ============================================
-
 macro_rules! validate_variant {
     ($msg:expr, $variant:literal) => {
-        $msg.validate()
-            .map_err(|e| format!("{} validation failed: {}", $variant, e))
+        $msg.validate().map_err(|e| {
+            WsHandlerError::ValidationError(format!("{} validation failed: {}", $variant, e))
+        })
     };
 }
-
-// ============================================
-// Legacy Helper Functions (for backward compatibility)
-// ============================================
 
 async fn send_success_to_client(
     tx: &tokio::sync::mpsc::UnboundedSender<Message>,
@@ -335,7 +316,6 @@ async fn send_success_to_client(
 
 async fn send_sync_to_client(
     tx: &tokio::sync::mpsc::UnboundedSender<Message>,
-
     message: UpdatePomodoroState,
 ) {
     let response = ServerResponse::SyncData(message);
@@ -347,15 +327,13 @@ async fn send_sync_to_client(
 
 async fn send_error_to_client(
     tx: &tokio::sync::mpsc::UnboundedSender<Message>,
-    code: &str,
-    message: &str,
+    ws_handler_error: &WsHandlerError,
     request_id: Option<String>,
 ) {
     let response = ServerResponse::Error {
-        code: code.to_string(),
-
-        message: message.to_string(),
-
+        //TODO improve error codes
+        code: "ERROR".to_string(),
+        message: ws_handler_error.to_string(),
         request_id,
     };
 
@@ -364,7 +342,7 @@ async fn send_error_to_client(
     }
 }
 
-fn validate_message(message: &ClientMessage) -> Result<(), String> {
+fn validate_message(message: &ClientMessage) -> WsHandlerResult<()> {
     match message {
         ClientMessage::RequestSync
         | ClientMessage::StartEvent

@@ -1,5 +1,5 @@
 use crate::persistence::schema;
-use application::persistence_traits::persistence_error::PersistenceError;
+use application::repository_traits::persistence_error::PersistenceError;
 use chrono::{DateTime, Utc};
 use diesel::{AsChangeset, Insertable, Queryable, Selectable};
 use domain::entities::category::Category;

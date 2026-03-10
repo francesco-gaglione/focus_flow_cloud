@@ -54,6 +54,7 @@ pub struct CreateManualSessionDto {
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct CreateManualSessionResponseDto {
+    pub success: bool,
     pub id: String,
 }
 
@@ -112,9 +113,10 @@ pub async fn create_manual_session_api(
         ended_at,
     };
 
-    let res = state.create_manual_session_uc.execute(command).await?;
+    let session_id = state.create_manual_session_uc.execute(command).await?;
 
     Ok(Json(CreateManualSessionResponseDto {
-        id: res.id().to_string(),
+        success: true,
+        id: session_id.to_string(),
     }))
 }

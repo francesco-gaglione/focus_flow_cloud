@@ -9,6 +9,7 @@ chrono = { workspace = true, features = ["serde"] }
 thiserror.workspace = true
 async-trait = { workspace = true }
 rand.workspace = true
+tracing.workspace = true
 mockall = { workspace = true, optional = true }
 
 [features]

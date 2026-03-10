@@ -5,8 +5,8 @@ use crate::{
         PostgresPersistence,
     },
 };
-use application::persistence_traits::persistence_error::{PersistenceError, PersistenceResult};
-use application::persistence_traits::user_persistence::UserPersistence;
+use application::repository_traits::persistence_error::{PersistenceError, PersistenceResult};
+use application::repository_traits::user_persistence::UserPersistence;
 use async_trait::async_trait;
 use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper};
 use domain::entities::user::User;

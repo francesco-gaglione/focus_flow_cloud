@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
-use crate::persistence_traits::persistence_error::PersistenceError;
-use crate::persistence_traits::user_persistence::UserPersistence;
+use crate::repository_traits::persistence_error::PersistenceError;
+use crate::repository_traits::user_persistence::UserPersistence;
 use thiserror::Error;
 use uuid::Uuid;
 
@@ -66,8 +66,8 @@ impl UpdateUserUsernameUseCase {
 mod tests {
     use std::sync::Arc;
 
-    use crate::persistence_traits::persistence_error::PersistenceError;
-    use crate::persistence_traits::user_persistence::MockUserPersistence;
+    use crate::repository_traits::persistence_error::PersistenceError;
+    use crate::repository_traits::user_persistence::MockUserPersistence;
     use crate::use_cases::user::update_user_username::{
         UpdateUserUsernameCommand, UpdateUserUsernameError, UpdateUserUsernameUseCase,
     };

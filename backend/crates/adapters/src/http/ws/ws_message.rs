@@ -1,13 +1,10 @@
 use serde::{Deserialize, Serialize};
 
 use crate::http::ws::{
-    handle_update_concentration_score::UpdateConcentrationScore, note_update::NoteUpdate,
-    update_pomodoro_context::UpdatePomodoroContext, update_pomodoro_state::UpdatePomodoroState,
+    handle_note_update::NoteUpdate, handle_update_concentration_score::UpdateConcentrationScore,
+    handle_update_pomodoro_context::UpdatePomodoroContext,
+    update_pomodoro_state::UpdatePomodoroState,
 };
-
-// ============================================
-// Client-to-Server Messages
-// ============================================
 
 /// Wrapper for all client requests with optional tracking ID
 #[derive(Debug, Serialize, Deserialize)]
@@ -32,10 +29,6 @@ pub enum ClientMessage {
     UpdateConcentrationScore(UpdateConcentrationScore),
 }
 
-// ============================================
-// Server-to-Client Responses
-// ============================================
-
 /// Direct responses from server to the requesting client
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -51,10 +44,6 @@ pub enum ServerResponse {
     },
     SyncData(UpdatePomodoroState),
 }
-
-// ============================================
-// Broadcast Events
-// ============================================
 
 /// Events broadcast to all connected clients (or all except sender)
 #[derive(Debug, Serialize, Deserialize, Clone)]

@@ -1,4 +1,11 @@
-use crate::http::{app_state::AppState, ws::update_pomodoro_state::UpdatePomodoroState};
+use crate::http::{
+    app_state::AppState,
+    ws::{error::WsHandlerResult, update_pomodoro_state::UpdatePomodoroState},
+};
+use application::use_cases::pomodoro_state::{
+    fetch_user_pomodoro_state::FetchUserPomodoroStateCommand,
+    update_current_session::UpdateSessionCommand,
+};
 use serde::{Deserialize, Serialize};
 use tracing::debug;
 use utoipa::ToSchema;
@@ -16,19 +23,21 @@ pub async fn handle_update_concentration_score(
     message: &UpdateConcentrationScore,
     state: &AppState,
     user_id: Uuid,
-) -> Result<UpdatePomodoroState, String> {
+) -> WsHandlerResult<UpdatePomodoroState> {
     debug!("Updating concentration score for user {}", user_id);
 
-    let states_map = state.pomodoro_states.read().await;
-    let user_state = states_map
-        .get(&user_id)
-        .ok_or("User state not found".to_string())?
-        .clone();
-    drop(states_map);
+    let command = UpdateSessionCommand {
+        user_id,
+        new_note: None,
+        new_concentration_score: Some(message.concentration_score),
+    };
 
-    let mut state = user_state.write().await;
+    state.update_current_session_uc.execute(command).await?;
 
-    state.update_current_session_concentration_score(message.concentration_score)?;
+    let pomodoro_state = state
+        .fetch_pomo_session_uc
+        .execute(FetchUserPomodoroStateCommand { user_id })
+        .await?;
 
-    Ok(UpdatePomodoroState::from(state.clone()))
+    Ok(pomodoro_state.into())
 }

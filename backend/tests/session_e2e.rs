@@ -72,7 +72,7 @@ async fn create_new_session_and_list() {
         .create_manual_session(&create_manual_session_dto)
         .await;
 
-    assert!(create_manual_session_response.id.len() > 0);
+    assert!(create_manual_session_response.success);
 
     // Fetch sessions and check if the session was created
     let response = context
@@ -176,7 +176,7 @@ async fn update_session_and_list() {
         .create_manual_session(&create_manual_session_dto)
         .await;
 
-    assert!(create_manual_session_response.id.len() > 0);
+    assert!(create_manual_session_response.success);
 
     // Update Manual Session
     let update_manual_session_dto = UpdateFocusSessionDto {

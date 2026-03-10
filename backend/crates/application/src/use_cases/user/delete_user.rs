@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
-use crate::persistence_traits::persistence_error::PersistenceError;
-use crate::persistence_traits::user_persistence::UserPersistence;
+use crate::repository_traits::persistence_error::PersistenceError;
+use crate::repository_traits::user_persistence::UserPersistence;
 use thiserror::Error;
 use uuid::Uuid;
 
@@ -52,7 +52,7 @@ impl DeleteUserUseCase {
 #[cfg(test)]
 mod tests {
     use crate::{
-        persistence_traits::user_persistence::MockUserPersistence,
+        repository_traits::user_persistence::MockUserPersistence,
         use_cases::user::delete_user::{DeleteUserCommand, DeleteUserUseCase},
     };
     use std::sync::Arc;
