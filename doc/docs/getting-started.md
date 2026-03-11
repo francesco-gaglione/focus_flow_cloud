@@ -24,7 +24,7 @@ The easiest way to run the FocusFlow backend is using Docker Compose. This autom
 1.  **Create a `docker-compose.yml` file**:
     Create a new file named `docker-compose.yml`. You can use the following example as a starting point.
 
-    > [!IMPORTANT]
+    > IMPORTANT!
     > Make sure to replace `JWT_SECRET` and passwords with secure values.
 
     ```yaml
@@ -125,12 +125,14 @@ All environment variables required for the backend:
 
 > 🚧 **Coming Soon**
 >
-> Helm charts and Kustomize configurations for deploying FocusFlow to Kubernetes clusters are currently under development.
+> Kubernetes deployments are currently under development.
 
 ## App
 
 ### Download
 Pre-built executables for various platforms are available on the [GitHub Releases](https://github.com/francesco-gaglione/focus_flow_cloud/releases) page.
+
+**NOTE**: In order to allow the mobile app to send push notifications, you will need to allow push notifications for the app on your device.
 
 ### Running locally
 To run the mobile application, you will need the Flutter SDK installed.
