@@ -102,10 +102,8 @@ mod tests {
             .expect_update_user_state()
             .returning(|_, _| Ok(()));
 
-        let use_case = TerminateSessionUseCase::new(
-            Arc::new(mock_pomodoro_repo),
-            Arc::new(mock_session_repo),
-        );
+        let use_case =
+            TerminateSessionUseCase::new(Arc::new(mock_pomodoro_repo), Arc::new(mock_session_repo));
         let result = use_case.execute(TerminateSessionCommand { user_id }).await;
         assert!(result.is_ok());
     }
@@ -121,10 +119,8 @@ mod tests {
             .expect_fetch_user_state()
             .returning(move |_| Ok(state.clone()));
 
-        let use_case = TerminateSessionUseCase::new(
-            Arc::new(mock_pomodoro_repo),
-            Arc::new(mock_session_repo),
-        );
+        let use_case =
+            TerminateSessionUseCase::new(Arc::new(mock_pomodoro_repo), Arc::new(mock_session_repo));
         let result = use_case.execute(TerminateSessionCommand { user_id }).await;
         assert!(result.is_err());
         assert!(matches!(
@@ -142,12 +138,12 @@ mod tests {
             .expect_fetch_user_state()
             .returning(|_| Err(PomodoroStateRepositoryError::UserNotFound));
 
-        let use_case = TerminateSessionUseCase::new(
-            Arc::new(mock_pomodoro_repo),
-            Arc::new(mock_session_repo),
-        );
+        let use_case =
+            TerminateSessionUseCase::new(Arc::new(mock_pomodoro_repo), Arc::new(mock_session_repo));
         let result = use_case
-            .execute(TerminateSessionCommand { user_id: Uuid::new_v4() })
+            .execute(TerminateSessionCommand {
+                user_id: Uuid::new_v4(),
+            })
             .await;
         assert!(result.is_err());
         assert!(matches!(

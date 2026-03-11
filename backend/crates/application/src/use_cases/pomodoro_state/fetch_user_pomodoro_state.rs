@@ -121,7 +121,9 @@ mod tests {
 
         let use_case = FetchUserPomodoroStateUseCase::new(Arc::new(mock_repo));
         let result = use_case
-            .execute(FetchUserPomodoroStateCommand { user_id: Uuid::new_v4() })
+            .execute(FetchUserPomodoroStateCommand {
+                user_id: Uuid::new_v4(),
+            })
             .await;
         assert!(result.is_ok());
         let output = result.unwrap();
@@ -171,7 +173,9 @@ mod tests {
 
         let use_case = FetchUserPomodoroStateUseCase::new(Arc::new(mock_repo));
         let result = use_case
-            .execute(FetchUserPomodoroStateCommand { user_id: Uuid::new_v4() })
+            .execute(FetchUserPomodoroStateCommand {
+                user_id: Uuid::new_v4(),
+            })
             .await;
         assert!(result.is_ok());
         let output = result.unwrap();
@@ -188,7 +192,9 @@ mod tests {
 
         let use_case = FetchUserPomodoroStateUseCase::new(Arc::new(mock_repo));
         let result = use_case
-            .execute(FetchUserPomodoroStateCommand { user_id: Uuid::new_v4() })
+            .execute(FetchUserPomodoroStateCommand {
+                user_id: Uuid::new_v4(),
+            })
             .await;
         assert!(result.is_err());
         assert!(matches!(

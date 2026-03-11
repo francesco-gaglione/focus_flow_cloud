@@ -47,13 +47,13 @@ mod tests {
     #[tokio::test]
     async fn test_init_success() {
         let mut mock_repo = MockPomodoroStateRepository::new();
-        mock_repo
-            .expect_init_user_state()
-            .returning(|_| Ok(()));
+        mock_repo.expect_init_user_state().returning(|_| Ok(()));
 
         let use_case = InitPomodoroStateUseCase::new(Arc::new(mock_repo));
         let result = use_case
-            .execute(InitPomodoroStateCommand { user_id: Uuid::new_v4() })
+            .execute(InitPomodoroStateCommand {
+                user_id: Uuid::new_v4(),
+            })
             .await;
         assert!(result.is_ok());
     }
@@ -67,7 +67,9 @@ mod tests {
 
         let use_case = InitPomodoroStateUseCase::new(Arc::new(mock_repo));
         let result = use_case
-            .execute(InitPomodoroStateCommand { user_id: Uuid::new_v4() })
+            .execute(InitPomodoroStateCommand {
+                user_id: Uuid::new_v4(),
+            })
             .await;
         assert!(result.is_err());
         assert!(matches!(
