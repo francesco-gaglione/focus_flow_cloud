@@ -58,3 +58,85 @@ impl UpdatePomodoroContextUseCase {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::repository_traits::pomodoro_state_repository::{
+        MockPomodoroStateRepository, PomodoroStateRepositoryError,
+    };
+    use domain::entities::pomodoro::pomodoro_state::PomodoroState;
+    use std::sync::Arc;
+    use uuid::Uuid;
+
+    #[tokio::test]
+    async fn test_update_context_with_category_and_task() {
+        let mut mock_repo = MockPomodoroStateRepository::new();
+        let user_id = Uuid::new_v4();
+        let state = PomodoroState::new();
+
+        mock_repo
+            .expect_fetch_user_state()
+            .returning(move |_| Ok(state.clone()));
+        mock_repo
+            .expect_update_user_state()
+            .returning(|_, _| Ok(()));
+
+        let use_case = UpdatePomodoroContextUseCase::new(Arc::new(mock_repo));
+        let result = use_case
+            .execute(UpdatePomodoroContextCommand {
+                user_id,
+                category_id: Some(Uuid::new_v4()),
+                task_id: Some(Uuid::new_v4()),
+            })
+            .await;
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_update_context_no_fields() {
+        let mut mock_repo = MockPomodoroStateRepository::new();
+        let user_id = Uuid::new_v4();
+        let state = PomodoroState::new();
+
+        mock_repo
+            .expect_fetch_user_state()
+            .returning(move |_| Ok(state.clone()));
+        mock_repo
+            .expect_update_user_state()
+            .returning(|_, _| Ok(()));
+
+        let use_case = UpdatePomodoroContextUseCase::new(Arc::new(mock_repo));
+        let result = use_case
+            .execute(UpdatePomodoroContextCommand {
+                user_id,
+                category_id: None,
+                task_id: None,
+            })
+            .await;
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_update_context_fetch_repo_error() {
+        let mut mock_repo = MockPomodoroStateRepository::new();
+
+        mock_repo
+            .expect_fetch_user_state()
+            .returning(|_| Err(PomodoroStateRepositoryError::UserNotFound));
+
+        let use_case = UpdatePomodoroContextUseCase::new(Arc::new(mock_repo));
+        let result = use_case
+            .execute(UpdatePomodoroContextCommand {
+                user_id: Uuid::new_v4(),
+                category_id: None,
+                task_id: None,
+            })
+            .await;
+        assert!(result.is_err());
+        assert!(matches!(
+            result.unwrap_err(),
+            UpdatePomodoroContextError::PomodoroStateRepositoryError(_)
+        ));
+    }
+}

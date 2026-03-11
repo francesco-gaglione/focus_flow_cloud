@@ -26,7 +26,3 @@ graph LR
     App -- HTTPS/WSS --> Back
     Back -- TCP --> DB
 ```
-
-Choose a section to dive deeper:
-- **[Backend Architecture](./backend)**: Internal structure of the Rust server.
-- **[App Architecture](./app)**: Overview of the Flutter application.

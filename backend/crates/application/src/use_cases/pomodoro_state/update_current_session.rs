@@ -69,3 +69,117 @@ impl UpdateSessionUseCase {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::repository_traits::pomodoro_state_repository::{
+        MockPomodoroStateRepository, PomodoroStateRepositoryError,
+    };
+    use domain::entities::focus_session_type::FocusSessionType;
+    use domain::entities::pomodoro::pomodoro_state::PomodoroState;
+    use std::sync::Arc;
+    use uuid::Uuid;
+
+    #[tokio::test]
+    async fn test_update_note_success() {
+        let mut mock_repo = MockPomodoroStateRepository::new();
+        let user_id = Uuid::new_v4();
+        let mut state = PomodoroState::new();
+        state
+            .start_new_session(user_id, FocusSessionType::Work, None, None)
+            .unwrap();
+
+        mock_repo
+            .expect_fetch_user_state()
+            .returning(move |_| Ok(state.clone()));
+        mock_repo
+            .expect_update_user_state()
+            .returning(|_, _| Ok(()));
+
+        let use_case = UpdateSessionUseCase::new(Arc::new(mock_repo));
+        let result = use_case
+            .execute(UpdateSessionCommand {
+                user_id,
+                new_note: Some("test note".to_string()),
+                new_concentration_score: None,
+            })
+            .await;
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_update_concentration_score_success() {
+        let mut mock_repo = MockPomodoroStateRepository::new();
+        let user_id = Uuid::new_v4();
+        let mut state = PomodoroState::new();
+        state
+            .start_new_session(user_id, FocusSessionType::Work, None, None)
+            .unwrap();
+
+        mock_repo
+            .expect_fetch_user_state()
+            .returning(move |_| Ok(state.clone()));
+        mock_repo
+            .expect_update_user_state()
+            .returning(|_, _| Ok(()));
+
+        let use_case = UpdateSessionUseCase::new(Arc::new(mock_repo));
+        let result = use_case
+            .execute(UpdateSessionCommand {
+                user_id,
+                new_note: None,
+                new_concentration_score: Some(3),
+            })
+            .await;
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_update_no_current_session() {
+        let mut mock_repo = MockPomodoroStateRepository::new();
+        let user_id = Uuid::new_v4();
+        let state = PomodoroState::new();
+
+        mock_repo
+            .expect_fetch_user_state()
+            .returning(move |_| Ok(state.clone()));
+
+        let use_case = UpdateSessionUseCase::new(Arc::new(mock_repo));
+        let result = use_case
+            .execute(UpdateSessionCommand {
+                user_id,
+                new_note: Some("note".to_string()),
+                new_concentration_score: None,
+            })
+            .await;
+        assert!(result.is_err());
+        assert!(matches!(
+            result.unwrap_err(),
+            UpdateSessionError::NoCurrentSession
+        ));
+    }
+
+    #[tokio::test]
+    async fn test_update_fetch_repo_error() {
+        let mut mock_repo = MockPomodoroStateRepository::new();
+
+        mock_repo
+            .expect_fetch_user_state()
+            .returning(|_| Err(PomodoroStateRepositoryError::UserNotFound));
+
+        let use_case = UpdateSessionUseCase::new(Arc::new(mock_repo));
+        let result = use_case
+            .execute(UpdateSessionCommand {
+                user_id: Uuid::new_v4(),
+                new_note: None,
+                new_concentration_score: None,
+            })
+            .await;
+        assert!(result.is_err());
+        assert!(matches!(
+            result.unwrap_err(),
+            UpdateSessionError::PomodoroStateRepositoryError(_)
+        ));
+    }
+}

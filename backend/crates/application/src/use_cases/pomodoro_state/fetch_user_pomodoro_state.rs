@@ -98,3 +98,102 @@ impl FetchUserPomodoroStateUseCase {
         Ok(state.into())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::repository_traits::pomodoro_state_repository::{
+        MockPomodoroStateRepository, PomodoroStateRepositoryError,
+    };
+    use domain::entities::focus_session_type::FocusSessionType;
+    use domain::entities::pomodoro::pomodoro_state::PomodoroState;
+    use std::sync::Arc;
+    use uuid::Uuid;
+
+    #[tokio::test]
+    async fn test_fetch_success_no_session() {
+        let mut mock_repo = MockPomodoroStateRepository::new();
+        let state = PomodoroState::new();
+
+        mock_repo
+            .expect_fetch_user_state()
+            .returning(move |_| Ok(state.clone()));
+
+        let use_case = FetchUserPomodoroStateUseCase::new(Arc::new(mock_repo));
+        let result = use_case
+            .execute(FetchUserPomodoroStateCommand { user_id: Uuid::new_v4() })
+            .await;
+        assert!(result.is_ok());
+        let output = result.unwrap();
+        assert!(output.user_current_session.is_none());
+        assert!(output.category_id.is_none());
+        assert!(output.task_id.is_none());
+    }
+
+    #[tokio::test]
+    async fn test_fetch_success_with_running_session() {
+        let mut mock_repo = MockPomodoroStateRepository::new();
+        let user_id = Uuid::new_v4();
+        let mut state = PomodoroState::new();
+        state
+            .start_new_session(user_id, FocusSessionType::Work, None, None)
+            .unwrap();
+
+        mock_repo
+            .expect_fetch_user_state()
+            .returning(move |_| Ok(state.clone()));
+
+        let use_case = FetchUserPomodoroStateUseCase::new(Arc::new(mock_repo));
+        let result = use_case
+            .execute(FetchUserPomodoroStateCommand { user_id })
+            .await;
+        assert!(result.is_ok());
+        let output = result.unwrap();
+        assert!(output.user_current_session.is_some());
+        assert_eq!(
+            output.user_current_session.unwrap().session_type,
+            UserSessionType::Work
+        );
+    }
+
+    #[tokio::test]
+    async fn test_fetch_with_category_and_task() {
+        let mut mock_repo = MockPomodoroStateRepository::new();
+        let category_id = Uuid::new_v4();
+        let task_id = Uuid::new_v4();
+        let mut state = PomodoroState::new();
+        state.update_category_id(category_id);
+        state.update_task_id(task_id);
+
+        mock_repo
+            .expect_fetch_user_state()
+            .returning(move |_| Ok(state.clone()));
+
+        let use_case = FetchUserPomodoroStateUseCase::new(Arc::new(mock_repo));
+        let result = use_case
+            .execute(FetchUserPomodoroStateCommand { user_id: Uuid::new_v4() })
+            .await;
+        assert!(result.is_ok());
+        let output = result.unwrap();
+        assert_eq!(output.category_id, Some(category_id.to_string()));
+        assert_eq!(output.task_id, Some(task_id.to_string()));
+    }
+
+    #[tokio::test]
+    async fn test_fetch_repository_error() {
+        let mut mock_repo = MockPomodoroStateRepository::new();
+        mock_repo
+            .expect_fetch_user_state()
+            .returning(|_| Err(PomodoroStateRepositoryError::UserNotFound));
+
+        let use_case = FetchUserPomodoroStateUseCase::new(Arc::new(mock_repo));
+        let result = use_case
+            .execute(FetchUserPomodoroStateCommand { user_id: Uuid::new_v4() })
+            .await;
+        assert!(result.is_err());
+        assert!(matches!(
+            result.err().unwrap(),
+            FetchUserPomodoroStateError::PomodoroRepositoryError(_)
+        ));
+    }
+}
