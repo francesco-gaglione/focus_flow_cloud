@@ -160,7 +160,8 @@ impl FocusSession<RunningSession> {
         if now.timestamp() <= started_at {
             debug!(
                 "Start date is in the future: now={:?}, started_at={:?}",
-                now.timestamp(), started_at
+                now.timestamp(),
+                started_at
             );
             return Err(FocusSessionError::InvalidDateRange(
                 "Start date is in the future".to_string(),

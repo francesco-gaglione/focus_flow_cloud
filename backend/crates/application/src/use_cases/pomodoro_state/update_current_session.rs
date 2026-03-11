@@ -51,7 +51,7 @@ impl UpdateSessionUseCase {
 
         let mut current_session = user_state
             .current_session()
-            .ok_or_else(|| UpdateSessionError::NoCurrentSession)?;
+            .ok_or(UpdateSessionError::NoCurrentSession)?;
 
         if let Some(note) = command.new_note {
             current_session.update_note(note);

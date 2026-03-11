@@ -150,7 +150,7 @@ impl PomodoroState {
 
                 // Include the current session if it exists
                 if self.current_session.is_some() {
-                    completed_work_sessions = completed_work_sessions + 1;
+                    completed_work_sessions += 1;
                 }
                 debug!(
                     "Completed work sessions: {}, work sessions before long break: {}",

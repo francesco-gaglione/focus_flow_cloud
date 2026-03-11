@@ -28,10 +28,7 @@ impl InitPomodoroStateUseCase {
         }
     }
 
-    pub async fn execute(
-        &self,
-        command: InitPomodoroStateCommand,
-    ) -> InitPomodoroStateResult<()> {
+    pub async fn execute(&self, command: InitPomodoroStateCommand) -> InitPomodoroStateResult<()> {
         self.pomodoro_state_repo
             .init_user_state(command.user_id)
             .await?;

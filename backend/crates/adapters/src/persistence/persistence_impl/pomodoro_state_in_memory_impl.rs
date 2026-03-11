@@ -65,11 +65,7 @@ impl From<PomodoroState> for PomodoroStateInMemoryStore {
             selected_category_id: value.category_id(),
             selected_task_id: value.task_id(),
             running_session: value.current_session(),
-            consecutive: value
-                .consecutive_sessions()
-                .iter()
-                .map(|s| s.clone().into())
-                .collect(),
+            consecutive: value.consecutive_sessions().to_vec(),
         }
     }
 }
