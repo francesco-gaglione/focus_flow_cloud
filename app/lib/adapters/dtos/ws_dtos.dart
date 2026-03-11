@@ -53,15 +53,6 @@ abstract class UpdatePomodoroContext with _$UpdatePomodoroContext {
 // -----------------------------------------------------------------------------
 
 @freezed
-abstract class UpdateWorkContext with _$UpdateWorkContext {
-  const factory UpdateWorkContext({String? categoryId, String? taskId}) =
-      _UpdateWorkContext;
-
-  factory UpdateWorkContext.fromJson(Map<String, dynamic> json) =>
-      _$UpdateWorkContextFromJson(json);
-}
-
-@freezed
 abstract class UpdateCurrentSession with _$UpdateCurrentSession {
   const factory UpdateCurrentSession({
     required SessionTypeEnum sessionType,
@@ -80,7 +71,8 @@ abstract class UpdateCurrentSession with _$UpdateCurrentSession {
 abstract class UpdatePomodoroState with _$UpdatePomodoroState {
   const factory UpdatePomodoroState({
     UpdateCurrentSession? currentSession,
-    required UpdateWorkContext workContext,
+    String? categoryId,
+    String? taskId,
   }) = _UpdatePomodoroState;
 
   factory UpdatePomodoroState.fromJson(Map<String, dynamic> json) =>

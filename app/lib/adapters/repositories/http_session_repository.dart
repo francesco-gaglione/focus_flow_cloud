@@ -30,7 +30,7 @@ class HttpSessionRepository implements SessionRepository {
             categoryId: session.categoryId,
             concentrationScore: session.concentrationScore,
             notes: session.notes,
-            createdAt: DateTime.fromMillisecondsSinceEpoch(session.createdAt * 1000, isUtc: true),
+            createdAt: DateTime.fromMillisecondsSinceEpoch((session.createdAt ?? session.startedAt) * 1000, isUtc: true),
           ),
         )
         .toList();
@@ -97,7 +97,7 @@ class HttpSessionRepository implements SessionRepository {
               categoryId: session.categoryId,
               concentrationScore: session.concentrationScore,
               notes: session.notes,
-              createdAt: DateTime.fromMillisecondsSinceEpoch(session.createdAt * 1000, isUtc: true),
+              createdAt: DateTime.fromMillisecondsSinceEpoch((session.createdAt ?? session.startedAt) * 1000, isUtc: true),
             ),
           )
           .toList();
@@ -208,7 +208,7 @@ class HttpSessionRepository implements SessionRepository {
       categoryId: json['categoryId'],
       concentrationScore: json['concentrationScore'],
       notes: json['notes'],
-      createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt'] * 1000, isUtc: true),
+      createdAt: DateTime.fromMillisecondsSinceEpoch((json['createdAt'] ?? json['startedAt']) * 1000, isUtc: true),
     );
   }
 

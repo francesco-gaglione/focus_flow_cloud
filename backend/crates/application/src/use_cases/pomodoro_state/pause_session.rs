@@ -8,6 +8,7 @@ use domain::entities::focus_session_type::FocusSessionType;
 use domain::entities::pomodoro::pomodoro_state::PomodoroStateError;
 use std::sync::Arc;
 use thiserror::Error;
+use tracing::debug;
 use uuid::Uuid;
 
 #[derive(Debug, Error, PartialEq)]
@@ -62,27 +63,38 @@ impl PauseSessionUseCase {
             .pomodoro_state_repo
             .fetch_user_state(command.user_id)
             .await?;
+
         let current_session = user_pomo_state
             .current_session()
-            .as_ref()
             .ok_or(PauseSessionError::SessionNotFound)?;
 
         match current_session.session_type() {
             FocusSessionType::Work => {
-                let current_session = current_session.terminate()?;
+                debug!("Current session type work, starting break session");
+                let terminated_session = user_pomo_state.terminate_current_session()?;
 
                 self.session_persistence
-                    .create_manual_session(current_session.clone())
+                    .create_manual_session(terminated_session.clone())
                     .await?;
 
                 let next_session_type = user_pomo_state.calculate_next_session_type();
+                let category_id = terminated_session.category_id();
+                let task_id = terminated_session.task_id();
 
+                debug!(
+                    "next_session_type: {:?}, category_id: {:?}, task_id: {:?}",
+                    next_session_type, category_id, task_id
+                );
                 user_pomo_state.start_new_session(
                     command.user_id,
                     next_session_type,
-                    current_session.category_id(),
-                    current_session.task_id(),
+                    category_id,
+                    task_id,
                 )?;
+
+                self.pomodoro_state_repo
+                    .update_user_state(command.user_id, user_pomo_state)
+                    .await?;
             }
             _ => {
                 tracing::error!("Break session already running cannot start a new break");

@@ -34,7 +34,6 @@ dependencies = [
  "tower-sessions",
  "tracing",
  "tracing-subscriber",
- "tracing-tree",
  "utoipa",
  "utoipa-axum",
  "utoipa-scalar",
@@ -3670,18 +3669,6 @@ dependencies = [
  "tracing-core",
  "tracing-log",
  "tracing-serde",
-]
-
-[[package]]
-name = "tracing-tree"
-version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b56c62d2c80033cb36fae448730a2f2ef99410fe3ecbffc916681a32f6807dbe"
-dependencies = [
- "nu-ansi-term",
- "tracing-core",
- "tracing-log",
- "tracing-subscriber",
 ]
 
 [[package]]

@@ -1,5 +1,5 @@
 use thiserror::Error;
-use tracing::{debug, warn};
+use tracing::debug;
 use uuid::Uuid;
 
 use crate::entities::{
@@ -24,7 +24,7 @@ pub type PomodoroStateResult<T> = Result<T, PomodoroStateError>;
 
 #[derive(Debug, Default, Clone)]
 pub struct PomodoroState {
-    user_id: Option<Uuid>,
+    user_id: Uuid,
     category_id: Option<Uuid>,
     task_id: Option<Uuid>,
     current_session: Option<FocusSession<RunningSession>>,
@@ -34,12 +34,16 @@ pub struct PomodoroState {
 impl PomodoroState {
     pub fn new() -> Self {
         Self {
-            user_id: None,
+            user_id: Uuid::default(),
             category_id: None,
             task_id: None,
             current_session: None,
             consecutive_sessions: Vec::new(),
         }
+    }
+
+    pub fn user_id(&self) -> Uuid {
+        self.user_id
     }
 
     pub fn category_id(&self) -> Option<Uuid> {
@@ -58,16 +62,22 @@ impl PomodoroState {
         self.task_id = Some(task_id);
     }
 
-    pub fn current_session(&mut self) -> &mut Option<FocusSession<RunningSession>> {
-        &mut self.current_session
+    pub fn current_session(&mut self) -> Option<FocusSession<RunningSession>> {
+        self.current_session.clone()
     }
 
-    pub fn terminate_current_session(&mut self) -> PomodoroStateResult<()> {
+    pub fn update_current_session(&mut self, session: FocusSession<RunningSession>) {
+        self.current_session = Some(session);
+    }
+
+    pub fn terminate_current_session(
+        &mut self,
+    ) -> PomodoroStateResult<FocusSession<TerminatedSession>> {
         if let Some(session) = self.current_session.take() {
             let terminated = session.terminate()?;
-            self.consecutive_sessions.push(terminated);
+            self.consecutive_sessions.push(terminated.clone());
             self.current_session = None;
-            Ok(())
+            Ok(terminated)
         } else {
             Err(PomodoroStateError::NoRunningSession)
         }
@@ -92,11 +102,21 @@ impl PomodoroState {
         category_id: Option<Uuid>,
         task_id: Option<Uuid>,
     ) -> PomodoroStateResult<()> {
-        self.user_id = Some(user_id);
+        self.user_id = user_id;
         let new_session =
             FocusSession::<NewSession>::new(user_id, category_id, task_id, session_type)?;
         self.current_session = Some(new_session.run_session());
         Ok(())
+    }
+
+    /// Restores a previously running session from persisted state, preserving the original start time.
+    pub fn restore_running_session(
+        &mut self,
+        user_id: Uuid,
+        session: FocusSession<RunningSession>,
+    ) {
+        self.user_id = user_id;
+        self.current_session = Some(session);
     }
 
     /// Calculates the next session type based on Pomodoro technique rules:
@@ -104,27 +124,38 @@ impl PomodoroState {
     /// - After completing a Break session: Work
     /// - LongBreak is suggested after 4 completed Work sessions
     pub fn calculate_next_session_type(&self) -> FocusSessionType {
-        if self.consecutive_sessions.is_empty() {
-            warn!("No previous session found, returning a work session fallback");
-            return FocusSessionType::Work;
-        }
+        let last_type = self
+            .consecutive_sessions
+            .last()
+            .map(|s| s.session_type())
+            .or_else(|| self.current_session.as_ref().map(|s| s.session_type()));
 
-        let last_session_type = match self.consecutive_sessions.last() {
-            Some(last_session) => last_session.session_type(),
+        let last_session_type = match last_type {
+            Some(t) => t,
             None => {
-                tracing::warn!("No previous session found, returning a work session fallback");
+                debug!("No session history or current session, defaulting to Work");
                 return FocusSessionType::Work;
             }
         };
 
+        debug!("Last session type: {:?}", last_session_type);
+
         match last_session_type {
             FocusSessionType::Work => {
-                let completed_work_sessions = self
+                let mut completed_work_sessions = self
                     .consecutive_sessions
                     .iter()
                     .filter(|s| s.session_type() == FocusSessionType::Work)
                     .count();
 
+                // Include the current session if it exists
+                if self.current_session.is_some() {
+                    completed_work_sessions = completed_work_sessions + 1;
+                }
+                debug!(
+                    "Completed work sessions: {}, work sessions before long break: {}",
+                    completed_work_sessions, WORK_SESSIONS_BEFORE_LONG_BREAK
+                );
                 let next_type = if completed_work_sessions % WORK_SESSIONS_BEFORE_LONG_BREAK == 0 {
                     FocusSessionType::LongBreak
                 } else {
@@ -143,10 +174,6 @@ impl PomodoroState {
                 FocusSessionType::Work
             }
         }
-    }
-
-    pub fn get_user_id(&self) -> Option<Uuid> {
-        self.user_id
     }
 }
 
@@ -185,7 +212,7 @@ mod tests {
         state
             .start_new_session(uid, FocusSessionType::Work, None, None)
             .unwrap();
-        assert_eq!(state.get_user_id(), Some(uid));
+        assert_eq!(state.user_id(), uid);
     }
 
     #[test]
@@ -223,10 +250,10 @@ mod tests {
     #[test]
     fn test_terminate_without_running_session_fails() {
         let mut state = PomodoroState::default();
-        assert_eq!(
+        assert!(matches!(
             state.terminate_current_session(),
             Err(PomodoroStateError::NoRunningSession)
-        );
+        ));
     }
 
     #[test]

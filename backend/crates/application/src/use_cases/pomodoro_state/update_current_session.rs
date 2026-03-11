@@ -19,6 +19,9 @@ pub enum UpdateSessionError {
 
     #[error("persistence error: {0}")]
     PersistenceError(#[from] PersistenceError),
+
+    #[error("no current session found")]
+    NoCurrentSession,
 }
 
 pub type UpdateSessionResult<T> = Result<T, UpdateSessionError>;
@@ -41,10 +44,14 @@ impl UpdateSessionUseCase {
     }
 
     pub async fn execute(&self, command: UpdateSessionCommand) -> UpdateSessionResult<()> {
-        let mut current_session = self
+        let mut user_state = self
             .pomodoro_state_repo
-            .fetch_running_session(command.user_id)
+            .fetch_user_state(command.user_id)
             .await?;
+
+        let mut current_session = user_state
+            .current_session()
+            .ok_or_else(|| UpdateSessionError::NoCurrentSession)?;
 
         if let Some(note) = command.new_note {
             current_session.update_note(note);
@@ -53,8 +60,10 @@ impl UpdateSessionUseCase {
             current_session.update_concentration_score(concentration_score)?;
         }
 
+        user_state.update_current_session(current_session);
+
         self.pomodoro_state_repo
-            .update_running_session(command.user_id, current_session)
+            .update_user_state(command.user_id, user_state)
             .await?;
 
         Ok(())

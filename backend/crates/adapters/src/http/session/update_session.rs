@@ -99,12 +99,18 @@ pub async fn update_session_api(
         .map_err(|_| HttpError::BadRequest("Invalid task id".to_string()))?;
     let started_at = payload
         .started_at
-        .and_then(|s| DateTime::from_timestamp(s, 0))
-        .ok_or_else(|| HttpError::BadRequest("Invalid started at timestamp".to_string()))?;
+        .map(|s| {
+            DateTime::from_timestamp(s, 0)
+                .ok_or_else(|| HttpError::BadRequest("Invalid started at timestamp".to_string()))
+        })
+        .transpose()?;
     let ended_at = payload
         .ended_at
-        .and_then(|s| DateTime::from_timestamp(s, 0))
-        .ok_or_else(|| HttpError::BadRequest("Invalid ended at timestamp".to_string()))?;
+        .map(|s| {
+            DateTime::from_timestamp(s, 0)
+                .ok_or_else(|| HttpError::BadRequest("Invalid ended at timestamp".to_string()))
+        })
+        .transpose()?;
 
     let command = UpdateFocusSessionCommand {
         session_id,
@@ -112,8 +118,8 @@ pub async fn update_session_api(
         task_id,
         concentration_score: payload.concentration_score,
         notes: payload.notes,
-        started_at: Some(started_at),
-        ended_at: Some(ended_at),
+        started_at,
+        ended_at,
     };
 
     state.update_focus_session_uc.execute(command).await?;

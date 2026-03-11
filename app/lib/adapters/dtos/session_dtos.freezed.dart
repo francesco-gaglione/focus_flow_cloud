@@ -866,7 +866,7 @@ as String?,
 /// @nodoc
 mixin _$FocusSessionDto {
 
- String get id; String get sessionType; int get startedAt; int? get endedAt; int? get actualDuration; String? get taskId; String? get categoryId; int? get concentrationScore; String? get notes; int get createdAt;
+ String get id; String get sessionType; int get startedAt; int? get endedAt; int? get actualDuration; String? get taskId; String? get categoryId; int? get concentrationScore; String? get notes; int? get createdAt;
 /// Create a copy of FocusSessionDto
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -899,7 +899,7 @@ abstract mixin class $FocusSessionDtoCopyWith<$Res>  {
   factory $FocusSessionDtoCopyWith(FocusSessionDto value, $Res Function(FocusSessionDto) _then) = _$FocusSessionDtoCopyWithImpl;
 @useResult
 $Res call({
- String id, String sessionType, int startedAt, int? endedAt, int? actualDuration, String? taskId, String? categoryId, int? concentrationScore, String? notes, int createdAt
+ String id, String sessionType, int startedAt, int? endedAt, int? actualDuration, String? taskId, String? categoryId, int? concentrationScore, String? notes, int? createdAt
 });
 
 
@@ -916,7 +916,7 @@ class _$FocusSessionDtoCopyWithImpl<$Res>
 
 /// Create a copy of FocusSessionDto
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? sessionType = null,Object? startedAt = null,Object? endedAt = freezed,Object? actualDuration = freezed,Object? taskId = freezed,Object? categoryId = freezed,Object? concentrationScore = freezed,Object? notes = freezed,Object? createdAt = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? sessionType = null,Object? startedAt = null,Object? endedAt = freezed,Object? actualDuration = freezed,Object? taskId = freezed,Object? categoryId = freezed,Object? concentrationScore = freezed,Object? notes = freezed,Object? createdAt = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,sessionType: null == sessionType ? _self.sessionType : sessionType // ignore: cast_nullable_to_non_nullable
@@ -927,8 +927,8 @@ as int?,taskId: freezed == taskId ? _self.taskId : taskId // ignore: cast_nullab
 as String?,categoryId: freezed == categoryId ? _self.categoryId : categoryId // ignore: cast_nullable_to_non_nullable
 as String?,concentrationScore: freezed == concentrationScore ? _self.concentrationScore : concentrationScore // ignore: cast_nullable_to_non_nullable
 as int?,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
-as String?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
-as int,
+as String?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 
@@ -1013,7 +1013,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String sessionType,  int startedAt,  int? endedAt,  int? actualDuration,  String? taskId,  String? categoryId,  int? concentrationScore,  String? notes,  int createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String sessionType,  int startedAt,  int? endedAt,  int? actualDuration,  String? taskId,  String? categoryId,  int? concentrationScore,  String? notes,  int? createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _FocusSessionDto() when $default != null:
 return $default(_that.id,_that.sessionType,_that.startedAt,_that.endedAt,_that.actualDuration,_that.taskId,_that.categoryId,_that.concentrationScore,_that.notes,_that.createdAt);case _:
@@ -1034,7 +1034,7 @@ return $default(_that.id,_that.sessionType,_that.startedAt,_that.endedAt,_that.a
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String sessionType,  int startedAt,  int? endedAt,  int? actualDuration,  String? taskId,  String? categoryId,  int? concentrationScore,  String? notes,  int createdAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String sessionType,  int startedAt,  int? endedAt,  int? actualDuration,  String? taskId,  String? categoryId,  int? concentrationScore,  String? notes,  int? createdAt)  $default,) {final _that = this;
 switch (_that) {
 case _FocusSessionDto():
 return $default(_that.id,_that.sessionType,_that.startedAt,_that.endedAt,_that.actualDuration,_that.taskId,_that.categoryId,_that.concentrationScore,_that.notes,_that.createdAt);case _:
@@ -1054,7 +1054,7 @@ return $default(_that.id,_that.sessionType,_that.startedAt,_that.endedAt,_that.a
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String sessionType,  int startedAt,  int? endedAt,  int? actualDuration,  String? taskId,  String? categoryId,  int? concentrationScore,  String? notes,  int createdAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String sessionType,  int startedAt,  int? endedAt,  int? actualDuration,  String? taskId,  String? categoryId,  int? concentrationScore,  String? notes,  int? createdAt)?  $default,) {final _that = this;
 switch (_that) {
 case _FocusSessionDto() when $default != null:
 return $default(_that.id,_that.sessionType,_that.startedAt,_that.endedAt,_that.actualDuration,_that.taskId,_that.categoryId,_that.concentrationScore,_that.notes,_that.createdAt);case _:
@@ -1069,7 +1069,7 @@ return $default(_that.id,_that.sessionType,_that.startedAt,_that.endedAt,_that.a
 @JsonSerializable()
 
 class _FocusSessionDto implements FocusSessionDto {
-  const _FocusSessionDto({required this.id, required this.sessionType, required this.startedAt, this.endedAt, this.actualDuration, this.taskId, this.categoryId, this.concentrationScore, this.notes, required this.createdAt});
+  const _FocusSessionDto({required this.id, required this.sessionType, required this.startedAt, this.endedAt, this.actualDuration, this.taskId, this.categoryId, this.concentrationScore, this.notes, this.createdAt});
   factory _FocusSessionDto.fromJson(Map<String, dynamic> json) => _$FocusSessionDtoFromJson(json);
 
 @override final  String id;
@@ -1081,7 +1081,7 @@ class _FocusSessionDto implements FocusSessionDto {
 @override final  String? categoryId;
 @override final  int? concentrationScore;
 @override final  String? notes;
-@override final  int createdAt;
+@override final  int? createdAt;
 
 /// Create a copy of FocusSessionDto
 /// with the given fields replaced by the non-null parameter values.
@@ -1116,7 +1116,7 @@ abstract mixin class _$FocusSessionDtoCopyWith<$Res> implements $FocusSessionDto
   factory _$FocusSessionDtoCopyWith(_FocusSessionDto value, $Res Function(_FocusSessionDto) _then) = __$FocusSessionDtoCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String sessionType, int startedAt, int? endedAt, int? actualDuration, String? taskId, String? categoryId, int? concentrationScore, String? notes, int createdAt
+ String id, String sessionType, int startedAt, int? endedAt, int? actualDuration, String? taskId, String? categoryId, int? concentrationScore, String? notes, int? createdAt
 });
 
 
@@ -1133,7 +1133,7 @@ class __$FocusSessionDtoCopyWithImpl<$Res>
 
 /// Create a copy of FocusSessionDto
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? sessionType = null,Object? startedAt = null,Object? endedAt = freezed,Object? actualDuration = freezed,Object? taskId = freezed,Object? categoryId = freezed,Object? concentrationScore = freezed,Object? notes = freezed,Object? createdAt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? sessionType = null,Object? startedAt = null,Object? endedAt = freezed,Object? actualDuration = freezed,Object? taskId = freezed,Object? categoryId = freezed,Object? concentrationScore = freezed,Object? notes = freezed,Object? createdAt = freezed,}) {
   return _then(_FocusSessionDto(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,sessionType: null == sessionType ? _self.sessionType : sessionType // ignore: cast_nullable_to_non_nullable
@@ -1144,8 +1144,8 @@ as int?,taskId: freezed == taskId ? _self.taskId : taskId // ignore: cast_nullab
 as String?,categoryId: freezed == categoryId ? _self.categoryId : categoryId // ignore: cast_nullable_to_non_nullable
 as String?,concentrationScore: freezed == concentrationScore ? _self.concentrationScore : concentrationScore // ignore: cast_nullable_to_non_nullable
 as int?,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
-as String?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
-as int,
+as String?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 

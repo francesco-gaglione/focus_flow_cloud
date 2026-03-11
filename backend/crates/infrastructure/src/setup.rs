@@ -1,5 +1,6 @@
 use application::use_cases::focus_session::update_focus_session::UpdateFocusSessionUseCase;
 use application::use_cases::pomodoro_state::fetch_user_pomodoro_state::FetchUserPomodoroStateUseCase;
+use application::use_cases::pomodoro_state::init_pomodoro_state::InitPomodoroStateUseCase;
 use application::use_cases::pomodoro_state::start_session::StartSessionUseCase;
 use application::use_cases::pomodoro_state::terminate_session::TerminateSessionUseCase;
 use application::use_cases::pomodoro_state::update_current_session::UpdateSessionUseCase;
@@ -67,6 +68,8 @@ pub async fn init_app_state(
     let password_policy = Arc::new(PasswordPolicyImpl::new());
 
     // Pomodoro state use cases
+    let init_pomodoro_state_uc =
+        Arc::new(InitPomodoroStateUseCase::new(pomodoro_state_arc.clone()));
     let pause_pomo_session_uc = Arc::new(PauseSessionUseCase::new(
         pomodoro_state_arc.clone(),
         postgres_arc.clone(),
@@ -193,6 +196,7 @@ pub async fn init_app_state(
     Ok(AppState {
         ws_clients: Arc::new(RwLock::new(HashMap::new())),
         config: config.clone(),
+        init_pomodoro_state_uc,
         pause_pomo_session_uc,
         fetch_pomo_session_uc,
         update_pomodoro_context_uc,
@@ -231,14 +235,12 @@ pub async fn init_app_state(
 
 pub fn init_tracing() {
     let filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| {
-        // Default to info, but enable debug for our app
-        // tower_http=info reduces noise from every single request detail if needed, but debug is good for dev
         "focus_flow_cloud=debug,api=debug,domain=debug,infrastructure=debug,application=debug,tower_http=info,axum=info,info".into()
     });
 
-    let registry = tracing_subscriber::registry().with(filter);
-
     let app_env = std::env::var("APP_ENV").unwrap_or_else(|_| "development".to_string());
+
+    let registry = tracing_subscriber::registry().with(filter);
 
     if app_env == "production" {
         registry

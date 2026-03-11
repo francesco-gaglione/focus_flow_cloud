@@ -1,6 +1,8 @@
 use std::sync::Arc;
 
-use domain::entities::focus_session::FocusSessionError;
+use domain::entities::{
+    focus_session::FocusSessionError, pomodoro::pomodoro_state::PomodoroStateError,
+};
 use thiserror::Error;
 use uuid::Uuid;
 
@@ -20,6 +22,9 @@ pub enum TerminateSessionError {
 
     #[error("persistence error: {0}")]
     PersistenceError(#[from] PersistenceError),
+
+    #[error("pomodoro state error: {0}")]
+    PomodoroStateError(#[from] PomodoroStateError),
 }
 
 pub type TerminateSessionResult<T> = Result<T, TerminateSessionError>;
@@ -45,20 +50,19 @@ impl TerminateSessionUseCase {
     }
 
     pub async fn execute(&self, command: TerminateSessionCommand) -> TerminateSessionResult<()> {
-        let current_session = self
+        let mut user_state = self
             .pomodoro_state_repo
-            .fetch_running_session(command.user_id)
+            .fetch_user_state(command.user_id)
             .await?;
 
-        let terminated_session = current_session.terminate()?;
-        drop(current_session);
+        let terminated_session = user_state.terminate_current_session()?;
 
         self.focus_session_repo
             .create_manual_session(terminated_session)
             .await?;
 
         self.pomodoro_state_repo
-            .clear_running_session(command.user_id)
+            .update_user_state(command.user_id, user_state)
             .await?;
 
         Ok(())

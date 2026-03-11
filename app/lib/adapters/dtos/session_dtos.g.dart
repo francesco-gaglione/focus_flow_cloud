@@ -90,7 +90,7 @@ _FocusSessionDto _$FocusSessionDtoFromJson(Map<String, dynamic> json) =>
       categoryId: json['categoryId'] as String?,
       concentrationScore: (json['concentrationScore'] as num?)?.toInt(),
       notes: json['notes'] as String?,
-      createdAt: (json['createdAt'] as num).toInt(),
+      createdAt: (json['createdAt'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$FocusSessionDtoToJson(_FocusSessionDto instance) =>

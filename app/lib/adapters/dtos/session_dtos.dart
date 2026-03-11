@@ -77,7 +77,7 @@ abstract class FocusSessionDto with _$FocusSessionDto {
     String? categoryId,
     int? concentrationScore,
     String? notes,
-    required int createdAt,
+    int? createdAt,
   }) = _FocusSessionDto;
 
   factory FocusSessionDto.fromJson(Map<String, dynamic> json) =>

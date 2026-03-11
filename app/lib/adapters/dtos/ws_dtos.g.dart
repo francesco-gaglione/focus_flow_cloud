@@ -36,18 +36,6 @@ Map<String, dynamic> _$UpdatePomodoroContextToJson(
   'taskId': instance.taskId,
 };
 
-_UpdateWorkContext _$UpdateWorkContextFromJson(Map<String, dynamic> json) =>
-    _UpdateWorkContext(
-      categoryId: json['categoryId'] as String?,
-      taskId: json['taskId'] as String?,
-    );
-
-Map<String, dynamic> _$UpdateWorkContextToJson(_UpdateWorkContext instance) =>
-    <String, dynamic>{
-      'categoryId': instance.categoryId,
-      'taskId': instance.taskId,
-    };
-
 _UpdateCurrentSession _$UpdateCurrentSessionFromJson(
   Map<String, dynamic> json,
 ) => _UpdateCurrentSession(
@@ -85,16 +73,16 @@ _UpdatePomodoroState _$UpdatePomodoroStateFromJson(Map<String, dynamic> json) =>
               : UpdateCurrentSession.fromJson(
                 json['currentSession'] as Map<String, dynamic>,
               ),
-      workContext: UpdateWorkContext.fromJson(
-        json['workContext'] as Map<String, dynamic>,
-      ),
+      categoryId: json['categoryId'] as String?,
+      taskId: json['taskId'] as String?,
     );
 
 Map<String, dynamic> _$UpdatePomodoroStateToJson(
   _UpdatePomodoroState instance,
 ) => <String, dynamic>{
   'currentSession': instance.currentSession,
-  'workContext': instance.workContext,
+  'categoryId': instance.categoryId,
+  'taskId': instance.taskId,
 };
 
 _WsClientRequest _$WsClientRequestFromJson(Map<String, dynamic> json) =>

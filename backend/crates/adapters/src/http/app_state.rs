@@ -1,6 +1,7 @@
 use crate::config::AppConfig;
 use application::use_cases::focus_session::update_focus_session::UpdateFocusSessionUseCase;
 use application::use_cases::pomodoro_state::fetch_user_pomodoro_state::FetchUserPomodoroStateUseCase;
+use application::use_cases::pomodoro_state::init_pomodoro_state::InitPomodoroStateUseCase;
 use application::use_cases::pomodoro_state::pause_session::PauseSessionUseCase;
 use application::use_cases::pomodoro_state::start_session::StartSessionUseCase;
 use application::use_cases::pomodoro_state::terminate_session::TerminateSessionUseCase;
@@ -58,6 +59,7 @@ pub struct AppState {
     pub update_category_uc: Arc<UpdateCategoryUseCases>,
 
     // Pomodoro state use cases
+    pub init_pomodoro_state_uc: Arc<InitPomodoroStateUseCase>,
     pub pause_pomo_session_uc: Arc<PauseSessionUseCase>,
     pub fetch_pomo_session_uc: Arc<FetchUserPomodoroStateUseCase>,
     pub update_pomodoro_context_uc: Arc<UpdatePomodoroContextUseCase>,

@@ -1,8 +1,8 @@
 use std::sync::Arc;
 
 use domain::entities::{
-    focus_session::{FocusSession, FocusSessionError, NewSession},
-    focus_session_type::FocusSessionType,
+    focus_session::FocusSessionError, focus_session_type::FocusSessionType,
+    pomodoro::pomodoro_state::PomodoroStateError,
 };
 use thiserror::Error;
 use uuid::Uuid;
@@ -26,6 +26,9 @@ pub enum StartSessionError {
 
     #[error("Pomodoro state repository error: {0}")]
     PomodoroStateRepositoryError(#[from] PomodoroStateRepositoryError),
+
+    #[error("Pomodoro state error: {0}")]
+    PomodoroStateError(#[from] PomodoroStateError),
 }
 
 pub type StartSessionResult<T> = Result<T, StartSessionError>;
@@ -61,21 +64,21 @@ impl StartSessionUseCase {
                 return Err(StartSessionError::WorkSessionAlreadyRunning);
             }
 
-            let terminated_session = current_session.terminate()?;
+            let terminated = user_state.terminate_current_session()?;
             self.focus_session_repo
-                .create_manual_session(terminated_session)
+                .create_manual_session(terminated)
                 .await?;
         }
 
-        let new_session = FocusSession::<NewSession>::new(
+        user_state.start_new_session(
             command.user_id,
+            FocusSessionType::Work,
             user_state.category_id(),
             user_state.task_id(),
-            FocusSessionType::Work,
         )?;
 
         self.pomodoro_state_repo
-            .store_running_session(command.user_id, new_session.run_session())
+            .update_user_state(command.user_id, user_state)
             .await?;
 
         Ok(())

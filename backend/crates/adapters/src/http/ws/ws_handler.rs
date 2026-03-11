@@ -2,6 +2,7 @@ use crate::http::request_id::RequestId;
 use crate::http::ws::error::WsHandlerResult;
 use crate::http::ws::handle_update_pomodoro_context::handle_update_pomodoro_context;
 use crate::http::{model::session_model::UserSession, ws::error::WsHandlerError};
+use application::use_cases::pomodoro_state::init_pomodoro_state::InitPomodoroStateCommand;
 use axum::{
     extract::{
         ws::{Message, WebSocket, WebSocketUpgrade},
@@ -58,6 +59,18 @@ async fn handle_socket(ws: WebSocket, state: AppState, request_id: RequestId, us
         let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel();
 
         state.ws_clients.write().await.insert(my_id, tx.clone());
+
+        // Init user state
+        if let Err(e) = state
+            .init_pomodoro_state_uc
+            .execute(InitPomodoroStateCommand { user_id })
+            .await
+        {
+            error!(
+                "Failed to init pomodoro state for user {}: {:?}",
+                user_id, e
+            );
+        }
 
         let send_task = tokio::spawn(async move {
             while let Some(msg) = rx.recv().await {
@@ -168,7 +181,8 @@ async fn handle_message(
     match msg {
         ClientMessage::RequestSync => match sync_pomodoro_state(state, user_id).await {
             Ok(msg) => {
-                send_sync_to_client(tx, msg).await;
+                send_sync_to_client(tx, msg.clone()).await;
+                info!("Synced pomodoro state: {:?}", msg);
             }
             Err(e) => {
                 error!("Failed to sync clients: {:?}", e);

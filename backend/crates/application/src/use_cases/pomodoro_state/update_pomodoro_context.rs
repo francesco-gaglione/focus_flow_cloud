@@ -1,8 +1,5 @@
 use std::sync::Arc;
-
-use domain::entities::focus_session_type::FocusSessionType;
 use thiserror::Error;
-use tracing::error;
 use uuid::Uuid;
 
 use crate::repository_traits::pomodoro_state_repository::{
@@ -41,20 +38,21 @@ impl UpdatePomodoroContextUseCase {
         &self,
         command: UpdatePomodoroContextCommand,
     ) -> UpdatePomodoroContextResult<()> {
-        let running_session = self
+        let mut user_state = self
             .pomodoro_state_repo
-            .fetch_running_session(command.user_id)
+            .fetch_user_state(command.user_id)
             .await?;
 
-        if running_session.session_type() == FocusSessionType::Work {
-            error!("cannot update context while in work session");
-            return Err(UpdatePomodoroContextError::CannotUpdateContextWhileInWorkSession);
+        if let Some(category_id) = command.category_id {
+            user_state.update_category_id(category_id);
         }
 
-        //TODO check if task_id is valid for the given category_id
+        if let Some(task_id) = command.task_id {
+            user_state.update_task_id(task_id);
+        }
 
         self.pomodoro_state_repo
-            .update_work_context(command.user_id, command.category_id, command.task_id)
+            .update_user_state(command.user_id, user_state)
             .await?;
 
         Ok(())

@@ -805,272 +805,6 @@ as String?,
 
 
 /// @nodoc
-mixin _$UpdateWorkContext {
-
- String? get categoryId; String? get taskId;
-/// Create a copy of UpdateWorkContext
-/// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-$UpdateWorkContextCopyWith<UpdateWorkContext> get copyWith => _$UpdateWorkContextCopyWithImpl<UpdateWorkContext>(this as UpdateWorkContext, _$identity);
-
-  /// Serializes this UpdateWorkContext to a JSON map.
-  Map<String, dynamic> toJson();
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is UpdateWorkContext&&(identical(other.categoryId, categoryId) || other.categoryId == categoryId)&&(identical(other.taskId, taskId) || other.taskId == taskId));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode => Object.hash(runtimeType,categoryId,taskId);
-
-@override
-String toString() {
-  return 'UpdateWorkContext(categoryId: $categoryId, taskId: $taskId)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class $UpdateWorkContextCopyWith<$Res>  {
-  factory $UpdateWorkContextCopyWith(UpdateWorkContext value, $Res Function(UpdateWorkContext) _then) = _$UpdateWorkContextCopyWithImpl;
-@useResult
-$Res call({
- String? categoryId, String? taskId
-});
-
-
-
-
-}
-/// @nodoc
-class _$UpdateWorkContextCopyWithImpl<$Res>
-    implements $UpdateWorkContextCopyWith<$Res> {
-  _$UpdateWorkContextCopyWithImpl(this._self, this._then);
-
-  final UpdateWorkContext _self;
-  final $Res Function(UpdateWorkContext) _then;
-
-/// Create a copy of UpdateWorkContext
-/// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? categoryId = freezed,Object? taskId = freezed,}) {
-  return _then(_self.copyWith(
-categoryId: freezed == categoryId ? _self.categoryId : categoryId // ignore: cast_nullable_to_non_nullable
-as String?,taskId: freezed == taskId ? _self.taskId : taskId // ignore: cast_nullable_to_non_nullable
-as String?,
-  ));
-}
-
-}
-
-
-/// Adds pattern-matching-related methods to [UpdateWorkContext].
-extension UpdateWorkContextPatterns on UpdateWorkContext {
-/// A variant of `map` that fallback to returning `orElse`.
-///
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case final Subclass value:
-///     return ...;
-///   case _:
-///     return orElse();
-/// }
-/// ```
-
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _UpdateWorkContext value)?  $default,{required TResult orElse(),}){
-final _that = this;
-switch (_that) {
-case _UpdateWorkContext() when $default != null:
-return $default(_that);case _:
-  return orElse();
-
-}
-}
-/// A `switch`-like method, using callbacks.
-///
-/// Callbacks receives the raw object, upcasted.
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case final Subclass value:
-///     return ...;
-///   case final Subclass2 value:
-///     return ...;
-/// }
-/// ```
-
-@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _UpdateWorkContext value)  $default,){
-final _that = this;
-switch (_that) {
-case _UpdateWorkContext():
-return $default(_that);case _:
-  throw StateError('Unexpected subclass');
-
-}
-}
-/// A variant of `map` that fallback to returning `null`.
-///
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case final Subclass value:
-///     return ...;
-///   case _:
-///     return null;
-/// }
-/// ```
-
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _UpdateWorkContext value)?  $default,){
-final _that = this;
-switch (_that) {
-case _UpdateWorkContext() when $default != null:
-return $default(_that);case _:
-  return null;
-
-}
-}
-/// A variant of `when` that fallback to an `orElse` callback.
-///
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case Subclass(:final field):
-///     return ...;
-///   case _:
-///     return orElse();
-/// }
-/// ```
-
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? categoryId,  String? taskId)?  $default,{required TResult orElse(),}) {final _that = this;
-switch (_that) {
-case _UpdateWorkContext() when $default != null:
-return $default(_that.categoryId,_that.taskId);case _:
-  return orElse();
-
-}
-}
-/// A `switch`-like method, using callbacks.
-///
-/// As opposed to `map`, this offers destructuring.
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case Subclass(:final field):
-///     return ...;
-///   case Subclass2(:final field2):
-///     return ...;
-/// }
-/// ```
-
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? categoryId,  String? taskId)  $default,) {final _that = this;
-switch (_that) {
-case _UpdateWorkContext():
-return $default(_that.categoryId,_that.taskId);case _:
-  throw StateError('Unexpected subclass');
-
-}
-}
-/// A variant of `when` that fallback to returning `null`
-///
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case Subclass(:final field):
-///     return ...;
-///   case _:
-///     return null;
-/// }
-/// ```
-
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? categoryId,  String? taskId)?  $default,) {final _that = this;
-switch (_that) {
-case _UpdateWorkContext() when $default != null:
-return $default(_that.categoryId,_that.taskId);case _:
-  return null;
-
-}
-}
-
-}
-
-/// @nodoc
-@JsonSerializable()
-
-class _UpdateWorkContext implements UpdateWorkContext {
-  const _UpdateWorkContext({this.categoryId, this.taskId});
-  factory _UpdateWorkContext.fromJson(Map<String, dynamic> json) => _$UpdateWorkContextFromJson(json);
-
-@override final  String? categoryId;
-@override final  String? taskId;
-
-/// Create a copy of UpdateWorkContext
-/// with the given fields replaced by the non-null parameter values.
-@override @JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-_$UpdateWorkContextCopyWith<_UpdateWorkContext> get copyWith => __$UpdateWorkContextCopyWithImpl<_UpdateWorkContext>(this, _$identity);
-
-@override
-Map<String, dynamic> toJson() {
-  return _$UpdateWorkContextToJson(this, );
-}
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UpdateWorkContext&&(identical(other.categoryId, categoryId) || other.categoryId == categoryId)&&(identical(other.taskId, taskId) || other.taskId == taskId));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode => Object.hash(runtimeType,categoryId,taskId);
-
-@override
-String toString() {
-  return 'UpdateWorkContext(categoryId: $categoryId, taskId: $taskId)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class _$UpdateWorkContextCopyWith<$Res> implements $UpdateWorkContextCopyWith<$Res> {
-  factory _$UpdateWorkContextCopyWith(_UpdateWorkContext value, $Res Function(_UpdateWorkContext) _then) = __$UpdateWorkContextCopyWithImpl;
-@override @useResult
-$Res call({
- String? categoryId, String? taskId
-});
-
-
-
-
-}
-/// @nodoc
-class __$UpdateWorkContextCopyWithImpl<$Res>
-    implements _$UpdateWorkContextCopyWith<$Res> {
-  __$UpdateWorkContextCopyWithImpl(this._self, this._then);
-
-  final _UpdateWorkContext _self;
-  final $Res Function(_UpdateWorkContext) _then;
-
-/// Create a copy of UpdateWorkContext
-/// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? categoryId = freezed,Object? taskId = freezed,}) {
-  return _then(_UpdateWorkContext(
-categoryId: freezed == categoryId ? _self.categoryId : categoryId // ignore: cast_nullable_to_non_nullable
-as String?,taskId: freezed == taskId ? _self.taskId : taskId // ignore: cast_nullable_to_non_nullable
-as String?,
-  ));
-}
-
-
-}
-
-
-/// @nodoc
 mixin _$UpdateCurrentSession {
 
  SessionTypeEnum get sessionType; int get sessionStartTime;// i64 maps to int in Dart
@@ -1353,7 +1087,7 @@ as int?,
 /// @nodoc
 mixin _$UpdatePomodoroState {
 
- UpdateCurrentSession? get currentSession; UpdateWorkContext get workContext;
+ UpdateCurrentSession? get currentSession; String? get categoryId; String? get taskId;
 /// Create a copy of UpdatePomodoroState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1366,16 +1100,16 @@ $UpdatePomodoroStateCopyWith<UpdatePomodoroState> get copyWith => _$UpdatePomodo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is UpdatePomodoroState&&(identical(other.currentSession, currentSession) || other.currentSession == currentSession)&&(identical(other.workContext, workContext) || other.workContext == workContext));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UpdatePomodoroState&&(identical(other.currentSession, currentSession) || other.currentSession == currentSession)&&(identical(other.categoryId, categoryId) || other.categoryId == categoryId)&&(identical(other.taskId, taskId) || other.taskId == taskId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,currentSession,workContext);
+int get hashCode => Object.hash(runtimeType,currentSession,categoryId,taskId);
 
 @override
 String toString() {
-  return 'UpdatePomodoroState(currentSession: $currentSession, workContext: $workContext)';
+  return 'UpdatePomodoroState(currentSession: $currentSession, categoryId: $categoryId, taskId: $taskId)';
 }
 
 
@@ -1386,11 +1120,11 @@ abstract mixin class $UpdatePomodoroStateCopyWith<$Res>  {
   factory $UpdatePomodoroStateCopyWith(UpdatePomodoroState value, $Res Function(UpdatePomodoroState) _then) = _$UpdatePomodoroStateCopyWithImpl;
 @useResult
 $Res call({
- UpdateCurrentSession? currentSession, UpdateWorkContext workContext
+ UpdateCurrentSession? currentSession, String? categoryId, String? taskId
 });
 
 
-$UpdateCurrentSessionCopyWith<$Res>? get currentSession;$UpdateWorkContextCopyWith<$Res> get workContext;
+$UpdateCurrentSessionCopyWith<$Res>? get currentSession;
 
 }
 /// @nodoc
@@ -1403,11 +1137,12 @@ class _$UpdatePomodoroStateCopyWithImpl<$Res>
 
 /// Create a copy of UpdatePomodoroState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? currentSession = freezed,Object? workContext = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? currentSession = freezed,Object? categoryId = freezed,Object? taskId = freezed,}) {
   return _then(_self.copyWith(
 currentSession: freezed == currentSession ? _self.currentSession : currentSession // ignore: cast_nullable_to_non_nullable
-as UpdateCurrentSession?,workContext: null == workContext ? _self.workContext : workContext // ignore: cast_nullable_to_non_nullable
-as UpdateWorkContext,
+as UpdateCurrentSession?,categoryId: freezed == categoryId ? _self.categoryId : categoryId // ignore: cast_nullable_to_non_nullable
+as String?,taskId: freezed == taskId ? _self.taskId : taskId // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 /// Create a copy of UpdatePomodoroState
@@ -1421,15 +1156,6 @@ $UpdateCurrentSessionCopyWith<$Res>? get currentSession {
 
   return $UpdateCurrentSessionCopyWith<$Res>(_self.currentSession!, (value) {
     return _then(_self.copyWith(currentSession: value));
-  });
-}/// Create a copy of UpdatePomodoroState
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$UpdateWorkContextCopyWith<$Res> get workContext {
-  
-  return $UpdateWorkContextCopyWith<$Res>(_self.workContext, (value) {
-    return _then(_self.copyWith(workContext: value));
   });
 }
 }
@@ -1513,10 +1239,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( UpdateCurrentSession? currentSession,  UpdateWorkContext workContext)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( UpdateCurrentSession? currentSession,  String? categoryId,  String? taskId)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UpdatePomodoroState() when $default != null:
-return $default(_that.currentSession,_that.workContext);case _:
+return $default(_that.currentSession,_that.categoryId,_that.taskId);case _:
   return orElse();
 
 }
@@ -1534,10 +1260,10 @@ return $default(_that.currentSession,_that.workContext);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( UpdateCurrentSession? currentSession,  UpdateWorkContext workContext)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( UpdateCurrentSession? currentSession,  String? categoryId,  String? taskId)  $default,) {final _that = this;
 switch (_that) {
 case _UpdatePomodoroState():
-return $default(_that.currentSession,_that.workContext);case _:
+return $default(_that.currentSession,_that.categoryId,_that.taskId);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1554,10 +1280,10 @@ return $default(_that.currentSession,_that.workContext);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( UpdateCurrentSession? currentSession,  UpdateWorkContext workContext)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( UpdateCurrentSession? currentSession,  String? categoryId,  String? taskId)?  $default,) {final _that = this;
 switch (_that) {
 case _UpdatePomodoroState() when $default != null:
-return $default(_that.currentSession,_that.workContext);case _:
+return $default(_that.currentSession,_that.categoryId,_that.taskId);case _:
   return null;
 
 }
@@ -1569,11 +1295,12 @@ return $default(_that.currentSession,_that.workContext);case _:
 @JsonSerializable()
 
 class _UpdatePomodoroState implements UpdatePomodoroState {
-  const _UpdatePomodoroState({this.currentSession, required this.workContext});
+  const _UpdatePomodoroState({this.currentSession, this.categoryId, this.taskId});
   factory _UpdatePomodoroState.fromJson(Map<String, dynamic> json) => _$UpdatePomodoroStateFromJson(json);
 
 @override final  UpdateCurrentSession? currentSession;
-@override final  UpdateWorkContext workContext;
+@override final  String? categoryId;
+@override final  String? taskId;
 
 /// Create a copy of UpdatePomodoroState
 /// with the given fields replaced by the non-null parameter values.
@@ -1588,16 +1315,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UpdatePomodoroState&&(identical(other.currentSession, currentSession) || other.currentSession == currentSession)&&(identical(other.workContext, workContext) || other.workContext == workContext));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UpdatePomodoroState&&(identical(other.currentSession, currentSession) || other.currentSession == currentSession)&&(identical(other.categoryId, categoryId) || other.categoryId == categoryId)&&(identical(other.taskId, taskId) || other.taskId == taskId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,currentSession,workContext);
+int get hashCode => Object.hash(runtimeType,currentSession,categoryId,taskId);
 
 @override
 String toString() {
-  return 'UpdatePomodoroState(currentSession: $currentSession, workContext: $workContext)';
+  return 'UpdatePomodoroState(currentSession: $currentSession, categoryId: $categoryId, taskId: $taskId)';
 }
 
 
@@ -1608,11 +1335,11 @@ abstract mixin class _$UpdatePomodoroStateCopyWith<$Res> implements $UpdatePomod
   factory _$UpdatePomodoroStateCopyWith(_UpdatePomodoroState value, $Res Function(_UpdatePomodoroState) _then) = __$UpdatePomodoroStateCopyWithImpl;
 @override @useResult
 $Res call({
- UpdateCurrentSession? currentSession, UpdateWorkContext workContext
+ UpdateCurrentSession? currentSession, String? categoryId, String? taskId
 });
 
 
-@override $UpdateCurrentSessionCopyWith<$Res>? get currentSession;@override $UpdateWorkContextCopyWith<$Res> get workContext;
+@override $UpdateCurrentSessionCopyWith<$Res>? get currentSession;
 
 }
 /// @nodoc
@@ -1625,11 +1352,12 @@ class __$UpdatePomodoroStateCopyWithImpl<$Res>
 
 /// Create a copy of UpdatePomodoroState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? currentSession = freezed,Object? workContext = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? currentSession = freezed,Object? categoryId = freezed,Object? taskId = freezed,}) {
   return _then(_UpdatePomodoroState(
 currentSession: freezed == currentSession ? _self.currentSession : currentSession // ignore: cast_nullable_to_non_nullable
-as UpdateCurrentSession?,workContext: null == workContext ? _self.workContext : workContext // ignore: cast_nullable_to_non_nullable
-as UpdateWorkContext,
+as UpdateCurrentSession?,categoryId: freezed == categoryId ? _self.categoryId : categoryId // ignore: cast_nullable_to_non_nullable
+as String?,taskId: freezed == taskId ? _self.taskId : taskId // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -1644,15 +1372,6 @@ $UpdateCurrentSessionCopyWith<$Res>? get currentSession {
 
   return $UpdateCurrentSessionCopyWith<$Res>(_self.currentSession!, (value) {
     return _then(_self.copyWith(currentSession: value));
-  });
-}/// Create a copy of UpdatePomodoroState
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$UpdateWorkContextCopyWith<$Res> get workContext {
-  
-  return $UpdateWorkContextCopyWith<$Res>(_self.workContext, (value) {
-    return _then(_self.copyWith(workContext: value));
   });
 }
 }

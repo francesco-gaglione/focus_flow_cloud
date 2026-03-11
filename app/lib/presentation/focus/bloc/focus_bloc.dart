@@ -367,11 +367,11 @@ class FocusBloc extends Bloc<FocusEvent, FocusState> {
     Emitter<FocusState> emit,
   ) async {
     final pomodoroState = event.pomodoroState;
-    logger.d('Pomodoro state - Work context: ${pomodoroState.workContext}');
+    logger.d('Pomodoro state - categoryId: ${pomodoroState.categoryId}, taskId: ${pomodoroState.taskId}');
     Category? selectedCategory;
     Task? selectedTask;
-    final categoryId = pomodoroState.workContext.categoryId;
-    final taskId = pomodoroState.workContext.taskId;
+    final categoryId = pomodoroState.categoryId;
+    final taskId = pomodoroState.taskId;
 
     if (categoryId != null) {
       try {

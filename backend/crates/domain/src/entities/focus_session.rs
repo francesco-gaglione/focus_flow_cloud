@@ -3,6 +3,7 @@ use std::marker::PhantomData;
 use crate::entities::focus_session_type::FocusSessionType;
 use chrono::{DateTime, Utc};
 use thiserror::Error;
+use tracing::debug;
 use uuid::Uuid;
 
 #[derive(Debug, Error, PartialEq)]
@@ -157,6 +158,10 @@ impl FocusSession<RunningSession> {
         };
 
         if now.timestamp() <= started_at {
+            debug!(
+                "Start date is in the future: now={:?}, started_at={:?}",
+                now.timestamp(), started_at
+            );
             return Err(FocusSessionError::InvalidDateRange(
                 "Start date is in the future".to_string(),
             ));
