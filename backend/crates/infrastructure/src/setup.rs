@@ -87,6 +87,7 @@ pub async fn init_app_state(
     let terminate_session_uc = Arc::new(TerminateSessionUseCase::new(
         pomodoro_state_arc.clone(),
         postgres_arc.clone(),
+        postgres_arc.clone(),
     ));
     let update_current_session_uc = Arc::new(UpdateSessionUseCase::new(pomodoro_state_arc.clone()));
 

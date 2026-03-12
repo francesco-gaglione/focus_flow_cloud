@@ -10,6 +10,7 @@ use crate::repository_traits::{
     focus_session_repository::FocusSessionRepository,
     persistence_error::PersistenceError,
     pomodoro_state_repository::{PomodoroStateRepository, PomodoroStateRepositoryError},
+    task_persistence::TaskPersistence,
 };
 
 #[derive(Debug, Error, PartialEq)]
@@ -36,16 +37,19 @@ pub struct TerminateSessionCommand {
 pub struct TerminateSessionUseCase {
     pomodoro_state_repo: Arc<dyn PomodoroStateRepository>,
     focus_session_repo: Arc<dyn FocusSessionRepository>,
+    task_persistence: Arc<dyn TaskPersistence>,
 }
 
 impl TerminateSessionUseCase {
     pub fn new(
         pomodoro_state_repo: Arc<dyn PomodoroStateRepository>,
         focus_session_repo: Arc<dyn FocusSessionRepository>,
+        task_persistence: Arc<dyn TaskPersistence>,
     ) -> Self {
         Self {
             pomodoro_state_repo,
             focus_session_repo,
+            task_persistence,
         }
     }
 
@@ -56,6 +60,14 @@ impl TerminateSessionUseCase {
             .await?;
 
         let terminated_session = user_state.terminate_current_session()?;
+
+        if let Some(task_id) = terminated_session.task_id() {
+            let mut task = self.task_persistence.find_by_id(task_id).await?;
+            if task.scheduled_date().is_some() {
+                task.complete();
+                self.task_persistence.update_task(task).await?;
+            }
+        }
 
         self.focus_session_repo
             .create_manual_session(terminated_session)
@@ -76,8 +88,11 @@ mod tests {
     use crate::repository_traits::pomodoro_state_repository::{
         MockPomodoroStateRepository, PomodoroStateRepositoryError,
     };
+    use crate::repository_traits::task_persistence::MockTaskPersistence;
+    use chrono::Utc;
     use domain::entities::focus_session_type::FocusSessionType;
     use domain::entities::pomodoro::pomodoro_state::PomodoroState;
+    use domain::entities::task::Task;
     use std::sync::Arc;
     use uuid::Uuid;
 
@@ -85,6 +100,7 @@ mod tests {
     async fn test_terminate_success() {
         let mut mock_pomodoro_repo = MockPomodoroStateRepository::new();
         let mut mock_session_repo = MockFocusSessionRepository::new();
+        let mock_task_persistence = MockTaskPersistence::new();
         let user_id = Uuid::new_v4();
         let mut state = PomodoroState::new();
         state
@@ -102,8 +118,108 @@ mod tests {
             .expect_update_user_state()
             .returning(|_, _| Ok(()));
 
-        let use_case =
-            TerminateSessionUseCase::new(Arc::new(mock_pomodoro_repo), Arc::new(mock_session_repo));
+        let use_case = TerminateSessionUseCase::new(
+            Arc::new(mock_pomodoro_repo),
+            Arc::new(mock_session_repo),
+            Arc::new(mock_task_persistence),
+        );
+        let result = use_case.execute(TerminateSessionCommand { user_id }).await;
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_terminate_with_scheduled_task_completes_it() {
+        let mut mock_pomodoro_repo = MockPomodoroStateRepository::new();
+        let mut mock_session_repo = MockFocusSessionRepository::new();
+        let mut mock_task_persistence = MockTaskPersistence::new();
+        let user_id = Uuid::new_v4();
+        let task_id = Uuid::new_v4();
+        let mut state = PomodoroState::new();
+        state
+            .start_new_session(user_id, FocusSessionType::Work, None, Some(task_id))
+            .unwrap();
+        std::thread::sleep(std::time::Duration::from_secs(1));
+
+        mock_pomodoro_repo
+            .expect_fetch_user_state()
+            .returning(move |_| Ok(state.clone()));
+        mock_task_persistence
+            .expect_find_by_id()
+            .returning(move |id| {
+                Ok(Task::reconstitute(
+                    id,
+                    user_id,
+                    None,
+                    "Scheduled Task".to_string(),
+                    None,
+                    Some(Utc::now()),
+                    None,
+                    None,
+                ))
+            });
+        mock_task_persistence
+            .expect_update_task()
+            .times(1)
+            .returning(|task| Ok(task));
+        mock_session_repo
+            .expect_create_manual_session()
+            .returning(|_| Ok(()));
+        mock_pomodoro_repo
+            .expect_update_user_state()
+            .returning(|_, _| Ok(()));
+
+        let use_case = TerminateSessionUseCase::new(
+            Arc::new(mock_pomodoro_repo),
+            Arc::new(mock_session_repo),
+            Arc::new(mock_task_persistence),
+        );
+        let result = use_case.execute(TerminateSessionCommand { user_id }).await;
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_terminate_with_unscheduled_task_does_not_complete_it() {
+        let mut mock_pomodoro_repo = MockPomodoroStateRepository::new();
+        let mut mock_session_repo = MockFocusSessionRepository::new();
+        let mut mock_task_persistence = MockTaskPersistence::new();
+        let user_id = Uuid::new_v4();
+        let task_id = Uuid::new_v4();
+        let mut state = PomodoroState::new();
+        state
+            .start_new_session(user_id, FocusSessionType::Work, None, Some(task_id))
+            .unwrap();
+        std::thread::sleep(std::time::Duration::from_secs(1));
+
+        mock_pomodoro_repo
+            .expect_fetch_user_state()
+            .returning(move |_| Ok(state.clone()));
+        mock_task_persistence
+            .expect_find_by_id()
+            .returning(move |id| {
+                Ok(Task::reconstitute(
+                    id,
+                    user_id,
+                    None,
+                    "Unscheduled Task".to_string(),
+                    None,
+                    None,
+                    None,
+                    None,
+                ))
+            });
+        // update_task must NOT be called
+        mock_session_repo
+            .expect_create_manual_session()
+            .returning(|_| Ok(()));
+        mock_pomodoro_repo
+            .expect_update_user_state()
+            .returning(|_, _| Ok(()));
+
+        let use_case = TerminateSessionUseCase::new(
+            Arc::new(mock_pomodoro_repo),
+            Arc::new(mock_session_repo),
+            Arc::new(mock_task_persistence),
+        );
         let result = use_case.execute(TerminateSessionCommand { user_id }).await;
         assert!(result.is_ok());
     }
@@ -112,6 +228,7 @@ mod tests {
     async fn test_terminate_no_running_session() {
         let mut mock_pomodoro_repo = MockPomodoroStateRepository::new();
         let mock_session_repo = MockFocusSessionRepository::new();
+        let mock_task_persistence = MockTaskPersistence::new();
         let user_id = Uuid::new_v4();
         let state = PomodoroState::new();
 
@@ -119,8 +236,11 @@ mod tests {
             .expect_fetch_user_state()
             .returning(move |_| Ok(state.clone()));
 
-        let use_case =
-            TerminateSessionUseCase::new(Arc::new(mock_pomodoro_repo), Arc::new(mock_session_repo));
+        let use_case = TerminateSessionUseCase::new(
+            Arc::new(mock_pomodoro_repo),
+            Arc::new(mock_session_repo),
+            Arc::new(mock_task_persistence),
+        );
         let result = use_case.execute(TerminateSessionCommand { user_id }).await;
         assert!(result.is_err());
         assert!(matches!(
@@ -133,13 +253,17 @@ mod tests {
     async fn test_terminate_fetch_repo_error() {
         let mut mock_pomodoro_repo = MockPomodoroStateRepository::new();
         let mock_session_repo = MockFocusSessionRepository::new();
+        let mock_task_persistence = MockTaskPersistence::new();
 
         mock_pomodoro_repo
             .expect_fetch_user_state()
             .returning(|_| Err(PomodoroStateRepositoryError::UserNotFound));
 
-        let use_case =
-            TerminateSessionUseCase::new(Arc::new(mock_pomodoro_repo), Arc::new(mock_session_repo));
+        let use_case = TerminateSessionUseCase::new(
+            Arc::new(mock_pomodoro_repo),
+            Arc::new(mock_session_repo),
+            Arc::new(mock_task_persistence),
+        );
         let result = use_case
             .execute(TerminateSessionCommand {
                 user_id: Uuid::new_v4(),
