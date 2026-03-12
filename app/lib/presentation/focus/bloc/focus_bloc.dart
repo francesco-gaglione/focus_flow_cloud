@@ -212,6 +212,7 @@ class FocusBloc extends Bloc<FocusEvent, FocusState> {
       final result = await _getScheduledTasks.execute(
         from: startOfDay.millisecondsSinceEpoch ~/ 1000,
         to: endOfDay.millisecondsSinceEpoch ~/ 1000,
+        completed: false,
       );
 
       emit(state.copyWith(todayScheduledTasks: result.tasks));
@@ -427,8 +428,9 @@ class FocusBloc extends Bloc<FocusEvent, FocusState> {
       _expiryTimer?.cancel();
       _expiryTimer = null;
       _notificationSentForCurrentSession = false;
+      add(ReloadTodayScheduledTasks());
     }
-    
+
     // Original ReloadTodaySessions call
     add(ReloadTodaySessions());
 
