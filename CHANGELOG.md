@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.0.0] - 2026-03-12
+
+### Bug Fixes
+
+- [**breaking**] General improvements (#68)
+- Terminate session completes scheduled tasks (#69)
+
 ## [3.0.0] - 2026-03-05
 
 ### Bug Fixes
