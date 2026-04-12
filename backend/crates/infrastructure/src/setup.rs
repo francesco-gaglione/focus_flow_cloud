@@ -34,8 +34,13 @@ use application::use_cases::{
     },
     user::login_user::LoginUseCase,
 };
+use tracing::subscriber::set_global_default;
+use tracing_bunyan_formatter::{BunyanFormattingLayer, JsonStorageLayer};
+use tracing_subscriber::fmt::MakeWriter;
+use tracing_subscriber::Registry;
 
 use std::collections::HashMap;
+use std::io::Sink;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
@@ -50,7 +55,8 @@ use adapters::persistence::persistence_impl::pomodoro_state_in_memory_impl::Pomo
 use application::auth_traits::password_hasher::PasswordHasher;
 use application::repository_traits::user_persistence::UserPersistence;
 use application::use_cases::pomodoro_state::pause_session::PauseSessionUseCase;
-use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
+use tracing_log::LogTracer;
+use tracing_subscriber::{layer::SubscriberExt, EnvFilter};
 
 pub async fn init_app_state(
     config: AppConfig,
@@ -234,29 +240,23 @@ pub async fn init_app_state(
     })
 }
 
-pub fn init_tracing() {
+pub fn init_tracing<Sink>(sink: Sink)
+where
+    Sink: for<'a> MakeWriter<'a> + Send + Sync + 'static,
+{
     let filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| {
         "focus_flow_cloud=debug,api=debug,domain=debug,infrastructure=debug,application=debug,tower_http=info,axum=info,info".into()
     });
 
-    let app_env = std::env::var("APP_ENV").unwrap_or_else(|_| "development".to_string());
+    let _app_env = std::env::var("APP_ENV").unwrap_or_else(|_| "development".to_string());
 
-    let registry = tracing_subscriber::registry().with(filter);
+    let formatting_layer = BunyanFormattingLayer::new("focus_flow_cloud".to_string(), sink);
+    let registry = Registry::default()
+        .with(filter)
+        .with(JsonStorageLayer)
+        .with(formatting_layer);
 
-    if app_env == "production" {
-        registry
-            .with(tracing_subscriber::fmt::layer().json())
-            .init();
-    } else {
-        registry
-            .with(
-                tracing_subscriber::fmt::layer()
-                    .pretty()
-                    .with_target(true)
-                    .with_thread_ids(true)
-                    .with_file(false)
-                    .with_line_number(false),
-            )
-            .init();
-    }
+    LogTracer::init().expect("Failed to set logger");
+
+    set_global_default(registry).expect("Failed to set subscriber");
 }
