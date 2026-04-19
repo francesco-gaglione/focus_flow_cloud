@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  namespace: focus-flow-cloud
+data:
+  postgres-url: postgres-service

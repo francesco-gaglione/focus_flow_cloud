@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: focus-flow-cloud
+  namespace: focus-flow-cloud
+  labels:
+    app: focus-flow-cloud
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: focus-flow-cloud
+  template:
+    metadata:
+      labels:
+        app: focus-flow-cloud
+    spec:
+      containers:
+        - name: focus-flow-cloud
+          image: ghcr.io/francesco-gaglione/focusflowcloud:latest
+          env:
+            - name: DATABASE_BASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: focus-flow-cloud-config
+                  key: DATABASE_BASE_URL
+            - name: SERVER_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: focus-flow-cloud-config
+                  key: SERVER_PORT
+            - name: RUST_LOG
+              valueFrom:
+                configMapKeyRef:
+                  name: focus-flow-cloud-config
+                  key: RUST_LOG
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: postgres-user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: postgres-password
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: postgres-db
+            - name: CORS_ORIGIN
+              valueFrom:
+                configMapKeyRef:
+                  name: focus-flow-cloud-config
+                  key: CORS_ORIGIN
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: focus-flow-cloud-secret
+                  key: JWT_SECRET
+            - name: APP_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: focus-flow-cloud-config
+                  key: APP_ENV
+            - name: ADMIN_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: focus-flow-cloud-config
+                  key: ADMIN_USERNAME
+            - name: ADMIN_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: focus-flow-cloud-config
+                  key: ADMIN_PASSWORD
+            - name: OTLP_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  name: focus-flow-cloud-config
+                  key: OTLP_ENDPOINT
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: focus-flow-cloud
+spec:
+  type: NodePort
+  selector:
+    app: focus-flow-cloud
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      nodePort: 30002
