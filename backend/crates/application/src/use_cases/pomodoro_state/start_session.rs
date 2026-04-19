@@ -5,6 +5,7 @@ use domain::entities::{
     pomodoro::pomodoro_state::PomodoroStateError,
 };
 use thiserror::Error;
+use tracing::instrument;
 use uuid::Uuid;
 
 use crate::repository_traits::{
@@ -33,6 +34,7 @@ pub enum StartSessionError {
 
 pub type StartSessionResult<T> = Result<T, StartSessionError>;
 
+#[derive(Debug)]
 pub struct StartSessionCommand {
     pub user_id: Uuid,
 }
@@ -53,6 +55,7 @@ impl StartSessionUseCase {
         }
     }
 
+    #[instrument(skip(self))]
     pub async fn execute(&self, command: StartSessionCommand) -> StartSessionResult<()> {
         let mut user_state = self
             .pomodoro_state_repo

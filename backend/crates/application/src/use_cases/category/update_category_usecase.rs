@@ -3,6 +3,7 @@ use std::sync::Arc;
 use crate::repository_traits::category_persistence::CategoryPersistence;
 use crate::repository_traits::persistence_error::PersistenceError;
 use thiserror::Error;
+use tracing::instrument;
 
 #[derive(Debug, Error)]
 pub enum UpdateCategoryError {
@@ -32,6 +33,7 @@ impl UpdateCategoryUseCases {
         }
     }
 
+    #[instrument(skip(self))]
     pub async fn execute(&self, command: UpdateCategoryCommand) -> UpdateCategoryResult<()> {
         let mut category = self.category_persistence.find_by_id(command.id).await?;
 

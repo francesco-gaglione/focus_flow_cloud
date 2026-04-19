@@ -1,11 +1,11 @@
 use crate::auth_traits::password_hasher::PasswordHasher;
 use crate::repository_traits::user_persistence::UserPersistence;
 use domain::services::token_service::{TokenService, TokenServiceError};
+use secrecy::{ExposeSecret, SecretBox};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use thiserror::Error;
-use tracing::debug;
-use validator::Validate;
+use tracing::{debug, instrument};
 
 #[derive(Debug, Error)]
 pub enum LoginError {
@@ -19,12 +19,9 @@ pub enum LoginError {
 
 pub type LoginResult<T> = Result<T, LoginError>;
 
-#[derive(Debug, Deserialize, Serialize, Validate)]
 pub struct LoginCommand {
-    #[validate(length(min = 1, message = "Username is required"))]
     pub username: String,
-    #[validate(length(min = 1, message = "Password is required"))]
-    pub password: String,
+    pub password: SecretBox<str>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -53,12 +50,14 @@ impl LoginUseCase {
         }
     }
 
+    #[instrument(skip_all)]
     pub async fn execute(&self, cmd: LoginCommand) -> LoginResult<LoginOutput> {
-        // Validate input
-        cmd.validate()
-            .map_err(|e| LoginError::Validation(e.to_string()))?;
+        if cmd.username.is_empty() || cmd.password.expose_secret().is_empty() {
+            return Err(LoginError::Validation(
+                "Username and password are required".to_string(),
+            ));
+        }
 
-        // Find user by username
         let user = self
             .user_persistence
             .find_user_by_username(&cmd.username)
@@ -67,18 +66,15 @@ impl LoginUseCase {
 
         debug!("User found: {:?}", user);
 
-        // Verify password
         if !self
             .password_hasher
-            .verify_password(&cmd.password, user.hashed_password())
+            .verify_password(cmd.password.expose_secret(), user.hashed_password())
             .map_err(|_| LoginError::InvalidCredentials)?
         {
             return Err(LoginError::InvalidCredentials);
         }
 
-        // Generate token
         let token = self.token_service.generate_token(&user)?;
-
         let refresh_token = self.token_service.generate_refresh_token(&user)?;
 
         Ok(LoginOutput {

@@ -3,6 +3,7 @@ use crate::http_error::HttpResult;
 use crate::openapi::USERS_TAG;
 use crate::{http::app_state::AppState, http_error::HttpError};
 use application::use_cases::user::register_user::{RegisterUserCommand, RegisterUserError};
+use secrecy::SecretBox;
 use axum::{extract::State, Extension, Json};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
@@ -57,7 +58,7 @@ pub async fn create_user_api(
 
     let cmd = RegisterUserCommand {
         username: payload.username,
-        password: payload.password,
+        password: SecretBox::new(payload.password.into_boxed_str()),
         requester_user_id: requester_id,
     };
 

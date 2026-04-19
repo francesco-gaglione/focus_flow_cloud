@@ -3,6 +3,7 @@ use crate::repository_traits::user_persistence::UserPersistence;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use thiserror::Error;
+use tracing::instrument;
 use uuid::Uuid;
 
 #[derive(Debug, Error)]
@@ -29,6 +30,7 @@ impl GetUserInfoUseCase {
         Self { user_persistence }
     }
 
+    #[instrument(skip(self))]
     pub async fn execute(&self, user_id: Uuid) -> UserInfoResult<GetUserInfoOutput> {
         let user = self.user_persistence.find_user_by_id(user_id).await?;
 

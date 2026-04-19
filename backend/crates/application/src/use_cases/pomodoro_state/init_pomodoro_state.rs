@@ -3,6 +3,7 @@ use crate::repository_traits::pomodoro_state_repository::{
 };
 use std::sync::Arc;
 use thiserror::Error;
+use tracing::instrument;
 
 #[derive(Debug, Error, PartialEq)]
 pub enum InitPomodoroStateError {
@@ -28,6 +29,7 @@ impl InitPomodoroStateUseCase {
         }
     }
 
+    #[instrument(skip(self))]
     pub async fn execute(&self, command: InitPomodoroStateCommand) -> InitPomodoroStateResult<()> {
         self.pomodoro_state_repo
             .init_user_state(command.user_id)

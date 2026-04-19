@@ -4,6 +4,7 @@ use chrono::{DateTime, Utc};
 use domain::entities::task::Task;
 use std::sync::Arc;
 use thiserror::Error;
+use tracing::instrument;
 use uuid::Uuid;
 
 #[derive(Debug, Error, PartialEq)]
@@ -14,6 +15,7 @@ pub enum GetTaskError {
 
 pub type GetTasksResult<T> = Result<T, GetTaskError>;
 
+#[derive(Debug)]
 pub struct GetTasksCommand {
     pub completed: Option<bool>,
 }
@@ -54,6 +56,7 @@ impl GetTasksUseCase {
         Self { task_persistence }
     }
 
+    #[instrument(skip(self))]
     pub async fn execute(&self, command: GetTasksCommand) -> GetTasksResult<Vec<TaskOutput>> {
         let res = self
             .task_persistence

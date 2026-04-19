@@ -11,6 +11,7 @@ use std::{
     sync::Arc,
 };
 use thiserror::Error;
+use tracing::instrument;
 use uuid::Uuid;
 
 use crate::repository_traits::category_persistence::CategoryPersistence;
@@ -29,6 +30,7 @@ pub enum CalculateStatsByPeriodError {
 
 pub type CalculateStatsByPeriodResult<T> = Result<T, CalculateStatsByPeriodError>;
 
+#[derive(Debug)]
 pub struct StatsPeriod {
     pub user_id: Uuid,
     pub start_date: i64,
@@ -54,6 +56,7 @@ impl CalculateStatsByPeriodUseCase {
         }
     }
 
+    #[instrument(skip(self))]
     pub async fn execute(&self, period: StatsPeriod) -> CalculateStatsByPeriodResult<Stats> {
         let start_date: Option<DateTime<Utc>> = DateTime::from_timestamp(period.start_date, 0);
         let end_date: Option<DateTime<Utc>> = period

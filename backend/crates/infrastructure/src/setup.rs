@@ -34,13 +34,16 @@ use application::use_cases::{
     },
     user::login_user::LoginUseCase,
 };
+use opentelemetry::global;
+use opentelemetry::trace::TracerProvider as _;
+use opentelemetry_otlp::WithExportConfig;
+use opentelemetry_sdk::Resource;
 use tracing::subscriber::set_global_default;
 use tracing_bunyan_formatter::{BunyanFormattingLayer, JsonStorageLayer};
 use tracing_subscriber::fmt::MakeWriter;
 use tracing_subscriber::Registry;
 
 use std::collections::HashMap;
-use std::io::Sink;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
@@ -248,15 +251,35 @@ where
         "focus_flow_cloud=debug,api=debug,domain=debug,infrastructure=debug,application=debug,tower_http=info,axum=info,info".into()
     });
 
-    let _app_env = std::env::var("APP_ENV").unwrap_or_else(|_| "development".to_string());
-
     let formatting_layer = BunyanFormattingLayer::new("focus_flow_cloud".to_string(), sink);
+
+    let otel_layer = std::env::var("OTLP_ENDPOINT").ok().map(|endpoint| {
+        let exporter = opentelemetry_otlp::SpanExporter::builder()
+            .with_tonic()
+            .with_endpoint(endpoint)
+            .build()
+            .expect("Failed to build OTLP span exporter");
+
+        let provider = opentelemetry_sdk::trace::TracerProvider::builder()
+            .with_batch_exporter(exporter, opentelemetry_sdk::runtime::Tokio)
+            .with_resource(Resource::new(vec![opentelemetry::KeyValue::new(
+                "service.name",
+                "focus_flow_cloud",
+            )]))
+            .build();
+
+        global::set_tracer_provider(provider.clone());
+        let tracer = provider.tracer("focus_flow_cloud");
+        tracing_opentelemetry::layer().with_tracer(tracer)
+    });
+
+    LogTracer::init().expect("Failed to set logger");
+
     let registry = Registry::default()
         .with(filter)
         .with(JsonStorageLayer)
-        .with(formatting_layer);
-
-    LogTracer::init().expect("Failed to set logger");
+        .with(formatting_layer)
+        .with(otel_layer);
 
     set_global_default(registry).expect("Failed to set subscriber");
 }

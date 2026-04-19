@@ -4,6 +4,7 @@ use crate::repository_traits::category_persistence::CategoryPersistence;
 use crate::repository_traits::persistence_error::PersistenceError;
 use domain::entities::category::Category;
 use thiserror::Error;
+use tracing::instrument;
 use uuid::Uuid;
 
 #[derive(Debug, Error)]
@@ -47,6 +48,7 @@ impl GetCategoryUseCases {
         }
     }
 
+    #[instrument(skip(self))]
     pub async fn execute(&self, category_id: Uuid) -> GetCategoryResult<CategoryOutput> {
         Ok(self
             .category_persistence

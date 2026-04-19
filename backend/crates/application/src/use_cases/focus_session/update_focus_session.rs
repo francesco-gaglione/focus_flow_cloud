@@ -5,6 +5,7 @@ use chrono::{DateTime, Utc};
 use domain::entities::focus_session::FocusSessionError;
 use std::sync::Arc;
 use thiserror::Error;
+use tracing::instrument;
 use uuid::Uuid;
 
 #[derive(Debug, Error, PartialEq)]
@@ -40,6 +41,7 @@ impl UpdateFocusSessionUseCase {
         }
     }
 
+    #[instrument(skip(self))]
     pub async fn execute(
         &self,
         update_session: UpdateFocusSessionCommand,

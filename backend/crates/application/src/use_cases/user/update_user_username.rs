@@ -3,6 +3,7 @@ use std::sync::Arc;
 use crate::repository_traits::persistence_error::PersistenceError;
 use crate::repository_traits::user_persistence::UserPersistence;
 use thiserror::Error;
+use tracing::instrument;
 use uuid::Uuid;
 
 #[derive(Debug, Error, PartialEq)]
@@ -19,6 +20,7 @@ pub enum UpdateUserUsernameError {
 
 pub type UpdateUserUsernameResult<T> = Result<T, UpdateUserUsernameError>;
 
+#[derive(Debug)]
 pub struct UpdateUserUsernameCommand {
     pub user_id: Uuid,
     pub new_username: String,
@@ -33,6 +35,7 @@ impl UpdateUserUsernameUseCase {
         Self { user_persistence }
     }
 
+    #[instrument(skip(self))]
     pub async fn execute(&self, cmd: UpdateUserUsernameCommand) -> UpdateUserUsernameResult<()> {
         // Validate input
         if cmd.new_username.is_empty() {

@@ -120,6 +120,17 @@ All environment variables required for the backend:
 | `POSTGRES_PASSWORD` | Database password | `secure_password` |
 | `ADMIN_USERNAME` | (Optional) Initial admin username | `admin` |
 | `ADMIN_PASSWORD` | (Optional) Initial admin password | `password` |
+| `OTLP_ENDPOINT` | (Optional) OpenTelemetry collector endpoint | `http://localhost:4317` |
+
+### Observability (Optional)
+
+FocusFlow supports distributed tracing via [OpenTelemetry](https://opentelemetry.io/). To enable it, set the `OTLP_ENDPOINT` environment variable pointing to any OTLP-compatible collector (Jaeger, Grafana Tempo, Honeycomb, Datadog, etc.):
+
+```yaml
+- OTLP_ENDPOINT=http://your-collector:4317
+```
+
+If the variable is not set, tracing is disabled and the backend only emits structured JSON logs to stdout. No collector is required for a basic deployment.
 
 ### Kubernetes
 

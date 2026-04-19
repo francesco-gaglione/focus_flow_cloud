@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use domain::entities::focus_session::FocusSessionError;
 use thiserror::Error;
+use tracing::instrument;
 use uuid::Uuid;
 
 use crate::repository_traits::{
@@ -26,6 +27,7 @@ pub enum UpdateSessionError {
 
 pub type UpdateSessionResult<T> = Result<T, UpdateSessionError>;
 
+#[derive(Debug)]
 pub struct UpdateSessionCommand {
     pub user_id: Uuid,
     pub new_note: Option<String>,
@@ -43,6 +45,7 @@ impl UpdateSessionUseCase {
         }
     }
 
+    #[instrument(skip(self))]
     pub async fn execute(&self, command: UpdateSessionCommand) -> UpdateSessionResult<()> {
         let mut user_state = self
             .pomodoro_state_repo

@@ -126,7 +126,7 @@ impl TestContext {
 pub async fn setup() -> TestContext {
     // Initialize tracing once
     TRACING.call_once(|| {
-        init_tracing();
+        init_tracing(std::io::sink);
     });
 
     // Start Postgres container

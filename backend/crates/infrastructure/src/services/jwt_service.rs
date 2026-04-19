@@ -3,6 +3,7 @@ use chrono::{Duration, Utc};
 use domain::services::token_service::{TokenService, TokenServiceError};
 use domain::{entities::user::User, services::token_service::TokenServiceResult};
 use jsonwebtoken::{encode, EncodingKey, Header};
+use secrecy::{ExposeSecret, SecretBox};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -14,12 +15,14 @@ struct Claims {
 }
 
 pub struct JwtService {
-    secret: String,
+    secret: SecretBox<str>,
 }
 
 impl JwtService {
     pub fn new(secret: String) -> Self {
-        Self { secret }
+        Self {
+            secret: SecretBox::new(secret.into_boxed_str()),
+        }
     }
 }
 
@@ -41,7 +44,7 @@ impl TokenService for JwtService {
         encode(
             &Header::default(),
             &claims,
-            &EncodingKey::from_secret(self.secret.as_bytes()),
+            &EncodingKey::from_secret(self.secret.expose_secret().as_bytes()),
         )
         .map_err(|e| TokenServiceError::TokenGenerationError(e.to_string()))
     }
@@ -62,7 +65,7 @@ impl TokenService for JwtService {
         encode(
             &Header::default(),
             &claims,
-            &EncodingKey::from_secret(self.secret.as_bytes()),
+            &EncodingKey::from_secret(self.secret.expose_secret().as_bytes()),
         )
         .map_err(|e| TokenServiceError::TokenGenerationError(e.to_string()))
     }
@@ -72,7 +75,7 @@ impl TokenService for JwtService {
 
         let claims = jsonwebtoken::decode::<Claims>(
             token,
-            &jsonwebtoken::DecodingKey::from_secret(self.secret.as_bytes()),
+            &jsonwebtoken::DecodingKey::from_secret(self.secret.expose_secret().as_bytes()),
             &validation,
         )
         .map(|data| data.claims)
@@ -90,7 +93,7 @@ impl TokenService for JwtService {
 
         let claims = jsonwebtoken::decode::<Claims>(
             token,
-            &jsonwebtoken::DecodingKey::from_secret(self.secret.as_bytes()),
+            &jsonwebtoken::DecodingKey::from_secret(self.secret.expose_secret().as_bytes()),
             &validation,
         )
         .map(|data| data.claims)

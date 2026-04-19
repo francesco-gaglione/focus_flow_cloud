@@ -1,13 +1,35 @@
+use secrecy::{ExposeSecret, SecretBox};
 use uuid::Uuid;
 
 use crate::entities::user_role::UserRole;
 
-#[derive(Debug, Clone)]
 pub struct User {
     id: Uuid,
     username: String,
-    hashed_password: String,
+    hashed_password: SecretBox<str>,
     role: UserRole,
+}
+
+impl Clone for User {
+    fn clone(&self) -> Self {
+        Self {
+            id: self.id,
+            username: self.username.clone(),
+            hashed_password: SecretBox::new(Box::from(self.hashed_password.expose_secret())),
+            role: self.role.clone(),
+        }
+    }
+}
+
+impl std::fmt::Debug for User {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("User")
+            .field("id", &self.id)
+            .field("username", &self.username)
+            .field("hashed_password", &"[REDACTED]")
+            .field("role", &self.role)
+            .finish()
+    }
 }
 
 impl User {
@@ -15,7 +37,7 @@ impl User {
         User {
             id: Uuid::new_v4(),
             username,
-            hashed_password,
+            hashed_password: SecretBox::new(hashed_password.into_boxed_str()),
             role,
         }
     }
@@ -29,7 +51,7 @@ impl User {
         User {
             id,
             username,
-            hashed_password,
+            hashed_password: SecretBox::new(hashed_password.into_boxed_str()),
             role,
         }
     }
@@ -43,7 +65,7 @@ impl User {
     }
 
     pub fn hashed_password(&self) -> &str {
-        &self.hashed_password
+        self.hashed_password.expose_secret()
     }
 
     pub fn update_username(&mut self, new_username: String) {
@@ -51,7 +73,7 @@ impl User {
     }
 
     pub fn update_password(&mut self, new_hashed_password: String) {
-        self.hashed_password = new_hashed_password;
+        self.hashed_password = SecretBox::new(new_hashed_password.into_boxed_str());
     }
 
     pub fn role(&self) -> &UserRole {

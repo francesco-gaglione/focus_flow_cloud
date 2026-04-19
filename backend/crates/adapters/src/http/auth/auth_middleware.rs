@@ -8,14 +8,12 @@ use axum::{
     response::Response,
 };
 use serde::Deserialize;
-use tracing::instrument;
 
 #[derive(Deserialize)]
 struct AuthQuery {
     token: Option<String>,
 }
 
-#[instrument(skip_all, name = "auth_middleware")]
 pub async fn auth_middleware(
     State(state): State<AppState>,
     mut req: Request,
@@ -45,6 +43,8 @@ pub async fn auth_middleware(
 
     let user_id = uuid::Uuid::parse_str(&user_id_str)
         .map_err(|_| HttpError::Unauthorized("Invalid user ID in token".to_string()))?;
+
+    tracing::Span::current().record("user_id", user_id.to_string().as_str());
 
     let session = UserSession { user_id };
     req.extensions_mut().insert(session);

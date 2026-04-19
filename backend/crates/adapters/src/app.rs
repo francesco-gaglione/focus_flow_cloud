@@ -41,7 +41,8 @@ pub fn create_app(app_state: AppState) -> Router {
                     method = %request.method(),
                     uri = %request.uri(),
                     version = ?request.version(),
-                    request_id = %request_id
+                    request_id = %request_id,
+                    user_id = tracing::field::Empty,
                 )
             }),
         )

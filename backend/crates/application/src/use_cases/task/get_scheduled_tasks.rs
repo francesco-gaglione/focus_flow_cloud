@@ -3,6 +3,7 @@ use std::sync::Arc;
 use chrono::{DateTime, Utc};
 use domain::entities::task::Task;
 use thiserror::Error;
+use tracing::instrument;
 use uuid::Uuid;
 
 use crate::repository_traits::{
@@ -65,6 +66,7 @@ impl GetScheduledTasksUseCase {
         Self { task_persistence }
     }
 
+    #[instrument(skip(self))]
     pub async fn execute(
         &self,
         command: GetScheduledTasksUseCaseCommand,
