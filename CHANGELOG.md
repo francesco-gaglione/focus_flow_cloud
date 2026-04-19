@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.0.2] - 2026-04-19
+
+### Features
+
+- K8s
+
 ## [4.0.1] - 2026-04-19
 
 ### Features
