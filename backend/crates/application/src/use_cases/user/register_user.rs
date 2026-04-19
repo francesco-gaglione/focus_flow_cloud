@@ -64,7 +64,8 @@ impl RegisterUserUseCase {
             ));
         }
 
-        self.password_policy_service.validate(cmd.password.expose_secret())?;
+        self.password_policy_service
+            .validate(cmd.password.expose_secret())?;
 
         // Check if current user is admin
         let requester_user = self
@@ -79,7 +80,9 @@ impl RegisterUserUseCase {
         }
 
         // Register user
-        let hashed_password = self.password_hasher.hash_password(cmd.password.expose_secret())?;
+        let hashed_password = self
+            .password_hasher
+            .hash_password(cmd.password.expose_secret())?;
         let user = User::new(cmd.username, hashed_password, UserRole::User);
         let user_id = self.user_persistence.create_user(user).await?;
         Ok(user_id)
@@ -236,7 +239,7 @@ mod tests {
 
         let cmd = RegisterUserCommand {
             username: "".to_string(),
-            password: "password".to_string(),
+            password: secrecy::SecretBox::new(Box::from("password")),
             requester_user_id: Uuid::new_v4(),
         };
 

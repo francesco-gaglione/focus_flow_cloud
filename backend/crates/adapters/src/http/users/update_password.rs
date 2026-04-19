@@ -5,9 +5,9 @@ use crate::openapi::USERS_TAG;
 use application::use_cases::user::update_password::{
     UpdatePasswordError, UpdateUserPasswordCommand,
 };
-use secrecy::SecretBox;
 use axum::extract::{Extension, State};
 use axum::Json;
+use secrecy::SecretBox;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use validator::Validate;

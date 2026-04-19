@@ -55,13 +55,16 @@ impl UpdateUserPasswordUseCase {
 
     #[instrument(skip_all)]
     pub async fn execute(&self, cmd: UpdateUserPasswordCommand) -> UpdatePasswordResult<()> {
-        if cmd.new_password.expose_secret().is_empty() || cmd.old_password.expose_secret().is_empty() {
+        if cmd.new_password.expose_secret().is_empty()
+            || cmd.old_password.expose_secret().is_empty()
+        {
             return Err(UpdatePasswordError::InvalidUserParam(
                 "New and old passwords cannot be empty".to_string(),
             ));
         }
 
-        self.password_policy_service.validate(cmd.new_password.expose_secret())?;
+        self.password_policy_service
+            .validate(cmd.new_password.expose_secret())?;
 
         let mut user = match self.user_persistence.find_user_by_id(cmd.user_id).await {
             Ok(user) => user,
@@ -80,7 +83,9 @@ impl UpdateUserPasswordUseCase {
             ));
         }
 
-        let hashed_password = self.password_hasher.hash_password(cmd.new_password.expose_secret())?;
+        let hashed_password = self
+            .password_hasher
+            .hash_password(cmd.new_password.expose_secret())?;
 
         user.update_password(hashed_password);
 
