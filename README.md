@@ -102,6 +102,24 @@ services:
       - POSTGRES_DB=focusflow
 ```
 
+### Self-Hosting with Kubernetes
+
+Kubernetes manifests are provided in the [`k8s/`](k8s/) directory. The namespace must be applied first, then the rest in dependency order:
+
+```bash
+cd k8s
+kubectl apply -f namespace.yaml
+kubectl apply -f postgres-secret.yaml
+kubectl apply -f postgres-config.yaml
+kubectl apply -f postgres-volume.yaml
+kubectl apply -f postgres.yaml
+kubectl apply -f focus-flow-cloud-secret.yaml
+kubectl apply -f focus-flow-cloud-config.yaml
+kubectl apply -f focus-flow-cloud.yaml
+```
+
+Edit `postgres-secret.yaml`, `focus-flow-cloud-secret.yaml`, and `focus-flow-cloud-config.yaml` with your own values before applying. See the [full Kubernetes guide](doc/docs/getting-started.md#kubernetes) for details.
+
 ### Development Setup
 
 We use [`just`](https://github.com/casey/just) to manage commands for the entire repository.
