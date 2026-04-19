@@ -2,6 +2,7 @@ use crate::repository_traits::persistence_error::PersistenceError;
 use crate::repository_traits::user_setting_persistence::UserSettingPersistence;
 use std::sync::Arc;
 use thiserror::Error;
+use tracing::instrument;
 use uuid::Uuid;
 
 #[derive(Debug, Error, PartialEq)]
@@ -23,6 +24,7 @@ impl UpdateSettingUseCase {
         }
     }
 
+    #[instrument(skip(self))]
     pub async fn execute(
         &self,
         user_id: Uuid,

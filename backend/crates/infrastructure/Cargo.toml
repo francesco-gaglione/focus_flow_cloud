@@ -13,6 +13,13 @@ diesel_migrations.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true
 async-trait.workspace = true
+tracing-bunyan-formatter.workspace = true
+tracing-log.workspace = true
+secrecy.workspace = true
+opentelemetry.workspace = true
+opentelemetry_sdk.workspace = true
+opentelemetry-otlp.workspace = true
+tracing-opentelemetry.workspace = true
 tokio = { workspace = true, features = ["sync"] }
 config.workspace = true
 dotenvy.workspace = true

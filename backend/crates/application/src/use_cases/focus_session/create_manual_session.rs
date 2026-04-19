@@ -7,6 +7,7 @@ use domain::entities::{
 };
 use std::sync::Arc;
 use thiserror::Error;
+use tracing::instrument;
 use uuid::Uuid;
 
 #[derive(Debug, Error)]
@@ -44,6 +45,7 @@ impl CreateManualSessionUseCase {
         }
     }
 
+    #[instrument(skip(self))]
     pub async fn execute(
         &self,
         session_cmd: CreateManualFocusSessionCommand,

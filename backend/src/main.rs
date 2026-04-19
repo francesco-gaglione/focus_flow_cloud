@@ -5,7 +5,7 @@ use tracing::info;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenvy::dotenv().ok();
-    init_tracing();
+    init_tracing(std::io::stdout);
 
     let config = infrastructure::config::load_from_env();
     let app_state = init_app_state(config, env!("CARGO_PKG_VERSION").to_string()).await?;

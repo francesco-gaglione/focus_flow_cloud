@@ -11,6 +11,7 @@ async-trait = { workspace = true }
 rand.workspace = true
 tracing.workspace = true
 mockall = { workspace = true, optional = true }
+secrecy = { workspace = true }
 
 [features]
 test-utils = ["mockall"]

@@ -2,8 +2,10 @@ use crate::auth_traits::password_hasher::{HashingError, PasswordHasher};
 use crate::repository_traits::persistence_error::PersistenceError;
 use crate::repository_traits::user_persistence::UserPersistence;
 use domain::traits::password_policy::{PasswordPolicy, PasswordPolicyError};
+use secrecy::{ExposeSecret, SecretBox};
 use std::sync::Arc;
 use thiserror::Error;
+use tracing::instrument;
 use uuid::Uuid;
 
 #[derive(Debug, Error)]
@@ -28,8 +30,8 @@ pub type UpdatePasswordResult<T> = Result<T, UpdatePasswordError>;
 
 pub struct UpdateUserPasswordCommand {
     pub user_id: Uuid,
-    pub old_password: String,
-    pub new_password: String,
+    pub old_password: SecretBox<str>,
+    pub new_password: SecretBox<str>,
 }
 
 pub struct UpdateUserPasswordUseCase {
@@ -51,14 +53,18 @@ impl UpdateUserPasswordUseCase {
         }
     }
 
+    #[instrument(skip_all)]
     pub async fn execute(&self, cmd: UpdateUserPasswordCommand) -> UpdatePasswordResult<()> {
-        if cmd.new_password.is_empty() || cmd.old_password.is_empty() {
+        if cmd.new_password.expose_secret().is_empty()
+            || cmd.old_password.expose_secret().is_empty()
+        {
             return Err(UpdatePasswordError::InvalidUserParam(
                 "New and old passwords cannot be empty".to_string(),
             ));
         }
 
-        self.password_policy_service.validate(&cmd.new_password)?;
+        self.password_policy_service
+            .validate(cmd.new_password.expose_secret())?;
 
         let mut user = match self.user_persistence.find_user_by_id(cmd.user_id).await {
             Ok(user) => user,
@@ -70,14 +76,16 @@ impl UpdateUserPasswordUseCase {
 
         if !self
             .password_hasher
-            .verify_password(&cmd.old_password, user.hashed_password())?
+            .verify_password(cmd.old_password.expose_secret(), user.hashed_password())?
         {
             return Err(UpdatePasswordError::InvalidUserParam(
                 "Invalid old password".to_string(),
             ));
         }
 
-        let hashed_password = self.password_hasher.hash_password(&cmd.new_password)?;
+        let hashed_password = self
+            .password_hasher
+            .hash_password(cmd.new_password.expose_secret())?;
 
         user.update_password(hashed_password);
 
@@ -155,8 +163,8 @@ mod tests {
 
         let cmd = UpdateUserPasswordCommand {
             user_id,
-            old_password: "old_password".to_string(),
-            new_password: "Password123!".to_string(),
+            old_password: secrecy::SecretBox::new(Box::from("old_password")),
+            new_password: secrecy::SecretBox::new(Box::from("Password123!")),
         };
 
         let result = use_case.execute(cmd).await;
@@ -207,8 +215,8 @@ mod tests {
 
         let cmd = UpdateUserPasswordCommand {
             user_id,
-            old_password: "wrong_old_password".to_string(),
-            new_password: "new_password".to_string(),
+            old_password: secrecy::SecretBox::new(Box::from("wrong_old_password")),
+            new_password: secrecy::SecretBox::new(Box::from("new_password")),
         };
 
         let result = use_case.execute(cmd).await;
@@ -232,8 +240,8 @@ mod tests {
 
         let cmd = UpdateUserPasswordCommand {
             user_id: Uuid::new_v4(),
-            old_password: "any".to_string(),
-            new_password: "".to_string(),
+            old_password: secrecy::SecretBox::new(Box::from("any")),
+            new_password: secrecy::SecretBox::new(Box::from("")),
         };
 
         let result = use_case.execute(cmd).await;
@@ -262,8 +270,8 @@ mod tests {
 
         let cmd = UpdateUserPasswordCommand {
             user_id: Uuid::new_v4(),
-            old_password: "old".to_string(),
-            new_password: "weak".to_string(),
+            old_password: secrecy::SecretBox::new(Box::from("old")),
+            new_password: secrecy::SecretBox::new(Box::from("weak")),
         };
 
         let result = use_case.execute(cmd).await;
@@ -297,8 +305,8 @@ mod tests {
 
         let cmd = UpdateUserPasswordCommand {
             user_id: Uuid::new_v4(),
-            old_password: "old".to_string(),
-            new_password: "NewPassword1!".to_string(),
+            old_password: secrecy::SecretBox::new(Box::from("old")),
+            new_password: secrecy::SecretBox::new(Box::from("NewPassword1!")),
         };
 
         let result = use_case.execute(cmd).await;

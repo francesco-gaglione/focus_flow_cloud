@@ -4,6 +4,7 @@ use chrono::{DateTime, Utc};
 use domain::entities::task::Task;
 use std::sync::Arc;
 use thiserror::Error;
+use tracing::instrument;
 use uuid::Uuid;
 
 #[derive(Debug, Error, PartialEq)]
@@ -14,6 +15,7 @@ pub enum OrphanTasksError {
 
 pub type OrphanTasksResult<T> = Result<T, OrphanTasksError>;
 
+#[derive(Debug)]
 pub struct GetOrphanTasksCommand {
     pub completed: Option<bool>,
 }
@@ -54,6 +56,7 @@ impl OrphanTasksUseCase {
         Self { task_persistence }
     }
 
+    #[instrument(skip(self))]
     pub async fn execute(
         &self,
         command: GetOrphanTasksCommand,

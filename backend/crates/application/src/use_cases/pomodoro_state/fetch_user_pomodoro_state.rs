@@ -6,6 +6,7 @@ use domain::entities::focus_session_type::FocusSessionType;
 use domain::entities::pomodoro::pomodoro_state::PomodoroState;
 use std::sync::Arc;
 use thiserror::Error;
+use tracing::instrument;
 
 #[derive(Debug, Error, PartialEq)]
 pub enum FetchUserPomodoroStateError {
@@ -86,6 +87,7 @@ impl FetchUserPomodoroStateUseCase {
         }
     }
 
+    #[instrument(skip(self))]
     pub async fn execute(
         &self,
         command: FetchUserPomodoroStateCommand,

@@ -3,6 +3,7 @@ use crate::repository_traits::user_setting_persistence::UserSettingPersistence;
 use domain::entities::user_setting::UserSetting;
 use std::sync::Arc;
 use thiserror::Error;
+use tracing::instrument;
 
 #[derive(Debug, Error, PartialEq)]
 pub enum GetSettingsError {
@@ -38,6 +39,7 @@ impl GetSettingsUseCase {
         }
     }
 
+    #[instrument(skip(self))]
     pub async fn execute(&self) -> GetSettingsResult<Vec<UserSettingOutput>> {
         Ok(self
             .setting_persistence

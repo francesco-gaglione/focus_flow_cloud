@@ -3,6 +3,7 @@ use std::sync::Arc;
 use crate::repository_traits::category_persistence::CategoryPersistence;
 use crate::repository_traits::persistence_error::PersistenceError;
 use thiserror::Error;
+use tracing::instrument;
 
 #[derive(Debug, Error)]
 pub enum DeleteCategoryError {
@@ -24,6 +25,7 @@ impl DeleteCategoryUseCases {
         }
     }
 
+    #[instrument(skip(self))]
     pub async fn execute(&self, category_id: uuid::Uuid) -> DeleteCategoryResult<()> {
         self.category_persistence
             .delete_category_by_id(category_id)

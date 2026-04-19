@@ -4,6 +4,7 @@ use domain::entities::{
     focus_session::FocusSessionError, pomodoro::pomodoro_state::PomodoroStateError,
 };
 use thiserror::Error;
+use tracing::instrument;
 use uuid::Uuid;
 
 use crate::repository_traits::{
@@ -30,6 +31,7 @@ pub enum TerminateSessionError {
 
 pub type TerminateSessionResult<T> = Result<T, TerminateSessionError>;
 
+#[derive(Debug)]
 pub struct TerminateSessionCommand {
     pub user_id: Uuid,
 }
@@ -53,6 +55,7 @@ impl TerminateSessionUseCase {
         }
     }
 
+    #[instrument(skip(self))]
     pub async fn execute(&self, command: TerminateSessionCommand) -> TerminateSessionResult<()> {
         let mut user_state = self
             .pomodoro_state_repo

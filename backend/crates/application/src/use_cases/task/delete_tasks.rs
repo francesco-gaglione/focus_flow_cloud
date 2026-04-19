@@ -2,6 +2,7 @@ use crate::repository_traits::persistence_error::PersistenceError;
 use crate::repository_traits::task_persistence::TaskPersistence;
 use std::sync::Arc;
 use thiserror::Error;
+use tracing::instrument;
 use uuid::Uuid;
 
 #[derive(Debug, Error, PartialEq)]
@@ -21,6 +22,7 @@ impl DeleteTasksUseCase {
         Self { task_persistence }
     }
 
+    #[instrument(skip(self))]
     pub async fn execute(&self, task_ids: Vec<Uuid>) -> DeleteTasksResult<Vec<Uuid>> {
         let mut deleted_ids = Vec::new();
         for task_id in task_ids {

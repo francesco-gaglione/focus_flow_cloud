@@ -13,6 +13,7 @@ chrono = { workspace = true, features = ["serde"] }
 serde = { workspace = true, features = ["derive"] }
 futures-util.workspace = true
 validator = { workspace = true, features = ["derive"] }
+secrecy.workspace = true
 
 [dev-dependencies]
 mockall.workspace = true

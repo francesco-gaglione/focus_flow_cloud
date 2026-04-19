@@ -3,6 +3,7 @@ use std::sync::Arc;
 use crate::auth_traits::password_hasher::{HashingError, PasswordHasher};
 use crate::repository_traits::persistence_error::PersistenceError;
 use crate::repository_traits::user_persistence::UserPersistence;
+use secrecy::{ExposeSecret, SecretBox};
 use thiserror::Error;
 use tracing::info;
 
@@ -22,7 +23,7 @@ pub type ValidateUserCredentialsResult<T> = Result<T, ValidateUserCredentialsErr
 
 pub struct ValidateUserCredentialsCommand {
     pub username: String,
-    pub password: String,
+    pub password: SecretBox<str>,
 }
 
 pub struct ValidateUserCredentialsUseCase {
@@ -46,7 +47,7 @@ impl ValidateUserCredentialsUseCase {
         cmd: ValidateUserCredentialsCommand,
     ) -> ValidateUserCredentialsResult<()> {
         // Validate user params
-        if cmd.username.is_empty() || cmd.password.is_empty() {
+        if cmd.username.is_empty() || cmd.password.expose_secret().is_empty() {
             return Err(ValidateUserCredentialsError::InvalidUserParams(
                 "Username or password is empty".to_string(),
             ));
@@ -67,7 +68,7 @@ impl ValidateUserCredentialsUseCase {
 
         if !self
             .password_hasher
-            .verify_password(&cmd.password, user.hashed_password())?
+            .verify_password(cmd.password.expose_secret(), user.hashed_password())?
         {
             return Err(ValidateUserCredentialsError::InvalidUserParams(
                 "Invalid password".to_string(),

@@ -5,7 +5,9 @@ use crate::repository_traits::persistence_error::PersistenceError;
 use crate::repository_traits::user_persistence::UserPersistence;
 use domain::entities::{user::User, user_role::UserRole};
 use domain::traits::password_policy::{PasswordPolicy, PasswordPolicyError};
+use secrecy::{ExposeSecret, SecretBox};
 use thiserror::Error;
+use tracing::instrument;
 use uuid::Uuid;
 
 #[derive(Debug, Error)]
@@ -30,7 +32,7 @@ pub type RegisterUserResult<T> = Result<T, RegisterUserError>;
 
 pub struct RegisterUserCommand {
     pub username: String,
-    pub password: String,
+    pub password: SecretBox<str>,
     pub requester_user_id: Uuid,
 }
 
@@ -53,15 +55,17 @@ impl RegisterUserUseCase {
         }
     }
 
+    #[instrument(skip_all)]
     pub async fn execute(&self, cmd: RegisterUserCommand) -> RegisterUserResult<Uuid> {
         // Validate input
-        if cmd.username.is_empty() || cmd.password.is_empty() {
+        if cmd.username.is_empty() || cmd.password.expose_secret().is_empty() {
             return Err(RegisterUserError::InvalidUserCredentials(
                 "Username and/or password cannot be empty".to_string(),
             ));
         }
 
-        self.password_policy_service.validate(&cmd.password)?;
+        self.password_policy_service
+            .validate(cmd.password.expose_secret())?;
 
         // Check if current user is admin
         let requester_user = self
@@ -76,7 +80,9 @@ impl RegisterUserUseCase {
         }
 
         // Register user
-        let hashed_password = self.password_hasher.hash_password(&cmd.password)?;
+        let hashed_password = self
+            .password_hasher
+            .hash_password(cmd.password.expose_secret())?;
         let user = User::new(cmd.username, hashed_password, UserRole::User);
         let user_id = self.user_persistence.create_user(user).await?;
         Ok(user_id)
@@ -135,7 +141,7 @@ mod tests {
 
         let cmd = RegisterUserCommand {
             username: "test_user".to_string(),
-            password: "Password1".to_string(),
+            password: secrecy::SecretBox::new(Box::from("Password1")),
             requester_user_id: Uuid::new_v4(),
         };
 
@@ -171,7 +177,7 @@ mod tests {
 
         let cmd = RegisterUserCommand {
             username: "test_user".to_string(),
-            password: "Password1".to_string(),
+            password: secrecy::SecretBox::new(Box::from("Password1")),
             requester_user_id: Uuid::new_v4(),
         };
 
@@ -202,7 +208,7 @@ mod tests {
 
         let cmd = RegisterUserCommand {
             username: "test_user".to_string(),
-            password: "".to_string(),
+            password: secrecy::SecretBox::new(Box::from("")),
             requester_user_id: Uuid::new_v4(),
         };
 
@@ -233,7 +239,7 @@ mod tests {
 
         let cmd = RegisterUserCommand {
             username: "".to_string(),
-            password: "password".to_string(),
+            password: secrecy::SecretBox::new(Box::from("password")),
             requester_user_id: Uuid::new_v4(),
         };
 
@@ -281,7 +287,7 @@ mod tests {
 
         let cmd = RegisterUserCommand {
             username: "user".to_string(),
-            password: "Password1".to_string(),
+            password: secrecy::SecretBox::new(Box::from("Password1")),
             requester_user_id: Uuid::new_v4(),
         };
 
@@ -329,7 +335,7 @@ mod tests {
 
         let cmd = RegisterUserCommand {
             username: "new_user".to_string(),
-            password: "Password1".to_string(),
+            password: secrecy::SecretBox::new(Box::from("Password1")),
             requester_user_id: Uuid::new_v4(),
         };
 

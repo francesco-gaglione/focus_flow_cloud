@@ -1,5 +1,6 @@
 use std::sync::Arc;
 use thiserror::Error;
+use tracing::instrument;
 use uuid::Uuid;
 
 use crate::repository_traits::pomodoro_state_repository::{
@@ -17,6 +18,7 @@ pub enum UpdatePomodoroContextError {
 
 pub type UpdatePomodoroContextResult<T> = Result<T, UpdatePomodoroContextError>;
 
+#[derive(Debug)]
 pub struct UpdatePomodoroContextCommand {
     pub user_id: Uuid,
     pub category_id: Option<Uuid>,
@@ -34,6 +36,7 @@ impl UpdatePomodoroContextUseCase {
         }
     }
 
+    #[instrument(skip(self))]
     pub async fn execute(
         &self,
         command: UpdatePomodoroContextCommand,

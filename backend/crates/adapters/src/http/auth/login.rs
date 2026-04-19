@@ -5,6 +5,7 @@ use crate::{http::app_state::AppState, http_error::HttpError};
 use application::use_cases::user::login_user::{LoginCommand, LoginError};
 use axum::extract::State;
 use axum::Json;
+use secrecy::SecretBox;
 use serde::{Deserialize, Serialize};
 use tower_sessions::Session;
 use utoipa::ToSchema;
@@ -54,7 +55,7 @@ pub async fn login_api(
 ) -> HttpResult<Json<LoginResponseDto>> {
     let cmd = LoginCommand {
         username: payload.username,
-        password: payload.password,
+        password: SecretBox::new(payload.password.into_boxed_str()),
     };
 
     let result = state.login_uc.execute(cmd).await?;

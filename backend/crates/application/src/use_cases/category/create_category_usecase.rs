@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use thiserror::Error;
+use tracing::instrument;
 use uuid::Uuid;
 
 use crate::repository_traits::category_persistence::CategoryPersistence;
@@ -21,6 +22,7 @@ pub enum CreateCategoryError {
 
 pub type CreateCategoryResult<T> = Result<T, CreateCategoryError>;
 
+#[derive(Debug)]
 pub struct CreateCategoryCommand {
     pub user_id: uuid::Uuid,
     pub name: String,
@@ -40,6 +42,7 @@ impl CreateCategoryUseCases {
         }
     }
 
+    #[instrument(skip(self))]
     pub async fn execute(&self, category_cmd: CreateCategoryCommand) -> CreateCategoryResult<Uuid> {
         let category = Category::create(
             category_cmd.user_id,

@@ -25,6 +25,13 @@ axum = { workspace = true, features=["ws"]}
 [workspace.dependencies]
 tracing = "0.1.41"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+tracing-bunyan-formatter = "0.3"
+tracing-log = "0.2"
+opentelemetry = { version = "0.27", features = ["trace"] }
+opentelemetry_sdk = { version = "0.27", features = ["trace", "rt-tokio"] }
+opentelemetry-otlp = { version = "0.27", features = ["tonic"] }
+tracing-opentelemetry = "0.28"
+secrecy = { version = "0.10.3", features = ["serde"] }
 lazy_static = "1.5.0"
 regex = "1.11.3"
 deadpool-diesel = { version = "0.6.1", features = ["postgres"] }

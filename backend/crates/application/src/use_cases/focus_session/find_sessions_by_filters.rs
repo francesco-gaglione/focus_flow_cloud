@@ -7,6 +7,7 @@ use domain::entities::focus_session::{FocusSession, TerminatedSession};
 use domain::entities::focus_session_type::FocusSessionType;
 use std::sync::Arc;
 use thiserror::Error;
+use tracing::instrument;
 use uuid::Uuid;
 
 #[derive(Debug, Error, PartialEq)]
@@ -88,6 +89,7 @@ impl FindSessionsByFiltersUseCase {
         }
     }
 
+    #[instrument(skip(self))]
     pub async fn execute(
         &self,
         filters: FindSessionFiltersCommand,

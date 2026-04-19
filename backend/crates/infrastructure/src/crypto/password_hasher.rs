@@ -30,10 +30,7 @@ impl PasswordHasher for Argon2Hasher {
     }
 
     fn verify_password(&self, password: &str, stored_hash: &str) -> Result<bool, HashingError> {
-        debug!(
-            "Attempting to verify password against hash: {}",
-            stored_hash
-        );
+        debug!("Attempting to verify password",);
         let parsed_hash = PasswordHash::new(stored_hash).map_err(|e| {
             error!("Failed to parse hash: {}", e);
             HashingError::InvalidHash(e.to_string())

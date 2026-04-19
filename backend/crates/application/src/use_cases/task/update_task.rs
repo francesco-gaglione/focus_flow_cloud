@@ -4,7 +4,7 @@ use chrono::{DateTime, Utc};
 use domain::entities::task::TaskError;
 use std::sync::Arc;
 use thiserror::Error;
-use tracing::debug;
+use tracing::{debug, instrument};
 use uuid::Uuid;
 
 #[derive(Debug, Error, PartialEq)]
@@ -38,6 +38,7 @@ impl UpdateTaskUseCase {
         Self { task_persistence }
     }
 
+    #[instrument(skip(self))]
     pub async fn execute(&self, command: UpdateTaskCommand) -> UpdateTaskResult<()> {
         let mut task = self.task_persistence.find_by_id(command.id).await?;
 

@@ -3,6 +3,7 @@ use std::sync::Arc;
 use crate::repository_traits::category_persistence::CategoryPersistence;
 use crate::repository_traits::persistence_error::PersistenceError;
 use thiserror::Error;
+use tracing::instrument;
 use uuid::Uuid;
 
 #[derive(Debug, Error, PartialEq)]
@@ -25,6 +26,7 @@ impl DeleteCategoriesUseCases {
         }
     }
 
+    #[instrument(skip(self))]
     pub async fn execute(&self, category_ids: Vec<Uuid>) -> DeleteCategoriesResult<Vec<Uuid>> {
         let mut deleted_ids: Vec<uuid::Uuid> = Vec::new();
         for category_id in category_ids {

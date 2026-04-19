@@ -7,6 +7,7 @@ use application::use_cases::user::update_password::{
 };
 use axum::extract::{Extension, State};
 use axum::Json;
+use secrecy::SecretBox;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use validator::Validate;
@@ -62,8 +63,8 @@ pub async fn update_password_api(
 ) -> HttpResult<()> {
     let cmd = UpdateUserPasswordCommand {
         user_id: user_session.user_id,
-        old_password: payload.old_password,
-        new_password: payload.new_password,
+        old_password: SecretBox::new(payload.old_password.into_boxed_str()),
+        new_password: SecretBox::new(payload.new_password.into_boxed_str()),
     };
 
     state.update_password_uc.execute(cmd).await?;

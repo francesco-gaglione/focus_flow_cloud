@@ -3,6 +3,7 @@ use std::sync::Arc;
 use crate::repository_traits::persistence_error::PersistenceError;
 use crate::repository_traits::user_persistence::UserPersistence;
 use thiserror::Error;
+use tracing::instrument;
 use uuid::Uuid;
 
 #[derive(Debug, Error)]
@@ -16,6 +17,7 @@ pub enum DeleteUserError {
 
 pub type DeleteUserResult<T> = Result<T, DeleteUserError>;
 
+#[derive(Debug)]
 pub struct DeleteUserCommand {
     pub target_user_id: Uuid,
     pub requester_user_id: Uuid,
@@ -30,6 +32,7 @@ impl DeleteUserUseCase {
         Self { user_persistence }
     }
 
+    #[instrument(skip(self))]
     pub async fn execute(&self, cmd: DeleteUserCommand) -> DeleteUserResult<()> {
         // validate permissions
         let requester_is_admin = self

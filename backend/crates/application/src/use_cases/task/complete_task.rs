@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use thiserror::Error;
+use tracing::instrument;
 use uuid::Uuid;
 
 use crate::repository_traits::{
@@ -36,6 +37,7 @@ impl CompleteTaskUseCase {
         Self { task_persistence }
     }
 
+    #[instrument(skip(self))]
     pub async fn execute(&self, command: CompleteTaskCommand) -> CompleteTaskResult<()> {
         let mut task = self.task_persistence.find_by_id(command.id).await?;
 

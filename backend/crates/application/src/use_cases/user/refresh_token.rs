@@ -4,6 +4,7 @@ use domain::services::token_service::{TokenService, TokenServiceError};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use thiserror::Error;
+use tracing::instrument;
 use validator::Validate;
 
 #[derive(Debug, Error)]
@@ -51,6 +52,7 @@ impl RefreshTokenUseCase {
         }
     }
 
+    #[instrument(skip(self))]
     pub async fn execute(
         &self,
         cmd: RefreshTokenCommand,

@@ -35,6 +35,7 @@ lazy_static.workspace = true
 regex.workspace = true
 dotenvy.workspace = true
 serde_urlencoded = "0.7.1"
+secrecy.workspace = true
 
 [dev-dependencies]
 testcontainers.workspace = true

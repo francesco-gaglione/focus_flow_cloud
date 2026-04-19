@@ -4,6 +4,7 @@ use chrono::{DateTime, Utc};
 use domain::entities::task::{Task, TaskError};
 use std::sync::Arc;
 use thiserror::Error;
+use tracing::instrument;
 use uuid::Uuid;
 
 #[derive(Debug, Error, PartialEq)]
@@ -36,6 +37,7 @@ impl CreateTaskUseCase {
         Self { task_persistence }
     }
 
+    #[instrument(skip(self))]
     pub async fn execute(&self, command: CreateTaskCommand) -> CreateTaskResult<Uuid> {
         let task = Task::create(
             command.user_id,

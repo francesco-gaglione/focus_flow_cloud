@@ -8,7 +8,7 @@ use domain::entities::focus_session_type::FocusSessionType;
 use domain::entities::pomodoro::pomodoro_state::PomodoroStateError;
 use std::sync::Arc;
 use thiserror::Error;
-use tracing::debug;
+use tracing::{debug, instrument};
 use uuid::Uuid;
 
 #[derive(Debug, Error, PartialEq)]
@@ -58,6 +58,7 @@ impl PauseSessionUseCase {
         }
     }
 
+    #[instrument(skip(self))]
     pub async fn execute(&self, command: PauseSessionCommand) -> PauseSessionResult<()> {
         let mut user_pomo_state = self
             .pomodoro_state_repo

@@ -6,6 +6,7 @@ use crate::repository_traits::task_persistence::TaskPersistence;
 use chrono::{DateTime, Utc};
 use domain::entities::{category::Category, task::Task};
 use thiserror::Error;
+use tracing::{info, instrument};
 use uuid::Uuid;
 
 #[derive(Debug, Error)]
@@ -16,6 +17,7 @@ pub enum GetCategoryAndTasksError {
 
 pub type GetCategoryAndTasksResult<T> = Result<T, GetCategoryAndTasksError>;
 
+#[derive(Debug)]
 pub struct GetCategoryAndTasksCommand {
     pub include_completed_tasks: Option<bool>,
 }
@@ -96,6 +98,7 @@ impl GetCategoryAndTaskUseCases {
         }
     }
 
+    #[instrument(skip(self))]
     pub async fn execute(
         &self,
         command: GetCategoryAndTasksCommand,
@@ -107,6 +110,7 @@ impl GetCategoryAndTaskUseCases {
         let include_completed_tasks = command.include_completed_tasks.unwrap_or(false);
 
         for c in &categories {
+            info!("Fetching tasks for category: {}", c.name());
             let tasks = self.task_persistence.find_by_category_id(c.id()).await?;
 
             let filtered_tasks = if include_completed_tasks {
