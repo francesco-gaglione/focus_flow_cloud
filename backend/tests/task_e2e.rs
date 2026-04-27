@@ -2,6 +2,7 @@ mod common;
 use adapters::http::{
     category::create_category::CreateCategoryDto,
     task::{
+        complete_task::CompleteTaskDto,
         create_task::CreateTaskDto,
         delete_tasks::{DeleteTasksDto, DeleteTasksResponseDto},
         get_tasks::TasksResponseDto,
@@ -17,26 +18,23 @@ use crate::common::setup;
 async fn create_new_task_and_list() {
     let context = setup().await;
 
-    // Create Category to link to the task
+    // Create Category
     let create_category_dto = CreateCategoryDto {
         name: "Work".to_string(),
         description: Some("Work related tasks".to_string()),
         color: Some("#FF5733".to_string()),
     };
-    let category_body = context.create_category(&create_category_dto).await;
+    context.create_category(&create_category_dto).await;
 
     // Create Task
     let create_task_dto = CreateTaskDto {
-        name: "Task".to_string(),
+        title: "Task".to_string(),
         description: Some("Work related tasks".to_string()),
-        category_id: Some(category_body.category_id),
-        scheduled_date: None,
-        scheduled_end_date: None,
+        due_date: None,
     };
 
     let create_task_body = context.create_task(&create_task_dto).await;
 
-    // Fetch tasks and check if the task was created
     let response = context
         .client
         .get(format!("{}/api/task", context.base_url))
@@ -51,34 +49,22 @@ async fn create_new_task_and_list() {
         .expect("Failed to deserialize response");
     assert!(body.tasks.len() == 1);
     assert!(body.tasks.iter().any(|t| t.id.eq(&create_task_body.id)));
-    assert!(body.tasks.iter().any(|t| t.name.eq("Task")));
+    assert!(body.tasks.iter().any(|t| t.title.eq("Task")));
 }
 
 #[tokio::test]
 async fn create_new_orphan_and_list() {
     let context = setup().await;
 
-    // Create Category to link to the task
-    let create_category_dto = CreateCategoryDto {
-        name: "Work".to_string(),
-        description: Some("Work related tasks".to_string()),
-        color: Some("#FF5733".to_string()),
-    };
-    let category_body = context.create_category(&create_category_dto).await;
-    assert!(category_body.category_id.len() > 0);
-
-    // Create Task
+    // Create Task without category
     let create_task_dto = CreateTaskDto {
-        name: "Orphan".to_string(),
+        title: "Orphan".to_string(),
         description: Some("Work related tasks".to_string()),
-        category_id: None,
-        scheduled_date: None,
-        scheduled_end_date: None,
+        due_date: None,
     };
 
     let create_task_body = context.create_task(&create_task_dto).await;
 
-    // Fetch tasks and check if the task was created
     let response = context
         .client
         .get(format!("{}/api/task/orphans", context.base_url))
@@ -96,7 +82,7 @@ async fn create_new_orphan_and_list() {
         .orphan_tasks
         .iter()
         .any(|t| t.id.eq(&create_task_body.id)));
-    assert!(body.orphan_tasks.iter().any(|t| t.name.eq("Orphan")));
+    assert!(body.orphan_tasks.iter().any(|t| t.title.eq("Orphan")));
 }
 
 #[tokio::test]
@@ -104,15 +90,12 @@ async fn create_scheduled_task_and_list() {
     let context = setup().await;
 
     let now = Utc::now();
-    let start_task_date = now.date_naive().and_hms_opt(11, 0, 0).unwrap().and_utc();
-    let end_task_date = now.date_naive().and_hms_opt(11, 30, 0).unwrap().and_utc();
+    let due = now.date_naive().and_hms_opt(11, 0, 0).unwrap().and_utc();
 
     let create_task_dto = CreateTaskDto {
-        name: "Task to update".to_string(),
+        title: "Scheduled Task".to_string(),
         description: Some("Description".to_string()),
-        category_id: None,
-        scheduled_date: Some(start_task_date.timestamp()),
-        scheduled_end_date: Some(end_task_date.timestamp()),
+        due_date: Some(due.timestamp()),
     };
 
     context.create_task(&create_task_dto).await;
@@ -127,8 +110,7 @@ async fn create_scheduled_task_and_list() {
     let tasks_body: TasksResponseDto = tasks_res.json().await.expect("Failed to deserialize tasks");
     assert_eq!(tasks_body.tasks.len(), 1);
     let task = tasks_body.tasks.get(0).unwrap();
-    assert_eq!(task.scheduled_date, Some(start_task_date.timestamp()));
-    assert_eq!(task.scheduled_end_date, Some(end_task_date.timestamp()));
+    assert_eq!(task.due_date, Some(due.timestamp()));
 }
 
 #[tokio::test]
@@ -137,24 +119,19 @@ async fn update_task_test() {
 
     // Create Task
     let create_task_dto = CreateTaskDto {
-        name: "Task to update".to_string(),
+        title: "Task to update".to_string(),
         description: Some("Description".to_string()),
-        category_id: None,
-        scheduled_date: None,
-        scheduled_end_date: None,
+        due_date: None,
     };
 
     let create_body = context.create_task(&create_task_dto).await;
     let task_id = create_body.id;
 
-    // Update Task
+    // Update Task title
     let update_dto = UpdateTaskDto {
-        category_id: None,
-        name: Some("Updated Task Name".to_string()),
+        title: Some("Updated Task Name".to_string()),
         description: Some("Updated Description".to_string()),
-        scheduled_date: None,
-        scheduled_end_date: None,
-        completed_at: Some(chrono::Utc::now().timestamp()),
+        due_date: None,
     };
 
     let update_res = context
@@ -173,6 +150,21 @@ async fn update_task_test() {
 
     assert_eq!(update_body.success, true);
 
+    // Complete the task via complete endpoint
+    let complete_dto = CompleteTaskDto {
+        task_id: task_id.clone(),
+    };
+
+    let complete_res = context
+        .client
+        .post(format!("{}/api/task/complete", context.base_url))
+        .json(&complete_dto)
+        .send()
+        .await
+        .expect("Failed to complete task");
+
+    assert_eq!(complete_res.status(), 200);
+
     let tasks_res = context
         .client
         .get(format!("{}/api/task?completed=true", context.base_url))
@@ -190,11 +182,9 @@ async fn delete_tasks_test() {
 
     // Create Task
     let create_task_dto = CreateTaskDto {
-        name: "Task to delete".to_string(),
+        title: "Task to delete".to_string(),
         description: None,
-        category_id: None,
-        scheduled_date: None,
-        scheduled_end_date: None,
+        due_date: None,
     };
 
     let create_body = context.create_task(&create_task_dto).await;

@@ -57,11 +57,9 @@ async fn test_calculate_stats_scenarios() {
 
     let coding_task = ctx
         .create_task(&CreateTaskDto {
-            name: "Coding".to_string(),
-            category_id: Some(work_cat.category_id.clone()),
+            title: "Coding".to_string(),
             description: None,
-            scheduled_date: None,
-            scheduled_end_date: None,
+            due_date: None,
         })
         .await;
 

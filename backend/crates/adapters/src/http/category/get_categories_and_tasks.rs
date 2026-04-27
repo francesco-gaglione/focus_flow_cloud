@@ -1,4 +1,5 @@
 use crate::http::dto::common::category_dto::CategoryDto;
+use crate::http::dto::common::task_dto::TaskDto;
 use crate::http_error::{map_persistence_error, HttpResult};
 use crate::openapi::CATEGORY_TAG;
 use crate::{http::app_state::AppState, http_error::HttpError};
@@ -28,13 +29,14 @@ pub struct GetCategoryTasksParams {
 #[serde(rename_all = "camelCase")]
 pub struct GetCategoriesResponseDto {
     pub categories: Vec<CategoryDto>,
+    pub tasks: Vec<TaskDto>,
 }
 
 #[utoipa::path(
     get,
     path = "/api/category",
     tag = CATEGORY_TAG,
-    summary = "Get all categories and their tasks",
+    summary = "Get all categories and tasks",
     params(
         GetCategoryTasksParams
     ),
@@ -51,26 +53,24 @@ pub async fn get_categories_and_tasks_api(
     State(state): State<AppState>,
     Query(params): Query<GetCategoryTasksParams>,
 ) -> HttpResult<Json<GetCategoriesResponseDto>> {
-    let categories_and_tasks = state
+    let result = state
         .get_category_and_task_uc
         .execute(GetCategoryAndTasksCommand {
             include_completed_tasks: params.include_completed_tasks,
         })
         .await?;
 
-    let response = GetCategoriesResponseDto {
-        categories: categories_and_tasks
-            .category_with_tasks
-            .into_iter()
+    Ok(Json(GetCategoriesResponseDto {
+        categories: result
+            .categories
+            .iter()
             .map(|c| CategoryDto {
-                id: c.category.id.to_string(),
-                name: c.category.name.to_string(),
-                description: c.category.description.map(|s| s.to_string()),
-                color: c.category.color.to_string(),
-                tasks: c.tasks.iter().map(|t| t.into()).collect(),
+                id: c.id.to_string(),
+                name: c.name.clone(),
+                description: c.description.clone(),
+                color: c.color.clone(),
             })
             .collect(),
-    };
-
-    Ok(Json(response))
+        tasks: result.tasks.iter().map(|t| t.into()).collect(),
+    }))
 }

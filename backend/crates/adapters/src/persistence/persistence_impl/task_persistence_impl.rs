@@ -6,12 +6,13 @@ use application::repository_traits::task_persistence::TaskPersistence;
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, SelectableHelper};
-use domain::entities::task::Task;
-use tracing::info;
+use domain::entities::tasks::task::Task;
+use tracing::{info, instrument};
 use uuid::Uuid;
 
 #[async_trait]
 impl TaskPersistence for PostgresPersistence {
+    #[instrument(skip(self))]
     async fn create_task(&self, task: Task) -> PersistenceResult<Uuid> {
         let conn = self
             .pool
@@ -63,61 +64,6 @@ impl TaskPersistence for PostgresPersistence {
             .map_err(|e| PersistenceError::Unexpected(e.to_string()))?;
 
         let tasks: Vec<Task> = result.into_iter().map(|c| c.into()).collect();
-        Ok(tasks)
-    }
-
-    async fn find_orphan_tasks(&self, completed: bool) -> PersistenceResult<Vec<Task>> {
-        let conn = self
-            .pool
-            .get()
-            .await
-            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?;
-
-        let result = conn
-            .interact(move |conn| {
-                let mut query = schema::tasks::table
-                    .filter(schema::tasks::deleted_at.is_null())
-                    .into_boxed();
-
-                if completed {
-                    query = query.filter(schema::tasks::completed_at.is_not_null());
-                } else {
-                    query = query.filter(schema::tasks::completed_at.is_null());
-                }
-
-                query
-                    .filter(schema::tasks::category_id.is_null())
-                    .select(DbTask::as_select())
-                    .load(conn)
-            })
-            .await
-            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?
-            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?;
-
-        let tasks: Vec<Task> = result.into_iter().map(|c| c.into()).collect();
-        Ok(tasks)
-    }
-
-    async fn find_by_category_id(&self, category_id: Uuid) -> PersistenceResult<Vec<Task>> {
-        let conn = self
-            .pool
-            .get()
-            .await
-            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?;
-
-        let result = conn
-            .interact(move |conn| {
-                schema::tasks::table
-                    .filter(schema::tasks::category_id.eq(category_id))
-                    .select(DbTask::as_select())
-                    .load(conn)
-            })
-            .await
-            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?
-            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?;
-
-        let tasks = result.into_iter().map(|c| c.into()).collect();
-
         Ok(tasks)
     }
 

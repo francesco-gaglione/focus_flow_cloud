@@ -1,4 +1,3 @@
-use crate::http::dto::common::task_dto::TaskDto;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
@@ -8,5 +7,4 @@ pub struct CategoryDto {
     pub name: String,
     pub description: Option<String>,
     pub color: String,
-    pub tasks: Vec<TaskDto>,
 }

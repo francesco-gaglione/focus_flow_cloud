@@ -66,8 +66,8 @@ impl TerminateSessionUseCase {
 
         if let Some(task_id) = terminated_session.task_id() {
             let mut task = self.task_persistence.find_by_id(task_id).await?;
-            if task.scheduled_date().is_some() {
-                task.complete();
+            if task.due_date().is_some() {
+                task.complete().ok();
                 self.task_persistence.update_task(task).await?;
             }
         }
@@ -95,7 +95,7 @@ mod tests {
     use chrono::Utc;
     use domain::entities::focus_session_type::FocusSessionType;
     use domain::entities::pomodoro::pomodoro_state::PomodoroState;
-    use domain::entities::task::Task;
+    use domain::entities::tasks::task::Task;
     use std::sync::Arc;
     use uuid::Uuid;
 
@@ -148,15 +148,11 @@ mod tests {
             .returning(move |_| Ok(state.clone()));
         mock_task_persistence
             .expect_find_by_id()
-            .returning(move |id| {
-                Ok(Task::reconstitute(
-                    id,
+            .returning(move |_| {
+                Ok(Task::new(
                     user_id,
-                    None,
                     "Scheduled Task".to_string(),
-                    None,
                     Some(Utc::now()),
-                    None,
                     None,
                 ))
             });
@@ -198,17 +194,8 @@ mod tests {
             .returning(move |_| Ok(state.clone()));
         mock_task_persistence
             .expect_find_by_id()
-            .returning(move |id| {
-                Ok(Task::reconstitute(
-                    id,
-                    user_id,
-                    None,
-                    "Unscheduled Task".to_string(),
-                    None,
-                    None,
-                    None,
-                    None,
-                ))
+            .returning(move |_| {
+                Ok(Task::new(user_id, "Unscheduled Task".to_string(), None, None))
             });
         // update_task must NOT be called
         mock_session_repo

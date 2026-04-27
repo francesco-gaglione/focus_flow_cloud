@@ -49,12 +49,14 @@ pub async fn get_tasks_api(
     State(state): State<AppState>,
     Query(params): Query<GetTasksParams>,
 ) -> HttpResult<Json<TasksResponseDto>> {
+    tracing::info!("Fetching tasks with completed: {:?}", params.completed);
     let res = state
         .get_tasks_uc
         .execute(GetTasksCommand {
             completed: params.completed,
         })
         .await?;
+    tracing::info!("Fetched {} tasks", res.len());
     Ok(Json(TasksResponseDto {
         tasks: res.iter().map(|task| task.into()).collect(),
     }))

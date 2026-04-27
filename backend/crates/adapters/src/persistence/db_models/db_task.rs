@@ -1,7 +1,7 @@
 use crate::persistence::schema;
 use chrono::{DateTime, Utc};
 use diesel::{AsChangeset, Insertable, Queryable, Selectable};
-use domain::entities::task::Task;
+use domain::entities::tasks::task::Task;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -15,10 +15,10 @@ pub struct DbTask {
     pub name: String,
     pub description: Option<String>,
     pub scheduled_date: Option<DateTime<Utc>>,
-    pub scheduled_end_date: Option<DateTime<Utc>>,
     pub created_at: DateTime<Utc>,
     pub completed_at: Option<DateTime<Utc>>,
     pub deleted_at: Option<DateTime<Utc>>,
+    pub scheduled_end_date: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Clone, Insertable, Serialize, Deserialize)]
@@ -49,11 +49,11 @@ impl From<Task> for NewDbTask {
         Self {
             id: value.id(),
             user_id: value.user_id(),
-            category_id: value.category_id(),
-            name: value.name().to_string(),
+            category_id: None,
+            name: value.title().to_string(),
             description: value.description().map(|s| s.to_string()),
-            scheduled_date: value.scheduled_date(),
-            scheduled_end_date: value.scheduled_end_date(),
+            scheduled_date: value.due_date(),
+            scheduled_end_date: None,
         }
     }
 }
@@ -63,11 +63,11 @@ impl From<Task> for DbTask {
         Self {
             id: value.id(),
             user_id: value.user_id(),
-            category_id: value.category_id(),
-            name: value.name().to_string(),
+            category_id: None,
+            name: value.title().to_string(),
             description: value.description().map(|s| s.to_string()),
-            scheduled_date: value.scheduled_date(),
-            scheduled_end_date: value.scheduled_end_date(),
+            scheduled_date: value.due_date(),
+            scheduled_end_date: None,
             created_at: Default::default(),
             completed_at: value.completed_at(),
             deleted_at: None,
@@ -78,11 +78,11 @@ impl From<Task> for DbTask {
 impl From<Task> for UpdateDbTask {
     fn from(value: Task) -> Self {
         Self {
-            category_id: value.category_id(),
-            name: Some(value.name().to_string()),
+            category_id: None,
+            name: Some(value.title().to_string()),
             description: value.description().map(|s| s.to_string()),
-            scheduled_date: value.scheduled_date(),
-            scheduled_end_date: value.scheduled_end_date(),
+            scheduled_date: value.due_date(),
+            scheduled_end_date: None,
             completed_at: value.completed_at(),
         }
     }
@@ -90,15 +90,16 @@ impl From<Task> for UpdateDbTask {
 
 impl From<DbTask> for Task {
     fn from(value: DbTask) -> Self {
-        Self::reconstitute(
+        Task::reconstitute(
             value.id,
             value.user_id,
-            value.category_id,
             value.name,
             value.description,
+            None,
+            vec![],
             value.scheduled_date,
-            value.scheduled_end_date,
             value.completed_at,
+            vec![],
         )
     }
 }

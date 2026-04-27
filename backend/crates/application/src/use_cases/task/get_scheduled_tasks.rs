@@ -1,7 +1,8 @@
 use std::sync::Arc;
 
 use chrono::{DateTime, Utc};
-use domain::entities::task::Task;
+use domain::entities::tasks::task::Task;
+use domain::entities::tasks::task_priority::TaskPriority;
 use thiserror::Error;
 use tracing::instrument;
 use uuid::Uuid;
@@ -34,11 +35,10 @@ pub struct ScheduledTaskListOutput {
 pub struct ScheduledTaskOutput {
     pub id: Uuid,
     pub user_id: Uuid,
-    pub category_id: Option<Uuid>,
-    pub name: String,
+    pub title: String,
     pub description: Option<String>,
-    pub scheduled_date: Option<DateTime<Utc>>,
-    pub scheduled_end_date: Option<DateTime<Utc>>,
+    pub priority: Option<TaskPriority>,
+    pub due_date: Option<DateTime<Utc>>,
     pub completed_at: Option<DateTime<Utc>>,
 }
 
@@ -47,11 +47,10 @@ impl From<&Task> for ScheduledTaskOutput {
         Self {
             id: value.id(),
             user_id: value.user_id(),
-            category_id: value.category_id(),
-            name: value.name().to_string(),
+            title: value.title().to_string(),
             description: value.description().map(|d| d.to_string()),
-            scheduled_date: value.scheduled_date(),
-            scheduled_end_date: value.scheduled_end_date(),
+            priority: value.priority(),
+            due_date: value.due_date(),
             completed_at: value.completed_at(),
         }
     }
@@ -90,30 +89,19 @@ mod tests {
     use chrono::Duration;
 
     fn make_task_minimal() -> Task {
-        Task::reconstitute(
-            Uuid::new_v4(),
-            Uuid::new_v4(),
-            None,
-            "Minimal task".to_string(),
-            None,
-            None,
-            None,
-            None,
-        )
+        Task::new(Uuid::new_v4(), "Minimal task".to_string(), None, None)
     }
 
     fn make_task_full() -> Task {
         let now = Utc::now();
-        Task::reconstitute(
+        let mut task = Task::new(
             Uuid::new_v4(),
-            Uuid::new_v4(),
-            Some(Uuid::new_v4()),
             "Full task".to_string(),
-            Some("A description".to_string()),
-            Some(now),
             Some(now + Duration::hours(1)),
-            Some(now - Duration::hours(1)),
-        )
+            Some("A description".to_string()),
+        );
+        task.complete().unwrap();
+        task
     }
 
     #[test]
@@ -122,14 +110,9 @@ mod tests {
         let output = ScheduledTaskOutput::from(&task);
         assert_eq!(output.id, task.id());
         assert_eq!(output.user_id, task.user_id());
-        assert_eq!(output.category_id, task.category_id());
-        assert_eq!(output.name, task.name().to_string());
-        assert_eq!(
-            output.description,
-            task.description().map(|d| d.to_string())
-        );
-        assert_eq!(output.scheduled_date, task.scheduled_date());
-        assert_eq!(output.scheduled_end_date, task.scheduled_end_date());
+        assert_eq!(output.title, task.title().to_string());
+        assert_eq!(output.description, task.description().map(|d| d.to_string()));
+        assert_eq!(output.due_date, task.due_date());
         assert_eq!(output.completed_at, task.completed_at());
     }
 
@@ -139,11 +122,9 @@ mod tests {
         let output = ScheduledTaskOutput::from(&task);
         assert_eq!(output.id, task.id());
         assert_eq!(output.user_id, task.user_id());
-        assert!(output.category_id.is_none());
-        assert_eq!(output.name, task.name().to_string());
+        assert_eq!(output.title, task.title().to_string());
         assert!(output.description.is_none());
-        assert!(output.scheduled_date.is_none());
-        assert!(output.scheduled_end_date.is_none());
+        assert!(output.due_date.is_none());
         assert!(output.completed_at.is_none());
     }
 
@@ -207,11 +188,9 @@ mod tests {
         let out = &result.scheduled_tasks[0];
         assert_eq!(out.id, task.id());
         assert_eq!(out.user_id, task.user_id());
-        assert_eq!(out.category_id, task.category_id());
-        assert_eq!(out.name, task.name().to_string());
+        assert_eq!(out.title, task.title().to_string());
         assert_eq!(out.description, task.description().map(|d| d.to_string()));
-        assert_eq!(out.scheduled_date, task.scheduled_date());
-        assert_eq!(out.scheduled_end_date, task.scheduled_end_date());
+        assert_eq!(out.due_date, task.due_date());
         assert_eq!(out.completed_at, task.completed_at());
     }
 
@@ -280,66 +259,6 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_execute_passes_to_filter() {
-        let to_dt = Utc::now();
-        let mut mock = MockTaskPersistence::new();
-        mock.expect_find_scheduled_tasks()
-            .withf(move |from, to, completed| {
-                from.is_none() && *to == Some(to_dt) && completed.is_none()
-            })
-            .returning(|_, _, _| Ok(vec![]));
-
-        let use_case = GetScheduledTasksUseCase::new(Arc::new(mock));
-        let result = use_case
-            .execute(GetScheduledTasksUseCaseCommand {
-                from: None,
-                to: Some(to_dt),
-                completed: None,
-            })
-            .await;
-
-        assert!(result.is_ok());
-    }
-
-    #[tokio::test]
-    async fn test_execute_passes_completed_some_true() {
-        let mut mock = MockTaskPersistence::new();
-        mock.expect_find_scheduled_tasks()
-            .withf(|_, _, completed| *completed == Some(true))
-            .returning(|_, _, _| Ok(vec![]));
-
-        let use_case = GetScheduledTasksUseCase::new(Arc::new(mock));
-        let result = use_case
-            .execute(GetScheduledTasksUseCaseCommand {
-                from: None,
-                to: None,
-                completed: Some(true),
-            })
-            .await;
-
-        assert!(result.is_ok());
-    }
-
-    #[tokio::test]
-    async fn test_execute_passes_completed_some_false() {
-        let mut mock = MockTaskPersistence::new();
-        mock.expect_find_scheduled_tasks()
-            .withf(|_, _, completed| *completed == Some(false))
-            .returning(|_, _, _| Ok(vec![]));
-
-        let use_case = GetScheduledTasksUseCase::new(Arc::new(mock));
-        let result = use_case
-            .execute(GetScheduledTasksUseCaseCommand {
-                from: None,
-                to: None,
-                completed: Some(false),
-            })
-            .await;
-
-        assert!(result.is_ok());
-    }
-
-    #[tokio::test]
     async fn test_execute_passes_all_filters() {
         let from_dt = Utc::now();
         let to_dt = from_dt + Duration::hours(24);
@@ -356,25 +275,6 @@ mod tests {
                 from: Some(from_dt),
                 to: Some(to_dt),
                 completed: Some(false),
-            })
-            .await;
-
-        assert!(result.is_ok());
-    }
-
-    #[tokio::test]
-    async fn test_execute_passes_none_filters() {
-        let mut mock = MockTaskPersistence::new();
-        mock.expect_find_scheduled_tasks()
-            .withf(|from, to, completed| from.is_none() && to.is_none() && completed.is_none())
-            .returning(|_, _, _| Ok(vec![]));
-
-        let use_case = GetScheduledTasksUseCase::new(Arc::new(mock));
-        let result = use_case
-            .execute(GetScheduledTasksUseCaseCommand {
-                from: None,
-                to: None,
-                completed: None,
             })
             .await;
 

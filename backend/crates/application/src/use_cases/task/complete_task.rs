@@ -16,6 +16,9 @@ pub enum CompleteTaskError {
     #[error("Unauthorized")]
     Unauthorized,
 
+    #[error("Sub-tasks must be completed before marking task as completed")]
+    UncompletedSubTasks,
+
     #[error("Persistence error: {0}")]
     PersistenceError(#[from] PersistenceError),
 }
@@ -45,7 +48,8 @@ impl CompleteTaskUseCase {
             return Err(CompleteTaskError::Unauthorized);
         }
 
-        task.complete();
+        task.complete()
+            .map_err(|_| CompleteTaskError::UncompletedSubTasks)?;
 
         self.task_persistence.update_task(task).await?;
 
@@ -58,29 +62,19 @@ mod tests {
     use super::*;
     use crate::repository_traits::task_persistence::MockTaskPersistence;
     use chrono::Utc;
-    use domain::entities::task::Task;
+    use domain::entities::tasks::task::Task;
 
     #[tokio::test]
     async fn test_complete_task_success() {
         let mut mock_persistence = MockTaskPersistence::new();
         let task_id = Uuid::new_v4();
-
         let user_id = Uuid::new_v4();
         let command = CompleteTaskCommand {
             id: task_id,
             user_id,
         };
 
-        let task = Task::reconstitute(
-            task_id,
-            user_id,
-            None,
-            "Test Task".to_string(),
-            None,
-            None,
-            None,
-            None,
-        );
+        let task = Task::new(user_id, "Test Task".to_string(), None, None);
 
         mock_persistence
             .expect_find_by_id()
@@ -137,16 +131,7 @@ mod tests {
             user_id,
         };
 
-        let task = Task::reconstitute(
-            task_id,
-            user_id,
-            None,
-            "Test Task".to_string(),
-            None,
-            None,
-            None,
-            None,
-        );
+        let task = Task::new(user_id, "Test Task".to_string(), None, None);
 
         mock_persistence
             .expect_find_by_id()
@@ -181,20 +166,11 @@ mod tests {
         };
 
         let old_completed_at = Utc::now() - chrono::Duration::hours(1);
-        let task = Task::reconstitute(
-            task_id,
-            user_id,
-            None,
-            "Already Completed Task".to_string(),
-            None,
-            None,
-            None,
-            Some(old_completed_at),
-        );
+        let mut task = Task::new(user_id, "Already Completed Task".to_string(), None, None);
+        task.complete().unwrap();
 
         mock_persistence
             .expect_find_by_id()
-            .with(mockall::predicate::eq(task_id))
             .times(1)
             .returning(move |_| Ok(task.clone()));
 
@@ -215,40 +191,29 @@ mod tests {
         let mut mock_persistence = MockTaskPersistence::new();
         let task_id = Uuid::new_v4();
         let user_id = Uuid::new_v4();
-        let category_id = Uuid::new_v4();
         let command = CompleteTaskCommand {
             id: task_id,
             user_id,
         };
 
-        let name = "Preserved Name".to_string();
-        let description = Some("Preserved Description".to_string());
-
-        let task = Task::reconstitute(
-            task_id,
+        let task = Task::new(
             user_id,
-            Some(category_id),
-            name.clone(),
-            description.clone(),
+            "Preserved Name".to_string(),
             None,
-            None,
-            None,
+            Some("Preserved Description".to_string()),
         );
 
         mock_persistence
             .expect_find_by_id()
-            .with(mockall::predicate::eq(task_id))
             .times(1)
             .returning(move |_| Ok(task.clone()));
 
         mock_persistence
             .expect_update_task()
             .withf(move |t| {
-                t.id() == task_id
-                    && t.user_id() == user_id
-                    && t.category_id() == Some(category_id)
-                    && t.name() == name
-                    && t.description() == description.as_deref()
+                t.user_id() == user_id
+                    && t.title() == "Preserved Name"
+                    && t.description() == Some("Preserved Description")
             })
             .times(1)
             .returning(|t| Ok(t));
@@ -270,16 +235,7 @@ mod tests {
             user_id: intruder_id,
         };
 
-        let task = Task::reconstitute(
-            task_id,
-            owner_id,
-            None,
-            "Private Task".to_string(),
-            None,
-            None,
-            None,
-            None,
-        );
+        let task = Task::new(owner_id, "Private Task".to_string(), None, None);
 
         mock_persistence
             .expect_find_by_id()

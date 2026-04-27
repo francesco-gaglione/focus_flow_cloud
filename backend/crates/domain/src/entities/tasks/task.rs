@@ -29,8 +29,6 @@ pub struct Task {
 }
 
 impl Task {
-    // --- constructors ---
-
     pub fn new(
         user_id: Uuid,
         title: String,

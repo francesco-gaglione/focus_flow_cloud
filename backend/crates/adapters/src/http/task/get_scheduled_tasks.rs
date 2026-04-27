@@ -8,6 +8,7 @@ use application::use_cases::task::get_scheduled_tasks::{
 use axum::extract::{Query, State};
 use axum::Json;
 use chrono::DateTime;
+use domain::entities::tasks::task_priority::TaskPriority;
 use serde::{Deserialize, Serialize};
 use utoipa::{IntoParams, ToSchema};
 
@@ -33,15 +34,23 @@ pub struct ScheduledTasksResponseDto {
     pub tasks: Vec<TaskDto>,
 }
 
+fn priority_to_str(p: Option<TaskPriority>) -> Option<String> {
+    p.map(|p| match p {
+        TaskPriority::Low => "low".to_string(),
+        TaskPriority::Medium => "medium".to_string(),
+        TaskPriority::High => "high".to_string(),
+        TaskPriority::Urgent => "urgent".to_string(),
+    })
+}
+
 impl From<&ScheduledTaskOutput> for TaskDto {
     fn from(value: &ScheduledTaskOutput) -> Self {
         Self {
             id: value.id.to_string(),
-            category_id: value.category_id.map(|c| c.to_string()),
-            name: value.name.clone(),
+            title: value.title.clone(),
             description: value.description.clone(),
-            scheduled_date: value.scheduled_date.map(|d| d.timestamp()),
-            scheduled_end_date: value.scheduled_end_date.map(|d| d.timestamp()),
+            priority: priority_to_str(value.priority),
+            due_date: value.due_date.map(|d| d.timestamp()),
             completed_at: value.completed_at.map(|d| d.timestamp()),
         }
     }
@@ -110,11 +119,10 @@ mod tests {
         ScheduledTaskOutput {
             id: Uuid::new_v4(),
             user_id: Uuid::new_v4(),
-            category_id: Some(Uuid::new_v4()),
-            name: "Task".to_string(),
+            title: "Task".to_string(),
             description: Some("Desc".to_string()),
-            scheduled_date: Some(now),
-            scheduled_end_date: Some(now),
+            priority: Some(TaskPriority::High),
+            due_date: Some(now),
             completed_at: Some(now),
         }
     }
@@ -125,18 +133,11 @@ mod tests {
         let dto = TaskDto::from(&output);
 
         assert_eq!(dto.id, output.id.to_string());
-        assert_eq!(dto.category_id, output.category_id.map(|c| c.to_string()));
-        assert_eq!(dto.name, output.name);
+        assert_eq!(dto.title, output.title);
         assert_eq!(dto.description, output.description);
-        assert_eq!(
-            dto.scheduled_date,
-            output.scheduled_date.map(|d| d.timestamp())
-        );
-        assert_eq!(
-            dto.scheduled_end_date,
-            output.scheduled_end_date.map(|d| d.timestamp())
-        );
+        assert_eq!(dto.due_date, output.due_date.map(|d| d.timestamp()));
         assert_eq!(dto.completed_at, output.completed_at.map(|d| d.timestamp()));
+        assert_eq!(dto.priority, Some("high".to_string()));
     }
 
     #[test]
@@ -144,19 +145,17 @@ mod tests {
         let output = ScheduledTaskOutput {
             id: Uuid::new_v4(),
             user_id: Uuid::new_v4(),
-            category_id: None,
-            name: "Minimal".to_string(),
+            title: "Minimal".to_string(),
             description: None,
-            scheduled_date: None,
-            scheduled_end_date: None,
+            priority: None,
+            due_date: None,
             completed_at: None,
         };
         let dto = TaskDto::from(&output);
 
-        assert!(dto.category_id.is_none());
         assert!(dto.description.is_none());
-        assert!(dto.scheduled_date.is_none());
-        assert!(dto.scheduled_end_date.is_none());
+        assert!(dto.priority.is_none());
+        assert!(dto.due_date.is_none());
         assert!(dto.completed_at.is_none());
     }
 

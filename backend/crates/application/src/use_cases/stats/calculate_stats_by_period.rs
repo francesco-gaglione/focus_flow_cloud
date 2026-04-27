@@ -79,7 +79,7 @@ impl CalculateStatsByPeriodUseCase {
             .await?;
 
         // Collect all unique IDs
-        let mut category_ids: HashSet<Uuid> =
+        let category_ids: HashSet<Uuid> =
             sessions.iter().filter_map(|s| s.category_id()).collect();
 
         let task_ids: HashSet<Uuid> = sessions.iter().filter_map(|s| s.task_id()).collect();
@@ -92,13 +92,6 @@ impl CalculateStatsByPeriodUseCase {
 
         let tasks_results = join_all(task_futures).await;
         let tasks: Vec<_> = tasks_results.into_iter().filter_map(|r| r.ok()).collect();
-
-        // Add Category IDs from Tasks to the set, to ensure we have names for them
-        for task in &tasks {
-            if let Some(cat_id) = task.category_id() {
-                category_ids.insert(cat_id);
-            }
-        }
 
         // Fetch Categories (concurrently)
         let category_futures: Vec<_> = category_ids
@@ -129,7 +122,7 @@ impl CalculateStatsByPeriodUseCase {
 
         let task_details: HashMap<Uuid, String> = tasks
             .iter()
-            .map(|t| (t.id(), t.name().to_string()))
+            .map(|t| (t.id(), t.title().to_string()))
             .collect();
 
         // Calculate stats using orchestrator pattern

@@ -35,6 +35,9 @@ impl From<CompleteTaskError> for HttpError {
             CompleteTaskError::Unauthorized => HttpError::Unauthorized(
                 "Current user is not authorized to complete this task".to_string(),
             ),
+            CompleteTaskError::UncompletedSubTasks => {
+                HttpError::BadRequest("Sub-tasks must be completed first".to_string())
+            }
         }
     }
 }

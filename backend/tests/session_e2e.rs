@@ -29,11 +29,9 @@ async fn create_new_session_and_list() {
 
     // Create Task
     let create_task_dto = CreateTaskDto {
-        name: "Task".to_string(),
+        title: "Task".to_string(),
         description: Some("Work related tasks".to_string()),
-        category_id: Some(category_body.category_id.clone()),
-        scheduled_date: None,
-        scheduled_end_date: None,
+        due_date: None,
     };
 
     let create_task_body = context.create_task(&create_task_dto).await;
@@ -56,7 +54,7 @@ async fn create_new_session_and_list() {
         .tasks
         .iter()
         .any(|t| t.id.eq(&create_task_body.id.clone())));
-    assert!(body.tasks.iter().any(|t| t.name.eq("Task")));
+    assert!(body.tasks.iter().any(|t| t.title.eq("Task")));
 
     // Create manual work session
     let create_manual_session_dto = CreateManualSessionDto {
@@ -143,21 +141,17 @@ async fn update_session_and_list() {
 
     // Create Task
     let create_task_dto = CreateTaskDto {
-        name: "Task".to_string(),
+        title: "Task".to_string(),
         description: Some("Work related tasks".to_string()),
-        category_id: Some(category_body.category_id.clone()),
-        scheduled_date: None,
-        scheduled_end_date: None,
+        due_date: None,
     };
 
     let create_task_body = context.create_task(&create_task_dto).await;
 
     let create_task_dto = CreateTaskDto {
-        name: "Task".to_string(),
+        title: "Task".to_string(),
         description: Some("Work related tasks".to_string()),
-        category_id: Some(category_body.category_id.clone()),
-        scheduled_date: None,
-        scheduled_end_date: None,
+        due_date: None,
     };
 
     let create_task_body_2 = context.create_task(&create_task_dto).await;
@@ -361,11 +355,9 @@ async fn find_sessions_by_task_category() {
 
     // 2. Create Task linked to Category
     let create_task_dto = CreateTaskDto {
-        name: "Task 1".to_string(),
+        title: "Task 1".to_string(),
         description: None,
-        category_id: Some(category.category_id.clone()),
-        scheduled_date: None,
-        scheduled_end_date: None,
+        due_date: None,
     };
     let task = context.create_task(&create_task_dto).await;
 
