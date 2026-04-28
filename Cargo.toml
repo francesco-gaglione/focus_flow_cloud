@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "shared",
+    "focus_flow_app",
+]
+resolver = "2"

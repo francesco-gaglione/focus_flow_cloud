@@ -1,5 +1,5 @@
 use crate::http::dto::common::category_dto::CategoryDto;
-use crate::http::dto::common::task_dto::TaskDto;
+use crate::http::dto::common::task_dto::{self, TaskDto};
 use crate::http_error::{map_persistence_error, HttpResult};
 use crate::openapi::CATEGORY_TAG;
 use crate::{http::app_state::AppState, http_error::HttpError};
@@ -71,6 +71,6 @@ pub async fn get_categories_and_tasks_api(
                 color: c.color.clone(),
             })
             .collect(),
-        tasks: result.tasks.iter().map(|t| t.into()).collect(),
+        tasks: result.tasks.iter().map(task_dto::from_category_task).collect(),
     }))
 }

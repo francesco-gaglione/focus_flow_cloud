@@ -7,6 +7,7 @@ use axum::extract::{Path, State};
 use axum::Json;
 use chrono::DateTime;
 use serde::{Deserialize, Serialize};
+use shared::task::{UpdateTaskDto, UpdateTaskResponseDto};
 use utoipa::ToSchema;
 use uuid::Uuid;
 use validator::Validate;
@@ -23,28 +24,6 @@ impl From<UpdateTaskError> for HttpError {
 pub struct UpdateTaskPathDto {
     #[validate(custom(function = "validate_uuid"))]
     pub id: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
-#[serde(rename_all = "camelCase")]
-pub struct UpdateTaskDto {
-    #[validate(length(
-        min = 1,
-        max = 255,
-        message = "Title must be between 1 and 255 characters"
-    ))]
-    pub title: Option<String>,
-
-    #[validate(length(max = 255, message = "Description must not exceed 255 characters"))]
-    pub description: Option<String>,
-
-    pub due_date: Option<i64>, // timestamp in seconds
-}
-
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
-#[serde(rename_all = "camelCase")]
-pub struct UpdateTaskResponseDto {
-    pub success: bool,
 }
 
 #[utoipa::path(

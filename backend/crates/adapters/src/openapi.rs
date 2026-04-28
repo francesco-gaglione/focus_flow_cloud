@@ -1,7 +1,5 @@
-use crate::http::auth::login::{LoginDto, LoginResponseDto};
-use crate::http::auth::logout::LogoutResponseDto;
-use crate::http::auth::refresh::{RefreshDto, RefreshResponseDto};
 use crate::http::category::create_category::{CreateCategoryDto, CreateCategoryResponseDto};
+use shared::auth::{LoginDto, LoginResponseDto, LogoutResponseDto, RefreshDto, RefreshResponseDto};
 use crate::http::category::delete_categories::DeleteCategoriesDto;
 use crate::http::category::get_categories_and_tasks::GetCategoriesResponseDto;
 use crate::http::category::get_category::GetCategoryResponseDto;
@@ -15,12 +13,10 @@ use crate::http::stats::calculate_stats_by_period::{
     GetStatsByPeriodDto, GetStatsByPeriodResponseDto,
 };
 use crate::http::task::complete_task::{CompleteTaskDto, CompleteTaskResponseDto};
-use crate::http::task::create_task::CreateTaskResponseDto;
 use crate::http::task::delete_tasks::DeleteTasksDto;
 use crate::http::task::get_scheduled_tasks::ScheduledTasksResponseDto;
-use crate::http::task::get_tasks::TasksResponseDto;
 use crate::http::task::orphan_tasks::OrphanTasksResponseDto;
-use crate::http::task::update_task::UpdateTaskDto;
+use shared::task::{CreateTaskResponseDto, TasksResponseDto, UpdateTaskDto};
 use crate::http::user_setting::get_user_settings::UserSettingsResponseDto;
 use crate::http::user_setting::update_setting::UpdateUserSettingDto;
 use crate::http::users::create_user::CreateUserDto;

@@ -14,6 +14,8 @@ app/android/app/debug
 app/android/app/profile
 app/android/app/release
 
+target
+
 # Generic
 .idea
 .zed
@@ -40,4 +42,3 @@ migrate_working_dir/
 
 # Flutter/Dart/Pub related (general)
 **/doc/api/
-

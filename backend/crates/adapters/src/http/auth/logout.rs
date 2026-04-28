@@ -1,14 +1,8 @@
 use crate::http_error::HttpResult;
 use crate::openapi::AUTH_TAG;
 use axum::Json;
-use serde::{Deserialize, Serialize};
+use shared::auth::LogoutResponseDto;
 use tower_sessions::Session;
-use utoipa::ToSchema;
-
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
-pub struct LogoutResponseDto {
-    pub message: String,
-}
 
 #[utoipa::path(
     post,

@@ -1,12 +1,13 @@
-use crate::http::dto::common::task_dto::TaskDto;
+use crate::http::dto::common::task_dto;
 use crate::http_error::{map_persistence_error, HttpResult};
 use crate::openapi::TASK_TAG;
 use crate::{http::app_state::AppState, http_error::HttpError};
 use application::use_cases::task::get_tasks::{GetTaskError, GetTasksCommand};
 use axum::extract::{Query, State};
 use axum::Json;
-use serde::{Deserialize, Serialize};
-use utoipa::{IntoParams, ToSchema};
+use serde::Deserialize;
+use shared::task::TasksResponseDto;
+use utoipa::IntoParams;
 
 impl From<GetTaskError> for HttpError {
     fn from(err: GetTaskError) -> Self {
@@ -20,12 +21,6 @@ impl From<GetTaskError> for HttpError {
 #[serde(rename_all = "camelCase")]
 pub struct GetTasksParams {
     pub completed: Option<bool>,
-}
-
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
-#[serde(rename_all = "camelCase")]
-pub struct TasksResponseDto {
-    pub tasks: Vec<TaskDto>,
 }
 
 #[utoipa::path(
@@ -58,6 +53,6 @@ pub async fn get_tasks_api(
         .await?;
     tracing::info!("Fetched {} tasks", res.len());
     Ok(Json(TasksResponseDto {
-        tasks: res.iter().map(|task| task.into()).collect(),
+        tasks: res.iter().map(task_dto::from_task_output).collect(),
     }))
 }

@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+shared = { workspace = true }
 domain = { path = "../domain" }
 application = { path = "../application" }
 axum = { workspace = true, features=["ws"]}

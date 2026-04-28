@@ -12,6 +12,10 @@ members = [
 ]
 resolver = "2"
 
+[workspace.dependencies.shared]
+path = "../shared"
+features = ["openapi"]
+
 [dependencies]
 adapters = { path = "crates/adapters" }
 infrastructure = { path = "crates/infrastructure" }

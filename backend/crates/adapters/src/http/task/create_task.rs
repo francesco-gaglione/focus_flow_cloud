@@ -5,8 +5,7 @@ use crate::openapi::TASK_TAG;
 use application::use_cases::task::create_task::{CreateTaskCommand, CreateTaskError};
 use axum::{extract::State, Extension, Json};
 use chrono::DateTime;
-use serde::{Deserialize, Serialize};
-use utoipa::ToSchema;
+use shared::task::{CreateTaskDto, CreateTaskResponseDto};
 use validator::Validate;
 
 impl From<CreateTaskError> for HttpError {
@@ -15,27 +14,6 @@ impl From<CreateTaskError> for HttpError {
             CreateTaskError::PersistenceError(e) => HttpError::GenericError(e.to_string()),
         }
     }
-}
-
-#[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
-#[serde(rename_all = "camelCase")]
-pub struct CreateTaskDto {
-    #[validate(length(
-        min = 1,
-        max = 255,
-        message = "Title must be between 1 and 255 characters"
-    ))]
-    pub title: String,
-
-    #[validate(length(max = 255, message = "Description must not exceed 255 characters"))]
-    pub description: Option<String>,
-
-    pub due_date: Option<i64>, // timestamp in seconds
-}
-
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
-pub struct CreateTaskResponseDto {
-    pub id: String,
 }
 
 #[utoipa::path(

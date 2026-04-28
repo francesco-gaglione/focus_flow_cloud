@@ -1,4 +1,4 @@
-use crate::http::dto::common::task_dto::TaskDto;
+use crate::http::dto::common::task_dto::{self, TaskDto};
 use crate::http_error::{map_persistence_error, HttpResult};
 use crate::openapi::TASK_TAG;
 use crate::{http::app_state::AppState, http_error::HttpError};
@@ -56,6 +56,6 @@ pub async fn fetch_orphan_tasks_api(
         })
         .await?;
     Ok(Json(OrphanTasksResponseDto {
-        orphan_tasks: res.iter().map(|task| task.into()).collect(),
+        orphan_tasks: res.iter().map(task_dto::from_orphan_task).collect(),
     }))
 }

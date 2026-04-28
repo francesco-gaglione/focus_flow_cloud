@@ -1,6 +1,7 @@
 use crate::http::app_state::AppState;
 use crate::http::dto::{
-    common::session_type_enum::SessionTypeEnum, validators::validate_uuid::validate_uuid,
+    common::session_type_enum::{enum_to_domain, SessionTypeEnum},
+    validators::validate_uuid::validate_uuid,
 };
 use crate::http::model::session_model::UserSession;
 use crate::http_error::{HttpError, HttpResult};
@@ -106,7 +107,7 @@ pub async fn create_manual_session_api(
         user_id: user.user_id,
         category_id,
         task_id,
-        session_type: payload.session_type.into(),
+        session_type: enum_to_domain(payload.session_type),
         concentration_score: payload.concentration_score,
         notes: payload.notes,
         started_at,

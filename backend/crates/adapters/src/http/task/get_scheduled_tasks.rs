@@ -43,16 +43,14 @@ fn priority_to_str(p: Option<TaskPriority>) -> Option<String> {
     })
 }
 
-impl From<&ScheduledTaskOutput> for TaskDto {
-    fn from(value: &ScheduledTaskOutput) -> Self {
-        Self {
-            id: value.id.to_string(),
-            title: value.title.clone(),
-            description: value.description.clone(),
-            priority: priority_to_str(value.priority),
-            due_date: value.due_date.map(|d| d.timestamp()),
-            completed_at: value.completed_at.map(|d| d.timestamp()),
-        }
+fn scheduled_task_to_dto(value: &ScheduledTaskOutput) -> TaskDto {
+    TaskDto {
+        id: value.id.to_string(),
+        title: value.title.clone(),
+        description: value.description.clone(),
+        priority: priority_to_str(value.priority),
+        due_date: value.due_date.map(|d| d.timestamp()),
+        completed_at: value.completed_at.map(|d| d.timestamp()),
     }
 }
 
@@ -102,7 +100,7 @@ pub async fn get_scheduled_tasks_api(
         })
         .await?;
     Ok(Json(ScheduledTasksResponseDto {
-        tasks: res.scheduled_tasks.iter().map(|task| task.into()).collect(),
+        tasks: res.scheduled_tasks.iter().map(scheduled_task_to_dto).collect(),
     }))
 }
 
@@ -130,7 +128,7 @@ mod tests {
     #[test]
     fn test_task_dto_maps_all_fields() {
         let output = full_output();
-        let dto = TaskDto::from(&output);
+        let dto = scheduled_task_to_dto(&output);
 
         assert_eq!(dto.id, output.id.to_string());
         assert_eq!(dto.title, output.title);
@@ -151,7 +149,7 @@ mod tests {
             due_date: None,
             completed_at: None,
         };
-        let dto = TaskDto::from(&output);
+        let dto = scheduled_task_to_dto(&output);
 
         assert!(dto.description.is_none());
         assert!(dto.priority.is_none());

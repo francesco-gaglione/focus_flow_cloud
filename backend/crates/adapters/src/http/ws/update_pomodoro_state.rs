@@ -3,7 +3,7 @@ use application::use_cases::pomodoro_state::fetch_user_pomodoro_state::{
 };
 use serde::{Deserialize, Serialize};
 
-use crate::http::dto::common::session_type_enum::SessionTypeEnum;
+use crate::http::dto::common::session_type_enum::{app_type_to_enum, SessionTypeEnum};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -71,7 +71,7 @@ impl From<FetchUserPomodoroStateOutput> for UpdatePomodoroState {
 impl From<UserCurrentSession> for UpdateCurrentSession {
     fn from(value: UserCurrentSession) -> Self {
         Self {
-            session_type: value.session_type.into(),
+            session_type: app_type_to_enum(value.session_type),
             session_start_time: value.session_start_time,
             category_id: value.category_id,
             task_id: value.task_id,
