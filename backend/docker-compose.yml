@@ -32,6 +32,16 @@ services:
     ports:
       - "${SERVER_PORT}:${SERVER_PORT}"
 
+  jaeger:
+    image: cr.jaegertracing.io/jaegertracing/jaeger:2.17.0
+    container_name: jaeger
+    restart: always
+    ports:
+      - "16686:16686" # UI
+      - "4317:4317" # OTLP gRPC
+      - "4318:4318" # OTLP HTTP
+      - "5778:5778" # Config
+      - "9411:9411" # Zipkin
 
 volumes:
   db:

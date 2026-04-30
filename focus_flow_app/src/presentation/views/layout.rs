@@ -1,9 +1,11 @@
-use crate::Route;
+use crate::{presentation::views::auth_page::AuthPage, state::auth_state::AuthState, Route};
 use dioxus::prelude::*;
 
 #[component]
 pub fn Layout() -> Element {
     let mut drawer_open: Signal<bool> = use_context_provider(|| Signal::new(false));
+
+    let auth_state = use_context::<Signal<AuthState>>();
 
     let route = use_route::<Route>();
     let active_section = match route {
@@ -13,9 +15,14 @@ pub fn Layout() -> Element {
 
     rsx! {
         div { class: "app-shell",
-
             div { class: "page-content",
-                Outlet::<Route> {}
+                if auth_state.read().is_authenticated() {
+                    Outlet::<Route> {}
+                } else {
+                    div {
+                        AuthPage {  }
+                    }
+                }
             }
 
             div {

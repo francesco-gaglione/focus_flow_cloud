@@ -1,5 +1,6 @@
-use crate::components::models::Task;
 use dioxus::prelude::*;
+
+use crate::model::task::Task;
 
 #[derive(Props, Clone, PartialEq)]
 pub struct TaskRowProps {
@@ -10,9 +11,13 @@ pub struct TaskRowProps {
 #[component]
 pub fn TaskRow(props: TaskRowProps) -> Element {
     let task = &props.task;
-    let row_class = if task.done { "todo-row done" } else { "todo-row" };
-    let due_label = task.due.label().to_string();
-    let due_class = task.due.css_class();
+    let row_class = if task.done {
+        "todo-row done"
+    } else {
+        "todo-row"
+    };
+    let due_label = task.due.to_string();
+    let due_class = "";
     let id = task.id.clone();
 
     rsx! {

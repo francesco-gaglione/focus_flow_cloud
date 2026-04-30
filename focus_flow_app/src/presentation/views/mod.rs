@@ -1,3 +1,4 @@
+mod auth_page;
 mod calendar;
 mod flashcards;
 mod flashcards_layout;

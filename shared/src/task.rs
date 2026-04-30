@@ -8,16 +8,30 @@ pub struct TaskDto {
     pub id: String,
     pub title: String,
     pub description: Option<String>,
-    pub priority: Option<String>,
+    pub priority: Option<TaskPriority>,
     pub due_date: Option<i64>,
     pub completed_at: Option<i64>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
+#[serde(rename_all = "camelCase")]
+pub enum TaskPriority {
+    Low,
+    Medium,
+    High,
+    Urgent,
 }
 
 #[derive(Debug, Serialize, Deserialize, Validate)]
 #[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct CreateTaskDto {
-    #[validate(length(min = 1, max = 255, message = "Title must be between 1 and 255 characters"))]
+    #[validate(length(
+        min = 1,
+        max = 255,
+        message = "Title must be between 1 and 255 characters"
+    ))]
     pub title: String,
     #[validate(length(max = 255, message = "Description must not exceed 255 characters"))]
     pub description: Option<String>,
@@ -34,7 +48,11 @@ pub struct CreateTaskResponseDto {
 #[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateTaskDto {
-    #[validate(length(min = 1, max = 255, message = "Title must be between 1 and 255 characters"))]
+    #[validate(length(
+        min = 1,
+        max = 255,
+        message = "Title must be between 1 and 255 characters"
+    ))]
     pub title: Option<String>,
     #[validate(length(max = 255, message = "Description must not exceed 255 characters"))]
     pub description: Option<String>,
@@ -53,4 +71,28 @@ pub struct UpdateTaskResponseDto {
 #[serde(rename_all = "camelCase")]
 pub struct TasksResponseDto {
     pub tasks: Vec<TaskDto>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CompleteTaskDto {
+    pub task_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CompleteTaskResponseDto {
+    pub id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DeleteTasksDto {
+    pub task_ids: Vec<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DeleteTasksResponseDto {
+    pub deleted_ids: Vec<String>,
 }

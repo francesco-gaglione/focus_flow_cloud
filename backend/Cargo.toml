@@ -3,34 +3,8 @@ name = "focus_flow_cloud"
 version = "4.0.1"
 edition = "2021"
 
-[workspace]
-members = [
-    "crates/domain",
-    "crates/application",
-    "crates/infrastructure",
-    "crates/adapters",
-]
-resolver = "2"
-
-[workspace.dependencies.shared]
-path = "../shared"
-features = ["openapi"]
-
 [dependencies]
-adapters = { path = "crates/adapters" }
-infrastructure = { path = "crates/infrastructure" }
-domain = { path = "crates/domain" }
-application = { path = "crates/application" }
-dotenvy.workspace = true
-tracing.workspace = true
-tokio = { workspace = true, features = ["full"] }
-axum = { workspace = true, features=["ws"]}
-
-[workspace.dependencies]
-tracing = "0.1.41"
-tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
-tracing-bunyan-formatter = "0.3"
-tracing-log = "0.2"
+shared = { path = "../shared" }
 opentelemetry = { version = "0.27", features = ["trace"] }
 opentelemetry_sdk = { version = "0.27", features = ["trace", "rt-tokio"] }
 opentelemetry-otlp = { version = "0.27", features = ["tonic"] }
@@ -42,15 +16,12 @@ deadpool-diesel = { version = "0.6.1", features = ["postgres"] }
 thiserror = "2.0.16"
 uuid = { version = "1.18.1", features = ["v4", "serde"] }
 chrono = { version = "0.4.42", features = ["serde"] }
-tokio = { version = "1.47.1", features = ["full"] }
 utoipa = { version = "5.4.0", features = ["axum_extras", "chrono"] }
 utoipa-axum = "0.2.0"
 utoipa-swagger-ui = { version = "9.0.2", features = ["axum"] }
 utoipa-scalar = { version = "0.3", features = ["axum"] }
-axum = { version="0.8.6", features=["ws"]}
 tokio-tungstenite = "0.28.0"
 futures-util = { version = "0.3", default-features = false, features = ["sink", "std"] }
-dotenvy = "0.15.7"
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.145"
 diesel = { version = "2", features = ["postgres", "uuid", "chrono", "r2d2"] }
@@ -67,16 +38,27 @@ tower-sessions = { version = "0.14.0", features = ["memory-store"] }
 mockall = "0.11"
 testcontainers = "0.23"
 testcontainers-modules = { version = "0.11", features = ["postgres"] }
+adapters = { path = "crates/adapters" }
+infrastructure = { path = "crates/infrastructure" }
+domain = { path = "crates/domain" }
+application = { path = "crates/application" }
+axum = { version="0.8.6", features=["ws"]}
+dotenvy = "0.15.7"
+tracing = "0.1.41"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+tracing-bunyan-formatter = "0.3"
+tracing-log = "0.2"
+tokio = { version = "1.47.1", features = ["full"] }
 
 
 # Dev dependencies
 [dev-dependencies]
-tokio-test = "0.4" # Not in workspace yet
-http-body-util = "0.1" # Not in workspace
+tokio-test = "0.4"
+http-body-util = "0.1"
 mockall.workspace = true
 testcontainers.workspace = true
 testcontainers-modules.workspace = true
-reqwest = { version = "0.12", features = ["json"] } # Not in workspace
+reqwest = { version = "0.12", features = ["json"] }
 serde_json.workspace = true
 chrono = { workspace = true, features = ["serde"] }
 uuid = { workspace = true, features = ["v4", "serde"] }

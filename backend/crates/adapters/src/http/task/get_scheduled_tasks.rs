@@ -34,12 +34,14 @@ pub struct ScheduledTasksResponseDto {
     pub tasks: Vec<TaskDto>,
 }
 
-fn priority_to_str(p: Option<TaskPriority>) -> Option<String> {
+use shared::task::TaskPriority as SharedTaskPriority;
+
+fn priority_to_dto(p: Option<TaskPriority>) -> Option<SharedTaskPriority> {
     p.map(|p| match p {
-        TaskPriority::Low => "low".to_string(),
-        TaskPriority::Medium => "medium".to_string(),
-        TaskPriority::High => "high".to_string(),
-        TaskPriority::Urgent => "urgent".to_string(),
+        TaskPriority::Low => SharedTaskPriority::Low,
+        TaskPriority::Medium => SharedTaskPriority::Medium,
+        TaskPriority::High => SharedTaskPriority::High,
+        TaskPriority::Urgent => SharedTaskPriority::Urgent,
     })
 }
 
@@ -48,7 +50,7 @@ fn scheduled_task_to_dto(value: &ScheduledTaskOutput) -> TaskDto {
         id: value.id.to_string(),
         title: value.title.clone(),
         description: value.description.clone(),
-        priority: priority_to_str(value.priority),
+        priority: priority_to_dto(value.priority),
         due_date: value.due_date.map(|d| d.timestamp()),
         completed_at: value.completed_at.map(|d| d.timestamp()),
     }
@@ -135,7 +137,7 @@ mod tests {
         assert_eq!(dto.description, output.description);
         assert_eq!(dto.due_date, output.due_date.map(|d| d.timestamp()));
         assert_eq!(dto.completed_at, output.completed_at.map(|d| d.timestamp()));
-        assert_eq!(dto.priority, Some("high".to_string()));
+        assert_eq!(dto.priority, Some(SharedTaskPriority::High));
     }
 
     #[test]

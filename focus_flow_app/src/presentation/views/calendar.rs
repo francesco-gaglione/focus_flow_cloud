@@ -1,13 +1,54 @@
 use dioxus::prelude::*;
 
-use crate::components::models::{Task, TaskDue};
+struct Task {
+    id: String,
+    title: String,
+    cat: String,
+    cat_color: String,
+    due: TaskDue,
+    done: bool,
+}
+
+enum TaskDue {
+    Today,
+    Tomorrow,
+    Upcoming(String),
+}
 
 fn sample_tasks() -> Vec<Task> {
     vec![
-        Task { id: "t1".into(), title: "Write design system intro".into(), cat: "work".into(), cat_color: "var(--cat-magenta)".into(), due: TaskDue::Today, done: false },
-        Task { id: "t4".into(), title: "Reply to Marco".into(), cat: "work".into(), cat_color: "var(--cat-magenta)".into(), due: TaskDue::Today, done: false },
-        Task { id: "t2".into(), title: "Pharmacy run".into(), cat: "errand".into(), cat_color: "var(--cat-amber)".into(), due: TaskDue::Tomorrow, done: false },
-        Task { id: "t5".into(), title: "Sketch chapter 3 cover".into(), cat: "work".into(), cat_color: "var(--cat-magenta)".into(), due: TaskDue::Upcoming("Thu".into()), done: false },
+        Task {
+            id: "t1".into(),
+            title: "Write design system intro".into(),
+            cat: "work".into(),
+            cat_color: "var(--cat-magenta)".into(),
+            due: TaskDue::Today,
+            done: false,
+        },
+        Task {
+            id: "t4".into(),
+            title: "Reply to Marco".into(),
+            cat: "work".into(),
+            cat_color: "var(--cat-magenta)".into(),
+            due: TaskDue::Today,
+            done: false,
+        },
+        Task {
+            id: "t2".into(),
+            title: "Pharmacy run".into(),
+            cat: "errand".into(),
+            cat_color: "var(--cat-amber)".into(),
+            due: TaskDue::Tomorrow,
+            done: false,
+        },
+        Task {
+            id: "t5".into(),
+            title: "Sketch chapter 3 cover".into(),
+            cat: "work".into(),
+            cat_color: "var(--cat-magenta)".into(),
+            due: TaskDue::Upcoming("Thu".into()),
+            done: false,
+        },
     ]
 }
 
@@ -172,8 +213,13 @@ fn WeekView() -> Element {
     let tasks = sample_tasks();
 
     let days = [
-        ("M", 21u32, false), ("T", 22, false), ("W", 23, false),
-        ("T", 24, false), ("F", 25, false), ("S", 26, false), ("S", 27, true),
+        ("M", 21u32, false),
+        ("T", 22, false),
+        ("W", 23, false),
+        ("T", 24, false),
+        ("F", 25, false),
+        ("S", 26, false),
+        ("S", 27, true),
     ];
 
     rsx! {

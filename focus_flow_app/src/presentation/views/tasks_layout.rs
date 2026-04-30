@@ -7,10 +7,10 @@ pub fn TasksLayout() -> Element {
     let route = use_route::<Route>();
 
     let (crumb_sub, title_html, active_tab) = match route {
-        Route::Todo {}     => ("Today",    "Today, <em>focus</em>.",          "todo"),
-        Route::Calendar {} => ("Calendar", "A month, <em>at a glance</em>.",  "calendar"),
-        Route::Stats {}    => ("Progress", "Your <em>quiet</em> wins.",        "stats"),
-        _                  => ("Today",    "Today.",                           "todo"),
+        Route::Todo {} => ("Today", "Today, <em>focus</em>.", "todo"),
+        Route::Calendar {} => ("Calendar", "A month, <em>at a glance</em>.", "calendar"),
+        Route::Stats {} => ("Progress", "Your <em>quiet</em> wins.", "stats"),
+        _ => ("Today", "Today.", "todo"),
     };
 
     rsx! {

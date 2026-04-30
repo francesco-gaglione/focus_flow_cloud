@@ -5,13 +5,14 @@ use application::use_cases::{
     task::{get_tasks::TaskOutput, orphan_tasks},
 };
 use domain::entities::tasks::task_priority::TaskPriority;
+use shared::task::TaskPriority as SharedTaskPriority;
 
-fn priority_to_str(p: Option<TaskPriority>) -> Option<String> {
+fn priority_to_dto(p: Option<TaskPriority>) -> Option<SharedTaskPriority> {
     p.map(|p| match p {
-        TaskPriority::Low => "low".to_string(),
-        TaskPriority::Medium => "medium".to_string(),
-        TaskPriority::High => "high".to_string(),
-        TaskPriority::Urgent => "urgent".to_string(),
+        TaskPriority::Low => SharedTaskPriority::Low,
+        TaskPriority::Medium => SharedTaskPriority::Medium,
+        TaskPriority::High => SharedTaskPriority::High,
+        TaskPriority::Urgent => SharedTaskPriority::Urgent,
     })
 }
 
@@ -31,7 +32,7 @@ pub fn from_orphan_task(v: &orphan_tasks::TaskOutput) -> TaskDto {
         id: v.id.to_string(),
         title: v.title.clone(),
         description: v.description.clone(),
-        priority: priority_to_str(v.priority),
+        priority: priority_to_dto(v.priority),
         due_date: v.due_date.map(|d| d.timestamp()),
         completed_at: v.completed_at.map(|c| c.timestamp()),
     }
@@ -42,7 +43,7 @@ pub fn from_task_output(v: &TaskOutput) -> TaskDto {
         id: v.id.to_string(),
         title: v.title.clone(),
         description: v.description.clone(),
-        priority: priority_to_str(v.priority),
+        priority: priority_to_dto(v.priority),
         due_date: v.due_date.map(|d| d.timestamp()),
         completed_at: v.completed_at.map(|c| c.timestamp()),
     }
