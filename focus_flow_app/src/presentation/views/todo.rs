@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 
 use crate::{
-    model::task::{Task, TaskDue},
+    model::task::{Subtask, Task, TaskDue},
     presentation::components::common_components::TaskRow,
     services::{
         api_client::ApiClient,
@@ -21,6 +21,8 @@ pub fn Todo() -> Element {
     let mut show_modal = use_signal(|| false);
     let mut new_title = use_signal(String::new);
     let mut new_cat = use_signal(|| "personal".to_string());
+    let mut new_subtask_input = use_signal(String::new);
+    let mut new_subtasks: Signal<Vec<String>> = use_signal(Vec::new);
 
     let mut auth_state = use_context::<Signal<AuthState>>();
     let mut api_client = use_context::<Signal<ApiClient>>();
@@ -200,6 +202,18 @@ pub fn Todo() -> Element {
                                 _ => "var(--cat-cyan)".into(),
                             };
                             let id = format!("t{}", tasks.read().len() + 1);
+                            let subtasks = new_subtasks
+                                .read()
+                                .clone()
+                                .into_iter()
+                                .enumerate()
+                                .map(|(i, title)| Subtask {
+                                    id: format!("s{i}"),
+                                    title,
+                                    is_completed: false,
+                                    sort_order: i as i16,
+                                })
+                                .collect();
                             tasks.write().insert(0, Task {
                                 id,
                                 title: val,
@@ -210,8 +224,11 @@ pub fn Todo() -> Element {
                                 due: TaskDue::Today,
                                 completed_at: None,
                                 done: false,
+                                subtasks,
                             });
                             new_title.set(String::new());
+                            new_subtask_input.set(String::new());
+                            new_subtasks.write().clear();
                             show_modal.set(false);
                         }
                     },
@@ -233,6 +250,53 @@ pub fn Todo() -> Element {
                                 option { value: "personal", "@personal" }
                                 option { value: "work", "@work" }
                                 option { value: "errand", "@errand" }
+                            }
+                        }
+                    }
+                    div { class: "sheet-field",
+                        label { class: "sheet-label", "Subtasks" }
+                        for (i, sub) in new_subtasks.read().clone().into_iter().enumerate() {
+                            div { class: "sheet-subtask-row",
+                                span { class: "sheet-subtask-title", "{sub}" }
+                                button {
+                                    r#type: "button",
+                                    class: "sheet-subtask-rm",
+                                    onclick: move |_| { new_subtasks.write().remove(i); },
+                                    "×"
+                                }
+                            }
+                        }
+                        div { class: "sheet-subtask-add",
+                            input {
+                                class: "sheet-input",
+                                placeholder: "Add a subtask…",
+                                value: "{new_subtask_input}",
+                                oninput: move |e| new_subtask_input.set(e.value()),
+                                onkeydown: move |e| {
+                                    if e.key() == Key::Enter {
+                                        e.prevent_default();
+                                        let val = new_subtask_input.read().trim().to_string();
+                                        if !val.is_empty() {
+                                            new_subtasks.write().push(val);
+                                            new_subtask_input.set(String::new());
+                                        }
+                                    }
+                                },
+                            }
+                            button {
+                                r#type: "button",
+                                class: "sheet-subtask-add-btn",
+                                onclick: move |_| {
+                                    let val = new_subtask_input.read().trim().to_string();
+                                    if !val.is_empty() {
+                                        new_subtasks.write().push(val);
+                                        new_subtask_input.set(String::new());
+                                    }
+                                },
+                                svg { view_box: "0 0 16 16",
+                                    line { x1: "8", y1: "3", x2: "8", y2: "13", stroke: "currentColor", stroke_width: "1.8", stroke_linecap: "round" }
+                                    line { x1: "3", y1: "8", x2: "13", y2: "8", stroke: "currentColor", stroke_width: "1.8", stroke_linecap: "round" }
+                                }
                             }
                         }
                     }

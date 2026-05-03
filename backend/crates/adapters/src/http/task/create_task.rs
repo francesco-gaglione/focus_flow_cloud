@@ -2,7 +2,9 @@ use crate::http::app_state::AppState;
 use crate::http::model::session_model::UserSession;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::TASK_TAG;
-use application::use_cases::task::create_task::{CreateTaskCommand, CreateTaskError};
+use application::use_cases::task::create_task::{
+    CreateSubtaskCommand, CreateTaskCommand, CreateTaskError,
+};
 use axum::{extract::State, Extension, Json};
 use chrono::DateTime;
 use shared::task::{CreateTaskDto, CreateTaskResponseDto};
@@ -52,11 +54,23 @@ pub async fn create_task_api(
         })
         .transpose()?;
 
+    let subtasks = payload.subtasks.map(|items| {
+        items
+            .into_iter()
+            .map(|s| CreateSubtaskCommand {
+                user_id: user.user_id,
+                title: s.title,
+                description: s.description,
+            })
+            .collect()
+    });
+
     let command = CreateTaskCommand {
         user_id: user.user_id,
         title: payload.title,
         description: payload.description,
         due_date,
+        subtasks,
     };
 
     tracing::info!("Creating task with command: {:?}", command);

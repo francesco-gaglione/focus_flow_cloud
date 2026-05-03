@@ -7,7 +7,7 @@ pub fn TasksLayout() -> Element {
     let route = use_route::<Route>();
 
     let (crumb_sub, title_html, active_tab) = match route {
-        Route::Todo {} => ("Today", "Today, <em>focus</em>.", "todo"),
+        Route::Todo {} => ("Today", "Tasks, <em>focus please.</em>", "todo"),
         Route::Calendar {} => ("Calendar", "A month, <em>at a glance</em>.", "calendar"),
         Route::Stats {} => ("Progress", "Your <em>quiet</em> wins.", "stats"),
         _ => ("Today", "Today.", "todo"),
@@ -25,18 +25,7 @@ pub fn TasksLayout() -> Element {
                 }
             }
             div { class: "title-block",
-                div { class: "app-crumb",
-                    span { "Tasks" }
-                    span { class: "sep", "/" }
-                    span { "{crumb_sub}" }
-                }
                 div { class: "app-title", dangerous_inner_html: title_html }
-            }
-            button { class: "icon-btn",
-                svg { view_box: "0 0 16 16",
-                    circle { cx: "7", cy: "7", r: "4.5", stroke: "currentColor", stroke_width: "1.6", fill: "none" }
-                    line { x1: "10.5", y1: "10.5", x2: "13.5", y2: "13.5", stroke: "currentColor", stroke_width: "1.6" }
-                }
             }
         }
 

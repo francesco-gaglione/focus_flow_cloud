@@ -1,0 +1,258 @@
+/* ============================================================
+   ICON BUTTON
+   ============================================================ */
+.icon-btn {
+    width: 36px;
+    height: 36px;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    color: var(--text-subtle);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition:
+        background var(--dur-fast) var(--ease-tech),
+        border-color var(--dur-fast) var(--ease-tech),
+        color var(--dur-fast) var(--ease-tech);
+}
+.icon-btn:hover {
+    background: var(--ds-gray-200);
+    border-color: var(--border-strong);
+    color: var(--text);
+}
+.icon-btn:active {
+    background: var(--ds-gray-300);
+}
+.icon-btn svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.6;
+}
+
+/* ============================================================
+   COMPOSER BAR
+   ============================================================ */
+.composer-bar {
+    flex-shrink: 0;
+    padding: 0 16px 12px;
+}
+.composer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 40px;
+    padding: 0 14px;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    color: var(--text);
+    font-family: var(--font-ui);
+    font-size: 14px;
+    transition: border-color var(--dur-fast) var(--ease-tech);
+}
+.composer:focus-within {
+    border-color: var(--accent);
+    box-shadow: var(--shadow-focus);
+}
+.composer .add-icon {
+    width: 16px;
+    height: 16px;
+    color: var(--accent);
+    flex-shrink: 0;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.8;
+}
+.composer input {
+    flex: 1;
+    background: transparent;
+    border: 0;
+    color: var(--text);
+    font: inherit;
+    outline: none;
+    min-width: 0;
+}
+.composer input::placeholder {
+    color: var(--text-subtle);
+}
+.composer .hint {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-subtle);
+    letter-spacing: var(--tracking-data);
+    text-transform: uppercase;
+}
+.composer kbd {
+    display: inline-block;
+    padding: 2px 6px;
+    border: 1px solid var(--border);
+    border-bottom-width: 2px;
+    background: var(--bg-sunk);
+    color: var(--text-subtle);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    border-radius: var(--r-xs);
+}
+
+/* ============================================================
+   FAB — green, elevated
+   ============================================================ */
+.fab {
+    position: fixed;
+    bottom: 100px;
+    right: 18px;
+    z-index: 15;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 48px;
+    padding: 0 20px;
+    background: var(--accent);
+    border: none;
+    border-radius: var(--r-md);
+    color: #fff;
+    font-family: var(--font-ui);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    box-shadow:
+        var(--shadow-md),
+        0 0 0 1px var(--accent);
+    transition:
+        background var(--dur-fast) var(--ease-tech),
+        transform var(--dur-fast) var(--ease-tech),
+        box-shadow var(--dur-fast) var(--ease-tech);
+}
+.fab:hover {
+    background: var(--accent-hover);
+    box-shadow:
+        var(--shadow-lg),
+        0 0 0 1px var(--accent-hover);
+}
+.fab:active {
+    transform: scale(0.96);
+}
+.fab-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+}
+
+/* ============================================================
+   CONTEXT MENU
+   ============================================================ */
+.ctx-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+}
+
+@keyframes ctx-in {
+    from { opacity: 0; transform: scale(0.94); }
+    to   { opacity: 1; transform: scale(1); }
+}
+.ctx-menu {
+    position: fixed;
+    z-index: 51;
+    min-width: 172px;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    box-shadow: var(--shadow-lg);
+    padding: 4px;
+    animation: ctx-in var(--dur-fast) var(--ease-snap) both;
+    transform-origin: top left;
+}
+.ctx-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    width: 100%;
+    padding: 9px 12px;
+    background: transparent;
+    border: 0;
+    border-radius: var(--r-sm);
+    color: var(--text);
+    font-family: var(--font-ui);
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+    transition: background var(--dur-fast) var(--ease-tech);
+}
+.ctx-item:hover {
+    background: var(--bg-raised);
+}
+.ctx-item:active {
+    background: var(--ds-gray-300);
+}
+.ctx-item.danger {
+    color: var(--danger);
+}
+.ctx-item.danger:hover {
+    background: var(--danger-soft);
+}
+.ctx-item-icon {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    stroke: currentColor;
+    fill: none;
+}
+.ctx-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 3px 0;
+}
+
+/* ============================================================
+   EMPTY STATE
+   ============================================================ */
+.empty-state {
+    text-align: center;
+    padding: 60px 24px;
+}
+.empty-state .ico {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 16px;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    color: var(--text-subtle);
+    display: grid;
+    place-items: center;
+}
+.empty-state .ico svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.5;
+}
+.empty-state h3 {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    margin: 0 0 8px;
+    color: var(--text);
+}
+.empty-state h3 em {
+    color: var(--accent);
+    font-style: normal;
+}
+.empty-state p {
+    font-size: 13px;
+    color: var(--text-subtle);
+    line-height: 1.55;
+    max-width: 260px;
+    margin: 0 auto;
+}

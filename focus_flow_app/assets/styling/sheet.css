@@ -1,0 +1,211 @@
+/* ============================================================
+   BOTTOM SHEET
+   ============================================================ */
+.sheet-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 40;
+}
+
+@keyframes sheet-in {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+.bottom-sheet {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 41;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-bottom: none;
+    border-radius: var(--r-xl) var(--r-xl) 0 0;
+    padding-bottom: 44px;
+    animation: sheet-in var(--dur-base) var(--ease-snap) both;
+}
+.sheet-handle {
+    width: 36px;
+    height: 4px;
+    background: var(--border-strong);
+    border-radius: var(--r-full);
+    margin: 14px auto 0;
+}
+.sheet-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px 14px;
+    border-bottom: 1px solid var(--border);
+}
+.sheet-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.025em;
+}
+
+.sheet-close {
+    width: 32px;
+    height: 32px;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    color: var(--text-subtle);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition:
+        background var(--dur-fast) var(--ease-tech),
+        color var(--dur-fast) var(--ease-tech);
+}
+.sheet-close:hover {
+    background: var(--ds-gray-200);
+    color: var(--text);
+}
+.sheet-close svg {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.6;
+}
+
+.sheet-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 20px 20px 4px;
+}
+.sheet-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.sheet-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: var(--tracking-data);
+    text-transform: uppercase;
+    color: var(--text-subtle);
+}
+.sheet-input {
+    height: 44px;
+    padding: 0 14px;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    color: var(--text);
+    font-family: var(--font-ui);
+    font-size: 15px;
+    outline: none;
+    width: 100%;
+    transition:
+        border-color var(--dur-fast) var(--ease-tech),
+        box-shadow var(--dur-fast) var(--ease-tech);
+}
+.sheet-input::placeholder {
+    color: var(--text-subtle);
+}
+.sheet-input:focus {
+    border-color: var(--accent);
+    box-shadow: var(--shadow-focus);
+}
+
+.sheet-select-wrap {
+    position: relative;
+}
+.sheet-select-wrap::after {
+    content: "▾";
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-subtle);
+    font-size: 12px;
+    pointer-events: none;
+}
+.sheet-select {
+    width: 100%;
+    appearance: none;
+    -webkit-appearance: none;
+    height: 44px;
+    padding: 0 36px 0 14px;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    color: var(--text);
+    font-family: var(--font-ui);
+    font-size: 15px;
+    outline: none;
+    cursor: pointer;
+    transition: border-color var(--dur-fast) var(--ease-tech);
+}
+.sheet-select:focus {
+    border-color: var(--accent);
+    box-shadow: var(--shadow-focus);
+}
+.sheet-select option {
+    background: var(--bg-elev);
+    color: var(--text);
+}
+
+.sheet-actions {
+    display: flex;
+    gap: 8px;
+    padding-top: 4px;
+}
+.sheet-btn-cancel {
+    flex: 1;
+    height: 46px;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    color: var(--text-muted);
+    font-family: var(--font-ui);
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+        background var(--dur-fast) var(--ease-tech),
+        color var(--dur-fast) var(--ease-tech);
+}
+.sheet-btn-cancel:hover {
+    background: var(--ds-gray-200);
+    color: var(--text);
+}
+.sheet-btn-cancel:active {
+    transform: scale(0.98);
+}
+
+.sheet-btn-submit {
+    flex: 2;
+    height: 46px;
+    background: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: var(--r-md);
+    color: #fff;
+    font-family: var(--font-ui);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+        background var(--dur-fast) var(--ease-tech),
+        transform var(--dur-fast) var(--ease-tech);
+}
+.sheet-btn-submit:hover {
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+}
+.sheet-btn-submit:active {
+    transform: scale(0.98);
+}

@@ -4,7 +4,10 @@ use uuid::Uuid;
 
 use crate::entities::{
     reminder::Reminder,
-    tasks::{subtask::Subtask, task_priority::TaskPriority},
+    tasks::{
+        subtask::{self, Subtask},
+        task_priority::TaskPriority,
+    },
 };
 
 #[derive(Debug, Clone, Error, PartialEq)]
@@ -146,6 +149,31 @@ impl Task {
         self.reminders.push(reminder);
     }
 
+    // Sets the sort order of a subtask at the given index.
+    // Moves other subtasks to fill the gap by shifting their sort order.
+    pub fn set_subtask_order(&mut self, index: usize, new_order: i16) {
+        let Some(old_order) = self.sub_tasks.get(index).map(|s| s.sort_order()) else {
+            return;
+        };
+
+        let (lo, hi, delta) = if new_order > old_order {
+            (old_order + 1, new_order, -1i16)
+        } else {
+            (new_order, old_order - 1, 1i16)
+        };
+
+        for (ind, subtask) in self.sub_tasks.iter_mut().enumerate() {
+            if ind == index {
+                continue;
+            }
+            let order = subtask.sort_order();
+            if order >= lo && order <= hi {
+                subtask.update_sort_order(order + delta);
+            }
+        }
+        self.sub_tasks[index].update_sort_order(new_order);
+    }
+
     // Getters
 
     pub fn id(&self) -> Uuid {
@@ -266,7 +294,7 @@ mod tests {
     fn test_task_subtasks() {
         let user_id = Uuid::new_v4();
         let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
-        let subtask = Subtask::new("Subtask 1".to_string(), None);
+        let subtask = Subtask::new("Subtask 1".to_string(), 0, None);
         task.add_subtask(subtask);
         assert_eq!(task.sub_tasks().len(), 1);
         let sub_tasks = task.sub_tasks();
@@ -278,10 +306,10 @@ mod tests {
     fn test_task_subtask_deletion() {
         let user_id = Uuid::new_v4();
         let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
-        let subtask = Subtask::new("Subtask 1".to_string(), None);
+        let subtask = Subtask::new("Subtask 1".to_string(), 0, None);
         task.add_subtask(subtask);
         assert_eq!(task.sub_tasks().len(), 1);
-        task.sub_tasks_mut().retain(|s| s.title != "Subtask 1");
+        task.sub_tasks_mut().retain(|s| s.title() != "Subtask 1");
         assert_eq!(task.sub_tasks().len(), 0);
     }
 
@@ -289,7 +317,7 @@ mod tests {
     fn test_task_subtask_update() {
         let user_id = Uuid::new_v4();
         let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
-        let subtask = Subtask::new("Subtask 1".to_string(), None);
+        let subtask = Subtask::new("Subtask 1".to_string(), 0, None);
         task.add_subtask(subtask);
         assert_eq!(task.sub_tasks().len(), 1);
         task.sub_tasks_mut()[0].update_title("Edited Subtask 1".to_string());
@@ -300,7 +328,7 @@ mod tests {
     fn test_task_subtask_completion() {
         let user_id = Uuid::new_v4();
         let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
-        let subtask = Subtask::new("Subtask 1".to_string(), None);
+        let subtask = Subtask::new("Subtask 1".to_string(), 0, None);
         task.add_subtask(subtask);
         task.sub_tasks_mut()[0].mark_completed();
         assert!(task.sub_tasks()[0].is_completed());
@@ -308,10 +336,96 @@ mod tests {
     }
 
     #[test]
+    fn test_subtask_order_shift_down() {
+        // Vec[A:0, B:1, C:2] → move idx=0 (A) to sort_order=2
+        // B and C in range [1,2] shift -1 → B:0, C:1; A gets 2
+        // Vec positions unchanged: [0]=A, [1]=B, [2]=C
+        let user_id = Uuid::new_v4();
+        let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
+        task.add_subtask(Subtask::new("A".to_string(), 0, None));
+        task.add_subtask(Subtask::new("B".to_string(), 1, None));
+        task.add_subtask(Subtask::new("C".to_string(), 2, None));
+
+        task.set_subtask_order(0, 2);
+
+        assert_eq!(task.sub_tasks()[0].title(), "A");
+        assert_eq!(task.sub_tasks()[0].sort_order(), 2);
+        assert_eq!(task.sub_tasks()[1].title(), "B");
+        assert_eq!(task.sub_tasks()[1].sort_order(), 0);
+        assert_eq!(task.sub_tasks()[2].title(), "C");
+        assert_eq!(task.sub_tasks()[2].sort_order(), 1);
+    }
+
+    #[test]
+    fn test_subtask_order_shift_up() {
+        // Vec[A:0, B:1, C:2] → move idx=2 (C) to sort_order=0
+        // A and B in range [0,1] shift +1 → A:1, B:2; C gets 0
+        // Vec positions unchanged: [0]=A, [1]=B, [2]=C
+        let user_id = Uuid::new_v4();
+        let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
+        task.add_subtask(Subtask::new("A".to_string(), 0, None));
+        task.add_subtask(Subtask::new("B".to_string(), 1, None));
+        task.add_subtask(Subtask::new("C".to_string(), 2, None));
+
+        task.set_subtask_order(2, 0);
+
+        assert_eq!(task.sub_tasks()[0].title(), "A");
+        assert_eq!(task.sub_tasks()[0].sort_order(), 1);
+        assert_eq!(task.sub_tasks()[1].title(), "B");
+        assert_eq!(task.sub_tasks()[1].sort_order(), 2);
+        assert_eq!(task.sub_tasks()[2].title(), "C");
+        assert_eq!(task.sub_tasks()[2].sort_order(), 0);
+    }
+
+    #[test]
+    fn test_subtask_order_no_op() {
+        // move to same sort_order → nothing changes
+        let user_id = Uuid::new_v4();
+        let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
+        task.add_subtask(Subtask::new("A".to_string(), 0, None));
+        task.add_subtask(Subtask::new("B".to_string(), 1, None));
+
+        task.set_subtask_order(0, 0);
+
+        assert_eq!(task.sub_tasks()[0].sort_order(), 0);
+        assert_eq!(task.sub_tasks()[1].sort_order(), 1);
+    }
+
+    #[test]
+    fn test_subtask_order_invalid_index() {
+        // out-of-bounds index → no panic, no change
+        let user_id = Uuid::new_v4();
+        let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
+        task.add_subtask(Subtask::new("A".to_string(), 0, None));
+
+        task.set_subtask_order(99, 5);
+
+        assert_eq!(task.sub_tasks()[0].sort_order(), 0);
+    }
+
+    #[test]
+    fn test_subtask_order_adjacent_swap() {
+        // Vec[A:0, B:1] → move idx=0 (A) to sort_order=1
+        // B in range [1,1] shifts -1 → B:0; A gets 1
+        // Vec positions unchanged: [0]=A, [1]=B
+        let user_id = Uuid::new_v4();
+        let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
+        task.add_subtask(Subtask::new("A".to_string(), 0, None));
+        task.add_subtask(Subtask::new("B".to_string(), 1, None));
+
+        task.set_subtask_order(0, 1);
+
+        assert_eq!(task.sub_tasks()[0].title(), "A");
+        assert_eq!(task.sub_tasks()[0].sort_order(), 1);
+        assert_eq!(task.sub_tasks()[1].title(), "B");
+        assert_eq!(task.sub_tasks()[1].sort_order(), 0);
+    }
+
+    #[test]
     fn test_task_completion() {
         let user_id = Uuid::new_v4();
         let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
-        let subtask = Subtask::new("Subtask 1".to_string(), None);
+        let subtask = Subtask::new("Subtask 1".to_string(), 0, None);
         task.add_subtask(subtask);
         let res = task.complete();
         assert!(res.is_err());

@@ -1,6 +1,7 @@
 use crate::repository_traits::persistence_error::PersistenceError;
 use crate::repository_traits::task_persistence::TaskPersistence;
 use chrono::{DateTime, Utc};
+use domain::entities::tasks::subtask::Subtask;
 use domain::entities::tasks::task::Task;
 use domain::entities::tasks::task_priority::TaskPriority;
 use std::sync::Arc;
@@ -30,6 +31,16 @@ pub struct TaskOutput {
     pub priority: Option<TaskPriority>,
     pub due_date: Option<DateTime<Utc>>,
     pub completed_at: Option<DateTime<Utc>>,
+    pub subtasks: Vec<SubTaskOutput>,
+}
+
+#[derive(Debug, Clone)]
+pub struct SubTaskOutput {
+    pub id: Uuid,
+    pub title: String,
+    pub description: Option<String>,
+    pub is_completed: bool,
+    pub sort_order: i16,
 }
 
 impl From<&Task> for TaskOutput {
@@ -42,6 +53,19 @@ impl From<&Task> for TaskOutput {
             priority: value.priority(),
             due_date: value.due_date(),
             completed_at: value.completed_at(),
+            subtasks: value.sub_tasks().iter().map(|s| s.into()).collect(),
+        }
+    }
+}
+
+impl From<&Subtask> for SubTaskOutput {
+    fn from(value: &Subtask) -> Self {
+        Self {
+            id: value.id(),
+            title: value.title().to_string(),
+            description: value.description().map(|d| d.to_string()),
+            is_completed: value.is_completed(),
+            sort_order: value.sort_order(),
         }
     }
 }

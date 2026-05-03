@@ -1,7 +1,7 @@
 use crate::repository_traits::persistence_error::PersistenceError;
 use crate::repository_traits::task_persistence::TaskPersistence;
 use chrono::{DateTime, Utc};
-use domain::entities::tasks::task::Task;
+use domain::entities::tasks::{subtask::Subtask, task::Task};
 use std::sync::Arc;
 use thiserror::Error;
 use tracing::instrument;
@@ -21,6 +21,14 @@ pub struct CreateTaskCommand {
     pub title: String,
     pub description: Option<String>,
     pub due_date: Option<DateTime<Utc>>,
+    pub subtasks: Option<Vec<CreateSubtaskCommand>>,
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateSubtaskCommand {
+    pub user_id: Uuid,
+    pub title: String,
+    pub description: Option<String>,
 }
 
 pub struct CreateTaskUseCase {
@@ -34,12 +42,22 @@ impl CreateTaskUseCase {
 
     #[instrument(skip(self))]
     pub async fn execute(&self, command: CreateTaskCommand) -> CreateTaskResult<Uuid> {
-        let task = Task::new(
+        let mut task = Task::new(
             command.user_id,
             command.title,
             command.due_date,
             command.description,
         );
+
+        if command.subtasks.is_some() {
+            for (index, s) in command.subtasks.unwrap().iter().enumerate() {
+                task.add_subtask(Subtask::new(
+                    s.title.clone(),
+                    index as i16,
+                    s.description.clone(),
+                ));
+            }
+        }
 
         tracing::info!("Creating task: {:?}", task);
         let result = self.task_persistence.create_task(task).await?;
@@ -69,6 +87,7 @@ mod tests {
             title: "New Task".to_string(),
             description: None,
             due_date: None,
+            subtasks: None,
         };
 
         let result = use_case.execute(command).await;
@@ -92,6 +111,7 @@ mod tests {
             title: "New Task".to_string(),
             description: None,
             due_date: Some(Utc::now() + chrono::Duration::minutes(15)),
+            subtasks: None,
         };
 
         let result = use_case.execute(command).await;
@@ -116,6 +136,7 @@ mod tests {
             title: "New Task".to_string(),
             description: None,
             due_date: None,
+            subtasks: None,
         };
 
         let result = use_case.execute(command).await;

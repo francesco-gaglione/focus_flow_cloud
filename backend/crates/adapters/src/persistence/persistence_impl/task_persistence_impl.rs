@@ -1,3 +1,4 @@
+use crate::persistence::db_models::db_subtask::{DbSubtask, NewDbSubtask};
 use crate::persistence::db_models::db_task::{DbTask, NewDbTask, UpdateDbTask};
 use crate::persistence::schema;
 use crate::persistence::PostgresPersistence;
@@ -14,39 +15,38 @@ use uuid::Uuid;
 impl TaskPersistence for PostgresPersistence {
     #[instrument(skip(self))]
     async fn create_task(&self, task: Task) -> PersistenceResult<Uuid> {
-        let conn = self
-            .pool
-            .get()
-            .await
-            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?;
+        let subtasks: Vec<NewDbSubtask> = task
+            .sub_tasks()
+            .iter()
+            .map(|s| NewDbSubtask::from_subtask(s, task.id(), task.user_id()))
+            .collect();
 
-        let result = conn
-            .interact(move |conn| {
-                diesel::insert_into(schema::tasks::table)
-                    .values(&NewDbTask::from(task))
+        let task_id = self
+            .with_transaction(move |conn| {
+                let db_task = diesel::insert_into(schema::tasks::table)
+                    .values(&NewDbTask::from(task.clone()))
                     .returning(DbTask::as_returning())
-                    .get_result(conn)
-            })
-            .await
-            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?
-            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?;
+                    .get_result(conn)?;
 
-        info!("Created task with id: {}", result.id);
-        Ok(result.id)
+                if !subtasks.is_empty() {
+                    diesel::insert_into(schema::subtasks::table)
+                        .values(&subtasks)
+                        .execute(conn)?;
+                }
+
+                Ok(db_task.id)
+            })
+            .await?;
+
+        info!("Created task with id: {}", task_id);
+        Ok(task_id)
     }
 
+    #[instrument(skip(self))]
     async fn find_all(&self, completed: bool) -> PersistenceResult<Vec<Task>> {
-        let conn = self
-            .pool
-            .get()
-            .await
-            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?;
-
-        let result = conn
-            .interact(move |conn| {
-                let mut query = schema::tasks::table
-                    .filter(schema::tasks::deleted_at.is_null())
-                    .into_boxed();
+        let tasks = self
+            .with_transaction(move |conn| {
+                let mut query = schema::tasks::table.into_boxed();
 
                 if completed {
                     query = query.filter(schema::tasks::completed_at.is_not_null());
@@ -54,19 +54,31 @@ impl TaskPersistence for PostgresPersistence {
                     query = query.filter(schema::tasks::completed_at.is_null());
                 }
 
-                query
+                let db_tasks: Vec<DbTask> = query
                     .select(DbTask::as_select())
                     .order(schema::tasks::created_at.desc())
-                    .load(conn)
-            })
-            .await
-            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?
-            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?;
+                    .load(conn)?;
 
-        let tasks: Vec<Task> = result.into_iter().map(|c| c.into()).collect();
+                let mut tasks = Vec::with_capacity(db_tasks.len());
+                for db_task in db_tasks {
+                    let db_subtasks: Vec<DbSubtask> = schema::subtasks::table
+                        .filter(schema::subtasks::task_id.eq(db_task.id))
+                        .select(DbSubtask::as_select())
+                        .order(schema::subtasks::sort_order.asc())
+                        .load(conn)?;
+
+                    let subtasks = db_subtasks.into_iter().map(|s| s.into()).collect();
+                    tasks.push(db_task.into_task_with_subtasks(subtasks));
+                }
+
+                Ok(tasks)
+            })
+            .await?;
+
         Ok(tasks)
     }
 
+    #[instrument(skip(self))]
     async fn find_by_id(&self, task_id: Uuid) -> PersistenceResult<Task> {
         let conn = self
             .pool
@@ -76,19 +88,31 @@ impl TaskPersistence for PostgresPersistence {
 
         let result = conn
             .interact(move |conn| {
-                schema::tasks::table
+                let db_task = schema::tasks::table
                     .filter(schema::tasks::id.eq(task_id))
-                    .filter(schema::tasks::deleted_at.is_null())
                     .select(DbTask::as_select())
                     .first(conn)
-                    .optional()
+                    .optional()?;
+
+                match db_task {
+                    None => Ok(None),
+                    Some(db_task) => {
+                        let db_subtasks: Vec<DbSubtask> = schema::subtasks::table
+                            .filter(schema::subtasks::task_id.eq(db_task.id))
+                            .select(DbSubtask::as_select())
+                            .order(schema::subtasks::sort_order.asc())
+                            .load(conn)?;
+                        let subtasks = db_subtasks.into_iter().map(|s| s.into()).collect();
+                        Ok(Some(db_task.into_task_with_subtasks(subtasks)))
+                    }
+                }
             })
             .await
             .map_err(|e| PersistenceError::Unexpected(e.to_string()))?
-            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?;
+            .map_err(|e: diesel::result::Error| PersistenceError::Unexpected(e.to_string()))?;
 
         match result {
-            Some(db_task) => Ok(db_task.into()),
+            Some(task) => Ok(task),
             None => Err(PersistenceError::NotFound(format!(
                 "Task with id {} not found",
                 task_id
@@ -96,6 +120,7 @@ impl TaskPersistence for PostgresPersistence {
         }
     }
 
+    #[instrument(skip(self))]
     async fn find_scheduled_tasks(
         &self,
         from: Option<DateTime<Utc>>,
@@ -108,10 +133,9 @@ impl TaskPersistence for PostgresPersistence {
             .await
             .map_err(|e| PersistenceError::Unexpected(e.to_string()))?;
 
-        let result = conn
+        let tasks = conn
             .interact(move |conn| {
                 let mut query = schema::tasks::table
-                    .filter(schema::tasks::deleted_at.is_null())
                     .filter(schema::tasks::scheduled_date.is_not_null())
                     .into_boxed();
 
@@ -128,48 +152,78 @@ impl TaskPersistence for PostgresPersistence {
                     None => {}
                 }
 
-                query
+                let db_tasks: Vec<DbTask> = query
                     .select(DbTask::as_select())
                     .order(schema::tasks::scheduled_date.asc())
-                    .load(conn)
+                    .load(conn)?;
+
+                let mut tasks = Vec::with_capacity(db_tasks.len());
+                for db_task in db_tasks {
+                    let db_subtasks: Vec<DbSubtask> = schema::subtasks::table
+                        .filter(schema::subtasks::task_id.eq(db_task.id))
+                        .select(DbSubtask::as_select())
+                        .order(schema::subtasks::sort_order.asc())
+                        .load(conn)?;
+                    let subtasks = db_subtasks.into_iter().map(|s| s.into()).collect();
+                    tasks.push(db_task.into_task_with_subtasks(subtasks));
+                }
+
+                Ok(tasks)
             })
             .await
             .map_err(|e| PersistenceError::Unexpected(e.to_string()))?
-            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?;
+            .map_err(|e: diesel::result::Error| PersistenceError::Unexpected(e.to_string()))?;
 
-        let tasks: Vec<Task> = result.into_iter().map(|c| c.into()).collect();
         Ok(tasks)
     }
 
+    #[instrument(skip(self))]
     async fn update_task(&self, task: Task) -> PersistenceResult<Task> {
-        let conn = self
-            .pool
-            .get()
-            .await
-            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?;
+        let task_id = task.id();
+        let new_subtasks: Vec<NewDbSubtask> = task
+            .sub_tasks()
+            .iter()
+            .map(|s| NewDbSubtask::from_subtask(s, task_id, task.user_id()))
+            .collect();
 
-        let task_id = task.id(); // Ensure we use ID from entity
-
-        let result = conn
-            .interact(move |conn| {
-                diesel::update(schema::tasks::table)
+        let updated = self
+            .with_transaction(move |conn| {
+                let updated_db_task = diesel::update(schema::tasks::table)
                     .filter(schema::tasks::id.eq(task_id))
-                    .filter(schema::tasks::deleted_at.is_null())
                     .set(&UpdateDbTask::from(task))
                     .returning(DbTask::as_returning())
                     .get_result(conn)
-                    .optional()
-            })
-            .await
-            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?
-            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?;
+                    .optional()?;
 
-        match result {
-            None => Err(PersistenceError::Unexpected("Task not updated".to_string())),
-            Some(updated) => Ok(updated.into()),
-        }
+                let Some(updated_db_task) = updated_db_task else {
+                    return Err(diesel::result::Error::NotFound);
+                };
+
+                diesel::delete(schema::subtasks::table)
+                    .filter(schema::subtasks::task_id.eq(task_id))
+                    .execute(conn)?;
+
+                if !new_subtasks.is_empty() {
+                    diesel::insert_into(schema::subtasks::table)
+                        .values(&new_subtasks)
+                        .execute(conn)?;
+                }
+
+                let db_subtasks: Vec<DbSubtask> = schema::subtasks::table
+                    .filter(schema::subtasks::task_id.eq(task_id))
+                    .select(DbSubtask::as_select())
+                    .order(schema::subtasks::sort_order.asc())
+                    .load(conn)?;
+
+                let subtasks = db_subtasks.into_iter().map(|s| s.into()).collect();
+                Ok(updated_db_task.into_task_with_subtasks(subtasks))
+            })
+            .await?;
+
+        Ok(updated)
     }
 
+    #[instrument(skip(self))]
     async fn delete_task(&self, task_id: Uuid) -> PersistenceResult<()> {
         let conn = self
             .pool

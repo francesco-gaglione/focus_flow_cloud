@@ -1,8 +1,16 @@
 #blog {
-  margin-top: 50px;
+    margin-top: 50px;
+    font-family: var(--font-sans, ui-sans-serif, sans-serif);
+    color: var(--text, #ffffff);
 }
 
 #blog a {
-  color: #ffffff;
-  margin-top: 50px;
+    color: var(--accent, #0070f3);
+    margin-top: 50px;
+    text-decoration: none;
+    transition: opacity 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#blog a:hover {
+    opacity: 0.8;
 }

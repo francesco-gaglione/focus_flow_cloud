@@ -1,6 +1,14 @@
 use std::fmt::Display;
 
 #[derive(Clone, PartialEq)]
+pub struct Subtask {
+    pub id: String,
+    pub title: String,
+    pub is_completed: bool,
+    pub sort_order: i16,
+}
+
+#[derive(Clone, PartialEq)]
 pub struct Task {
     pub id: String,
     pub title: String,
@@ -11,6 +19,7 @@ pub struct Task {
     pub due: TaskDue,
     pub completed_at: Option<chrono::NaiveDateTime>,
     pub done: bool,
+    pub subtasks: Vec<Subtask>,
 }
 
 #[derive(Clone, PartialEq)]

@@ -1,0 +1,175 @@
+/* ============================================================
+   GEIST DESIGN SYSTEM — FONTS
+   ============================================================ */
+@font-face {
+    font-family: "Geist";
+    src: url("https://cdn.jsdelivr.net/npm/geist@1.5.1/dist/fonts/geist-sans/GeistVariableVF.woff2")
+        format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: "Geist Mono";
+    src: url("https://cdn.jsdelivr.net/npm/geist@1.5.1/dist/fonts/geist-mono/GeistMonoVariableVF.woff2")
+        format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* ============================================================
+   TOKENS — DARK BASE
+   ============================================================ */
+:root {
+    /* Fonts */
+    --font-sans:
+        "Geist", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+    --font-mono:
+        "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --font-display: var(--font-sans);
+    --font-body: var(--font-sans);
+    --font-ui: var(--font-sans);
+    --font-serif: var(--font-sans);
+
+    /* Geist gray scale — dark */
+    --ds-background-100: #080808;
+    --ds-background-200: #111111;
+    --ds-gray-100: #181818;
+    --ds-gray-200: #202020;
+    --ds-gray-300: #2a2a2a;
+    --ds-gray-400: #313131;
+    --ds-gray-500: #494949;
+    --ds-gray-600: #606060;
+    --ds-gray-700: #7d7d7d;
+    --ds-gray-800: #a8a8a8;
+    --ds-gray-900: #efefef;
+    --ds-gray-1000: #ffffff;
+
+    /* Accent scales */
+    --ds-green-100: #0c2318;
+    --ds-green-700: #46a758;
+    --ds-green-800: #3d9a4d;
+    --ds-blue-700: #0070f3;
+    --ds-blue-800: #3291ff;
+    --ds-amber-700: #ffb224;
+    --ds-red-100: #2a1314;
+    --ds-red-700: #e5484d;
+    --ds-red-900: #ff8589;
+    --ds-teal-700: #12a594;
+    --ds-purple-700: #8e4ec6;
+    --ds-pink-700: #f2056f;
+
+    /* Semantic surfaces */
+    --bg: var(--ds-background-100); /* #080808 */
+    --bg-elev: var(--ds-background-200); /* #111111 — nav, sheets */
+    --bg-raised: var(--ds-gray-100); /* #181818 — cards, rows */
+    --bg-sunk: #040404; /* deepest inset */
+    --bg-overlay: rgba(0, 0, 0, 0.6);
+
+    /* Text */
+    --text: var(--ds-gray-1000); /* #fff */
+    --text-muted: var(--ds-gray-900); /* #efefef */
+    --text-subtle: var(--ds-gray-700); /* #7d7d7d */
+
+    /* Borders */
+    --border: var(--ds-gray-300); /* #2a2a2a */
+    --border-strong: var(--ds-gray-500); /* #494949 */
+    --divider: var(--ds-gray-300);
+
+    /* Accent — green */
+    --accent: var(--ds-green-700); /* #46a758 */
+    --accent-hover: var(--ds-green-800); /* #3d9a4d */
+    --accent-soft: rgba(70, 167, 88, 0.12);
+    --accent-ring: rgba(70, 167, 88, 0.35);
+    --accent-glow: transparent;
+
+    /* Status */
+    --success: var(--ds-green-700);
+    --success-soft: rgba(70, 167, 88, 0.1);
+    --warning: var(--ds-amber-700);
+    --warning-soft: rgba(255, 178, 36, 0.1);
+    --danger: var(--ds-red-700);
+    --danger-soft: rgba(229, 72, 77, 0.12);
+    --info: var(--ds-blue-700);
+    --info-soft: rgba(0, 112, 243, 0.12);
+
+    /* Category colors */
+    --cat-cyan: var(--ds-teal-700);
+    --cat-lime: var(--ds-green-700);
+    --cat-amber: var(--ds-amber-700);
+    --cat-magenta: var(--ds-pink-700);
+    --cat-violet: var(--ds-purple-700);
+    --cat-coral: var(--ds-red-700);
+
+    /* Spacing — 4px base */
+    --s-0: 0;
+    --s-1: 4px;
+    --s-2: 8px;
+    --s-3: 12px;
+    --s-4: 16px;
+    --s-5: 20px;
+    --s-6: 24px;
+    --s-8: 32px;
+    --s-10: 40px;
+    --s-12: 48px;
+    --s-16: 64px;
+
+    /* Radii */
+    --r-xs: 4px;
+    --r-sm: 6px;
+    --r-md: 8px;
+    --r-lg: 12px;
+    --r-xl: 16px;
+    --r-full: 9999px;
+
+    /* Font sizes */
+    --fs-xs: 11px;
+    --fs-sm: 13px;
+    --fs-base: 14px;
+    --fs-md: 16px;
+    --fs-lg: 18px;
+    --fs-xl: 24px;
+    --fs-2xl: 32px;
+    --fs-3xl: 40px;
+    --fs-4xl: 64px;
+
+    /* Tracking */
+    --tracking-tight: -0.025em;
+    --tracking-normal: 0;
+    --tracking-data: 0.02em;
+    --tracking-mega: 0.05em;
+
+    /* Targets */
+    --hit-min: 36px;
+    --hit-comfortable: 44px;
+    --hit-large: 56px;
+
+    /* Motion */
+    --ease-tech: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-snap: cubic-bezier(0, 0, 0.2, 1);
+    --dur-fast: 150ms;
+    --dur-base: 250ms;
+    --dur-slow: 400ms;
+    --dur-ambient: 2000ms;
+
+    /* Shadows */
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.5);
+    --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.55);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.6), 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.65), 0 2px 4px rgba(0, 0, 0, 0.5);
+    --shadow-focus: 0 0 0 2px var(--accent-ring);
+    --shadow-glow: none;
+
+    /* Convenience */
+    --pad-card: var(--s-4);
+    --pad-row: var(--s-4);
+    --gap: var(--s-4);
+
+    /* Clip-path compat (unused) */
+    --clip-cut-sm: none;
+    --clip-cut-md: none;
+    --clip-cut-lg: none;
+    --clip-tag: none;
+}

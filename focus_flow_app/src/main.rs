@@ -27,8 +27,16 @@ enum Route {
             #[route("/cards")]   Flashcards {},
 }
 
-const MAIN_CSS: Asset = asset!("/assets/styling/main.css");
-const FONTS: &str = "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap";
+const CSS_TOKENS: Asset      = asset!("/assets/styling/tokens.css");
+const CSS_BASE: Asset        = asset!("/assets/styling/base.css");
+const CSS_COMPONENTS: Asset  = asset!("/assets/styling/components.css");
+const CSS_LAYOUT: Asset      = asset!("/assets/styling/layout.css");
+const CSS_SHEET: Asset       = asset!("/assets/styling/sheet.css");
+const CSS_TASKS: Asset       = asset!("/assets/styling/views/tasks.css");
+const CSS_CALENDAR: Asset    = asset!("/assets/styling/views/calendar.css");
+const CSS_STATS: Asset       = asset!("/assets/styling/views/stats.css");
+const CSS_AUTH: Asset        = asset!("/assets/styling/views/auth.css");
+const CSS_FLASHCARDS: Asset  = asset!("/assets/styling/views/flashcards.css");
 
 fn main() {
     dioxus_std::set_dir!();
@@ -64,10 +72,16 @@ fn App() -> Element {
     use_context_provider(|| Signal::new(api_client));
 
     rsx! {
-        document::Link { rel: "stylesheet", href: MAIN_CSS }
-        document::Link { rel: "preconnect", href: "https://fonts.googleapis.com" }
-        document::Link { rel: "preconnect", href: "https://fonts.gstatic.com" }
-        document::Link { rel: "stylesheet", href: FONTS }
+        document::Link { rel: "stylesheet", href: CSS_TOKENS }
+        document::Link { rel: "stylesheet", href: CSS_BASE }
+        document::Link { rel: "stylesheet", href: CSS_COMPONENTS }
+        document::Link { rel: "stylesheet", href: CSS_LAYOUT }
+        document::Link { rel: "stylesheet", href: CSS_SHEET }
+        document::Link { rel: "stylesheet", href: CSS_TASKS }
+        document::Link { rel: "stylesheet", href: CSS_CALENDAR }
+        document::Link { rel: "stylesheet", href: CSS_STATS }
+        document::Link { rel: "stylesheet", href: CSS_AUTH }
+        document::Link { rel: "stylesheet", href: CSS_FLASHCARDS }
         Router::<Route> {}
     }
 }

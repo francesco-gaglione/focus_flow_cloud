@@ -1,16 +1,22 @@
+use uuid::Uuid;
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct Subtask {
-    pub title: String,
-    pub description: Option<String>,
-    pub completed: bool,
+    id: Uuid,
+    title: String,
+    description: Option<String>,
+    completed: bool,
+    sort_order: i16,
 }
 
 impl Subtask {
-    pub fn new(title: String, description: Option<String>) -> Self {
+    pub fn new(title: String, sort_order: i16, description: Option<String>) -> Self {
         Self {
+            id: Uuid::new_v4(),
             title,
             description,
             completed: false,
+            sort_order,
         }
     }
 
@@ -22,8 +28,16 @@ impl Subtask {
         self.description = Some(description);
     }
 
+    pub fn update_sort_order(&mut self, sort_order: i16) {
+        self.sort_order = sort_order;
+    }
+
     pub fn mark_completed(&mut self) {
         self.completed = true;
+    }
+
+    pub fn id(&self) -> Uuid {
+        self.id
     }
 
     pub fn title(&self) -> &str {
@@ -37,6 +51,10 @@ impl Subtask {
     pub fn is_completed(&self) -> bool {
         self.completed
     }
+
+    pub fn sort_order(&self) -> i16 {
+        self.sort_order
+    }
 }
 
 #[cfg(test)]
@@ -47,16 +65,17 @@ mod tests {
     fn test_task_creation() {
         let title = "Title";
         let description = "";
-        let subtask = Subtask::new(title.to_string(), Some(description.to_string()));
+        let subtask = Subtask::new(title.to_string(), 0, Some(description.to_string()));
         assert_eq!(subtask.title, title);
         assert_eq!(subtask.description, Some(description.to_string()));
+        assert_eq!(subtask.sort_order, 0);
     }
 
     #[test]
     fn test_task_getters() {
         let title = "Title";
         let description = "";
-        let subtask = Subtask::new(title.to_string(), Some(description.to_string()));
+        let subtask = Subtask::new(title.to_string(), 0, Some(description.to_string()));
         assert_eq!(subtask.title(), title);
         assert_eq!(subtask.description(), Some(description));
         assert!(!subtask.is_completed());
@@ -66,7 +85,7 @@ mod tests {
     fn test_task_update() {
         let title = "Title";
         let description = "";
-        let mut subtask = Subtask::new(title.to_string(), Some(description.to_string()));
+        let mut subtask = Subtask::new(title.to_string(), 0, Some(description.to_string()));
         assert_eq!(subtask.title(), title);
         assert_eq!(subtask.description(), Some(description));
         subtask.update_title("New Title".to_string());
@@ -79,7 +98,7 @@ mod tests {
     fn test_task_completition() {
         let title = "Title";
         let description = "";
-        let mut subtask = Subtask::new(title.to_string(), Some(description.to_string()));
+        let mut subtask = Subtask::new(title.to_string(), 0, Some(description.to_string()));
         assert_eq!(subtask.title(), title);
         assert_eq!(subtask.description(), Some(description));
         assert!(!subtask.completed);

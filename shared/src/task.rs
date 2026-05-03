@@ -11,6 +11,18 @@ pub struct TaskDto {
     pub priority: Option<TaskPriority>,
     pub due_date: Option<i64>,
     pub completed_at: Option<i64>,
+    pub subtasks: Vec<SubtaskDto>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
+#[serde(rename_all = "camelCase")]
+pub struct SubtaskDto {
+    pub id: String,
+    pub title: String,
+    pub description: Option<String>,
+    pub is_completed: bool,
+    pub sort_order: i16,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -26,6 +38,20 @@ pub enum TaskPriority {
 #[derive(Debug, Serialize, Deserialize, Validate)]
 #[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
+pub struct CreateSubtaskDto {
+    #[validate(length(
+        min = 1,
+        max = 255,
+        message = "Title must be between 1 and 255 characters"
+    ))]
+    pub title: String,
+    #[validate(length(max = 255, message = "Description must not exceed 255 characters"))]
+    pub description: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Validate)]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
+#[serde(rename_all = "camelCase")]
 pub struct CreateTaskDto {
     #[validate(length(
         min = 1,
@@ -36,6 +62,8 @@ pub struct CreateTaskDto {
     #[validate(length(max = 255, message = "Description must not exceed 255 characters"))]
     pub description: Option<String>,
     pub due_date: Option<i64>,
+    #[validate(nested)]
+    pub subtasks: Option<Vec<CreateSubtaskDto>>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

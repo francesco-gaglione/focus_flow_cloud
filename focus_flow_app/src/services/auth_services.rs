@@ -44,17 +44,17 @@ pub async fn login(username: &str, password: &str) -> AuthResult<()> {
         .ok_or_else(|| "ApiClient signal not found".to_string())
         .map_err(|e| AuthError::Generic(e.to_string()))?;
 
-    let api = api_signal.read();
-
     let request_dto = LoginDto {
         username: username.to_string(),
         password: password.to_string(),
     };
 
     info!("Logging in with username: {}", username);
-    let response = api
-        .post::<LoginDto, LoginResponseDto>("/api/auth/login", None, None, &request_dto)
-        .await?;
+    let response = {
+        let api = api_signal.read();
+        api.post::<LoginDto, LoginResponseDto>("/api/auth/login", None, None, &request_dto)
+            .await?
+    };
 
     info!("Login successful, auth token received");
 

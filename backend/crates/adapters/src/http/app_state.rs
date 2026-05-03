@@ -33,7 +33,7 @@ use application::use_cases::{
     stats::calculate_stats_by_period::CalculateStatsByPeriodUseCase,
     task::{
         create_task::CreateTaskUseCase, delete_tasks::DeleteTasksUseCase,
-        orphan_tasks::OrphanTasksUseCase, update_task::UpdateTaskUseCase,
+        update_task::UpdateTaskUseCase,
     },
 };
 use axum::extract::ws::Message;
@@ -70,7 +70,6 @@ pub struct AppState {
     // Task Use Cases
     pub create_task_uc: Arc<CreateTaskUseCase>,
     pub delete_tasks_uc: Arc<DeleteTasksUseCase>,
-    pub orphan_tasks_uc: Arc<OrphanTasksUseCase>,
     pub get_tasks_uc: Arc<GetTasksUseCase>,
     pub update_task_uc: Arc<UpdateTaskUseCase>,
     pub complete_task_uc: Arc<CompleteTaskUseCase>,

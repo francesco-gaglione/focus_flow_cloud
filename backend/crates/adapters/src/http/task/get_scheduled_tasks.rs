@@ -53,6 +53,7 @@ fn scheduled_task_to_dto(value: &ScheduledTaskOutput) -> TaskDto {
         priority: priority_to_dto(value.priority),
         due_date: value.due_date.map(|d| d.timestamp()),
         completed_at: value.completed_at.map(|d| d.timestamp()),
+        subtasks: vec![],
     }
 }
 

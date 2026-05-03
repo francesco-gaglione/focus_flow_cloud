@@ -3,7 +3,7 @@ use dioxus::signals::{ReadableExt, Signal};
 use shared::task::{TaskDto, TasksResponseDto};
 
 use crate::{
-    model::task::{Task, TaskDue, TaskPriority},
+    model::task::{Subtask, Task, TaskDue, TaskPriority},
     services::api_client::{ApiClient, ApiError},
 };
 
@@ -89,6 +89,17 @@ impl From<TaskDto> for Task {
                 .map(|dt: DateTime<Utc>| dt.with_timezone(&Local).naive_local())
         });
 
+        let subtasks = dto
+            .subtasks
+            .into_iter()
+            .map(|s| Subtask {
+                id: s.id,
+                title: s.title,
+                is_completed: s.is_completed,
+                sort_order: s.sort_order,
+            })
+            .collect();
+
         Task {
             id: dto.id,
             title: dto.title,
@@ -99,6 +110,7 @@ impl From<TaskDto> for Task {
             due,
             completed_at,
             done: dto.completed_at.is_some(),
+            subtasks,
         }
     }
 }

@@ -30,7 +30,7 @@ use application::use_cases::{
     stats::calculate_stats_by_period::CalculateStatsByPeriodUseCase,
     task::{
         create_task::CreateTaskUseCase, delete_tasks::DeleteTasksUseCase,
-        orphan_tasks::OrphanTasksUseCase, update_task::UpdateTaskUseCase,
+        update_task::UpdateTaskUseCase,
     },
     user::login_user::LoginUseCase,
 };
@@ -115,7 +115,6 @@ pub async fn init_app_state(
     let create_task_uc = Arc::new(CreateTaskUseCase::new(postgres_arc.clone()));
     let get_tasks_uc = Arc::new(GetTasksUseCase::new(postgres_arc.clone()));
     let delete_tasks_uc = Arc::new(DeleteTasksUseCase::new(postgres_arc.clone()));
-    let orphan_tasks_uc = Arc::new(OrphanTasksUseCase::new(postgres_arc.clone()));
     let update_task_uc = Arc::new(UpdateTaskUseCase::new(postgres_arc.clone()));
     let complete_task_uc = Arc::new(CompleteTaskUseCase::new(postgres_arc.clone()));
     let get_scheduled_task_uc = Arc::new(GetScheduledTasksUseCase::new(postgres_arc.clone()));
@@ -222,7 +221,6 @@ pub async fn init_app_state(
         get_tasks_uc,
         create_task_uc,
         delete_tasks_uc,
-        orphan_tasks_uc,
         update_task_uc,
         complete_task_uc,
         get_scheduled_task_uc,

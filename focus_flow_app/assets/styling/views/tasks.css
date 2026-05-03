@@ -1,0 +1,460 @@
+/* ============================================================
+   FILTER CHIPS
+   ============================================================ */
+.filter-strip {
+    display: flex;
+    gap: 6px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: 4px 0 12px;
+    scroll-snap-type: x mandatory;
+}
+.filter-strip::-webkit-scrollbar {
+    display: none;
+}
+
+.chip {
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    appearance: none;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: var(--r-full);
+    color: var(--text-subtle);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: var(--tracking-data);
+    text-transform: uppercase;
+    padding: 5px 12px;
+    height: 28px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition:
+        background var(--dur-fast) var(--ease-tech),
+        border-color var(--dur-fast) var(--ease-tech),
+        color var(--dur-fast) var(--ease-tech);
+}
+.chip:hover {
+    background: var(--ds-gray-200);
+    border-color: var(--border-strong);
+    color: var(--text-muted);
+}
+.chip:active {
+    background: var(--ds-gray-300);
+}
+.chip.active {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.chip .count {
+    background: var(--ds-gray-300);
+    color: var(--text-subtle);
+    padding: 1px 5px;
+    font-size: 10px;
+    border-radius: var(--r-full);
+}
+.chip.active .count {
+    background: var(--accent);
+    color: #fff;
+}
+
+/* ============================================================
+   SECTION HEADERS — colored accent line for today/overdue
+   ============================================================ */
+.section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 20px 0 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+}
+.section-head .lbl {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-subtle);
+    letter-spacing: var(--tracking-data);
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.section-head .lbl::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: var(--r-full);
+    background: var(--border-strong);
+}
+.section-head .lbl.danger {
+    color: var(--danger);
+}
+.section-head .lbl.danger::before {
+    background: var(--danger);
+}
+.section-head .lbl.today {
+    color: var(--accent);
+}
+.section-head .lbl.today::before {
+    background: var(--accent);
+}
+.section-head .count {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-subtle);
+    letter-spacing: var(--tracking-data);
+    background: var(--bg-raised);
+    padding: 2px 8px;
+    border-radius: var(--r-full);
+    border: 1px solid var(--border);
+}
+
+/* ============================================================
+   FILTER BAR (dropdowns)
+   ============================================================ */
+.filter-bar {
+    flex-shrink: 0;
+    display: flex;
+    gap: 8px;
+    padding: 0 16px 14px;
+}
+.filter-select-wrap {
+    flex: 1;
+    position: relative;
+}
+.filter-select-wrap::after {
+    content: "▾";
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-subtle);
+    font-size: 11px;
+    pointer-events: none;
+}
+.filter-select {
+    width: 100%;
+    appearance: none;
+    -webkit-appearance: none;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: var(--tracking-data);
+    text-transform: uppercase;
+    padding: 0 28px 0 12px;
+    height: 36px;
+    cursor: pointer;
+    outline: none;
+    transition: border-color var(--dur-fast) var(--ease-tech);
+}
+.filter-select:focus {
+    border-color: var(--accent);
+    box-shadow: var(--shadow-focus);
+}
+.filter-select option {
+    background: var(--bg-elev);
+    color: var(--text);
+}
+
+/* ============================================================
+   TASK ROW — circular check, 4px left stripe, elevated card
+   ============================================================ */
+.todo-row-wrap {
+    margin-bottom: 6px;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.todo-row {
+    display: grid;
+    grid-template-columns: 26px 1fr auto;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 12px 14px 16px;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--cat, var(--accent));
+    border-radius: 0 var(--r-md) var(--r-md) 0;
+    transition:
+        background var(--dur-fast) var(--ease-tech),
+        border-color var(--dur-fast) var(--ease-tech);
+    position: relative;
+}
+.todo-row-wrap.expanded .todo-row {
+    border-radius: 0 var(--r-md) 0 0;
+    border-bottom-color: var(--bg-raised);
+}
+.todo-row:hover {
+    background: var(--ds-gray-200);
+}
+.todo-row.done {
+    opacity: 0.45;
+}
+.todo-row.done .todo-title {
+    text-decoration: line-through;
+    text-decoration-color: var(--border-strong);
+}
+
+/* Expand/collapse chevron */
+.todo-expand-btn {
+    width: 28px;
+    height: 28px;
+    background: transparent;
+    border: 0;
+    color: var(--text-subtle);
+    cursor: pointer;
+    border-radius: var(--r-sm);
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    transition:
+        color var(--dur-fast) var(--ease-tech),
+        background var(--dur-fast) var(--ease-tech);
+}
+.todo-expand-btn:hover {
+    color: var(--text);
+    background: var(--ds-gray-300);
+}
+.todo-expand-btn svg {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.6;
+    transition: transform var(--dur-base) var(--ease-tech);
+}
+.todo-expand-btn.open svg {
+    transform: rotate(180deg);
+}
+
+/* Subtask list */
+.todo-subtask-list {
+    background: var(--bg-sunk);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-left: 4px solid var(--cat, var(--accent));
+    border-radius: 0 0 var(--r-md) 0;
+}
+.todo-subtask-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px 9px 14px;
+}
+.todo-subtask-item + .todo-subtask-item {
+    border-top: 1px solid var(--border);
+}
+.todo-subtask-check {
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid var(--border-strong);
+    border-radius: var(--r-xs);
+    background: var(--bg);
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+}
+.todo-subtask-check.done {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+.todo-subtask-check svg {
+    width: 9px;
+    height: 9px;
+}
+.todo-subtask-title {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+.todo-subtask-title.done {
+    text-decoration: line-through;
+    text-decoration-color: var(--border-strong);
+    color: var(--text-subtle);
+}
+
+/* Circular checkbox */
+.todo-check {
+    width: 22px;
+    height: 22px;
+    border: 1.5px solid var(--border-strong);
+    border-radius: var(--r-full);
+    background: var(--bg);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition:
+        background var(--dur-fast) var(--ease-tech),
+        border-color var(--dur-fast) var(--ease-tech);
+}
+.todo-check:hover {
+    border-color: var(--accent);
+}
+.todo-check-icon {
+    width: 11px;
+    height: 11px;
+    stroke: #fff;
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0;
+    transform: scale(0.5);
+    transition:
+        opacity var(--dur-fast) var(--ease-tech),
+        transform var(--dur-fast) var(--ease-tech);
+}
+.todo-row.done .todo-check {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+.todo-row.done .todo-check-icon {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.todo-body {
+    min-width: 0;
+}
+.todo-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.4;
+    margin-bottom: 4px;
+    word-wrap: break-word;
+}
+.todo-sub {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-subtle);
+    letter-spacing: var(--tracking-data);
+    text-transform: uppercase;
+}
+.todo-cat {
+    color: var(--cat, var(--accent));
+    font-weight: 500;
+}
+.todo-due {
+    color: var(--text-subtle);
+}
+.todo-due.today {
+    color: var(--accent);
+}
+.todo-due.overdue {
+    color: var(--danger);
+}
+
+.todo-more {
+    width: 28px;
+    height: 28px;
+    background: transparent;
+    border: 0;
+    color: var(--text-subtle);
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    border-radius: var(--r-sm);
+    display: grid;
+    place-items: center;
+    transition:
+        color var(--dur-fast) var(--ease-tech),
+        background var(--dur-fast) var(--ease-tech);
+}
+.todo-more:hover {
+    color: var(--text);
+    background: var(--ds-gray-300);
+}
+
+.todo-subtask-ct {
+    color: var(--text-subtle);
+}
+
+/* ============================================================
+   SUBTASK — sheet rows + inline count
+   ============================================================ */
+.sheet-subtask-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    margin-bottom: 4px;
+}
+.sheet-subtask-title {
+    flex: 1;
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+.sheet-subtask-rm {
+    width: 24px;
+    height: 24px;
+    background: transparent;
+    border: 0;
+    color: var(--text-subtle);
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    border-radius: var(--r-sm);
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    transition: color var(--dur-fast) var(--ease-tech);
+}
+.sheet-subtask-rm:hover {
+    color: var(--danger);
+}
+
+.sheet-subtask-add {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 4px;
+}
+.sheet-subtask-add .sheet-input {
+    flex: 1;
+    height: 38px;
+    font-size: 14px;
+}
+.sheet-subtask-add-btn {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    color: var(--accent);
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition:
+        background var(--dur-fast) var(--ease-tech),
+        border-color var(--dur-fast) var(--ease-tech);
+}
+.sheet-subtask-add-btn:hover {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+}
+.sheet-subtask-add-btn svg {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.8;
+}
