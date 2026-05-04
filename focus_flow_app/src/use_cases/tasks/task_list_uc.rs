@@ -72,7 +72,7 @@ impl std::fmt::Display for TaskDue {
 }
 
 //Fetch all tasks and related info for todo page
-pub async fn task_list_uc() -> TaskListResult<TaskList> {
+pub async fn task_list_uc(category_id: Option<&str>) -> TaskListResult<TaskList> {
     let tasks_dto: TasksResponseDto = get_all_tasks().await?;
     debug!("Tasks dto: {:?}", tasks_dto);
     let categories = get_all_categories().await?;
