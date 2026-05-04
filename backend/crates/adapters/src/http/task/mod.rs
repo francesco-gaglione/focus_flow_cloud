@@ -1,7 +1,6 @@
 pub mod complete_task;
 pub mod create_task;
 pub mod delete_tasks;
-pub mod get_scheduled_tasks;
 pub mod get_tasks;
 pub mod routes;
 pub mod update_task;

@@ -1,14 +1,14 @@
 use dioxus::prelude::*;
 
 use crate::{
-    services::{api_client::ApiClient, auth_services::login, storage},
+    services::storage,
     state::app_state::AppState,
+    use_cases::auth::{login_uc::login_uc, update_base_url_uc::update_base_url_uc},
 };
 
 #[component]
 pub fn AuthPage() -> Element {
     let mut app_state = use_context::<Signal<AppState>>();
-    let mut api_client = use_context::<Signal<ApiClient>>();
 
     let mut server_url_input = use_signal(|| String::new());
     let mut username_input = use_signal(|| String::new());
@@ -49,7 +49,7 @@ pub fn AuthPage() -> Element {
                             if !url.is_empty() {
                                 storage::set_item("server_url", &url);
                                 app_state.write().set_server_url(url.clone());
-                                api_client.write().set_base_url(&url);
+                                update_base_url_uc(&url); //TODO handle error
                             }
                         },
                         "Continue"
@@ -108,7 +108,7 @@ pub fn AuthPage() -> Element {
                             error_msg.set(None);
                             is_loading.set(true);
                             spawn(async move {
-                                match login(&username, &password).await {
+                                match login_uc(&username, &password).await {
                                     Ok(_) => {}
                                     Err(e) => {
                                         error!("{}", e.to_string());

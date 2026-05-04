@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use thiserror::Error;
-use tracing::instrument;
+use tracing::{error, info, instrument};
 use uuid::Uuid;
 
 use crate::repository_traits::{
@@ -45,13 +45,22 @@ impl CompleteTaskUseCase {
         let mut task = self.task_persistence.find_by_id(command.id).await?;
 
         if task.user_id() != command.user_id {
+            error!(
+                "Unauthorized attempt to complete task: {:?} by user: {:?}",
+                command.id, command.user_id
+            );
             return Err(CompleteTaskError::Unauthorized);
         }
 
-        task.complete()
-            .map_err(|_| CompleteTaskError::UncompletedSubTasks)?;
+        info!("Completing task: {:?}", command.id);
+        task.complete().map_err(|_| {
+            error!("Uncompleted sub-tasks");
+            CompleteTaskError::UncompletedSubTasks
+        })?;
 
+        info!("Updating task: {:?}", command.id);
         self.task_persistence.update_task(task).await?;
+        info!("Task completed successfully: {:?}", command.id);
 
         Ok(())
     }

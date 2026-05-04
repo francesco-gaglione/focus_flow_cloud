@@ -1,4 +1,3 @@
+pub mod bottom_sheet;
 pub mod drawer;
-mod task_row;
-
-pub use task_row::TaskRow;
+pub mod filter_chip;

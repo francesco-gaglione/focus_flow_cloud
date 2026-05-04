@@ -6,7 +6,6 @@ diesel::table! {
         user_id -> Uuid,
         #[max_length = 255]
         name -> Varchar,
-        description -> Nullable<Text>,
         #[max_length = 7]
         color -> Varchar,
         created_at -> Timestamptz,

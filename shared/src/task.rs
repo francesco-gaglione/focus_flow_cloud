@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 use validator::Validate;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -12,6 +13,7 @@ pub struct TaskDto {
     pub due_date: Option<i64>,
     pub completed_at: Option<i64>,
     pub subtasks: Vec<SubtaskDto>,
+    pub category_id: Option<Uuid>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -64,6 +66,7 @@ pub struct CreateTaskDto {
     pub due_date: Option<i64>,
     #[validate(nested)]
     pub subtasks: Option<Vec<CreateSubtaskDto>>,
+    pub category_id: Option<Uuid>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -101,13 +104,15 @@ pub struct TasksResponseDto {
     pub tasks: Vec<TaskDto>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Validate)]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct CompleteTaskDto {
     pub task_id: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct CompleteTaskResponseDto {
     pub id: String,
@@ -115,12 +120,13 @@ pub struct CompleteTaskResponseDto {
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct DeleteTasksDto {
-    pub task_ids: Vec<String>,
+pub struct DeleteTaskDto {
+    pub task_id: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
-pub struct DeleteTasksResponseDto {
-    pub deleted_ids: Vec<String>,
+pub struct DeleteTaskResponseDto {
+    pub deleted_id: String,
 }

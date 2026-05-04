@@ -32,6 +32,7 @@ pub struct TaskOutput {
     pub due_date: Option<DateTime<Utc>>,
     pub completed_at: Option<DateTime<Utc>>,
     pub subtasks: Vec<SubTaskOutput>,
+    pub category_id: Option<Uuid>,
 }
 
 #[derive(Debug, Clone)]
@@ -54,6 +55,7 @@ impl From<&Task> for TaskOutput {
             due_date: value.due_date(),
             completed_at: value.completed_at(),
             subtasks: value.sub_tasks().iter().map(|s| s.into()).collect(),
+            category_id: value.category_id().clone(),
         }
     }
 }
@@ -82,10 +84,7 @@ impl GetTasksUseCase {
     #[instrument(skip(self))]
     pub async fn execute(&self, command: GetTasksCommand) -> GetTasksResult<Vec<TaskOutput>> {
         tracing::info!("Fetching tasks with completed: {:?}", command.completed);
-        let res = self
-            .task_persistence
-            .find_all(command.completed.unwrap_or(false))
-            .await?;
+        let res = self.task_persistence.find_all(command.completed).await?;
         tracing::info!("Fetched {} tasks", res.len());
         Ok(res.iter().map(|t| t.into()).collect())
     }
@@ -104,7 +103,7 @@ mod tests {
 
         mock_persistence
             .expect_find_all()
-            .with(mockall::predicate::eq(false))
+            .with(mockall::predicate::eq(Some(false)))
             .returning(move |_| Ok(returned_tasks.clone()));
 
         let use_case = GetTasksUseCase::new(Arc::new(mock_persistence));
@@ -121,7 +120,7 @@ mod tests {
 
         mock_persistence
             .expect_find_all()
-            .with(mockall::predicate::eq(true))
+            .with(mockall::predicate::eq(Some(true)))
             .returning(move |_| Ok(vec![]));
 
         let use_case = GetTasksUseCase::new(Arc::new(mock_persistence));

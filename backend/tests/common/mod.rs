@@ -3,7 +3,6 @@ use adapters::config::AppConfig;
 use adapters::http::{
     category::create_category::{CreateCategoryDto, CreateCategoryResponseDto},
     session::create_manual_session::{CreateManualSessionDto, CreateManualSessionResponseDto},
-    task::create_task::{CreateTaskDto, CreateTaskResponseDto},
     user_setting::{
         get_user_settings::UserSettingsResponseDto, update_setting::UpdateUserSettingDto,
     },

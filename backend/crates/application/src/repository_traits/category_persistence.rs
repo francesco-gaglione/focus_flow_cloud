@@ -1,6 +1,6 @@
 use crate::repository_traits::persistence_error::PersistenceResult;
 use async_trait::async_trait;
-use domain::entities::category::Category;
+use domain::entities::tasks::category::Category;
 use uuid::Uuid;
 
 #[cfg_attr(test, mockall::automock)]

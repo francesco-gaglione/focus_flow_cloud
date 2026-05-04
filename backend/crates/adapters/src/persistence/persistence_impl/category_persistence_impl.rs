@@ -6,12 +6,13 @@ use application::repository_traits::persistence_error::{PersistenceError, Persis
 use async_trait::async_trait;
 use chrono::Utc;
 use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, SelectableHelper};
-use domain::entities::category::Category;
-use tracing::{error, info};
+use domain::entities::tasks::category::Category;
+use tracing::{error, info, instrument};
 use uuid::Uuid;
 
 #[async_trait]
 impl CategoryPersistence for PostgresPersistence {
+    #[instrument(skip(self))]
     async fn create_category(&self, category: Category) -> PersistenceResult<Uuid> {
         let conn = self
             .pool
@@ -38,6 +39,7 @@ impl CategoryPersistence for PostgresPersistence {
         Ok(result.id)
     }
 
+    #[instrument(skip(self))]
     async fn find_all(&self) -> PersistenceResult<Vec<Category>> {
         let conn = self
             .pool
@@ -65,6 +67,7 @@ impl CategoryPersistence for PostgresPersistence {
         Ok(categories)
     }
 
+    #[instrument(skip(self))]
     async fn find_by_id(&self, category_id: Uuid) -> PersistenceResult<Category> {
         let conn = self
             .pool
@@ -94,6 +97,7 @@ impl CategoryPersistence for PostgresPersistence {
         }
     }
 
+    #[instrument(skip(self))]
     async fn update_category(&self, category: Category) -> PersistenceResult<Category> {
         let conn = self
             .pool
@@ -128,6 +132,7 @@ impl CategoryPersistence for PostgresPersistence {
         }
     }
 
+    #[instrument(skip(self))]
     async fn delete_category_by_id(&self, category_id: Uuid) -> PersistenceResult<()> {
         let conn = self
             .pool

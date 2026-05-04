@@ -1,0 +1,124 @@
+/* dx-components theme — remapped to Geist dark design system */
+
+/* Force dark mode always */
+:root {
+  --dark: initial;
+  --light: ;
+}
+
+:root {
+  /* Primary scale (backgrounds) */
+  --primary-color:   #080808;
+  --primary-color-1: #040404;
+  --primary-color-2: #080808;
+  --primary-color-3: #181818;   /* bg-raised — input backgrounds */
+  --primary-color-4: #202020;   /* ds-gray-200 — hover */
+  --primary-color-5: #2a2a2a;   /* ds-gray-300 */
+  --primary-color-6: #2a2a2a;   /* border */
+  --primary-color-7: #494949;   /* border-strong */
+
+  /* Secondary scale (text) */
+  --secondary-color:   #ffffff;
+  --secondary-color-1: #efefef;
+  --secondary-color-2: #e0e0e0;
+  --secondary-color-3: #cccccc;
+  --secondary-color-4: #ffffff;  /* override to white text */
+  --secondary-color-5: #7d7d7d;  /* text-subtle */
+  --secondary-color-6: #494949;
+
+  /* Accent green instead of blue */
+  --focused-border-color: #46a758;
+
+  /* Status */
+  --primary-success-color:   rgba(70, 167, 88, 0.12);
+  --secondary-success-color: #46a758;
+  --primary-warning-color:   rgba(255, 178, 36, 0.1);
+  --secondary-warning-color: #ffb224;
+  --primary-error-color:     #e5484d;
+  --secondary-error-color:   #e5484d;
+  --contrast-error-color:    #ffffff;
+  --primary-info-color:      #2a2a2a;
+  --secondary-info-color:    #494949;
+}
+
+/* ── Select ── */
+.dx-select { width: 100%; }
+
+.dx-select-trigger {
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  border-radius: 8px;
+  font-family: var(--font-ui, system-ui);
+  font-size: 15px;
+}
+
+.dx-select-list {
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.65), 0 2px 4px rgba(0,0,0,.5);
+  padding: 4px;
+  z-index: 200;
+}
+
+.dx-select-option {
+  border-radius: 6px;
+  font-family: var(--font-ui, system-ui);
+  font-size: 14px;
+  padding: 10px 12px;
+}
+
+/* Filter-bar variant — compact height, mono font */
+.filter-select-wrap .dx-select-trigger {
+  height: 36px;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.filter-select-wrap .dx-select-option {
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+/* ── DatePicker ── */
+.dx-date-picker { width: 100%; }
+
+.dx-date-picker-group {
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  border-radius: 8px;
+  font-family: var(--font-ui, system-ui);
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+.dx-date-picker-group:focus-within {
+  box-shadow: inset 0 0 0 1px #46a758, 0 0 0 2px rgba(70,167,88,.35);
+}
+
+/* ── Popover (calendar popup) ── */
+.dx-popover-content {
+  background: #111111 !important;
+  border: 1px solid #2a2a2a !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,.65) !important;
+  padding: 12px !important;
+  z-index: 200 !important;
+  max-width: unset !important;
+}
+
+/* ── Calendar ── */
+.dx-calendar-day[data-today="true"] {
+  border: 1px solid #46a758;
+  color: #46a758;
+}
+.dx-calendar-day[data-selected="true"] {
+  background: #46a758 !important;
+  color: #fff !important;
+}
+.dx-calendar-day[data-selected="true"]:hover {
+  background: #3d9a4d !important;
+}

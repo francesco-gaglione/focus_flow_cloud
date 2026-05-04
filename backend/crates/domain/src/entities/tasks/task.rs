@@ -4,10 +4,7 @@ use uuid::Uuid;
 
 use crate::entities::{
     reminder::Reminder,
-    tasks::{
-        subtask::{self, Subtask},
-        task_priority::TaskPriority,
-    },
+    tasks::{subtask::Subtask, task_priority::TaskPriority},
 };
 
 #[derive(Debug, Clone, Error, PartialEq)]
@@ -25,6 +22,7 @@ pub struct Task {
     title: String,
     description: Option<String>,
     priority: Option<TaskPriority>,
+    category_id: Option<Uuid>,
     sub_tasks: Vec<Subtask>,
     due_date: Option<DateTime<Utc>>,
     completed_at: Option<DateTime<Utc>>,
@@ -44,6 +42,7 @@ impl Task {
             title,
             description,
             priority: None,
+            category_id: None,
             sub_tasks: Vec::new(),
             due_date,
             completed_at: None,
@@ -57,6 +56,7 @@ impl Task {
         title: String,
         description: Option<String>,
         priority: Option<TaskPriority>,
+        category_id: Option<Uuid>,
         sub_tasks: Vec<Subtask>,
         due_date: Option<DateTime<Utc>>,
         completed_at: Option<DateTime<Utc>>,
@@ -68,6 +68,7 @@ impl Task {
             title,
             description,
             priority,
+            category_id,
             sub_tasks,
             due_date,
             completed_at,
@@ -127,6 +128,14 @@ impl Task {
 
     pub fn update_priority(&mut self, priority: Option<TaskPriority>) {
         self.priority = priority;
+    }
+
+    pub fn update_category_id(&mut self, category_id: Uuid) {
+        self.category_id = Some(category_id);
+    }
+
+    pub fn unlink_category(&mut self) {
+        self.category_id = None;
     }
 
     pub fn update_user_id(&mut self, user_id: Uuid) {
@@ -194,6 +203,10 @@ impl Task {
 
     pub fn priority(&self) -> Option<TaskPriority> {
         self.priority
+    }
+
+    pub fn category_id(&self) -> Option<Uuid> {
+        self.category_id
     }
 
     pub fn due_date(&self) -> Option<DateTime<Utc>> {
@@ -294,7 +307,7 @@ mod tests {
     fn test_task_subtasks() {
         let user_id = Uuid::new_v4();
         let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
-        let subtask = Subtask::new("Subtask 1".to_string(), 0, None);
+        let subtask = Subtask::new("Subtask 1".to_string(), 0, None, None);
         task.add_subtask(subtask);
         assert_eq!(task.sub_tasks().len(), 1);
         let sub_tasks = task.sub_tasks();
@@ -306,7 +319,7 @@ mod tests {
     fn test_task_subtask_deletion() {
         let user_id = Uuid::new_v4();
         let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
-        let subtask = Subtask::new("Subtask 1".to_string(), 0, None);
+        let subtask = Subtask::new("Subtask 1".to_string(), 0, None, None);
         task.add_subtask(subtask);
         assert_eq!(task.sub_tasks().len(), 1);
         task.sub_tasks_mut().retain(|s| s.title() != "Subtask 1");
@@ -317,7 +330,7 @@ mod tests {
     fn test_task_subtask_update() {
         let user_id = Uuid::new_v4();
         let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
-        let subtask = Subtask::new("Subtask 1".to_string(), 0, None);
+        let subtask = Subtask::new("Subtask 1".to_string(), 0, None, None);
         task.add_subtask(subtask);
         assert_eq!(task.sub_tasks().len(), 1);
         task.sub_tasks_mut()[0].update_title("Edited Subtask 1".to_string());
@@ -328,7 +341,7 @@ mod tests {
     fn test_task_subtask_completion() {
         let user_id = Uuid::new_v4();
         let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
-        let subtask = Subtask::new("Subtask 1".to_string(), 0, None);
+        let subtask = Subtask::new("Subtask 1".to_string(), 0, None, None);
         task.add_subtask(subtask);
         task.sub_tasks_mut()[0].mark_completed();
         assert!(task.sub_tasks()[0].is_completed());
@@ -342,9 +355,9 @@ mod tests {
         // Vec positions unchanged: [0]=A, [1]=B, [2]=C
         let user_id = Uuid::new_v4();
         let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
-        task.add_subtask(Subtask::new("A".to_string(), 0, None));
-        task.add_subtask(Subtask::new("B".to_string(), 1, None));
-        task.add_subtask(Subtask::new("C".to_string(), 2, None));
+        task.add_subtask(Subtask::new("A".to_string(), 0, None, None));
+        task.add_subtask(Subtask::new("B".to_string(), 1, None, None));
+        task.add_subtask(Subtask::new("C".to_string(), 2, None, None));
 
         task.set_subtask_order(0, 2);
 
@@ -363,9 +376,9 @@ mod tests {
         // Vec positions unchanged: [0]=A, [1]=B, [2]=C
         let user_id = Uuid::new_v4();
         let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
-        task.add_subtask(Subtask::new("A".to_string(), 0, None));
-        task.add_subtask(Subtask::new("B".to_string(), 1, None));
-        task.add_subtask(Subtask::new("C".to_string(), 2, None));
+        task.add_subtask(Subtask::new("A".to_string(), 0, None, None));
+        task.add_subtask(Subtask::new("B".to_string(), 1, None, None));
+        task.add_subtask(Subtask::new("C".to_string(), 2, None, None));
 
         task.set_subtask_order(2, 0);
 
@@ -382,8 +395,8 @@ mod tests {
         // move to same sort_order → nothing changes
         let user_id = Uuid::new_v4();
         let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
-        task.add_subtask(Subtask::new("A".to_string(), 0, None));
-        task.add_subtask(Subtask::new("B".to_string(), 1, None));
+        task.add_subtask(Subtask::new("A".to_string(), 0, None, None));
+        task.add_subtask(Subtask::new("B".to_string(), 1, None, None));
 
         task.set_subtask_order(0, 0);
 
@@ -396,7 +409,7 @@ mod tests {
         // out-of-bounds index → no panic, no change
         let user_id = Uuid::new_v4();
         let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
-        task.add_subtask(Subtask::new("A".to_string(), 0, None));
+        task.add_subtask(Subtask::new("A".to_string(), 0, None, None));
 
         task.set_subtask_order(99, 5);
 
@@ -410,8 +423,8 @@ mod tests {
         // Vec positions unchanged: [0]=A, [1]=B
         let user_id = Uuid::new_v4();
         let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
-        task.add_subtask(Subtask::new("A".to_string(), 0, None));
-        task.add_subtask(Subtask::new("B".to_string(), 1, None));
+        task.add_subtask(Subtask::new("A".to_string(), 0, None, None));
+        task.add_subtask(Subtask::new("B".to_string(), 1, None, None));
 
         task.set_subtask_order(0, 1);
 
@@ -425,7 +438,7 @@ mod tests {
     fn test_task_completion() {
         let user_id = Uuid::new_v4();
         let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
-        let subtask = Subtask::new("Subtask 1".to_string(), 0, None);
+        let subtask = Subtask::new("Subtask 1".to_string(), 0, None, None);
         task.add_subtask(subtask);
         let res = task.complete();
         assert!(res.is_err());
@@ -514,5 +527,40 @@ mod tests {
         let due_date = Utc::now() - Duration::from_secs(30);
         task.set_due_date(Some(due_date));
         assert!(task.is_overdue())
+    }
+
+    #[test]
+    fn test_task_category_id() {
+        let user_id = Uuid::new_v4();
+        let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
+        assert_eq!(task.category_id(), None);
+
+        let category_id = Uuid::new_v4();
+        task.update_category_id(category_id);
+        assert_eq!(task.category_id(), Some(category_id));
+
+        task.unlink_category();
+        assert_eq!(task.category_id(), None);
+    }
+
+    #[test]
+    fn test_task_reconstitute_with_category() {
+        let id = Uuid::new_v4();
+        let user_id = Uuid::new_v4();
+        let category_id = Uuid::new_v4();
+        let task = Task::reconstitute(
+            id,
+            user_id,
+            "Test Task".to_string(),
+            None,
+            None,
+            Some(category_id),
+            Vec::new(),
+            None,
+            None,
+            Vec::new(),
+        );
+        assert_eq!(task.id(), id);
+        assert_eq!(task.category_id(), Some(category_id));
     }
 }

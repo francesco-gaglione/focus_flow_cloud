@@ -79,8 +79,7 @@ impl CalculateStatsByPeriodUseCase {
             .await?;
 
         // Collect all unique IDs
-        let category_ids: HashSet<Uuid> =
-            sessions.iter().filter_map(|s| s.category_id()).collect();
+        let category_ids: HashSet<Uuid> = sessions.iter().filter_map(|s| s.category_id()).collect();
 
         let task_ids: HashSet<Uuid> = sessions.iter().filter_map(|s| s.task_id()).collect();
 
@@ -212,20 +211,18 @@ mod tests {
             .with(mockall::predicate::always())
             .returning(move |id| {
                 if id == break_category_id {
-                    Ok(domain::entities::category::Category::reconstitute(
+                    Ok(domain::entities::tasks::category::Category::reconstitute(
                         break_category_id,
                         Uuid::new_v4(),
                         "Break Category".to_string(),
-                        None,
                         "#FF0000".to_string(),
                     )
                     .unwrap())
                 } else {
-                    Ok(domain::entities::category::Category::reconstitute(
+                    Ok(domain::entities::tasks::category::Category::reconstitute(
                         id,
                         Uuid::new_v4(),
                         "Work Category".to_string(),
-                        None,
                         "#0000FF".to_string(),
                     )
                     .unwrap())

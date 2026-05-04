@@ -6,6 +6,9 @@ DROP INDEX IF EXISTS idx_tasks_user_scheduled_active;
 ALTER TABLE tasks DROP COLUMN scheduled_end_date;
 ALTER TABLE tasks DROP COLUMN deleted_at;
 
+-- Remove description from categories (no longer part of domain model)
+ALTER TABLE categories DROP COLUMN description;
+
 -- Rename name → title
 ALTER TABLE tasks RENAME COLUMN name TO title;
 

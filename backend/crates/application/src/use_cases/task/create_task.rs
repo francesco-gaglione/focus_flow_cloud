@@ -20,6 +20,7 @@ pub struct CreateTaskCommand {
     pub user_id: Uuid,
     pub title: String,
     pub description: Option<String>,
+    pub category_id: Option<Uuid>,
     pub due_date: Option<DateTime<Utc>>,
     pub subtasks: Option<Vec<CreateSubtaskCommand>>,
 }
@@ -49,12 +50,17 @@ impl CreateTaskUseCase {
             command.description,
         );
 
+        if command.category_id.is_some() {
+            task.update_category_id(command.category_id.unwrap());
+        }
+
         if command.subtasks.is_some() {
             for (index, s) in command.subtasks.unwrap().iter().enumerate() {
                 task.add_subtask(Subtask::new(
                     s.title.clone(),
                     index as i16,
                     s.description.clone(),
+                    None,
                 ));
             }
         }

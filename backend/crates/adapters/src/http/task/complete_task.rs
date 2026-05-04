@@ -1,29 +1,17 @@
 use std::str::FromStr;
 
 use crate::http::app_state::AppState;
-use crate::http::dto::validators::validate_uuid::validate_uuid;
 use crate::http::model::session_model::UserSession;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::TASK_TAG;
 use application::use_cases::task::complete_task::{CompleteTaskCommand, CompleteTaskError};
 use axum::{extract::State, Extension, Json};
-use serde::{Deserialize, Serialize};
-use tracing::debug;
-use utoipa::ToSchema;
+use shared::task::CompleteTaskDto;
+use tracing::{debug, error};
 use uuid::Uuid;
 use validator::Validate;
 
-#[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
-#[serde(rename_all = "camelCase")]
-pub struct CompleteTaskDto {
-    #[validate(custom(function = "validate_uuid"))]
-    pub task_id: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
-pub struct CompleteTaskResponseDto {
-    pub id: String,
-}
+pub use shared::task::CompleteTaskResponseDto;
 
 impl From<CompleteTaskError> for HttpError {
     fn from(value: CompleteTaskError) -> Self {
@@ -64,9 +52,10 @@ pub async fn complete_task_api(
     Extension(user): Extension<UserSession>,
     Json(payload): Json<CompleteTaskDto>,
 ) -> HttpResult<Json<CompleteTaskResponseDto>> {
-    payload
-        .validate()
-        .map_err(|e| HttpError::BadRequest(e.to_string()))?;
+    payload.validate().map_err(|e| {
+        error!("Validation error: {}", e);
+        HttpError::BadRequest(e.to_string())
+    })?;
 
     let task_id = Uuid::from_str(payload.task_id.as_str())
         .map_err(|e| HttpError::BadRequest(e.to_string()))?;

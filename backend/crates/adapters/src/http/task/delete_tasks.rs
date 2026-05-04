@@ -1,18 +1,18 @@
 use crate::http::app_state::AppState;
-use crate::http::dto::validators::validate_uuids::validate_uuids;
+use crate::http::dto::validators::validate_uuid::validate_uuid;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::TASK_TAG;
-use application::use_cases::task::delete_tasks::DeleteTasksError;
-use axum::extract::State;
+use application::use_cases::task::delete_task::DeleteTaskError;
+use axum::extract::{Query, State};
 use axum::Json;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use validator::Validate;
 
-impl From<DeleteTasksError> for HttpError {
-    fn from(value: DeleteTasksError) -> Self {
+impl From<DeleteTaskError> for HttpError {
+    fn from(value: DeleteTaskError) -> Self {
         match value {
-            DeleteTasksError::PersistenceError(e) => HttpError::GenericError(e.to_string()),
+            DeleteTaskError::PersistenceError(e) => HttpError::GenericError(e.to_string()),
         }
     }
 }
@@ -20,14 +20,11 @@ impl From<DeleteTasksError> for HttpError {
 #[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteTasksDto {
-    #[validate(custom(function = "validate_uuids"))]
-    pub task_ids: Vec<String>,
+    #[validate(custom(function = "validate_uuid"))]
+    pub task_id: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
-pub struct DeleteTasksResponseDto {
-    pub deleted_ids: Vec<String>,
-}
+pub use shared::task::DeleteTaskResponseDto;
 
 #[utoipa::path(
     delete,
@@ -36,7 +33,7 @@ pub struct DeleteTasksResponseDto {
     summary = "Delete one or more tasks",
     request_body = DeleteTasksDto,
     responses(
-        (status = 200, description = "Tasks deleted successfully", body = DeleteTasksResponseDto),
+        (status = 200, description = "Tasks deleted successfully", body = DeleteTaskResponseDto),
         (status = 400, description = "Bad request - validation error"),
         (status = 401, description = "Unauthorized"),
         (status = 500, description = "Internal server error")
@@ -47,8 +44,8 @@ pub struct DeleteTasksResponseDto {
 )]
 pub async fn delete_tasks_api(
     State(state): State<AppState>,
-    Json(payload): Json<DeleteTasksDto>,
-) -> HttpResult<Json<DeleteTasksResponseDto>> {
+    Query(payload): Query<DeleteTasksDto>,
+) -> HttpResult<Json<DeleteTaskResponseDto>> {
     payload
         .validate()
         .map_err(|e| HttpError::BadRequest(e.to_string()))?;
@@ -56,18 +53,11 @@ pub async fn delete_tasks_api(
     let res = state
         .delete_tasks_uc
         .execute(
-            payload
-                .task_ids
-                .iter()
-                .map(|id| id.parse().unwrap()) // should be safe due to dto validation
-                .collect(),
+            payload.task_id.parse().unwrap(), // should be safe due to dto validation
         )
         .await?;
 
-    match !res.is_empty() {
-        true => Ok(Json(DeleteTasksResponseDto {
-            deleted_ids: res.iter().map(|id| id.to_string()).collect(),
-        })),
-        false => Err(HttpError::GenericError("Tasks not delted".to_string())),
-    }
+    Ok(Json(DeleteTaskResponseDto {
+        deleted_id: res.to_string(),
+    }))
 }

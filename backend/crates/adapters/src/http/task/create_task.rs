@@ -71,6 +71,7 @@ pub async fn create_task_api(
         description: payload.description,
         due_date,
         subtasks,
+        category_id: payload.category_id,
     };
 
     tracing::info!("Creating task with command: {:?}", command);

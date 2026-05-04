@@ -1,9 +1,12 @@
 [application]
 
+[serve]
+port = 9090
+
 [web.app]
 
 # HTML title tag content
-title = "focus_flow_app"
+title = "Focus Flow"
 
 # include `assets` in web platform
 [web.resource]

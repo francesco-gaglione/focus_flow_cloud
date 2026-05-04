@@ -4,7 +4,7 @@ use adapters::http::{
     task::{
         complete_task::CompleteTaskDto,
         create_task::CreateTaskDto,
-        delete_tasks::{DeleteTasksDto, DeleteTasksResponseDto},
+        delete_tasks::{DeleteTasksDto, DeleteTaskResponseDto},
         get_tasks::TasksResponseDto,
         orphan_tasks::OrphanTasksResponseDto,
         update_task::{UpdateTaskDto, UpdateTaskResponseDto},
@@ -204,7 +204,7 @@ async fn delete_tasks_test() {
         .expect("Failed to delete task");
 
     assert_eq!(delete_res.status(), 200);
-    let delete_body: DeleteTasksResponseDto = delete_res
+    let delete_body: DeleteTaskResponseDto = delete_res
         .json()
         .await
         .expect("Failed to deserialize delete response");

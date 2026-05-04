@@ -7,7 +7,7 @@ use uuid::Uuid;
 use crate::repository_traits::category_persistence::CategoryPersistence;
 use crate::repository_traits::persistence_error::PersistenceError;
 use domain::{
-    entities::category::{Category, CategoryError},
+    entities::tasks::category::{Category, CategoryError},
     helpers::random_hex_color,
 };
 
@@ -26,7 +26,6 @@ pub type CreateCategoryResult<T> = Result<T, CreateCategoryError>;
 pub struct CreateCategoryCommand {
     pub user_id: uuid::Uuid,
     pub name: String,
-    pub description: Option<String>,
     pub color: Option<String>,
 }
 
@@ -47,7 +46,6 @@ impl CreateCategoryUseCases {
         let category = Category::create(
             category_cmd.user_id,
             category_cmd.name,
-            category_cmd.description,
             category_cmd.color.unwrap_or_else(random_hex_color),
         )?;
 
@@ -76,7 +74,6 @@ mod tests {
     async fn test_create_category() {
         let mut mock = MockCategoryPersistence::new();
         let name = "Test Category".to_string();
-        let description: Option<String> = None;
         let color = "#FF0000".to_string();
 
         let id = Uuid::new_v4();
@@ -93,7 +90,6 @@ mod tests {
             .execute(CreateCategoryCommand {
                 user_id,
                 name: name.to_string(),
-                description: description.map(|d| d.to_string()),
                 color: Some(color.to_string()),
             })
             .await;

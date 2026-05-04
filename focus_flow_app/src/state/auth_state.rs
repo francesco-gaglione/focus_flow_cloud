@@ -13,6 +13,10 @@ impl AuthState {
         self.auth_token.as_deref()
     }
 
+    pub fn refresh_token(&self) -> Option<&str> {
+        self.refresh_token.as_deref()
+    }
+
     pub fn set_auth_token(&mut self, token: Option<String>) {
         self.auth_token = token;
     }

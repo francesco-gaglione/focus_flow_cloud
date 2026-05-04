@@ -128,42 +128,6 @@
     flex: 1;
     position: relative;
 }
-.filter-select-wrap::after {
-    content: "▾";
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-subtle);
-    font-size: 11px;
-    pointer-events: none;
-}
-.filter-select {
-    width: 100%;
-    appearance: none;
-    -webkit-appearance: none;
-    background: var(--bg-raised);
-    border: 1px solid var(--border);
-    border-radius: var(--r-md);
-    color: var(--text);
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: var(--tracking-data);
-    text-transform: uppercase;
-    padding: 0 28px 0 12px;
-    height: 36px;
-    cursor: pointer;
-    outline: none;
-    transition: border-color var(--dur-fast) var(--ease-tech);
-}
-.filter-select:focus {
-    border-color: var(--accent);
-    box-shadow: var(--shadow-focus);
-}
-.filter-select option {
-    background: var(--bg-elev);
-    color: var(--text);
-}
 
 /* ============================================================
    TASK ROW — circular check, 4px left stripe, elevated card
@@ -329,6 +293,14 @@
 .todo-title {
     font-size: 15px;
     font-weight: 500;
+    color: var(--text);
+    line-height: 1.4;
+    margin-bottom: 4px;
+    word-wrap: break-word;
+}
+.todo-description {
+    font-size: 12px;
+    font-weight: 300;
     color: var(--text);
     line-height: 1.4;
     margin-bottom: 4px;

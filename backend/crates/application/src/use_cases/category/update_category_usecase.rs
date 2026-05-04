@@ -17,7 +17,6 @@ pub type UpdateCategoryResult<T> = Result<T, UpdateCategoryError>;
 pub struct UpdateCategoryCommand {
     pub id: uuid::Uuid,
     pub name: Option<String>,
-    pub description: Option<String>,
     pub color: Option<String>,
 }
 
@@ -40,9 +39,6 @@ impl UpdateCategoryUseCases {
         if let Some(name) = command.name {
             category.update_name(name);
         }
-        if let Some(description) = command.description {
-            category.update_description(Some(description));
-        }
         if let Some(color) = command.color {
             category.update_color(color);
         }
@@ -63,23 +59,20 @@ mod tests {
             UpdateCategoryCommand, UpdateCategoryUseCases,
         },
     };
-    use domain::entities::category::Category;
+    use domain::entities::tasks::category::Category;
 
     #[tokio::test]
     async fn test_update_category_usecase() {
         let category_id = uuid::Uuid::new_v4();
         let category_name = "Test Category".to_string();
-        let category_description = "Test Description".to_string();
         let category_color = "#FF0000".to_string();
 
         let mut category_persistence = MockCategoryPersistence::new();
 
         let name_clone_update = category_name.clone();
-        let description_clone_update = category_description.clone();
         let color_clone_update = category_color.clone();
 
         let name_clone_find = category_name.clone();
-        let description_clone_find = category_description.clone();
         let color_clone_find = category_color.clone();
 
         category_persistence
@@ -89,7 +82,6 @@ mod tests {
                     category_id,
                     uuid::Uuid::new_v4(),
                     name_clone_update.clone(),
-                    Some(description_clone_update.clone()),
                     color_clone_update.clone(),
                 )
                 .unwrap())
@@ -102,7 +94,6 @@ mod tests {
                     category_id,
                     uuid::Uuid::new_v4(),
                     name_clone_find.clone(),
-                    Some(description_clone_find.clone()),
                     color_clone_find.clone(),
                 )
                 .unwrap())
@@ -113,7 +104,6 @@ mod tests {
             .execute(UpdateCategoryCommand {
                 id: category_id,
                 name: Some(category_name.clone()),
-                description: Some(category_description.clone()),
                 color: Some(category_color.clone()),
             })
             .await;

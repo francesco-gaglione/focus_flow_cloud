@@ -71,15 +71,15 @@ app-serve:
 
 # Serve app (desktop)
 app-serve-desktop:
-    cd focus_flow_app && dx serve --platform desktop
+    cd focus_flow_app && dx serve --platform desktop --port 9090
 
 # Serve app (iOS)
 app-serve-ios:
-    cd focus_flow_app && dx serve --platform ios
+    cd focus_flow_app && dx serve --platform ios --port 9090
 
 # Serve app (iOS)
 app-serve-android:
-    cd focus_flow_app && dx serve --platform android
+    cd focus_flow_app && dx serve --platform android --port 9090
 
 # Run app tests
 app-test:

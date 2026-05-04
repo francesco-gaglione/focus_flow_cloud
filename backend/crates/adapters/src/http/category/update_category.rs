@@ -42,9 +42,6 @@ pub struct UpdateCategoryDto {
     ))]
     pub name: Option<String>,
 
-    #[validate(length(max = 255, message = "Description must not exceed 255 characters"))]
-    pub description: Option<String>,
-
     #[validate(regex(path = *COLOR_REGEX, message = "Color must be a valid hex code"))]
     pub color: Option<String>,
 }
@@ -95,7 +92,6 @@ pub async fn update_category_api(
         .execute(UpdateCategoryCommand {
             id: category_id,
             name: payload.name,
-            description: payload.description,
             color: payload.color,
         })
         .await?;

@@ -10,9 +10,14 @@ pub struct Subtask {
 }
 
 impl Subtask {
-    pub fn new(title: String, sort_order: i16, description: Option<String>) -> Self {
+    pub fn new(
+        title: String,
+        sort_order: i16,
+        description: Option<String>,
+        id: Option<Uuid>,
+    ) -> Self {
         Self {
-            id: Uuid::new_v4(),
+            id: id.unwrap_or_else(Uuid::new_v4),
             title,
             description,
             completed: false,
@@ -65,7 +70,7 @@ mod tests {
     fn test_task_creation() {
         let title = "Title";
         let description = "";
-        let subtask = Subtask::new(title.to_string(), 0, Some(description.to_string()));
+        let subtask = Subtask::new(title.to_string(), 0, Some(description.to_string()), None);
         assert_eq!(subtask.title, title);
         assert_eq!(subtask.description, Some(description.to_string()));
         assert_eq!(subtask.sort_order, 0);
@@ -75,7 +80,7 @@ mod tests {
     fn test_task_getters() {
         let title = "Title";
         let description = "";
-        let subtask = Subtask::new(title.to_string(), 0, Some(description.to_string()));
+        let subtask = Subtask::new(title.to_string(), 0, Some(description.to_string()), None);
         assert_eq!(subtask.title(), title);
         assert_eq!(subtask.description(), Some(description));
         assert!(!subtask.is_completed());
@@ -85,7 +90,7 @@ mod tests {
     fn test_task_update() {
         let title = "Title";
         let description = "";
-        let mut subtask = Subtask::new(title.to_string(), 0, Some(description.to_string()));
+        let mut subtask = Subtask::new(title.to_string(), 0, Some(description.to_string()), None);
         assert_eq!(subtask.title(), title);
         assert_eq!(subtask.description(), Some(description));
         subtask.update_title("New Title".to_string());
@@ -98,7 +103,7 @@ mod tests {
     fn test_task_completition() {
         let title = "Title";
         let description = "";
-        let mut subtask = Subtask::new(title.to_string(), 0, Some(description.to_string()));
+        let mut subtask = Subtask::new(title.to_string(), 0, Some(description.to_string()), None);
         assert_eq!(subtask.title(), title);
         assert_eq!(subtask.description(), Some(description));
         assert!(!subtask.completed);

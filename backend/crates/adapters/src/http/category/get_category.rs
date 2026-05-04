@@ -54,7 +54,6 @@ pub async fn get_category(
         category: CategoryDto {
             id: category.id.to_string(),
             name: category.name.to_string(),
-            description: category.description.map(|s| s.to_string()),
             color: category.color.to_string(),
         },
     };

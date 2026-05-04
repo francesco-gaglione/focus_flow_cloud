@@ -54,6 +54,11 @@ impl NewDbSubtask {
 
 impl From<DbSubtask> for Subtask {
     fn from(value: DbSubtask) -> Self {
-        Subtask::new(value.title, value.sort_order, value.description)
+        Subtask::new(
+            value.title,
+            value.sort_order,
+            value.description,
+            Some(value.id),
+        )
     }
 }

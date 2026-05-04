@@ -67,7 +67,7 @@ impl From<Task> for NewDbTask {
         Self {
             id: value.id(),
             user_id: value.user_id(),
-            category_id: None,
+            category_id: value.category_id(),
             title: value.title().to_string(),
             description: value.description().map(|s| s.to_string()),
             scheduled_date: value.due_date(),
@@ -81,7 +81,7 @@ impl From<Task> for DbTask {
         Self {
             id: value.id(),
             user_id: value.user_id(),
-            category_id: None,
+            category_id: value.category_id(),
             title: value.title().to_string(),
             description: value.description().map(|s| s.to_string()),
             scheduled_date: value.due_date(),
@@ -95,7 +95,7 @@ impl From<Task> for DbTask {
 impl From<Task> for UpdateDbTask {
     fn from(value: Task) -> Self {
         Self {
-            category_id: None,
+            category_id: value.category_id(),
             title: Some(value.title().to_string()),
             description: value.description().map(|s| s.to_string()),
             scheduled_date: value.due_date(),
@@ -114,6 +114,7 @@ impl From<DbTask> for Task {
             value.title,
             value.description,
             priority,
+            value.category_id,
             vec![],
             value.scheduled_date,
             value.completed_at,
@@ -131,6 +132,7 @@ impl DbTask {
             self.title,
             self.description,
             priority,
+            self.category_id,
             subtasks,
             self.scheduled_date,
             self.completed_at,

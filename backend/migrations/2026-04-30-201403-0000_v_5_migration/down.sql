@@ -1,25 +1,24 @@
--- Drop subtasks table
-DROP TABLE IF EXISTS subtasks;
+-- Rollback subtasks table
+DROP TABLE subtasks;
 
--- Restore partial indexes that reference deleted_at
-DROP INDEX IF EXISTS idx_tasks_user_category_active;
-DROP INDEX IF EXISTS idx_tasks_user_scheduled_active;
-
--- Remove added column
+-- Undo the addition of priority and rename title back to name
+-- We assume the original name column structure is restored
 ALTER TABLE tasks DROP COLUMN priority;
-
--- Rename title → name
 ALTER TABLE tasks RENAME COLUMN title TO name;
 
--- Restore removed columns
-ALTER TABLE tasks ADD COLUMN deleted_at TIMESTAMPTZ;
-ALTER TABLE tasks ADD COLUMN scheduled_end_date TIMESTAMPTZ;
+-- Drop the indexes created in up.sql
+DROP INDEX IF EXISTS idx_tasks_user_category_active;
+DROP INDEX IF EXISTS idx_tasks_user_scheduled_active;
+DROP INDEX IF EXISTS idx_subtasks_task_id;
+DROP INDEX IF EXISTS idx_subtasks_user_id;
 
--- Recreate original partial indexes
-CREATE INDEX idx_tasks_user_category_active
-    ON tasks (user_id, category_id, scheduled_date)
-    WHERE deleted_at IS NULL;
+-- Restore dropped columns (adding them back is necessary to reverse the drops)
+ALTER TABLE tasks ADD COLUMN scheduled_end_date TIMESTAMP;
+ALTER TABLE tasks ADD COLUMN deleted_at TIMESTAMP;
 
-CREATE INDEX idx_tasks_user_scheduled_active
-    ON tasks (user_id, scheduled_date DESC)
-    WHERE deleted_at IS NULL AND scheduled_date IS NOT NULL;
+-- Restore description to categories (Conditional addition to prevent "already exists" error)
+DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'categories' AND column_name = 'description') THEN
+        ALTER TABLE categories ADD COLUMN description TEXT;
+    END IF;
+END $$;

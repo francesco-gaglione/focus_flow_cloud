@@ -8,7 +8,7 @@ use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, SelectableHelper};
 use domain::entities::tasks::task::Task;
-use tracing::{info, instrument};
+use tracing::{debug, info, instrument};
 use uuid::Uuid;
 
 #[async_trait]
@@ -43,14 +43,14 @@ impl TaskPersistence for PostgresPersistence {
     }
 
     #[instrument(skip(self))]
-    async fn find_all(&self, completed: bool) -> PersistenceResult<Vec<Task>> {
+    async fn find_all(&self, completed: Option<bool>) -> PersistenceResult<Vec<Task>> {
         let tasks = self
             .with_transaction(move |conn| {
                 let mut query = schema::tasks::table.into_boxed();
 
-                if completed {
+                if completed.is_some() && completed.unwrap() == true {
                     query = query.filter(schema::tasks::completed_at.is_not_null());
-                } else {
+                } else if completed.is_some() && completed.unwrap() == false {
                     query = query.filter(schema::tasks::completed_at.is_null());
                 }
 
@@ -61,6 +61,8 @@ impl TaskPersistence for PostgresPersistence {
 
                 let mut tasks = Vec::with_capacity(db_tasks.len());
                 for db_task in db_tasks {
+                    debug!("Found task: {:?}", db_task);
+                    debug!("Searching for subtasks");
                     let db_subtasks: Vec<DbSubtask> = schema::subtasks::table
                         .filter(schema::subtasks::task_id.eq(db_task.id))
                         .select(DbSubtask::as_select())

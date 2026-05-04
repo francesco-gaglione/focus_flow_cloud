@@ -121,42 +121,15 @@
     box-shadow: var(--shadow-focus);
 }
 
-.sheet-select-wrap {
-    position: relative;
+.sheet-datetime-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
 }
-.sheet-select-wrap::after {
-    content: "▾";
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-subtle);
-    font-size: 12px;
-    pointer-events: none;
-}
-.sheet-select {
-    width: 100%;
-    appearance: none;
-    -webkit-appearance: none;
-    height: 44px;
-    padding: 0 36px 0 14px;
-    background: var(--bg-raised);
-    border: 1px solid var(--border);
-    border-radius: var(--r-md);
-    color: var(--text);
-    font-family: var(--font-ui);
-    font-size: 15px;
-    outline: none;
-    cursor: pointer;
-    transition: border-color var(--dur-fast) var(--ease-tech);
-}
-.sheet-select:focus {
-    border-color: var(--accent);
-    box-shadow: var(--shadow-focus);
-}
-.sheet-select option {
-    background: var(--bg-elev);
-    color: var(--text);
+.sheet-time {
+    flex-shrink: 0;
+    width: 110px;
+    color-scheme: dark;
 }
 
 .sheet-actions {

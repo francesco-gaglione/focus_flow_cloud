@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use crate::repository_traits::category_persistence::CategoryPersistence;
 use crate::repository_traits::persistence_error::PersistenceError;
-use domain::entities::category::Category;
+use domain::entities::tasks::category::Category;
 use thiserror::Error;
 use tracing::instrument;
 use uuid::Uuid;
@@ -20,7 +20,6 @@ pub struct CategoryOutput {
     pub id: Uuid,
     pub user_id: Uuid,
     pub name: String,
-    pub description: Option<String>,
     pub color: String,
 }
 
@@ -30,7 +29,6 @@ impl From<Category> for CategoryOutput {
             id: value.id(),
             user_id: value.user_id(),
             name: value.name().to_string(),
-            description: value.description().map(|d| d.to_string()),
             color: value.color().to_string(),
         }
     }
@@ -68,7 +66,7 @@ mod tests {
         repository_traits::category_persistence::MockCategoryPersistence,
         use_cases::category::get_category_usecase::GetCategoryUseCases,
     };
-    use domain::entities::category::Category;
+    use domain::entities::tasks::category::Category;
 
     #[tokio::test]
     async fn test_get_category_usecase() {
@@ -77,7 +75,6 @@ mod tests {
             category_id,
             Uuid::new_v4(),
             "Test Category".to_string(),
-            None,
             "#FFFFFF".to_string(),
         )
         .unwrap();

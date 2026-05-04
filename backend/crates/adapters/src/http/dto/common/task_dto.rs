@@ -1,8 +1,6 @@
 pub use shared::task::TaskDto;
 
-use application::use_cases::{
-    category::get_category_and_task_usecase, task::get_tasks::TaskOutput,
-};
+use application::use_cases::task::get_tasks::TaskOutput;
 use domain::entities::tasks::task_priority::TaskPriority;
 use shared::task::{SubtaskDto, TaskPriority as SharedTaskPriority};
 
@@ -13,18 +11,6 @@ fn priority_to_dto(p: Option<TaskPriority>) -> Option<SharedTaskPriority> {
         TaskPriority::High => SharedTaskPriority::High,
         TaskPriority::Urgent => SharedTaskPriority::Urgent,
     })
-}
-
-pub fn from_category_task(v: &get_category_and_task_usecase::TaskDto) -> TaskDto {
-    TaskDto {
-        id: v.id.to_string(),
-        title: v.title.clone(),
-        description: v.description.clone(),
-        priority: None,
-        due_date: v.due_date.map(|d| d.timestamp()),
-        completed_at: v.completed_at.map(|c| c.timestamp()),
-        subtasks: vec![], //FIX
-    }
 }
 
 pub fn from_task_output(v: &TaskOutput) -> TaskDto {
@@ -46,5 +32,6 @@ pub fn from_task_output(v: &TaskOutput) -> TaskDto {
                 sort_order: s.sort_order,
             })
             .collect(),
+        category_id: v.category_id.clone(),
     }
 }

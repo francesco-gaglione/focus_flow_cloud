@@ -1,16 +1,19 @@
 use dioxus::prelude::*;
 
-mod model;
+mod clients;
+mod components;
 mod presentation;
 mod services;
 mod state;
+mod use_cases;
 
 use presentation::views::{
     Calendar, Flashcards, FlashcardsLayout, Layout, Stats, TasksLayout, Todo,
 };
 
 use crate::{
-    services::{api_client::ApiClient, storage::get_item},
+    clients::http_client::ApiClient,
+    services::storage::get_item,
     state::{app_state::AppState, auth_state::AuthState},
 };
 
@@ -27,16 +30,17 @@ enum Route {
             #[route("/cards")]   Flashcards {},
 }
 
-const CSS_TOKENS: Asset      = asset!("/assets/styling/tokens.css");
-const CSS_BASE: Asset        = asset!("/assets/styling/base.css");
-const CSS_COMPONENTS: Asset  = asset!("/assets/styling/components.css");
-const CSS_LAYOUT: Asset      = asset!("/assets/styling/layout.css");
-const CSS_SHEET: Asset       = asset!("/assets/styling/sheet.css");
-const CSS_TASKS: Asset       = asset!("/assets/styling/views/tasks.css");
-const CSS_CALENDAR: Asset    = asset!("/assets/styling/views/calendar.css");
-const CSS_STATS: Asset       = asset!("/assets/styling/views/stats.css");
-const CSS_AUTH: Asset        = asset!("/assets/styling/views/auth.css");
-const CSS_FLASHCARDS: Asset  = asset!("/assets/styling/views/flashcards.css");
+const CSS_DX_THEME: Asset = asset!("/assets/dx-components-theme.css");
+const CSS_TOKENS: Asset = asset!("/assets/styling/tokens.css");
+const CSS_BASE: Asset = asset!("/assets/styling/base.css");
+const CSS_COMPONENTS: Asset = asset!("/assets/styling/components.css");
+const CSS_LAYOUT: Asset = asset!("/assets/styling/layout.css");
+const CSS_SHEET: Asset = asset!("/assets/styling/sheet.css");
+const CSS_TASKS: Asset = asset!("/assets/styling/views/tasks.css");
+const CSS_CALENDAR: Asset = asset!("/assets/styling/views/calendar.css");
+const CSS_STATS: Asset = asset!("/assets/styling/views/stats.css");
+const CSS_AUTH: Asset = asset!("/assets/styling/views/auth.css");
+const CSS_FLASHCARDS: Asset = asset!("/assets/styling/views/flashcards.css");
 
 fn main() {
     dioxus_std::set_dir!();
@@ -72,6 +76,7 @@ fn App() -> Element {
     use_context_provider(|| Signal::new(api_client));
 
     rsx! {
+        document::Link { rel: "stylesheet", href: CSS_DX_THEME }
         document::Link { rel: "stylesheet", href: CSS_TOKENS }
         document::Link { rel: "stylesheet", href: CSS_BASE }
         document::Link { rel: "stylesheet", href: CSS_COMPONENTS }
