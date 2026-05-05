@@ -39,3 +39,7 @@ CREATE TABLE subtasks (
 
 CREATE INDEX idx_subtasks_task_id ON subtasks (task_id);
 CREATE INDEX idx_subtasks_user_id ON subtasks (user_id);
+
+-- Remove category_id from focus_session
+DROP INDEX IF EXISTS idx_sessions_user_category_started;
+ALTER TABLE focus_session DROP COLUMN category_id;

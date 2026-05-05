@@ -30,7 +30,6 @@ use application::use_cases::{
         create_manual_session::CreateManualSessionUseCase,
         find_sessions_by_filters::FindSessionsByFiltersUseCase,
     },
-    stats::calculate_stats_by_period::CalculateStatsByPeriodUseCase,
     task::{
         create_task::CreateTaskUseCase, delete_task::DeleteTaskUseCase,
         update_task::UpdateTaskUseCase,
@@ -79,9 +78,6 @@ pub struct AppState {
     pub create_manual_session_uc: Arc<CreateManualSessionUseCase>,
     pub update_focus_session_uc: Arc<UpdateFocusSessionUseCase>,
     pub find_sessions_by_filters_uc: Arc<FindSessionsByFiltersUseCase>,
-
-    // Stats Use Cases
-    pub calculate_stats_by_period_uc: Arc<CalculateStatsByPeriodUseCase>,
 
     // User Setting Use Cases
     pub update_user_setting_uc: Arc<UpdateSettingUseCase>,

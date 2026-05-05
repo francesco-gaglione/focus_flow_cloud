@@ -33,9 +33,6 @@ pub struct UpdateFocusSessionPathDto {
 #[serde(rename_all = "camelCase")]
 pub struct UpdateFocusSessionDto {
     #[validate(custom(function = "validate_uuid"))]
-    pub category_id: Option<String>,
-
-    #[validate(custom(function = "validate_uuid"))]
     pub task_id: Option<String>,
 
     #[validate(range(min = 0, max = 5))]
@@ -85,12 +82,7 @@ pub async fn update_session_api(
 
     let session_id = Uuid::parse_str(&path.id)
         .map_err(|_| HttpError::BadRequest("Invalid session id".to_string()))?;
-    let category_id = payload
-        .category_id
-        .as_ref()
-        .map(|id| Uuid::parse_str(id))
-        .transpose()
-        .map_err(|_| HttpError::BadRequest("Invalid category id".to_string()))?;
+
     let task_id = payload
         .task_id
         .as_ref()
@@ -114,7 +106,6 @@ pub async fn update_session_api(
 
     let command = UpdateFocusSessionCommand {
         session_id,
-        category_id,
         task_id,
         concentration_score: payload.concentration_score,
         notes: payload.notes,

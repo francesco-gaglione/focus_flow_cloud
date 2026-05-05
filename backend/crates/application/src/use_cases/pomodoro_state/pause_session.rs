@@ -79,19 +79,13 @@ impl PauseSessionUseCase {
                     .await?;
 
                 let next_session_type = user_pomo_state.calculate_next_session_type();
-                let category_id = terminated_session.category_id();
                 let task_id = terminated_session.task_id();
 
                 debug!(
-                    "next_session_type: {:?}, category_id: {:?}, task_id: {:?}",
-                    next_session_type, category_id, task_id
+                    "next_session_type: {:?}, task_id: {:?}",
+                    next_session_type, task_id
                 );
-                user_pomo_state.start_new_session(
-                    command.user_id,
-                    next_session_type,
-                    category_id,
-                    task_id,
-                )?;
+                user_pomo_state.start_new_session(command.user_id, next_session_type, task_id)?;
 
                 self.pomodoro_state_repo
                     .update_user_state(command.user_id, user_pomo_state)
@@ -128,7 +122,7 @@ mod tests {
         let user_id = Uuid::new_v4();
         let mut state = PomodoroState::new();
         state
-            .start_new_session(user_id, FocusSessionType::Work, None, None)
+            .start_new_session(user_id, FocusSessionType::Work, None)
             .unwrap();
         std::thread::sleep(std::time::Duration::from_secs(1));
 
@@ -155,7 +149,7 @@ mod tests {
         let user_id = Uuid::new_v4();
         let mut state = PomodoroState::new();
         state
-            .start_new_session(user_id, FocusSessionType::ShortBreak, None, None)
+            .start_new_session(user_id, FocusSessionType::ShortBreak, None)
             .unwrap();
 
         mock_pomodoro_repo

@@ -18,6 +18,9 @@ chrono = { version = "0.4.42", features = ["serde"] }
 uuid = { version = "1", features = ["v4", "serde"] }
 time = { version = "0.3", features = ["macros"] }
 dioxus-primitives = { git = "https://github.com/DioxusLabs/components", version = "0.0.1", default-features = false }
+tokio = { version = "1", features = ["sync", "time"] }
+tokio-tungstenite = { version = "0.24", default-features = false, features = ["connect", "handshake"] }
+futures-util = { version = "0.3", default-features = false, features = ["sink", "std"] }
 
 [features]
 default = ["mobile"]

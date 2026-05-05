@@ -97,14 +97,6 @@ impl FocusSessionRepository for PostgresPersistence {
                     query = query.filter(focus_session::started_at.le(end));
                 }
 
-                if let Some(cat_ids) = filters.category_ids {
-                    query = query.filter(
-                        focus_session::category_id
-                            .eq_any(cat_ids.clone())
-                            .or(tasks::category_id.eq_any(cat_ids)),
-                    );
-                }
-
                 if let Some(task_ids) = filters.task_ids {
                     query = query.filter(
                         focus_session::task_id

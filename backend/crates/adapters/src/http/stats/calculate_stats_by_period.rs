@@ -2,28 +2,9 @@ use crate::http::app_state::AppState;
 use crate::http::model::session_model::UserSession;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::STATS_TAG;
-use application::use_cases::stats::calculate_stats_by_period::{
-    CalculateStatsByPeriodError, StatsPeriod,
-};
 
-impl From<CalculateStatsByPeriodError> for HttpError {
-    fn from(value: CalculateStatsByPeriodError) -> Self {
-        match value {
-            CalculateStatsByPeriodError::PersistenceError(e) => {
-                HttpError::GenericError(e.to_string())
-            }
-        }
-    }
-}
 use axum::extract::{Extension, Query, State};
 use axum::Json;
-use domain::entities::stats::calculators::daily_activity_calculator::{
-    DailyActivityDistributionItem, DailyActivityItem,
-};
-use domain::entities::stats::category_distribution::{
-    CategoryDistributionItem, TaskDistributionItem,
-};
-use domain::entities::stats::{ConcentrationPeriod, Stats};
 use serde::{Deserialize, Serialize};
 use tracing::debug;
 use utoipa::{IntoParams, ToSchema};
@@ -91,97 +72,6 @@ pub struct DailyActivityDistributionDto {
     pub total_focus_time: i64,
 }
 
-impl From<Stats> for GetStatsByPeriodResponseDto {
-    fn from(stats: Stats) -> Self {
-        Self {
-            total_sessions: stats.total_sessions(),
-            total_breaks: stats.total_breaks(),
-            total_focus_time: stats.total_focus_time(),
-            total_break_time: stats.total_break_time(),
-            focus_pause_ratio: stats.focus_pause_ratio(),
-            most_concentrated_period: stats.most_concentrated_period().clone().into(),
-            less_concentrated_period: stats.less_concentrated_period().clone().into(),
-            concentration_distribution: *stats.concentration_distribution(),
-            category_distribution: stats
-                .category_distribution()
-                .to_vec()
-                .into_iter()
-                .map(|item| item.into())
-                .collect(),
-            daily_activity: stats
-                .daily_activity()
-                .to_vec()
-                .into_iter()
-                .map(|item| item.into())
-                .collect(),
-        }
-    }
-}
-
-impl From<ConcentrationPeriod> for ConcentrationPeriodDto {
-    fn from(period: ConcentrationPeriod) -> Self {
-        match period {
-            ConcentrationPeriod::Morning => ConcentrationPeriodDto::Morning,
-            ConcentrationPeriod::Afternoon => ConcentrationPeriodDto::Afternoon,
-        }
-    }
-}
-
-impl From<CategoryDistributionItem> for CategoryDistributionDto {
-    fn from(item: CategoryDistributionItem) -> Self {
-        Self {
-            category_name: item.category_name().to_string(),
-            category_id: item.category_id().to_string(),
-            total_focus_time: item.total_focus_time(),
-            percentage: item.percentage(),
-            task_distribution: item
-                .task_distribution()
-                .to_vec()
-                .into_iter()
-                .map(|item| item.into())
-                .collect(),
-        }
-    }
-}
-
-impl From<TaskDistributionItem> for TaskDistributionDto {
-    fn from(item: TaskDistributionItem) -> Self {
-        Self {
-            task_name: item.task_name().to_string(),
-            total_focus_time: item.total_focus_time(),
-            percentage: item.percentage(),
-        }
-    }
-}
-
-impl From<DailyActivityItem> for DailyActivityDto {
-    fn from(item: DailyActivityItem) -> Self {
-        Self {
-            date: item
-                .date
-                .and_hms_opt(0, 0, 0)
-                .unwrap()
-                .and_utc()
-                .timestamp(),
-            category_distribution: item
-                .category_distribution
-                .into_iter()
-                .map(|dist| dist.into())
-                .collect(),
-        }
-    }
-}
-
-impl From<DailyActivityDistributionItem> for DailyActivityDistributionDto {
-    fn from(item: DailyActivityDistributionItem) -> Self {
-        Self {
-            category_name: item.category_name.to_string(),
-            category_id: item.category_id.to_string(),
-            total_focus_time: item.total_focus_time,
-        }
-    }
-}
-
 #[utoipa::path(
     get,
     path = "/api/stats/period",
@@ -207,16 +97,19 @@ pub async fn calculate_stats_by_period_api(
 ) -> HttpResult<Json<GetStatsByPeriodResponseDto>> {
     debug!("query: {:?}", query);
 
-    let stats_period = StatsPeriod {
-        user_id: session.user_id,
-        start_date: query.start_date,
-        end_date: query.end_date,
+    //Mock response
+    let res = GetStatsByPeriodResponseDto {
+        total_sessions: todo!(),
+        total_breaks: todo!(),
+        total_focus_time: todo!(),
+        total_break_time: todo!(),
+        focus_pause_ratio: todo!(),
+        most_concentrated_period: todo!(),
+        less_concentrated_period: todo!(),
+        concentration_distribution: todo!(),
+        category_distribution: todo!(),
+        daily_activity: todo!(),
     };
 
-    let stats = state
-        .calculate_stats_by_period_uc
-        .execute(stats_period)
-        .await?;
-
-    Ok(Json(stats.into()))
+    Ok(Json(res))
 }

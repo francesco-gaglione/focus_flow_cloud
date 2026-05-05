@@ -17,7 +17,6 @@ pub enum FetchUserPomodoroStateError {
 pub type FetchUserPomodoroStateResult<T> = Result<T, FetchUserPomodoroStateError>;
 
 pub struct FetchUserPomodoroStateOutput {
-    pub category_id: Option<String>,
     pub task_id: Option<String>,
     pub user_current_session: Option<UserCurrentSession>,
 }
@@ -25,7 +24,6 @@ pub struct FetchUserPomodoroStateOutput {
 pub struct UserCurrentSession {
     pub session_type: UserSessionType,
     pub session_start_time: i64,
-    pub category_id: Option<String>,
     pub task_id: Option<String>,
     pub note: Option<String>,
     pub concentration_score: i32,
@@ -41,7 +39,6 @@ pub enum UserSessionType {
 impl From<PomodoroState> for FetchUserPomodoroStateOutput {
     fn from(mut value: PomodoroState) -> Self {
         Self {
-            category_id: value.category_id().map(|id| id.to_string()),
             task_id: value.task_id().map(|id| id.to_string()),
             user_current_session: value.current_session().as_ref().map(|s| s.into()),
         }
@@ -53,7 +50,6 @@ impl From<&FocusSession<RunningSession>> for UserCurrentSession {
         Self {
             session_type: value.session_type().into(),
             session_start_time: value.started_at().timestamp(),
-            category_id: value.category_id().map(|id| id.to_string()),
             task_id: value.task_id().map(|id| id.to_string()),
             note: value.note(),
             concentration_score: 0,
@@ -107,7 +103,6 @@ mod tests {
     use crate::repository_traits::pomodoro_state_repository::{
         MockPomodoroStateRepository, PomodoroStateRepositoryError,
     };
-    use domain::entities::focus_session_type::FocusSessionType;
     use domain::entities::pomodoro::pomodoro_state::PomodoroState;
     use std::sync::Arc;
     use uuid::Uuid;
@@ -130,7 +125,6 @@ mod tests {
         assert!(result.is_ok());
         let output = result.unwrap();
         assert!(output.user_current_session.is_none());
-        assert!(output.category_id.is_none());
         assert!(output.task_id.is_none());
     }
 
@@ -138,10 +132,7 @@ mod tests {
     async fn test_fetch_success_with_running_session() {
         let mut mock_repo = MockPomodoroStateRepository::new();
         let user_id = Uuid::new_v4();
-        let mut state = PomodoroState::new();
-        state
-            .start_new_session(user_id, FocusSessionType::Work, None, None)
-            .unwrap();
+        let state = PomodoroState::new();
 
         mock_repo
             .expect_fetch_user_state()
@@ -163,10 +154,8 @@ mod tests {
     #[tokio::test]
     async fn test_fetch_with_category_and_task() {
         let mut mock_repo = MockPomodoroStateRepository::new();
-        let category_id = Uuid::new_v4();
         let task_id = Uuid::new_v4();
         let mut state = PomodoroState::new();
-        state.update_category_id(category_id);
         state.update_task_id(task_id);
 
         mock_repo
@@ -181,7 +170,6 @@ mod tests {
             .await;
         assert!(result.is_ok());
         let output = result.unwrap();
-        assert_eq!(output.category_id, Some(category_id.to_string()));
         assert_eq!(output.task_id, Some(task_id.to_string()));
     }
 

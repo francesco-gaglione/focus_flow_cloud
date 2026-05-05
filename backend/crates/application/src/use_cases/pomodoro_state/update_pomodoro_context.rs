@@ -21,7 +21,6 @@ pub type UpdatePomodoroContextResult<T> = Result<T, UpdatePomodoroContextError>;
 #[derive(Debug)]
 pub struct UpdatePomodoroContextCommand {
     pub user_id: Uuid,
-    pub category_id: Option<Uuid>,
     pub task_id: Option<Uuid>,
 }
 
@@ -45,10 +44,6 @@ impl UpdatePomodoroContextUseCase {
             .pomodoro_state_repo
             .fetch_user_state(command.user_id)
             .await?;
-
-        if let Some(category_id) = command.category_id {
-            user_state.update_category_id(category_id);
-        }
 
         if let Some(task_id) = command.task_id {
             user_state.update_task_id(task_id);
@@ -89,7 +84,6 @@ mod tests {
         let result = use_case
             .execute(UpdatePomodoroContextCommand {
                 user_id,
-                category_id: Some(Uuid::new_v4()),
                 task_id: Some(Uuid::new_v4()),
             })
             .await;
@@ -113,7 +107,6 @@ mod tests {
         let result = use_case
             .execute(UpdatePomodoroContextCommand {
                 user_id,
-                category_id: None,
                 task_id: None,
             })
             .await;
@@ -132,7 +125,6 @@ mod tests {
         let result = use_case
             .execute(UpdatePomodoroContextCommand {
                 user_id: Uuid::new_v4(),
-                category_id: None,
                 task_id: None,
             })
             .await;

@@ -9,6 +9,8 @@ pub struct TaskRowProps {
     pub on_subtask_toggle: EventHandler<(String, String)>,
     #[props(optional)]
     pub on_delete: Option<EventHandler<String>>,
+    #[props(optional)]
+    pub on_start_timer: Option<EventHandler<(String, String)>>,
 }
 
 #[component]
@@ -28,7 +30,11 @@ pub fn TaskRow(props: TaskRowProps) -> Element {
     let cat_color = task.cat_color.as_deref().unwrap_or("white").to_string();
     let id = task.id.clone();
     let delete_id = task.id.clone();
+    let timer_id = task.id.clone();
+    let timer_title = task.title.clone();
     let on_delete = props.on_delete.clone();
+    let on_start_timer = props.on_start_timer.clone();
+    let has_timer = on_start_timer.is_some();
     let subtask_total = task.subtasks.len();
     let subtask_done = task.subtasks.iter().filter(|s| s.is_completed).count();
     let has_subtasks = subtask_total > 0;
@@ -158,6 +164,24 @@ pub fn TaskRow(props: TaskRowProps) -> Element {
             div {
                 class: "ctx-menu",
                 style: "left: {menu_x}px; top: {menu_y}px;",
+                if has_timer {
+                    button {
+                        class: "ctx-item",
+                        onclick: move |_| {
+                            if let Some(ref cb) = on_start_timer {
+                                cb.call((timer_id.clone(), timer_title.clone()));
+                            }
+                            show_menu.set(false);
+                        },
+                        svg { view_box: "0 0 16 16", class: "ctx-item-icon",
+                            circle { cx: "8", cy: "9", r: "5", stroke: "currentColor", stroke_width: "1.6", fill: "none" }
+                            line { x1: "8", y1: "9", x2: "8", y2: "6", stroke: "currentColor", stroke_width: "1.6", stroke_linecap: "round" }
+                            line { x1: "8", y1: "9", x2: "10", y2: "8", stroke: "currentColor", stroke_width: "1.6", stroke_linecap: "round" }
+                            line { x1: "5", y1: "2", x2: "11", y2: "2", stroke: "currentColor", stroke_width: "1.6", stroke_linecap: "round" }
+                        }
+                        "Start timer"
+                    }
+                }
                 button {
                     class: "ctx-item danger",
                     onclick: move |_| {

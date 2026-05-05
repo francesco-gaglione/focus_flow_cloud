@@ -64,14 +64,6 @@ impl TerminateSessionUseCase {
 
         let terminated_session = user_state.terminate_current_session()?;
 
-        if let Some(task_id) = terminated_session.task_id() {
-            let mut task = self.task_persistence.find_by_id(task_id).await?;
-            if task.due_date().is_some() {
-                task.complete().ok();
-                self.task_persistence.update_task(task).await?;
-            }
-        }
-
         self.focus_session_repo
             .create_manual_session(terminated_session)
             .await?;
@@ -107,7 +99,7 @@ mod tests {
         let user_id = Uuid::new_v4();
         let mut state = PomodoroState::new();
         state
-            .start_new_session(user_id, FocusSessionType::Work, None, None)
+            .start_new_session(user_id, FocusSessionType::Work, None)
             .unwrap();
         std::thread::sleep(std::time::Duration::from_secs(1));
 
@@ -139,7 +131,7 @@ mod tests {
         let task_id = Uuid::new_v4();
         let mut state = PomodoroState::new();
         state
-            .start_new_session(user_id, FocusSessionType::Work, None, Some(task_id))
+            .start_new_session(user_id, FocusSessionType::Work, Some(task_id))
             .unwrap();
         std::thread::sleep(std::time::Duration::from_secs(1));
 
@@ -185,7 +177,7 @@ mod tests {
         let task_id = Uuid::new_v4();
         let mut state = PomodoroState::new();
         state
-            .start_new_session(user_id, FocusSessionType::Work, None, Some(task_id))
+            .start_new_session(user_id, FocusSessionType::Work, Some(task_id))
             .unwrap();
         std::thread::sleep(std::time::Duration::from_secs(1));
 
@@ -195,7 +187,12 @@ mod tests {
         mock_task_persistence
             .expect_find_by_id()
             .returning(move |_| {
-                Ok(Task::new(user_id, "Unscheduled Task".to_string(), None, None))
+                Ok(Task::new(
+                    user_id,
+                    "Unscheduled Task".to_string(),
+                    None,
+                    None,
+                ))
             });
         // update_task must NOT be called
         mock_session_repo

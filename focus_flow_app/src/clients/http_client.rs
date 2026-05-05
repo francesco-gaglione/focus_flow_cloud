@@ -4,7 +4,7 @@ use reqwest::StatusCode;
 use serde::{de::DeserializeOwned, Serialize};
 use std::fmt;
 
-#[derive(Debug, Clone, thiserror::Error)]
+#[derive(Debug, Clone, thiserror::Error, PartialEq)]
 pub enum ApiError {
     Network(String),
     InternalServerError(String),

@@ -24,7 +24,6 @@ pub type CreateManualSessionResult<T> = Result<T, CreateManualSessionError>;
 #[derive(Debug, Clone)]
 pub struct CreateManualFocusSessionCommand {
     pub user_id: Uuid,
-    pub category_id: Option<Uuid>,
     pub task_id: Option<Uuid>,
     pub session_type: FocusSessionType,
     pub concentration_score: Option<i32>, // if none a default will be used (5)
@@ -52,7 +51,6 @@ impl CreateManualSessionUseCase {
     ) -> CreateManualSessionResult<Uuid> {
         let session = FocusSession::<TerminatedSession>::new(
             session_cmd.user_id,
-            session_cmd.category_id,
             session_cmd.task_id,
             session_cmd.session_type,
             session_cmd.concentration_score,
@@ -84,7 +82,6 @@ mod tests {
     async fn test_create_manual_session_success() {
         let mut mock_session_persistence = MockFocusSessionRepository::new();
 
-        let category_id = Uuid::new_v4();
         let task_id = Uuid::new_v4();
         let started_at = DateTime::from_timestamp(1761118663, 0).unwrap();
         let ended_at = DateTime::from_timestamp(1761118714, 0).unwrap();
@@ -95,7 +92,6 @@ mod tests {
 
         let cmd = CreateManualFocusSessionCommand {
             user_id: Uuid::new_v4(),
-            category_id: Some(category_id),
             task_id: Some(task_id),
             session_type: FocusSessionType::Work,
             concentration_score: Some(4),
@@ -126,7 +122,6 @@ mod tests {
 
         let cmd = CreateManualFocusSessionCommand {
             user_id: Uuid::new_v4(),
-            category_id: Some(Uuid::new_v4()),
             task_id: Some(Uuid::new_v4()),
             session_type: FocusSessionType::Work,
             concentration_score: Some(3),

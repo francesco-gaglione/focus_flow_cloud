@@ -94,6 +94,7 @@ mod tests {
             description: None,
             due_date: None,
             subtasks: None,
+            category_id: Some(Uuid::new_v4()),
         };
 
         let result = use_case.execute(command).await;
@@ -117,6 +118,7 @@ mod tests {
             title: "New Task".to_string(),
             description: None,
             due_date: Some(Utc::now() + chrono::Duration::minutes(15)),
+            category_id: Some(Uuid::new_v4()),
             subtasks: None,
         };
 
@@ -141,6 +143,7 @@ mod tests {
             user_id: Uuid::new_v4(),
             title: "New Task".to_string(),
             description: None,
+            category_id: Some(Uuid::new_v4()),
             due_date: None,
             subtasks: None,
         };

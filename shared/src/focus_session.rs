@@ -32,7 +32,6 @@ impl SessionTypeEnum {
 #[serde(rename_all = "camelCase")]
 pub struct FocusSessionDto {
     pub id: String,
-    pub category_id: Option<String>,
     pub task_id: Option<String>,
     pub session_type: SessionTypeEnum,
     pub actual_duration: Option<i64>,

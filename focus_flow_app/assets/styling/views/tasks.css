@@ -128,6 +128,13 @@
     flex: 1;
     position: relative;
 }
+.filter-select-wrap .dx-select {
+    width: 100%;
+}
+.filter-select-wrap .dx-select-trigger {
+    width: 100%;
+    box-sizing: border-box;
+}
 
 /* ============================================================
    TASK ROW — circular check, 4px left stripe, elevated card

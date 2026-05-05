@@ -37,15 +37,13 @@ mod tests {
     #[tokio::test]
     async fn test_delete_tasks_success() {
         let mut mock_persistence = MockTaskPersistence::new();
-        let task_ids = vec![uuid::Uuid::new_v4(), uuid::Uuid::new_v4()];
+        let task_ids = uuid::Uuid::new_v4();
         let expected_deleted_ids = task_ids.clone();
 
-        for &id in &task_ids {
-            mock_persistence
-                .expect_delete_task()
-                .with(mockall::predicate::eq(id))
-                .returning(|_| Ok(()));
-        }
+        mock_persistence
+            .expect_delete_task()
+            .with(mockall::predicate::eq(task_ids))
+            .returning(|_| Ok(()));
 
         let use_case = DeleteTaskUseCase::new(Arc::new(mock_persistence));
         let result = use_case.execute(task_ids).await;
@@ -59,7 +57,6 @@ mod tests {
         let mut mock_persistence = MockTaskPersistence::new();
         let id1 = uuid::Uuid::new_v4();
         let id2 = uuid::Uuid::new_v4();
-        let task_ids = vec![id1, id2];
 
         mock_persistence
             .expect_delete_task()
@@ -72,7 +69,8 @@ mod tests {
             .returning(|_| Err(PersistenceError::Unexpected("Error".to_string())));
 
         let use_case = DeleteTaskUseCase::new(Arc::new(mock_persistence));
-        let result = use_case.execute(task_ids).await;
+        let result = use_case.execute(id1).await;
+        let result = use_case.execute(id2).await;
 
         assert!(result.is_err());
     }

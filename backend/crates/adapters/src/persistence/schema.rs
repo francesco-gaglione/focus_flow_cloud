@@ -19,7 +19,6 @@ diesel::table! {
         id -> Uuid,
         user_id -> Uuid,
         task_id -> Nullable<Uuid>,
-        category_id -> Nullable<Uuid>,
         #[max_length = 20]
         session_type -> Varchar,
         actual_duration -> Nullable<Int8>,
@@ -90,7 +89,6 @@ diesel::table! {
 }
 
 diesel::joinable!(categories -> users (user_id));
-diesel::joinable!(focus_session -> categories (category_id));
 diesel::joinable!(focus_session -> tasks (task_id));
 diesel::joinable!(focus_session -> users (user_id));
 diesel::joinable!(subtasks -> tasks (task_id));

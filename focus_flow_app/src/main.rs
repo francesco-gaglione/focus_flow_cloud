@@ -8,11 +8,12 @@ mod state;
 mod use_cases;
 
 use presentation::views::{
-    Calendar, Flashcards, FlashcardsLayout, Layout, Stats, TasksLayout, Todo,
+    Calendar, Flashcards, FlashcardsLayout, Layout, Pomodoro, Stats, TasksLayout, Todo,
 };
 
 use crate::{
     clients::http_client::ApiClient,
+    components::toast::ToastProvider,
     services::storage::get_item,
     state::{app_state::AppState, auth_state::AuthState},
 };
@@ -25,6 +26,7 @@ enum Route {
             #[route("/")]        Todo {},
             #[route("/calendar")] Calendar {},
             #[route("/stats")]   Stats {},
+            #[route("/timer")]   Pomodoro {},
         #[end_layout]
         #[layout(FlashcardsLayout)]
             #[route("/cards")]   Flashcards {},
@@ -41,6 +43,7 @@ const CSS_CALENDAR: Asset = asset!("/assets/styling/views/calendar.css");
 const CSS_STATS: Asset = asset!("/assets/styling/views/stats.css");
 const CSS_AUTH: Asset = asset!("/assets/styling/views/auth.css");
 const CSS_FLASHCARDS: Asset = asset!("/assets/styling/views/flashcards.css");
+const CSS_POMODORO: Asset = asset!("/assets/styling/views/pomodoro.css");
 
 fn main() {
     dioxus_std::set_dir!();
@@ -74,6 +77,7 @@ fn App() -> Element {
     use_context_provider(|| Signal::new(auth_state));
     use_context_provider(|| Signal::new(app_state));
     use_context_provider(|| Signal::new(api_client));
+    use_context_provider(|| Signal::new(Option::<(String, String)>::None)); // (task_id, task_title) for timer
 
     rsx! {
         document::Link { rel: "stylesheet", href: CSS_DX_THEME }
@@ -87,6 +91,9 @@ fn App() -> Element {
         document::Link { rel: "stylesheet", href: CSS_STATS }
         document::Link { rel: "stylesheet", href: CSS_AUTH }
         document::Link { rel: "stylesheet", href: CSS_FLASHCARDS }
-        Router::<Route> {}
+        document::Link { rel: "stylesheet", href: CSS_POMODORO }
+        ToastProvider{
+            Router::<Route> {}
+        }
     }
 }

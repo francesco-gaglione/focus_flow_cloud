@@ -27,7 +27,6 @@ use application::use_cases::{
         create_manual_session::CreateManualSessionUseCase,
         find_sessions_by_filters::FindSessionsByFiltersUseCase,
     },
-    stats::calculate_stats_by_period::CalculateStatsByPeriodUseCase,
     task::{
         create_task::CreateTaskUseCase, delete_task::DeleteTaskUseCase,
         update_task::UpdateTaskUseCase,
@@ -121,13 +120,6 @@ pub async fn init_app_state(
     let update_focus_session_uc = Arc::new(UpdateFocusSessionUseCase::new(postgres_arc.clone()));
     let find_sessions_by_filters_uc =
         Arc::new(FindSessionsByFiltersUseCase::new(postgres_arc.clone()));
-
-    // Stats Use Cases
-    let calculate_stats_by_period_uc = Arc::new(CalculateStatsByPeriodUseCase::new(
-        postgres_arc.clone(),
-        postgres_arc.clone(),
-        postgres_arc.clone(),
-    ));
 
     // User Setting Use Cases
     let get_user_settings_uc = Arc::new(GetSettingsUseCase::new(postgres_arc.clone()));
@@ -224,7 +216,6 @@ pub async fn init_app_state(
         create_manual_session_uc,
         update_focus_session_uc,
         find_sessions_by_filters_uc,
-        calculate_stats_by_period_uc,
         update_user_setting_uc,
         get_user_settings_uc,
         register_user_uc,

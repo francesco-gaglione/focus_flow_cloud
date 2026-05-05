@@ -36,9 +36,6 @@ pub struct CreateManualSessionDto {
     #[validate(custom(function = "validate_uuid"))]
     pub task_id: Option<String>,
 
-    #[validate(custom(function = "validate_uuid"))]
-    pub category_id: Option<String>,
-
     pub session_type: SessionTypeEnum,
 
     #[validate(range(min = 0, max = 5))]
@@ -86,11 +83,6 @@ pub async fn create_manual_session_api(
         .validate()
         .map_err(|e| HttpError::BadRequest(e.to_string()))?;
 
-    let category_id = payload
-        .category_id
-        .map(|id| Uuid::parse_str(id.as_str()))
-        .transpose()
-        .map_err(|_| HttpError::BadRequest("Invalid category id".to_string()))?;
     let task_id = payload
         .task_id
         .map(|id| Uuid::parse_str(id.as_str()))
@@ -105,7 +97,6 @@ pub async fn create_manual_session_api(
 
     let command = CreateManualFocusSessionCommand {
         user_id: user.user_id,
-        category_id,
         task_id,
         session_type: enum_to_domain(payload.session_type),
         concentration_score: payload.concentration_score,

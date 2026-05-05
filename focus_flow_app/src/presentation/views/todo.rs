@@ -1,4 +1,7 @@
+use std::time::Duration;
+
 use dioxus::prelude::*;
+use dioxus_primitives::toast::{use_toast, ToastOptions};
 
 use crate::{
     components::select::{Select, SelectList, SelectOption, SelectTrigger, SelectValue},
@@ -10,6 +13,7 @@ use crate::{
         delete_task_uc::delete_task_uc,
         task_list_uc::{task_list_uc, TaskDue, TodoCategory, TodoTask},
     },
+    Route,
 };
 
 #[component]
@@ -21,8 +25,7 @@ pub fn Todo() -> Element {
     let mut period_filter = use_signal(|| "all".to_string());
     let mut cat_filter = use_signal(|| "all".to_string());
     let mut show_modal = use_signal(|| false);
-
-    //TODO ho implementato l'api di complete subtask sul backend quindi puo essere utilizzata qui per il completamento dei subtask
+    let toast_api = use_toast();
 
     let mut fetch_task_list = use_resource(move || async move {
         //TODO review the get all task api and consider to add some filters so the app
@@ -80,12 +83,26 @@ pub fn Todo() -> Element {
 
     let complete_task_toggle = move |id: String| {
         spawn(async move {
-            match complete_task_uc(id).await {
+            match complete_task_uc(&id).await {
                 Ok(_) => {
                     info!("Task completed");
                     fetch_task_list.restart();
                 }
                 Err(e) => {
+                    let task = tasks.iter().find(|t| t.id == id);
+                    if let Some(task) = task {
+                        if task.subtasks.iter().filter(|s| !s.is_completed).count() > 0 {
+                            toast_api.info(
+                                "Uncompleted subtasks".to_string(),
+                                ToastOptions::new()
+                                    .description(
+                                        "Complete all subtasks before completing this task",
+                                    )
+                                    .duration(Duration::from_secs(15))
+                                    .permanent(false),
+                            );
+                        }
+                    }
                     error!("Error completing a task: {}", e.to_string());
                 }
             }
@@ -118,6 +135,13 @@ pub fn Todo() -> Element {
                 }
             }
         });
+    };
+
+    let mut selected_task = use_context::<Signal<Option<(String, String)>>>();
+    let navigator = use_navigator();
+    let start_timer_handler = move |(task_id, task_title): (String, String)| {
+        selected_task.set(Some((task_id, task_title)));
+        navigator.push(Route::Pomodoro {});
     };
 
     let show_sections = *period_filter.read() == "all";
@@ -181,20 +205,20 @@ pub fn Todo() -> Element {
                 }
             } else if show_sections {
                 if !overdue.is_empty() {
-                    TaskSection { label: "Overdue", modifier: "danger", tasks: overdue, on_toggle: complete_task_toggle, on_subtask_toggle: complete_subtask_handler, on_delete: delete_task_handler }
+                    TaskSection { label: "Overdue", modifier: "danger", tasks: overdue, on_toggle: complete_task_toggle, on_subtask_toggle: complete_subtask_handler, on_delete: delete_task_handler, on_start_timer: start_timer_handler }
                 }
                 if !today_tasks.is_empty() {
-                    TaskSection { label: "Today", modifier: "today", tasks: today_tasks, on_toggle: complete_task_toggle, on_subtask_toggle: complete_subtask_handler, on_delete: delete_task_handler }
+                    TaskSection { label: "Today", modifier: "today", tasks: today_tasks, on_toggle: complete_task_toggle, on_subtask_toggle: complete_subtask_handler, on_delete: delete_task_handler, on_start_timer: start_timer_handler }
                 }
                 if !upcoming_tasks.is_empty() {
-                    TaskSection { label: "Upcoming", modifier: "", tasks: upcoming_tasks, on_toggle: complete_task_toggle, on_subtask_toggle: complete_subtask_handler, on_delete: delete_task_handler }
+                    TaskSection { label: "Upcoming", modifier: "", tasks: upcoming_tasks, on_toggle: complete_task_toggle, on_subtask_toggle: complete_subtask_handler, on_delete: delete_task_handler, on_start_timer: start_timer_handler }
                 }
                 if !done_tasks.is_empty() {
-                    TaskSection { label: "Done", modifier: "", tasks: done_tasks, on_toggle: complete_task_toggle, on_subtask_toggle: complete_subtask_handler, on_delete: delete_task_handler }
+                    TaskSection { label: "Done", modifier: "", tasks: done_tasks, on_toggle: complete_task_toggle, on_subtask_toggle: complete_subtask_handler, on_delete: delete_task_handler, on_start_timer: start_timer_handler }
                 }
             } else {
                 for task in filtered.iter() {
-                    TaskRow { task: task.clone(), on_toggle: complete_task_toggle, on_subtask_toggle: complete_subtask_handler, on_delete: delete_task_handler }
+                    TaskRow { task: task.clone(), on_toggle: complete_task_toggle, on_subtask_toggle: complete_subtask_handler, on_delete: delete_task_handler, on_start_timer: start_timer_handler }
                 }
             }
         }
@@ -238,6 +262,7 @@ struct TaskSectionProps {
     on_toggle: EventHandler<String>,
     on_subtask_toggle: EventHandler<(String, String)>,
     on_delete: EventHandler<String>,
+    on_start_timer: EventHandler<(String, String)>,
 }
 
 #[component]
@@ -252,7 +277,7 @@ fn TaskSection(props: TaskSectionProps) -> Element {
                 span { class: "count", "{count} {word}" }
             }
             for task in props.tasks.iter() {
-                TaskRow { task: task.clone(), on_toggle: props.on_toggle, on_subtask_toggle: props.on_subtask_toggle, on_delete: props.on_delete }
+                TaskRow { task: task.clone(), on_toggle: props.on_toggle, on_subtask_toggle: props.on_subtask_toggle, on_delete: props.on_delete, on_start_timer: props.on_start_timer }
             }
         }
     }

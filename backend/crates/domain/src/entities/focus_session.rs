@@ -36,7 +36,6 @@ pub struct NewSession;
 pub struct FocusSession<S> {
     id: Uuid,
     user_id: Uuid,
-    category_id: Option<Uuid>,
     task_id: Option<Uuid>,
     session_type: FocusSessionType,
     actual_duration: Option<i64>,
@@ -60,14 +59,6 @@ impl<S> FocusSession<S> {
         self.user_id
     }
 
-    pub fn category_id(&self) -> Option<Uuid> {
-        self.category_id
-    }
-
-    pub fn update_category_id(&mut self, id: Uuid) {
-        self.category_id = Some(id);
-    }
-
     pub fn task_id(&self) -> Option<Uuid> {
         self.task_id
     }
@@ -88,14 +79,12 @@ impl<S> FocusSession<S> {
 impl FocusSession<NewSession> {
     pub fn new(
         user_id: Uuid,
-        category_id: Option<Uuid>,
         task_id: Option<Uuid>,
         session_type: FocusSessionType,
     ) -> FocusSessionResult<Self> {
         Ok(FocusSession {
             id: Uuid::new_v4(),
             user_id,
-            category_id,
             task_id,
             session_type,
             actual_duration: None,
@@ -115,7 +104,6 @@ impl FocusSession<NewSession> {
         FocusSession {
             id: self.id,
             user_id: self.user_id,
-            category_id: self.category_id,
             task_id: self.task_id,
             session_type: self.session_type,
             actual_duration: self.actual_duration,
@@ -173,7 +161,6 @@ impl FocusSession<RunningSession> {
         Ok(FocusSession {
             id: self.id,
             user_id: self.user_id,
-            category_id: self.category_id,
             task_id: self.task_id,
             session_type: self.session_type,
             actual_duration: Some(actual_duration),
@@ -194,7 +181,6 @@ impl FocusSession<TerminatedSession> {
     #[allow(clippy::too_many_arguments)]
     pub fn new(
         user_id: Uuid,
-        category_id: Option<Uuid>,
         task_id: Option<Uuid>,
         session_type: FocusSessionType,
         concentration_score: Option<i32>,
@@ -213,7 +199,6 @@ impl FocusSession<TerminatedSession> {
         Ok(FocusSession {
             id: Uuid::new_v4(),
             user_id,
-            category_id,
             task_id,
             session_type,
             actual_duration: Some(duration),
@@ -259,7 +244,6 @@ impl FocusSession<TerminatedSession> {
     pub fn reconstitute(
         id: Uuid,
         user_id: Uuid,
-        category_id: Option<Uuid>,
         task_id: Option<Uuid>,
         session_type: FocusSessionType,
         actual_duration: Option<i64>,
@@ -271,7 +255,6 @@ impl FocusSession<TerminatedSession> {
         FocusSession {
             id,
             user_id,
-            category_id,
             task_id,
             session_type,
             actual_duration,
@@ -309,7 +292,7 @@ mod tests {
     use super::*;
 
     fn make_running_session() -> FocusSession<RunningSession> {
-        FocusSession::<NewSession>::new(Uuid::new_v4(), None, None, FocusSessionType::Work)
+        FocusSession::<NewSession>::new(Uuid::new_v4(), None, FocusSessionType::Work)
             .unwrap()
             .run_session()
     }
@@ -323,34 +306,25 @@ mod tests {
     #[test]
     fn test_new_session() {
         let user_id = Uuid::new_v4();
-        let category_id = Uuid::new_v4();
         let task_id = Uuid::new_v4();
 
-        let result = FocusSession::<NewSession>::new(
-            user_id,
-            Some(category_id),
-            Some(task_id),
-            FocusSessionType::Work,
-        );
+        let result =
+            FocusSession::<NewSession>::new(user_id, Some(task_id), FocusSessionType::Work);
 
         assert!(result.is_ok());
     }
 
     #[test]
     fn test_new_session_without_optional_fields() {
-        let result = FocusSession::<NewSession>::new(
-            Uuid::new_v4(),
-            None,
-            None,
-            FocusSessionType::ShortBreak,
-        );
+        let result =
+            FocusSession::<NewSession>::new(Uuid::new_v4(), None, FocusSessionType::ShortBreak);
         assert!(result.is_ok());
     }
 
     #[test]
     fn test_run_session_preserves_user_id() {
         let user_id = Uuid::new_v4();
-        let running = FocusSession::<NewSession>::new(user_id, None, None, FocusSessionType::Work)
+        let running = FocusSession::<NewSession>::new(user_id, None, FocusSessionType::Work)
             .unwrap()
             .run_session();
         assert_eq!(running.user_id(), user_id);
@@ -358,14 +332,10 @@ mod tests {
 
     #[test]
     fn test_run_session_preserves_session_type() {
-        let running = FocusSession::<NewSession>::new(
-            Uuid::new_v4(),
-            None,
-            None,
-            FocusSessionType::LongBreak,
-        )
-        .unwrap()
-        .run_session();
+        let running =
+            FocusSession::<NewSession>::new(Uuid::new_v4(), None, FocusSessionType::LongBreak)
+                .unwrap()
+                .run_session();
         assert_eq!(running.session_type(), FocusSessionType::LongBreak);
     }
 
@@ -415,7 +385,7 @@ mod tests {
     #[test]
     fn test_terminate_preserves_user_id() {
         let user_id = Uuid::new_v4();
-        let running = FocusSession::<NewSession>::new(user_id, None, None, FocusSessionType::Work)
+        let running = FocusSession::<NewSession>::new(user_id, None, FocusSessionType::Work)
             .unwrap()
             .run_session();
         std::thread::sleep(std::time::Duration::from_secs(1));
@@ -425,14 +395,10 @@ mod tests {
 
     #[test]
     fn test_terminate_preserves_session_type() {
-        let running = FocusSession::<NewSession>::new(
-            Uuid::new_v4(),
-            None,
-            None,
-            FocusSessionType::ShortBreak,
-        )
-        .unwrap()
-        .run_session();
+        let running =
+            FocusSession::<NewSession>::new(Uuid::new_v4(), None, FocusSessionType::ShortBreak)
+                .unwrap()
+                .run_session();
         std::thread::sleep(std::time::Duration::from_secs(1));
         let terminated = running.terminate().unwrap();
         assert_eq!(terminated.session_type(), FocusSessionType::ShortBreak);

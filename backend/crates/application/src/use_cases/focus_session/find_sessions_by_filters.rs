@@ -28,7 +28,6 @@ pub type FindSessionByFiltersResult<T> = Result<T, FindSessionByFiltersError>;
 pub struct FindSessionFiltersCommand {
     pub user_id: Uuid,
     pub date_range: Option<FocusSessionDateFilter>,
-    pub category_ids: Option<Vec<String>>,
     pub task_ids: Option<Vec<String>>,
     pub session_type: Option<FocusSessionType>,
     pub concentration_score_range: Option<ConcentrationScoreFilter>,
@@ -51,7 +50,6 @@ pub struct ConcentrationScoreFilter {
 pub struct FocusSessionOutput {
     pub id: Uuid,
     pub user_id: Uuid,
-    pub category_id: Option<Uuid>,
     pub task_id: Option<Uuid>,
     pub session_type: FocusSessionType,
     pub actual_duration: i64,
@@ -66,7 +64,6 @@ impl From<&FocusSession<TerminatedSession>> for FocusSessionOutput {
         Self {
             id: value.id(),
             user_id: value.user_id(),
-            category_id: value.category_id(),
             task_id: value.task_id(),
             session_type: value.session_type(),
             actual_duration: value.actual_duration(),
@@ -109,16 +106,6 @@ impl FindSessionsByFiltersUseCase {
             .transpose()?
             .unwrap_or((None, None));
 
-        let category_ids = filters
-            .category_ids
-            .map(|ids| {
-                ids.iter()
-                    .map(|id| Uuid::parse_str(id))
-                    .collect::<Result<Vec<_>, _>>()
-                    .map_err(|_| FindSessionByFiltersError::InvalidCategoryId)
-            })
-            .transpose()?;
-
         let task_ids = filters
             .task_ids
             .map(|ids| {
@@ -138,7 +125,6 @@ impl FindSessionsByFiltersUseCase {
             user_id: filters.user_id,
             start_date,
             end_date,
-            category_ids,
             task_ids,
             session_type: filters.session_type,
             min_concentration_score,
@@ -170,7 +156,6 @@ mod tests {
     async fn test_find_session_by_filters_success() {
         let mut mock_session_persistence = MockFocusSessionRepository::new();
 
-        let category_id = Uuid::new_v4();
         let task_id = Uuid::new_v4();
         let session_id = Uuid::new_v4();
         let started_at = DateTime::from_timestamp(1761118663, 0).unwrap();
@@ -179,7 +164,6 @@ mod tests {
         let focus_session = FocusSession::reconstitute(
             session_id,
             Uuid::new_v4(),
-            Some(category_id),
             Some(task_id),
             FocusSessionType::Work,
             Some(51),
@@ -199,7 +183,6 @@ mod tests {
                 end_date: 1761119000,
             }),
             user_id: Uuid::new_v4(),
-            category_ids: Some(vec![category_id.to_string()]),
             task_ids: None,
             session_type: Some(FocusSessionType::Work),
             concentration_score_range: Some(ConcentrationScoreFilter { min: 1, max: 5 }),
@@ -228,7 +211,6 @@ mod tests {
             session_id,
             Uuid::new_v4(),
             None,
-            None,
             FocusSessionType::Work,
             Some(51),
             Some(5),
@@ -252,7 +234,6 @@ mod tests {
         let filters = FindSessionFiltersCommand {
             user_id: Uuid::new_v4(),
             date_range: None,
-            category_ids: None,
             task_ids: None,
             session_type: None,
             concentration_score_range: None,
@@ -279,7 +260,6 @@ mod tests {
         let filters = FindSessionFiltersCommand {
             user_id: Uuid::new_v4(),
             date_range: None,
-            category_ids: None,
             task_ids: None,
             session_type: None,
             concentration_score_range: None,
@@ -303,7 +283,6 @@ mod tests {
                 start_date: i64::MAX, // Invalid timestamp
                 end_date: 1761119000,
             }),
-            category_ids: None,
             task_ids: None,
             session_type: None,
             concentration_score_range: None,

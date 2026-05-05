@@ -11,7 +11,7 @@ pub enum CompleteTaskError {
 
 pub type CompleteTaskResult<T> = Result<T, CompleteTaskError>;
 
-pub async fn complete_task_uc(task_id: String) -> CompleteTaskResult<()> {
-    complete_task(&task_id).await?;
+pub async fn complete_task_uc(task_id: &str) -> CompleteTaskResult<()> {
+    complete_task(task_id).await?;
     Ok(())
 }

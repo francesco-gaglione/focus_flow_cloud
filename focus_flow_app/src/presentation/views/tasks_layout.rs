@@ -10,6 +10,7 @@ pub fn TasksLayout() -> Element {
         Route::Todo {} => ("Today", "Tasks, <em>focus please.</em>", "todo"),
         Route::Calendar {} => ("Calendar", "A month, <em>at a glance</em>.", "calendar"),
         Route::Stats {} => ("Progress", "Your <em>quiet</em> wins.", "stats"),
+        Route::Pomodoro {} => ("Timer", "Pomodoro, <em>deep work.</em>", "timer"),
         _ => ("Today", "Today.", "todo"),
     };
 
@@ -31,7 +32,7 @@ pub fn TasksLayout() -> Element {
 
         Outlet::<Route> {}
 
-        nav { class: "bottom-nav bottom-nav-3",
+        nav { class: "bottom-nav",
             Link {
                 to: Route::Todo {},
                 class: if active_tab == "todo" { "nav-tab active" } else { "nav-tab" },
@@ -66,6 +67,19 @@ pub fn TasksLayout() -> Element {
                     }
                 }
                 span { "Stats" }
+            }
+            Link {
+                to: Route::Pomodoro {},
+                class: if active_tab == "timer" { "nav-tab active" } else { "nav-tab" },
+                span { class: "ico",
+                    svg { view_box: "0 0 24 24",
+                        circle { cx: "12", cy: "13", r: "7", stroke: "currentColor", stroke_width: "1.6", fill: "none" }
+                        line { x1: "12", y1: "13", x2: "12", y2: "9", stroke: "currentColor", stroke_width: "1.6", stroke_linecap: "round" }
+                        line { x1: "12", y1: "13", x2: "15", y2: "11", stroke: "currentColor", stroke_width: "1.6", stroke_linecap: "round" }
+                        line { x1: "9", y1: "3", x2: "15", y2: "3", stroke: "currentColor", stroke_width: "1.6", stroke_linecap: "round" }
+                    }
+                }
+                span { "Timer" }
             }
         }
     }

@@ -93,7 +93,6 @@ pub struct GetSessionFiltersResponseDto {
 fn focus_session_to_dto(value: FocusSessionOutput) -> FocusSessionDto {
     FocusSessionDto {
         id: value.id.to_string(),
-        category_id: value.category_id.map(|id| id.to_string()),
         task_id: value.task_id.map(|id| id.to_string()),
         session_type: domain_to_enum(value.session_type),
         actual_duration: Some(value.actual_duration),
@@ -173,7 +172,6 @@ pub async fn get_sessions(
     let filters = FindSessionFiltersCommand {
         user_id: session.user_id,
         date_range,
-        category_ids: query.category_ids.clone(),
         task_ids: query.task_ids.clone(),
         session_type,
         concentration_score_range,
