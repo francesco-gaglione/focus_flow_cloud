@@ -11,6 +11,8 @@ A comprehensive Pomodoro technique tracking solution featuring a Rust backend an
 
 > **Full Documentation**: [https://francesco-gaglione.github.io/focus_flow_cloud/](https://francesco-gaglione.github.io/focus_flow_cloud/)
 
+> **V5 is under development. Leave feedback here:** [V5](https://github.com/francesco-gaglione/focus_flow_cloud/discussions/73)
+
 ## Screenshots
 
 <table>
