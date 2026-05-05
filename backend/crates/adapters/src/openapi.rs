@@ -20,7 +20,10 @@ use crate::http::users::get_info::UserInfoResponseDto;
 use crate::http::users::update_password::UpdatePasswordDto;
 use crate::http::users::update_username::UpdateUsernameDto;
 use shared::auth::{LoginDto, LoginResponseDto, LogoutResponseDto, RefreshDto, RefreshResponseDto};
-use shared::task::{CompleteTaskDto, CreateTaskResponseDto, TasksResponseDto, UpdateTaskDto};
+use shared::task::{
+    CompleteSubTaskDto, CompleteSubTaskResponseDto, CompleteTaskDto, CreateTaskResponseDto,
+    TasksResponseDto, UpdateTaskDto,
+};
 use utoipa::openapi::security::{HttpAuthScheme, HttpBuilder, SecurityScheme};
 use utoipa::{Modify, OpenApi};
 
@@ -84,6 +87,7 @@ impl Modify for SecurityAddon {
         crate::http::task::delete_tasks::delete_tasks_api,
         crate::http::task::create_task::create_task_api,
         crate::http::task::complete_task::complete_task_api,
+        crate::http::task::complete_subtask::complete_sub_task_api,
         crate::http::session::create_manual_session::create_manual_session_api,
         crate::http::session::update_session::update_session_api,
         crate::http::session::get_sessions::get_sessions,
@@ -100,6 +104,7 @@ impl Modify for SecurityAddon {
         schemas(GetCategoryResponseDto),
         schemas(TasksResponseDto),
         schemas(CompleteTaskResponseDto, CompleteTaskDto),
+        schemas(CompleteSubTaskDto, CompleteSubTaskResponseDto),
         schemas(UpdateTaskDto, CreateTaskResponseDto),
         schemas(DeleteTasksDto, CreateTaskResponseDto),
         schemas(CreateManualSessionDto, CreateManualSessionResponseDto),

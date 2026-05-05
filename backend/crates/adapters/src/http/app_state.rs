@@ -8,6 +8,7 @@ use application::use_cases::pomodoro_state::start_session::StartSessionUseCase;
 use application::use_cases::pomodoro_state::terminate_session::TerminateSessionUseCase;
 use application::use_cases::pomodoro_state::update_current_session::UpdateSessionUseCase;
 use application::use_cases::pomodoro_state::update_pomodoro_context::UpdatePomodoroContextUseCase;
+use application::use_cases::task::complete_subtask::CompleteSubTaskUseCase;
 use application::use_cases::task::complete_task::CompleteTaskUseCase;
 use application::use_cases::task::get_tasks::GetTasksUseCase;
 use application::use_cases::user::get_user_info::GetUserInfoUseCase;
@@ -72,6 +73,7 @@ pub struct AppState {
     pub get_tasks_uc: Arc<GetTasksUseCase>,
     pub update_task_uc: Arc<UpdateTaskUseCase>,
     pub complete_task_uc: Arc<CompleteTaskUseCase>,
+    pub complete_sub_task_uc: Arc<CompleteSubTaskUseCase>,
 
     // Focus Session Use Cases
     pub create_manual_session_uc: Arc<CreateManualSessionUseCase>,

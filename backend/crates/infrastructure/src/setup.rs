@@ -6,6 +6,7 @@ use application::use_cases::pomodoro_state::start_session::StartSessionUseCase;
 use application::use_cases::pomodoro_state::terminate_session::TerminateSessionUseCase;
 use application::use_cases::pomodoro_state::update_current_session::UpdateSessionUseCase;
 use application::use_cases::pomodoro_state::update_pomodoro_context::UpdatePomodoroContextUseCase;
+use application::use_cases::task::complete_subtask::CompleteSubTaskUseCase;
 use application::use_cases::task::complete_task::CompleteTaskUseCase;
 use application::use_cases::task::get_tasks::GetTasksUseCase;
 use application::use_cases::user::get_user_info::GetUserInfoUseCase;
@@ -113,6 +114,7 @@ pub async fn init_app_state(
     let delete_tasks_uc = Arc::new(DeleteTaskUseCase::new(postgres_arc.clone()));
     let update_task_uc = Arc::new(UpdateTaskUseCase::new(postgres_arc.clone()));
     let complete_task_uc = Arc::new(CompleteTaskUseCase::new(postgres_arc.clone()));
+    let complete_sub_task_uc = Arc::new(CompleteSubTaskUseCase::new(postgres_arc.clone()));
 
     // Focus Session Use Cases
     let create_manual_session_uc = Arc::new(CreateManualSessionUseCase::new(postgres_arc.clone()));
@@ -218,6 +220,7 @@ pub async fn init_app_state(
         delete_tasks_uc,
         update_task_uc,
         complete_task_uc,
+        complete_sub_task_uc,
         create_manual_session_uc,
         update_focus_session_uc,
         find_sessions_by_filters_uc,

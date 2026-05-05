@@ -28,6 +28,7 @@ pub struct NewDbSubtask {
     pub title: String,
     pub description: Option<String>,
     pub sort_order: i16,
+    pub completed_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Clone, AsChangeset, Serialize, Deserialize)]
@@ -48,17 +49,22 @@ impl NewDbSubtask {
             title: subtask.title().to_string(),
             description: subtask.description().map(|s| s.to_string()),
             sort_order: subtask.sort_order(),
+            completed_at: None,
         }
     }
 }
 
 impl From<DbSubtask> for Subtask {
     fn from(value: DbSubtask) -> Self {
-        Subtask::new(
+        let mut subtask = Subtask::new(
             value.title,
             value.sort_order,
             value.description,
             Some(value.id),
-        )
+        );
+        if let Some(_) = value.completed_at {
+            subtask.mark_completed();
+        }
+        subtask
     }
 }

@@ -185,7 +185,19 @@ impl TaskPersistence for PostgresPersistence {
         let new_subtasks: Vec<NewDbSubtask> = task
             .sub_tasks()
             .iter()
-            .map(|s| NewDbSubtask::from_subtask(s, task_id, task.user_id()))
+            .map(|s| NewDbSubtask {
+                id: s.id(),
+                task_id,
+                user_id: task.user_id(),
+                title: s.title().to_string(),
+                description: s.description().map(|d| d.to_string()),
+                sort_order: s.sort_order(),
+                completed_at: if s.is_completed() {
+                    Some(Utc::now())
+                } else {
+                    None
+                },
+            })
             .collect();
 
         let updated = self
@@ -201,11 +213,13 @@ impl TaskPersistence for PostgresPersistence {
                     return Err(diesel::result::Error::NotFound);
                 };
 
+                debug!("Deleting subtasks for task_id: {}", task_id);
                 diesel::delete(schema::subtasks::table)
                     .filter(schema::subtasks::task_id.eq(task_id))
                     .execute(conn)?;
 
                 if !new_subtasks.is_empty() {
+                    debug!("Inserting new subtasks for task_id: {}", task_id);
                     diesel::insert_into(schema::subtasks::table)
                         .values(&new_subtasks)
                         .execute(conn)?;

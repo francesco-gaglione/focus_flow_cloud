@@ -4,6 +4,7 @@ use crate::{
     components::select::{Select, SelectList, SelectOption, SelectTrigger, SelectValue},
     presentation::components::task::{create_task_sheet::CreateTaskSheet, task_row::TaskRow},
     use_cases::tasks::{
+        complete_subtask_uc::complete_task_uc as complete_subtask_uc,
         complete_task_uc::complete_task_uc,
         create_task_uc::{create_task_uc, CreateTaskCommand},
         delete_task_uc::delete_task_uc,
@@ -20,6 +21,8 @@ pub fn Todo() -> Element {
     let mut period_filter = use_signal(|| "all".to_string());
     let mut cat_filter = use_signal(|| "all".to_string());
     let mut show_modal = use_signal(|| false);
+
+    //TODO ho implementato l'api di complete subtask sul backend quindi puo essere utilizzata qui per il completamento dei subtask
 
     let mut fetch_task_list = use_resource(move || async move {
         //TODO review the get all task api and consider to add some filters so the app
@@ -84,6 +87,20 @@ pub fn Todo() -> Element {
                 }
                 Err(e) => {
                     error!("Error completing a task: {}", e.to_string());
+                }
+            }
+        });
+    };
+
+    let complete_subtask_handler = move |(task_id, subtask_id): (String, String)| {
+        spawn(async move {
+            match complete_subtask_uc(task_id, subtask_id).await {
+                Ok(_) => {
+                    info!("Subtask completed");
+                    fetch_task_list.restart();
+                }
+                Err(e) => {
+                    error!("Error completing subtask: {}", e.to_string());
                 }
             }
         });
@@ -164,20 +181,20 @@ pub fn Todo() -> Element {
                 }
             } else if show_sections {
                 if !overdue.is_empty() {
-                    TaskSection { label: "Overdue", modifier: "danger", tasks: overdue, on_toggle: complete_task_toggle, on_delete: delete_task_handler }
+                    TaskSection { label: "Overdue", modifier: "danger", tasks: overdue, on_toggle: complete_task_toggle, on_subtask_toggle: complete_subtask_handler, on_delete: delete_task_handler }
                 }
                 if !today_tasks.is_empty() {
-                    TaskSection { label: "Today", modifier: "today", tasks: today_tasks, on_toggle: complete_task_toggle, on_delete: delete_task_handler }
+                    TaskSection { label: "Today", modifier: "today", tasks: today_tasks, on_toggle: complete_task_toggle, on_subtask_toggle: complete_subtask_handler, on_delete: delete_task_handler }
                 }
                 if !upcoming_tasks.is_empty() {
-                    TaskSection { label: "Upcoming", modifier: "", tasks: upcoming_tasks, on_toggle: complete_task_toggle, on_delete: delete_task_handler }
+                    TaskSection { label: "Upcoming", modifier: "", tasks: upcoming_tasks, on_toggle: complete_task_toggle, on_subtask_toggle: complete_subtask_handler, on_delete: delete_task_handler }
                 }
                 if !done_tasks.is_empty() {
-                    TaskSection { label: "Done", modifier: "", tasks: done_tasks, on_toggle: complete_task_toggle, on_delete: delete_task_handler }
+                    TaskSection { label: "Done", modifier: "", tasks: done_tasks, on_toggle: complete_task_toggle, on_subtask_toggle: complete_subtask_handler, on_delete: delete_task_handler }
                 }
             } else {
                 for task in filtered.iter() {
-                    TaskRow { task: task.clone(), on_toggle: complete_task_toggle, on_delete: delete_task_handler }
+                    TaskRow { task: task.clone(), on_toggle: complete_task_toggle, on_subtask_toggle: complete_subtask_handler, on_delete: delete_task_handler }
                 }
             }
         }
@@ -219,6 +236,7 @@ struct TaskSectionProps {
     modifier: &'static str,
     tasks: Vec<TodoTask>,
     on_toggle: EventHandler<String>,
+    on_subtask_toggle: EventHandler<(String, String)>,
     on_delete: EventHandler<String>,
 }
 
@@ -234,7 +252,7 @@ fn TaskSection(props: TaskSectionProps) -> Element {
                 span { class: "count", "{count} {word}" }
             }
             for task in props.tasks.iter() {
-                TaskRow { task: task.clone(), on_toggle: props.on_toggle, on_delete: props.on_delete }
+                TaskRow { task: task.clone(), on_toggle: props.on_toggle, on_subtask_toggle: props.on_subtask_toggle, on_delete: props.on_delete }
             }
         }
     }

@@ -3,8 +3,8 @@ use dioxus::{
     signals::{ReadableExt, Signal},
 };
 use shared::task::{
-    CompleteTaskResponseDto, CreateTaskDto, CreateTaskResponseDto, DeleteTaskDto,
-    DeleteTaskResponseDto, TasksResponseDto,
+    CompleteSubTaskDto, CompleteSubTaskResponseDto, CompleteTaskDto, CompleteTaskResponseDto,
+    CreateTaskDto, CreateTaskResponseDto, DeleteTaskDto, DeleteTaskResponseDto, TasksResponseDto,
 };
 
 use crate::clients::http_client::{ApiClient, ApiError, ApiResult};
@@ -38,14 +38,35 @@ pub async fn complete_task(task_id: &str) -> ApiResult<()> {
     let api_signal = dioxus::core::try_consume_context::<Signal<ApiClient>>()
         .ok_or_else(|| ApiError::ClientError("ApiClient signal not found".to_string()))?;
     let api = (*api_signal.read()).clone();
-    let delelete_task_dto = DeleteTaskDto {
+    let complete_task_dto = CompleteTaskDto {
         task_id: task_id.to_string(),
     };
 
-    debug!("Completing task: {:?}", delelete_task_dto);
+    debug!("Completing task: {:?}", complete_task_dto);
     let _ = api
-        .post::<DeleteTaskDto, CompleteTaskResponseDto>(
+        .post::<CompleteTaskDto, CompleteTaskResponseDto>(
             "/api/task/complete",
+            None,
+            None,
+            &complete_task_dto,
+        )
+        .await?;
+    Ok(())
+}
+
+pub async fn complete_sub_task(task_id: &str, subtask_id: &str) -> ApiResult<()> {
+    let api_signal = dioxus::core::try_consume_context::<Signal<ApiClient>>()
+        .ok_or_else(|| ApiError::ClientError("ApiClient signal not found".to_string()))?;
+    let api = (*api_signal.read()).clone();
+    let delelete_task_dto = CompleteSubTaskDto {
+        task_id: task_id.to_string(),
+        subtask_id: subtask_id.to_string(),
+    };
+
+    debug!("Completing subtask: {:?}", delelete_task_dto);
+    let _ = api
+        .post::<CompleteSubTaskDto, CompleteSubTaskResponseDto>(
+            "/api/task/subtask/complete",
             None,
             None,
             &delelete_task_dto,

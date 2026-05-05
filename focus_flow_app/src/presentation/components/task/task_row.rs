@@ -6,6 +6,7 @@ use crate::use_cases::tasks::task_list_uc::TodoTask;
 pub struct TaskRowProps {
     pub task: TodoTask,
     pub on_toggle: EventHandler<String>,
+    pub on_subtask_toggle: EventHandler<(String, String)>,
     #[props(optional)]
     pub on_delete: Option<EventHandler<String>>,
 }
@@ -32,6 +33,23 @@ pub fn TaskRow(props: TaskRowProps) -> Element {
     let subtask_done = task.subtasks.iter().filter(|s| s.is_completed).count();
     let has_subtasks = subtask_total > 0;
     let done = task.done;
+
+    struct SubtaskItem {
+        task_id: String,
+        subtask_id: String,
+        is_completed: bool,
+        title: String,
+    }
+    let subtask_items: Vec<SubtaskItem> = task
+        .subtasks
+        .iter()
+        .map(|s| SubtaskItem {
+            task_id: task.id.clone(),
+            subtask_id: s.id.clone(),
+            is_completed: s.is_completed,
+            title: s.title.clone(),
+        })
+        .collect();
 
     let wrap_class = if has_subtasks && *expanded.read() {
         "todo-row-wrap expanded"
@@ -105,19 +123,22 @@ pub fn TaskRow(props: TaskRowProps) -> Element {
                 div {
                     class: "todo-subtask-list",
                     style: "--cat: {cat_color}",
-                    for subtask in props.task.subtasks.iter() {
+                    for sub in subtask_items {
                         div { class: "todo-subtask-item",
                             div {
-                                class: if subtask.is_completed { "todo-subtask-check done" } else { "todo-subtask-check" },
-                                if subtask.is_completed {
+                                class: if sub.is_completed { "todo-subtask-check done" } else { "todo-subtask-check" },
+                                onclick: move |_| {
+                                    props.on_subtask_toggle.call((sub.task_id.clone(), sub.subtask_id.clone()))
+                                },
+                                if sub.is_completed {
                                     svg { view_box: "0 0 16 16",
                                         path { d: "M3 8l3 3 7-7", stroke: "currentColor", stroke_width: "2.5", fill: "none", stroke_linecap: "round", stroke_linejoin: "round" }
                                     }
                                 }
                             }
                             span {
-                                class: if subtask.is_completed { "todo-subtask-title done" } else { "todo-subtask-title" },
-                                "{subtask.title}"
+                                class: if sub.is_completed { "todo-subtask-title done" } else { "todo-subtask-title" },
+                                "{sub.title}"
                             }
                         }
                     }

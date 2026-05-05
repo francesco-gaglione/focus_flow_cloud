@@ -118,6 +118,21 @@ pub struct CompleteTaskResponseDto {
     pub id: String,
 }
 
+#[derive(Debug, Serialize, Deserialize, Validate)]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
+#[serde(rename_all = "camelCase")]
+pub struct CompleteSubTaskDto {
+    pub task_id: String,
+    pub subtask_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
+#[serde(rename_all = "camelCase")]
+pub struct CompleteSubTaskResponseDto {
+    pub id: String,
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteTaskDto {
