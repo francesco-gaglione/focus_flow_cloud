@@ -7,11 +7,12 @@ use crate::{
     components::select::{Select, SelectList, SelectOption, SelectTrigger, SelectValue},
     presentation::components::task::{create_task_sheet::CreateTaskSheet, task_row::TaskRow},
     use_cases::tasks::{
-        complete_subtask_uc::complete_task_uc as complete_subtask_uc,
-        complete_task_uc::complete_task_uc,
+        create_subtask_uc::create_subtask_uc,
         create_task_uc::{create_task_uc, CreateTaskCommand},
         delete_task_uc::delete_task_uc,
         task_list_uc::{task_list_uc, TaskDue, TodoCategory, TodoTask},
+        update_subtask_completition_uc::update_subtask_completition_uc,
+        update_task_completition_uc::update_task_completition_uc,
     },
     Route,
 };
@@ -81,9 +82,9 @@ pub fn Todo() -> Element {
         .collect();
     let done_tasks: Vec<TodoTask> = filtered.iter().filter(|t| t.done).cloned().collect();
 
-    let complete_task_toggle = move |id: String| {
+    let complete_task_toggle = move |(id, completed): (String, bool)| {
         spawn(async move {
-            match complete_task_uc(&id).await {
+            match update_task_completition_uc(&id, Some(completed)).await {
                 Ok(_) => {
                     info!("Task completed");
                     fetch_task_list.restart();
@@ -109,19 +110,20 @@ pub fn Todo() -> Element {
         });
     };
 
-    let complete_subtask_handler = move |(task_id, subtask_id): (String, String)| {
-        spawn(async move {
-            match complete_subtask_uc(task_id, subtask_id).await {
-                Ok(_) => {
-                    info!("Subtask completed");
-                    fetch_task_list.restart();
+    let complete_subtask_handler =
+        move |(task_id, subtask_id, completed): (String, String, bool)| {
+            spawn(async move {
+                match update_subtask_completition_uc(task_id, subtask_id, Some(completed)).await {
+                    Ok(_) => {
+                        info!("Subtask completed");
+                        fetch_task_list.restart();
+                    }
+                    Err(e) => {
+                        error!("Error completing subtask: {}", e.to_string());
+                    }
                 }
-                Err(e) => {
-                    error!("Error completing subtask: {}", e.to_string());
-                }
-            }
-        });
-    };
+            });
+        };
 
     let delete_task_handler = move |id: String| {
         spawn(async move {
@@ -142,6 +144,20 @@ pub fn Todo() -> Element {
     let start_timer_handler = move |(task_id, task_title): (String, String)| {
         selected_task.set(Some((task_id, task_title)));
         navigator.push(Route::Pomodoro {});
+    };
+
+    let add_subtask_handler = move |(task_id, title): (String, String)| {
+        spawn(async move {
+            match create_subtask_uc(task_id, title, None).await {
+                Ok(_) => {
+                    info!("Subtask created");
+                    fetch_task_list.restart();
+                }
+                Err(e) => {
+                    error!("Error creating subtask: {}", e);
+                }
+            }
+        });
     };
 
     let show_sections = *period_filter.read() == "all";
@@ -205,20 +221,20 @@ pub fn Todo() -> Element {
                 }
             } else if show_sections {
                 if !overdue.is_empty() {
-                    TaskSection { label: "Overdue", modifier: "danger", tasks: overdue, on_toggle: complete_task_toggle, on_subtask_toggle: complete_subtask_handler, on_delete: delete_task_handler, on_start_timer: start_timer_handler }
+                    TaskSection { label: "Overdue", modifier: "danger", tasks: overdue, on_toggle: complete_task_toggle, on_subtask_toggle: complete_subtask_handler, on_delete: delete_task_handler, on_start_timer: start_timer_handler, on_add_subtask: add_subtask_handler }
                 }
                 if !today_tasks.is_empty() {
-                    TaskSection { label: "Today", modifier: "today", tasks: today_tasks, on_toggle: complete_task_toggle, on_subtask_toggle: complete_subtask_handler, on_delete: delete_task_handler, on_start_timer: start_timer_handler }
+                    TaskSection { label: "Today", modifier: "today", tasks: today_tasks, on_toggle: complete_task_toggle, on_subtask_toggle: complete_subtask_handler, on_delete: delete_task_handler, on_start_timer: start_timer_handler, on_add_subtask: add_subtask_handler }
                 }
                 if !upcoming_tasks.is_empty() {
-                    TaskSection { label: "Upcoming", modifier: "", tasks: upcoming_tasks, on_toggle: complete_task_toggle, on_subtask_toggle: complete_subtask_handler, on_delete: delete_task_handler, on_start_timer: start_timer_handler }
+                    TaskSection { label: "Upcoming", modifier: "", tasks: upcoming_tasks, on_toggle: complete_task_toggle, on_subtask_toggle: complete_subtask_handler, on_delete: delete_task_handler, on_start_timer: start_timer_handler, on_add_subtask: add_subtask_handler }
                 }
                 if !done_tasks.is_empty() {
-                    TaskSection { label: "Done", modifier: "", tasks: done_tasks, on_toggle: complete_task_toggle, on_subtask_toggle: complete_subtask_handler, on_delete: delete_task_handler, on_start_timer: start_timer_handler }
+                    TaskSection { label: "Done", modifier: "", tasks: done_tasks, on_toggle: complete_task_toggle, on_subtask_toggle: complete_subtask_handler, on_delete: delete_task_handler, on_start_timer: start_timer_handler, on_add_subtask: add_subtask_handler }
                 }
             } else {
                 for task in filtered.iter() {
-                    TaskRow { task: task.clone(), on_toggle: complete_task_toggle, on_subtask_toggle: complete_subtask_handler, on_delete: delete_task_handler, on_start_timer: start_timer_handler }
+                    TaskRow { task: task.clone(), on_toggle: complete_task_toggle, on_subtask_toggle: complete_subtask_handler, on_delete: delete_task_handler, on_start_timer: start_timer_handler, on_add_subtask: add_subtask_handler }
                 }
             }
         }
@@ -259,10 +275,11 @@ struct TaskSectionProps {
     label: &'static str,
     modifier: &'static str,
     tasks: Vec<TodoTask>,
-    on_toggle: EventHandler<String>,
-    on_subtask_toggle: EventHandler<(String, String)>,
+    on_toggle: EventHandler<(String, bool)>,
+    on_subtask_toggle: EventHandler<(String, String, bool)>,
     on_delete: EventHandler<String>,
     on_start_timer: EventHandler<(String, String)>,
+    on_add_subtask: EventHandler<(String, String)>,
 }
 
 #[component]
@@ -277,7 +294,7 @@ fn TaskSection(props: TaskSectionProps) -> Element {
                 span { class: "count", "{count} {word}" }
             }
             for task in props.tasks.iter() {
-                TaskRow { task: task.clone(), on_toggle: props.on_toggle, on_subtask_toggle: props.on_subtask_toggle, on_delete: props.on_delete, on_start_timer: props.on_start_timer }
+                TaskRow { task: task.clone(), on_toggle: props.on_toggle, on_subtask_toggle: props.on_subtask_toggle, on_delete: props.on_delete, on_start_timer: props.on_start_timer, on_add_subtask: props.on_add_subtask }
             }
         }
     }

@@ -6,9 +6,9 @@ use application::use_cases::pomodoro_state::start_session::StartSessionUseCase;
 use application::use_cases::pomodoro_state::terminate_session::TerminateSessionUseCase;
 use application::use_cases::pomodoro_state::update_current_session::UpdateSessionUseCase;
 use application::use_cases::pomodoro_state::update_pomodoro_context::UpdatePomodoroContextUseCase;
-use application::use_cases::task::complete_subtask::CompleteSubTaskUseCase;
-use application::use_cases::task::complete_task::CompleteTaskUseCase;
+use application::use_cases::task::add_subtask::AddSubTaskUseCase;
 use application::use_cases::task::get_tasks::GetTasksUseCase;
+use application::use_cases::task::update_subtask::UpdateSubTaskUseCase;
 use application::use_cases::user::get_user_info::GetUserInfoUseCase;
 use application::use_cases::user::refresh_token::RefreshTokenUseCase;
 use application::use_cases::user::register_user::RegisterUserUseCase;
@@ -95,7 +95,6 @@ pub async fn init_app_state(
     let terminate_session_uc = Arc::new(TerminateSessionUseCase::new(
         pomodoro_state_arc.clone(),
         postgres_arc.clone(),
-        postgres_arc.clone(),
     ));
     let update_current_session_uc = Arc::new(UpdateSessionUseCase::new(pomodoro_state_arc.clone()));
 
@@ -112,8 +111,8 @@ pub async fn init_app_state(
     let get_tasks_uc = Arc::new(GetTasksUseCase::new(postgres_arc.clone()));
     let delete_tasks_uc = Arc::new(DeleteTaskUseCase::new(postgres_arc.clone()));
     let update_task_uc = Arc::new(UpdateTaskUseCase::new(postgres_arc.clone()));
-    let complete_task_uc = Arc::new(CompleteTaskUseCase::new(postgres_arc.clone()));
-    let complete_sub_task_uc = Arc::new(CompleteSubTaskUseCase::new(postgres_arc.clone()));
+    let update_subtask_uc = Arc::new(UpdateSubTaskUseCase::new(postgres_arc.clone()));
+    let add_subtask_uc = Arc::new(AddSubTaskUseCase::new(postgres_arc.clone()));
 
     // Focus Session Use Cases
     let create_manual_session_uc = Arc::new(CreateManualSessionUseCase::new(postgres_arc.clone()));
@@ -211,8 +210,8 @@ pub async fn init_app_state(
         create_task_uc,
         delete_tasks_uc,
         update_task_uc,
-        complete_task_uc,
-        complete_sub_task_uc,
+        update_subtask_uc,
+        add_subtask_uc,
         create_manual_session_uc,
         update_focus_session_uc,
         find_sessions_by_filters_uc,

@@ -8,9 +8,9 @@ use application::use_cases::pomodoro_state::start_session::StartSessionUseCase;
 use application::use_cases::pomodoro_state::terminate_session::TerminateSessionUseCase;
 use application::use_cases::pomodoro_state::update_current_session::UpdateSessionUseCase;
 use application::use_cases::pomodoro_state::update_pomodoro_context::UpdatePomodoroContextUseCase;
-use application::use_cases::task::complete_subtask::CompleteSubTaskUseCase;
-use application::use_cases::task::complete_task::CompleteTaskUseCase;
+use application::use_cases::task::add_subtask::AddSubTaskUseCase;
 use application::use_cases::task::get_tasks::GetTasksUseCase;
+use application::use_cases::task::update_subtask::UpdateSubTaskUseCase;
 use application::use_cases::user::get_user_info::GetUserInfoUseCase;
 use application::use_cases::user::login_user::LoginUseCase;
 use application::use_cases::user::refresh_token::RefreshTokenUseCase;
@@ -71,8 +71,8 @@ pub struct AppState {
     pub delete_tasks_uc: Arc<DeleteTaskUseCase>,
     pub get_tasks_uc: Arc<GetTasksUseCase>,
     pub update_task_uc: Arc<UpdateTaskUseCase>,
-    pub complete_task_uc: Arc<CompleteTaskUseCase>,
-    pub complete_sub_task_uc: Arc<CompleteSubTaskUseCase>,
+    pub update_subtask_uc: Arc<UpdateSubTaskUseCase>,
+    pub add_subtask_uc: Arc<AddSubTaskUseCase>,
 
     // Focus Session Use Cases
     pub create_manual_session_uc: Arc<CreateManualSessionUseCase>,

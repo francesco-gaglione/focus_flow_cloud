@@ -9,7 +9,7 @@ use crate::repository_traits::{
 };
 
 #[derive(Debug, Error, PartialEq)]
-pub enum CompleteSubTaskError {
+pub enum UpdateSubTaskError {
     #[error("Task not found: {0}")]
     TaskNotFound(Uuid),
 
@@ -26,26 +26,27 @@ pub enum CompleteSubTaskError {
     PersistenceError(#[from] PersistenceError),
 }
 
-pub type CompleteSubTaskResult<T> = Result<T, CompleteSubTaskError>;
+pub type UpdateSubTaskResult<T> = Result<T, UpdateSubTaskError>;
 
 #[derive(Debug)]
-pub struct CompleteSubTaskCommand {
+pub struct UpdateSubTaskCommand {
     pub task_id: Uuid,
     pub sub_task_id: Uuid,
     pub user_id: Uuid,
+    pub completed: Option<bool>,
 }
 
-pub struct CompleteSubTaskUseCase {
+pub struct UpdateSubTaskUseCase {
     task_persistence: Arc<dyn TaskPersistence>,
 }
 
-impl CompleteSubTaskUseCase {
+impl UpdateSubTaskUseCase {
     pub fn new(task_persistence: Arc<dyn TaskPersistence>) -> Self {
         Self { task_persistence }
     }
 
     #[instrument(skip(self))]
-    pub async fn execute(&self, command: CompleteSubTaskCommand) -> CompleteSubTaskResult<()> {
+    pub async fn execute(&self, command: UpdateSubTaskCommand) -> UpdateSubTaskResult<()> {
         info!("Finding task: {:?}", command.task_id);
         let mut task = self.task_persistence.find_by_id(command.task_id).await?;
 
@@ -54,33 +55,30 @@ impl CompleteSubTaskUseCase {
                 "Unauthorized attempt to complete subtask: {:?} by user: {:?}",
                 command.sub_task_id, command.user_id
             );
-            return Err(CompleteSubTaskError::Unauthorized);
+            return Err(UpdateSubTaskError::Unauthorized);
         }
 
-        info!("Completing subtask: {:?}", command.sub_task_id);
+        if let Some(completed) = command.completed {
+            let sub_task = task
+                .sub_tasks_mut()
+                .iter_mut()
+                .find(|s| s.id() == command.sub_task_id)
+                .ok_or_else(|| {
+                    error!("Subtask not found: {:?}", command.sub_task_id);
+                    UpdateSubTaskError::SubTaskNotFound(command.sub_task_id)
+                })?;
+            if completed {
+                info!("Completing subtask: {:?}", command.sub_task_id);
+                sub_task.mark_completed();
+            } else {
+                sub_task.mark_incomplete();
+            }
+        }
 
-        let sub_task = task
-            .sub_tasks_mut()
-            .iter_mut()
-            .find(|s| s.id() == command.sub_task_id)
-            .ok_or_else(|| {
-                error!("Subtask not found: {:?}", command.sub_task_id);
-                CompleteSubTaskError::SubTaskNotFound(command.sub_task_id)
-            })?;
-        sub_task.mark_completed();
-
-        info!("Updating task: {:?}", command.task_id);
+        info!("Updating subtask: {:?}", command.task_id);
         self.task_persistence.update_task(task).await?;
-        info!("Task completed successfully: {:?}", command.task_id);
+        info!("Subtask updated successfully: {:?}", command.task_id);
 
         Ok(())
     }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::repository_traits::task_persistence::MockTaskPersistence;
-    use chrono::Utc;
-    use domain::entities::tasks::task::Task;
 }

@@ -41,6 +41,10 @@ impl Subtask {
         self.completed = true;
     }
 
+    pub fn mark_incomplete(&mut self) {
+        self.completed = false;
+    }
+
     pub fn id(&self) -> Uuid {
         self.id
     }

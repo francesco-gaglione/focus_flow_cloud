@@ -27,7 +27,7 @@ pub struct SubtaskDto {
     pub sort_order: i16,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Copy)]
 #[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub enum TaskPriority {
@@ -67,6 +67,7 @@ pub struct CreateTaskDto {
     #[validate(nested)]
     pub subtasks: Option<Vec<CreateSubtaskDto>>,
     pub category_id: Option<Uuid>,
+    pub priority: Option<TaskPriority>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -88,6 +89,7 @@ pub struct UpdateTaskDto {
     #[validate(length(max = 255, message = "Description must not exceed 255 characters"))]
     pub description: Option<String>,
     pub due_date: Option<i64>,
+    pub completed: Option<bool>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -107,29 +109,14 @@ pub struct TasksResponseDto {
 #[derive(Debug, Serialize, Deserialize, Validate)]
 #[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
-pub struct CompleteTaskDto {
-    pub task_id: String,
+pub struct UpdateSubTaskDto {
+    pub completed: Option<bool>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 #[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
-pub struct CompleteTaskResponseDto {
-    pub id: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, Validate)]
-#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
-#[serde(rename_all = "camelCase")]
-pub struct CompleteSubTaskDto {
-    pub task_id: String,
-    pub subtask_id: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
-#[serde(rename_all = "camelCase")]
-pub struct CompleteSubTaskResponseDto {
+pub struct UpdateSubTaskResponseDto {
     pub id: String,
 }
 
@@ -144,4 +131,11 @@ pub struct DeleteTaskDto {
 #[serde(rename_all = "camelCase")]
 pub struct DeleteTaskResponseDto {
     pub deleted_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
+#[serde(rename_all = "camelCase")]
+pub struct CreateSubtaskResponseDto {
+    pub id: String,
 }

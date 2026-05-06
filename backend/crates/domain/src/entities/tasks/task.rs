@@ -110,6 +110,10 @@ impl Task {
         Ok(())
     }
 
+    pub fn uncomplete(&mut self) {
+        self.completed_at = None;
+    }
+
     pub fn mark_completed(&mut self) -> TaskResult<()> {
         self.complete()
     }

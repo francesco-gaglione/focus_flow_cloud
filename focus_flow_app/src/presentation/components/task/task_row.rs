@@ -1,16 +1,19 @@
 use dioxus::prelude::*;
+use shared::task::TaskPriority;
 
 use crate::use_cases::tasks::task_list_uc::TodoTask;
 
 #[derive(Props, Clone, PartialEq)]
 pub struct TaskRowProps {
     pub task: TodoTask,
-    pub on_toggle: EventHandler<String>,
-    pub on_subtask_toggle: EventHandler<(String, String)>,
+    pub on_toggle: EventHandler<(String, bool)>,
+    pub on_subtask_toggle: EventHandler<(String, String, bool)>,
     #[props(optional)]
     pub on_delete: Option<EventHandler<String>>,
     #[props(optional)]
     pub on_start_timer: Option<EventHandler<(String, String)>>,
+    #[props(optional)]
+    pub on_add_subtask: Option<EventHandler<(String, String)>>,
 }
 
 #[component]
@@ -34,7 +37,17 @@ pub fn TaskRow(props: TaskRowProps) -> Element {
     let timer_title = task.title.clone();
     let on_delete = props.on_delete.clone();
     let on_start_timer = props.on_start_timer.clone();
+    let on_add_subtask = props.on_add_subtask.clone();
     let has_timer = on_start_timer.is_some();
+    let has_add_subtask = on_add_subtask.is_some();
+    let add_task_id = task.id.clone();
+    let priority_label = task.priority.as_ref().map(|p| match p {
+        TaskPriority::Low => ("low", "LOW"),
+        TaskPriority::Medium => ("medium", "MED"),
+        TaskPriority::High => ("high", "HIGH"),
+        TaskPriority::Urgent => ("urgent", "URGENT"),
+    });
+    let mut new_subtask_title = use_signal(String::new);
     let subtask_total = task.subtasks.len();
     let subtask_done = task.subtasks.iter().filter(|s| s.is_completed).count();
     let has_subtasks = subtask_total > 0;
@@ -57,7 +70,8 @@ pub fn TaskRow(props: TaskRowProps) -> Element {
         })
         .collect();
 
-    let wrap_class = if has_subtasks && *expanded.read() {
+    let can_expand = has_subtasks || has_add_subtask;
+    let wrap_class = if can_expand && *expanded.read() {
         "todo-row-wrap expanded"
     } else {
         "todo-row-wrap"
@@ -83,7 +97,7 @@ pub fn TaskRow(props: TaskRowProps) -> Element {
                 style: "--cat: {cat_color}",
                 div {
                     class: "todo-check",
-                    onclick: move |_| props.on_toggle.call(id.clone()),
+                    onclick: move |_| props.on_toggle.call((id.clone(), !done)),
                     svg { view_box: "0 0 16 16", class: "todo-check-icon",
                         path { d: "M3 8l3 3 7-7" }
                     }
@@ -94,18 +108,22 @@ pub fn TaskRow(props: TaskRowProps) -> Element {
                         div { class: "todo-description", "{task.description.clone().unwrap()}" }
                     }
                     div { class: "todo-sub",
+                        if let Some((lvl, lbl)) = priority_label {
+                            span { class: "todo-priority todo-priority-{lvl}", "{lbl}" }
+                            span { "·" }
+                        }
                         if let Some(cat) = task.cat.as_deref() {
                             span { class: "todo-cat", "@{cat}" }
                         }
                         span { "·" }
                         span { "{due_label}" }
-                        if has_subtasks {
+                        if has_subtasks || has_add_subtask {
                             span { "·" }
                             span { class: "todo-subtask-ct", "{subtask_done}/{subtask_total}" }
                         }
                     }
                 }
-                if has_subtasks {
+                if can_expand {
                     button {
                         class: "{expand_btn_class}",
                         onclick: move |_| {
@@ -125,7 +143,7 @@ pub fn TaskRow(props: TaskRowProps) -> Element {
                     }
                 }
             }
-            if has_subtasks && *expanded.read() {
+            if can_expand && *expanded.read() {
                 div {
                     class: "todo-subtask-list",
                     style: "--cat: {cat_color}",
@@ -134,7 +152,7 @@ pub fn TaskRow(props: TaskRowProps) -> Element {
                             div {
                                 class: if sub.is_completed { "todo-subtask-check done" } else { "todo-subtask-check" },
                                 onclick: move |_| {
-                                    props.on_subtask_toggle.call((sub.task_id.clone(), sub.subtask_id.clone()))
+                                    props.on_subtask_toggle.call((sub.task_id.clone(), sub.subtask_id.clone(), !sub.is_completed))
                                 },
                                 if sub.is_completed {
                                     svg { view_box: "0 0 16 16",
@@ -145,6 +163,28 @@ pub fn TaskRow(props: TaskRowProps) -> Element {
                             span {
                                 class: if sub.is_completed { "todo-subtask-title done" } else { "todo-subtask-title" },
                                 "{sub.title}"
+                            }
+                        }
+                    }
+                    if on_add_subtask.is_some() {
+                        div { class: "todo-subtask-item todo-subtask-add-row",
+                            input {
+                                class: "todo-subtask-input",
+                                r#type: "text",
+                                placeholder: "Add subtask…",
+                                value: "{new_subtask_title}",
+                                oninput: move |e| new_subtask_title.set(e.value()),
+                                onkeydown: move |e| {
+                                    if e.key() == Key::Enter {
+                                        let title = new_subtask_title.read().trim().to_string();
+                                        if !title.is_empty() {
+                                            if let Some(ref cb) = on_add_subtask {
+                                                cb.call((add_task_id.clone(), title));
+                                                new_subtask_title.set(String::new());
+                                            }
+                                        }
+                                    }
+                                },
                             }
                         }
                     }

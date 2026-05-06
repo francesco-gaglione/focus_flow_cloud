@@ -36,6 +36,7 @@ pub struct NewDbSubtask {
 pub struct UpdateDbSubtask {
     pub title: Option<String>,
     pub description: Option<String>,
+    #[diesel(treat_none_as_null = true)]
     pub completed_at: Option<DateTime<Utc>>,
     pub sort_order: Option<i16>,
 }

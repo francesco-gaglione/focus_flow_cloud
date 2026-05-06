@@ -35,7 +35,15 @@ pub type HttpResult<T> = Result<T, HttpError>;
 
 impl IntoResponse for HttpError {
     fn into_response(self) -> Response {
-        tracing::error!("API Error: {:?}", self);
+        match &self {
+            HttpError::GenericError(_) => tracing::error!("API error: {:?}", self),
+            HttpError::BadRequest(msg) => tracing::warn!("Bad request: {}", msg),
+            HttpError::NotFound(msg) => tracing::warn!("Not found: {}", msg),
+            HttpError::Unauthorized(msg) => tracing::warn!("Unauthorized: {}", msg),
+            HttpError::InvalidCredentials(msg) => tracing::warn!("Invalid credentials: {}", msg),
+            HttpError::Forbidden => tracing::warn!("Forbidden"),
+            HttpError::ResourceAlreadyExist(msg) => tracing::warn!("Conflict: {}", msg),
+        }
 
         let status = self.status_code();
         let error_code = self.error_code();

@@ -23,10 +23,14 @@ impl TaskPersistence for PostgresPersistence {
 
         let task_id = self
             .with_transaction(move |conn| {
+                let new_db_task = NewDbTask::from(task.clone());
+                debug!("create_task: inserting priority={:?}", new_db_task.priority);
                 let db_task = diesel::insert_into(schema::tasks::table)
-                    .values(&NewDbTask::from(task.clone()))
+                    .values(&new_db_task)
                     .returning(DbTask::as_returning())
                     .get_result(conn)?;
+
+                debug!("create_task: returned db_task priority={:?}", db_task.priority);
 
                 if !subtasks.is_empty() {
                     diesel::insert_into(schema::subtasks::table)
@@ -200,14 +204,22 @@ impl TaskPersistence for PostgresPersistence {
             })
             .collect();
 
+        let update_dto = UpdateDbTask::from(task);
+        debug!(
+            "update_task id={} completed_at={:?} title={:?} priority={:?}",
+            task_id, update_dto.completed_at, update_dto.title, update_dto.priority
+        );
+
         let updated = self
             .with_transaction(move |conn| {
                 let updated_db_task = diesel::update(schema::tasks::table)
                     .filter(schema::tasks::id.eq(task_id))
-                    .set(&UpdateDbTask::from(task))
+                    .set(&update_dto)
                     .returning(DbTask::as_returning())
                     .get_result(conn)
                     .optional()?;
+
+                debug!("update_task result completed_at={:?}", updated_db_task.as_ref().map(|t: &DbTask| t.completed_at));
 
                 let Some(updated_db_task) = updated_db_task else {
                     return Err(diesel::result::Error::NotFound);

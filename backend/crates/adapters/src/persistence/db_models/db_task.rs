@@ -39,6 +39,7 @@ pub struct UpdateDbTask {
     pub title: Option<String>,
     pub description: Option<String>,
     pub scheduled_date: Option<DateTime<Utc>>,
+    #[diesel(treat_none_as_null = true)]
     pub completed_at: Option<DateTime<Utc>>,
     pub priority: Option<String>,
 }

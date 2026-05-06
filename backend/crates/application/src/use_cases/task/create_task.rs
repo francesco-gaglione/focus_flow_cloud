@@ -1,7 +1,7 @@
 use crate::repository_traits::persistence_error::PersistenceError;
 use crate::repository_traits::task_persistence::TaskPersistence;
 use chrono::{DateTime, Utc};
-use domain::entities::tasks::{subtask::Subtask, task::Task};
+use domain::entities::tasks::{subtask::Subtask, task::Task, task_priority::TaskPriority};
 use std::sync::Arc;
 use thiserror::Error;
 use tracing::instrument;
@@ -23,6 +23,7 @@ pub struct CreateTaskCommand {
     pub category_id: Option<Uuid>,
     pub due_date: Option<DateTime<Utc>>,
     pub subtasks: Option<Vec<CreateSubtaskCommand>>,
+    pub priority: Option<TaskPriority>,
 }
 
 #[derive(Debug, Clone)]
@@ -52,6 +53,10 @@ impl CreateTaskUseCase {
 
         if command.category_id.is_some() {
             task.update_category_id(command.category_id.unwrap());
+        }
+
+        if let Some(priority) = command.priority {
+            task.set_priority(priority);
         }
 
         if command.subtasks.is_some() {
@@ -95,6 +100,7 @@ mod tests {
             due_date: None,
             subtasks: None,
             category_id: Some(Uuid::new_v4()),
+            priority: None,
         };
 
         let result = use_case.execute(command).await;

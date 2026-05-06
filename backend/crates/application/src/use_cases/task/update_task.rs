@@ -4,13 +4,16 @@ use chrono::{DateTime, Utc};
 use domain::entities::tasks::task_priority::TaskPriority;
 use std::sync::Arc;
 use thiserror::Error;
-use tracing::instrument;
+use tracing::{error, info, instrument};
 use uuid::Uuid;
 
 #[derive(Debug, Error, PartialEq)]
 pub enum UpdateTaskError {
     #[error("Persistence error: {0}")]
     PersistenceError(#[from] PersistenceError),
+
+    #[error("Sub-tasks must be completed before marking task as completed")]
+    UncompletedSubTasks,
 }
 
 pub type UpdateTaskResult<T> = Result<T, UpdateTaskError>;
@@ -22,6 +25,7 @@ pub struct UpdateTaskCommand {
     pub description: Option<String>,
     pub due_date: Option<DateTime<Utc>>,
     pub priority: Option<TaskPriority>,
+    pub completed: Option<bool>,
 }
 
 pub struct UpdateTaskUseCase {
@@ -38,19 +42,36 @@ impl UpdateTaskUseCase {
         let mut task = self.task_persistence.find_by_id(command.id).await?;
 
         if let Some(title) = command.title {
+            info!("Updating title to: {}", title);
             task.update_title(title);
         }
         if let Some(description) = command.description {
+            info!("Updating description to: {}", description);
             task.update_description(Some(description));
         }
         if let Some(due_date) = command.due_date {
+            info!("Updating due date to: {}", due_date);
             task.update_due_date(Some(due_date));
         }
         if let Some(priority) = command.priority {
+            info!("Updating priority to: {:?}", priority);
             task.update_priority(Some(priority));
         }
+        if let Some(completed) = command.completed {
+            info!("Updating completed status to: {}", completed);
+            if completed {
+                task.complete().map_err(|_| {
+                    error!("Uncompleted sub-tasks");
+                    UpdateTaskError::UncompletedSubTasks
+                })?;
+            } else {
+                task.uncomplete();
+            }
+        }
 
+        info!("Updating task: {}", command.id);
         self.task_persistence.update_task(task).await?;
+        info!("Task updated successfully");
 
         Ok(())
     }
@@ -85,6 +106,7 @@ mod tests {
             description: None,
             due_date: None,
             priority: None,
+            completed: None,
         };
 
         let result = use_case.execute(command).await;
@@ -106,6 +128,7 @@ mod tests {
             description: None,
             due_date: None,
             priority: None,
+            completed: None,
         };
 
         let result = use_case.execute(command).await;
@@ -136,6 +159,7 @@ mod tests {
             description: None,
             due_date: None,
             priority: Some(TaskPriority::High),
+            completed: None,
         };
 
         let result = use_case.execute(command).await;

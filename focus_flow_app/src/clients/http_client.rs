@@ -213,6 +213,26 @@ impl ApiClient {
         self.handle_response(response).await
     }
 
+    pub(crate) async fn patch_raw<B, R>(
+        &self,
+        endpoint: &str,
+        path_params: Option<&[(&str, &str)]>,
+        query: Option<&[(&str, &str)]>,
+        body: &B,
+    ) -> ApiResult<R>
+    where
+        B: Serialize + ?Sized,
+        R: DeserializeOwned,
+    {
+        let url = self.build_url(endpoint, path_params);
+        let mut request = self.apply_auth(self.client.patch(&url).json(body));
+        if let Some(q) = query {
+            request = request.query(q);
+        }
+        let response = request.send().await.map_err(ApiError::from)?;
+        self.handle_response(response).await
+    }
+
     // Public methods — automatic 401 → refresh → retry.
     pub async fn get<T>(
         &self,
@@ -269,6 +289,27 @@ impl ApiClient {
             Err(ApiError::Unauthorized) if self.try_refresh().await => {
                 self.with_token_from_context()
                     .put_raw(endpoint, path_params, query, body)
+                    .await
+            }
+            other => other,
+        }
+    }
+
+    pub async fn patch<B, R>(
+        &self,
+        endpoint: &str,
+        path_params: Option<&[(&str, &str)]>,
+        query: Option<&[(&str, &str)]>,
+        body: &B,
+    ) -> ApiResult<R>
+    where
+        B: Serialize + ?Sized,
+        R: DeserializeOwned,
+    {
+        match self.patch_raw(endpoint, path_params, query, body).await {
+            Err(ApiError::Unauthorized) if self.try_refresh().await => {
+                self.with_token_from_context()
+                    .patch_raw(endpoint, path_params, query, body)
                     .await
             }
             other => other,

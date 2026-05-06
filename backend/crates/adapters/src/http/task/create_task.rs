@@ -7,7 +7,8 @@ use application::use_cases::task::create_task::{
 };
 use axum::{extract::State, Extension, Json};
 use chrono::DateTime;
-use shared::task::{CreateTaskDto, CreateTaskResponseDto};
+use domain::entities::tasks::task_priority::TaskPriority as DomainPriority;
+use shared::task::{CreateTaskDto, CreateTaskResponseDto, TaskPriority as SharedPriority};
 use validator::Validate;
 
 impl From<CreateTaskError> for HttpError {
@@ -65,6 +66,13 @@ pub async fn create_task_api(
             .collect()
     });
 
+    let priority = payload.priority.map(|p| match p {
+        SharedPriority::Low => DomainPriority::Low,
+        SharedPriority::Medium => DomainPriority::Medium,
+        SharedPriority::High => DomainPriority::High,
+        SharedPriority::Urgent => DomainPriority::Urgent,
+    });
+
     let command = CreateTaskCommand {
         user_id: user.user_id,
         title: payload.title,
@@ -72,6 +80,7 @@ pub async fn create_task_api(
         due_date,
         subtasks,
         category_id: payload.category_id,
+        priority,
     };
 
     tracing::info!("Creating task with command: {:?}", command);

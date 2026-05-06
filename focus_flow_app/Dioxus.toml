@@ -1,4 +1,8 @@
 [application]
+name = "focus_flow_app"
+
+[bundle]
+identifier = "com.francescogaglione.focusflow"
 
 [serve]
 port = 9090

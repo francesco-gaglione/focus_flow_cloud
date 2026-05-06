@@ -16,6 +16,9 @@ impl From<UpdateTaskError> for HttpError {
     fn from(value: UpdateTaskError) -> Self {
         match value {
             UpdateTaskError::PersistenceError(e) => HttpError::GenericError(e.to_string()),
+            UpdateTaskError::UncompletedSubTasks => HttpError::BadRequest(
+                "Sub-tasks must be completed before marking task as completed".to_string(),
+            ),
         }
     }
 }
@@ -27,7 +30,7 @@ pub struct UpdateTaskPathDto {
 }
 
 #[utoipa::path(
-    put,
+    patch,
     path = "/api/task/{id}",
     tag = TASK_TAG,
     summary = "Update a task",
@@ -75,6 +78,7 @@ pub async fn update_task_api(
         description: payload.description,
         due_date,
         priority: None,
+        completed: payload.completed,
     };
 
     state.update_task_uc.execute(command).await?;

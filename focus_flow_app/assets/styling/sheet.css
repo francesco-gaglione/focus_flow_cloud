@@ -90,6 +90,14 @@
     flex-direction: column;
     gap: 6px;
 }
+.sheet-field-row {
+    display: flex;
+    gap: 12px;
+}
+.sheet-field-flex {
+    flex: 1;
+    min-width: 0;
+}
 .sheet-label {
     font-family: var(--font-mono);
     font-size: 11px;

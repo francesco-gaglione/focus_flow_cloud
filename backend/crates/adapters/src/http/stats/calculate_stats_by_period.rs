@@ -1,6 +1,6 @@
 use crate::http::app_state::AppState;
 use crate::http::model::session_model::UserSession;
-use crate::http_error::{HttpError, HttpResult};
+use crate::http_error::HttpResult;
 use crate::openapi::STATS_TAG;
 
 use axum::extract::{Extension, Query, State};
@@ -91,8 +91,8 @@ pub struct DailyActivityDistributionDto {
     )
 )]
 pub async fn calculate_stats_by_period_api(
-    State(state): State<AppState>,
-    Extension(session): Extension<UserSession>,
+    State(_state): State<AppState>,
+    Extension(_session): Extension<UserSession>,
     query: Query<GetStatsByPeriodDto>,
 ) -> HttpResult<Json<GetStatsByPeriodResponseDto>> {
     debug!("query: {:?}", query);

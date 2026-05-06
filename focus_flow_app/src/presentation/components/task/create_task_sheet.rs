@@ -1,6 +1,8 @@
 use chrono::{Local, NaiveDateTime, NaiveTime, TimeZone, Utc};
-use dioxus::prelude::*;
+use dioxus::{logger::tracing::debug, prelude::*};
 use time::Date as TimeDate;
+
+use shared::task::TaskPriority;
 
 use crate::{
     components::{
@@ -48,6 +50,7 @@ pub fn CreateTaskSheet(props: CreateTaskSheetProps) -> Element {
     let mut selected_cat_id = use_signal(String::new);
     let mut selected_date: Signal<Option<TimeDate>> = use_signal(|| None);
     let mut due_time_str = use_signal(String::new);
+    let mut selected_priority: Signal<Option<TaskPriority>> = use_signal(|| None);
     let mut subtask_input = use_signal(String::new);
     let mut subtasks: Signal<Vec<String>> = use_signal(Vec::new);
 
@@ -66,6 +69,7 @@ pub fn CreateTaskSheet(props: CreateTaskSheetProps) -> Element {
         selected_cat_id.set(String::new());
         selected_date.set(None);
         due_time_str.set(String::new());
+        selected_priority.set(None);
         subtask_input.set(String::new());
         subtasks.write().clear();
         on_close.call(());
@@ -99,6 +103,7 @@ pub fn CreateTaskSheet(props: CreateTaskSheetProps) -> Element {
                         },
                         due_date,
                         category_id,
+                        priority: *selected_priority.read(),
                         subtasks: subtasks
                             .read()
                             .iter()
@@ -112,6 +117,7 @@ pub fn CreateTaskSheet(props: CreateTaskSheetProps) -> Element {
                     selected_cat_id.set(String::new());
                     selected_date.set(None);
                     due_time_str.set(String::new());
+                    selected_priority.set(None);
                     subtask_input.set(String::new());
                     subtasks.write().clear();
                 },
@@ -153,24 +159,52 @@ pub fn CreateTaskSheet(props: CreateTaskSheetProps) -> Element {
                     }
                 }
 
-                div { class: "sheet-field",
-                    label { class: "sheet-label", "Category" }
-                    Select::<String> {
-                        default_value: None,
-                        on_value_change: move |v: Option<String>| {
-                            selected_cat_id.set(v.unwrap_or_default());
-                        },
-                        SelectTrigger {
-                            SelectValue { placeholder: "No category" }
-                        }
-                        SelectList {
-                            for (i, cat) in props.categories.iter().enumerate() {
-                                SelectOption::<String> {
-                                    index: i,
-                                    value: cat.id.clone(),
-                                    text_value: cat.name.clone(),
-                                    "@{cat.name}"
+                div { class: "sheet-field-row",
+                    div { class: "sheet-field sheet-field-flex",
+                        label { class: "sheet-label", "Category" }
+                        Select::<String> {
+                            default_value: None,
+                            on_value_change: move |v: Option<String>| {
+                                selected_cat_id.set(v.unwrap_or_default());
+                            },
+                            SelectTrigger {
+                                SelectValue { placeholder: "No category" }
+                            }
+                            SelectList {
+                                for (i, cat) in props.categories.iter().enumerate() {
+                                    SelectOption::<String> {
+                                        index: i,
+                                        value: cat.id.clone(),
+                                        text_value: cat.name.clone(),
+                                        "@{cat.name}"
+                                    }
                                 }
+                            }
+                        }
+                    }
+
+                    div { class: "sheet-field sheet-field-flex",
+                        label { class: "sheet-label", "Priority" }
+                        Select::<String> {
+                            default_value: None,
+                            on_value_change: move |v: Option<String>| {
+                                debug!("priority on_value_change: {:?}", v);
+                                selected_priority.set(v.as_deref().and_then(|s| match s {
+                                    "low" => Some(TaskPriority::Low),
+                                    "medium" => Some(TaskPriority::Medium),
+                                    "high" => Some(TaskPriority::High),
+                                    "urgent" => Some(TaskPriority::Urgent),
+                                    _ => None,
+                                }));
+                            },
+                            SelectTrigger {
+                                SelectValue { placeholder: "None" }
+                            }
+                            SelectList {
+                                SelectOption::<String> { index: 0_usize, value: "low".to_string(), text_value: "Low", "Low" }
+                                SelectOption::<String> { index: 1_usize, value: "medium".to_string(), text_value: "Medium", "Medium" }
+                                SelectOption::<String> { index: 2_usize, value: "high".to_string(), text_value: "High", "High" }
+                                SelectOption::<String> { index: 3_usize, value: "urgent".to_string(), text_value: "Urgent", "Urgent" }
                             }
                         }
                     }

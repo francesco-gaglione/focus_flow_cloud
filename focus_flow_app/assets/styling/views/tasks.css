@@ -253,6 +253,24 @@
     color: var(--text-subtle);
 }
 
+/* Inline add-subtask row */
+.todo-subtask-add-row {
+    padding: 6px 12px 6px 14px;
+}
+.todo-subtask-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+.todo-subtask-input::placeholder {
+    color: var(--text-subtle);
+    font-style: italic;
+}
+
 /* Circular checkbox */
 .todo-check {
     width: 22px;
@@ -323,6 +341,17 @@
     letter-spacing: var(--tracking-data);
     text-transform: uppercase;
 }
+.todo-priority {
+    font-weight: 600;
+    padding: 1px 5px;
+    border-radius: var(--r-xs);
+    font-size: 10px;
+}
+.todo-priority-low    { color: #6b7280; background: rgba(107,114,128,.12); }
+.todo-priority-medium { color: #d97706; background: rgba(217,119, 6,.12); }
+.todo-priority-high   { color: #ef4444; background: rgba(239, 68,68,.12); }
+.todo-priority-urgent { color: #7c3aed; background: rgba(124, 58,237,.12); }
+
 .todo-cat {
     color: var(--cat, var(--accent));
     font-weight: 500;
