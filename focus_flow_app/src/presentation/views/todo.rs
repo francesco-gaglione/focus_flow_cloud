@@ -230,7 +230,27 @@ pub fn Todo() -> Element {
                     TaskSection { label: "Upcoming", modifier: "", tasks: upcoming_tasks, on_toggle: complete_task_toggle, on_subtask_toggle: complete_subtask_handler, on_delete: delete_task_handler, on_start_timer: start_timer_handler, on_add_subtask: add_subtask_handler }
                 }
                 if !done_tasks.is_empty() {
-                    TaskSection { label: "Done", modifier: "", tasks: done_tasks, on_toggle: complete_task_toggle, on_subtask_toggle: complete_subtask_handler, on_delete: delete_task_handler, on_start_timer: start_timer_handler, on_add_subtask: add_subtask_handler }
+                    TaskSection {
+                        label: "Done",
+                        modifier: "",
+                        tasks: done_tasks.clone(),
+                        on_toggle: complete_task_toggle,
+                        on_subtask_toggle: complete_subtask_handler,
+                        on_delete: delete_task_handler,
+                        on_start_timer: start_timer_handler,
+                        on_add_subtask: add_subtask_handler,
+                        on_delete_all: move |_| {
+                            let ids: Vec<String> = done_tasks.iter().map(|t| t.id.clone()).collect();
+                            spawn(async move {
+                                for id in ids {
+                                    if let Err(e) = delete_task_uc(id).await {
+                                        error!("Error deleting done task: {}", e);
+                                    }
+                                }
+                                fetch_task_list.restart();
+                            });
+                        },
+                    }
                 }
             } else {
                 for task in filtered.iter() {
@@ -280,6 +300,8 @@ struct TaskSectionProps {
     on_delete: EventHandler<String>,
     on_start_timer: EventHandler<(String, String)>,
     on_add_subtask: EventHandler<(String, String)>,
+    #[props(default)]
+    on_delete_all: Option<EventHandler<()>>,
 }
 
 #[component]
@@ -291,7 +313,17 @@ fn TaskSection(props: TaskSectionProps) -> Element {
         div {
             div { class: "section-head",
                 span { class: "{label_class}", "{props.label}" }
-                span { class: "count", "{count} {word}" }
+                div { class: "section-head-right",
+                    span { class: "count", "{count} {word}" }
+                    if let Some(on_delete_all) = props.on_delete_all {
+                        button {
+                            class: "section-delete-all-btn",
+                            r#type: "button",
+                            onclick: move |_| on_delete_all.call(()),
+                            "Delete all"
+                        }
+                    }
+                }
             }
             for task in props.tasks.iter() {
                 TaskRow { task: task.clone(), on_toggle: props.on_toggle, on_subtask_toggle: props.on_subtask_toggle, on_delete: props.on_delete, on_start_timer: props.on_start_timer, on_add_subtask: props.on_add_subtask }

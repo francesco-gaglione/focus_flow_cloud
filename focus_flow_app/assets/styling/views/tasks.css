@@ -104,6 +104,38 @@
 .section-head .lbl.today::before {
     background: var(--accent);
 }
+.section-head-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.section-delete-all-btn {
+    appearance: none;
+    background: transparent;
+    border: 1px solid var(--danger);
+    border-radius: var(--r-sm);
+    color: var(--danger);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: var(--tracking-data);
+    text-transform: uppercase;
+    padding: 3px 8px;
+    height: 22px;
+    cursor: pointer;
+    transition:
+        background var(--dur-fast) var(--ease-tech),
+        color var(--dur-fast) var(--ease-tech);
+}
+.section-delete-all-btn:hover {
+    background: var(--danger);
+    color: #fff;
+}
+.section-delete-all-btn:active {
+    transform: scale(0.97);
+}
+
 .section-head .count {
     font-family: var(--font-mono);
     font-size: 11px;

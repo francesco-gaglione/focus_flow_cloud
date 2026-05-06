@@ -1,11 +1,25 @@
-use crate::{presentation::views::auth_page::AuthPage, state::auth_state::AuthState, Route};
+use crate::{
+    clients::auth_client::logout,
+    presentation::views::auth_page::AuthPage,
+    state::auth_state::AuthState,
+    Route,
+};
 use dioxus::prelude::*;
 
 #[component]
 pub fn Layout() -> Element {
     let mut drawer_open: Signal<bool> = use_context_provider(|| Signal::new(false));
 
-    let auth_state = use_context::<Signal<AuthState>>();
+    let mut auth_state = use_context::<Signal<AuthState>>();
+
+    let logout_handler = move |_| {
+        auth_state.write().delete_auth_token();
+        auth_state.write().delete_refresh_token();
+        drawer_open.set(false);
+        spawn(async move {
+            let _ = logout().await;
+        });
+    };
 
     let route = use_route::<Route>();
     let active_section = match route {
@@ -75,6 +89,16 @@ pub fn Layout() -> Element {
                     div { class: "who",
                         span { class: "n", "You" }
                         span { class: "e", "local · synced" }
+                    }
+                    button {
+                        class: "sd-logout",
+                        r#type: "button",
+                        onclick: logout_handler,
+                        svg { view_box: "0 0 16 16",
+                            path { d: "M6 3H3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h3", stroke: "currentColor", stroke_width: "1.5", fill: "none", stroke_linecap: "round" }
+                            polyline { points: "10 11 13 8 10 5", stroke: "currentColor", stroke_width: "1.5", fill: "none", stroke_linecap: "round", stroke_linejoin: "round" }
+                            line { x1: "13", y1: "8", x2: "6", y2: "8", stroke: "currentColor", stroke_width: "1.5", stroke_linecap: "round" }
+                        }
                     }
                 }
             }

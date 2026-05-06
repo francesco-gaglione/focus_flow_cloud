@@ -18,6 +18,7 @@ pub struct DbTask {
     pub created_at: DateTime<Utc>,
     pub completed_at: Option<DateTime<Utc>>,
     pub priority: Option<String>,
+    pub deleted_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Clone, Insertable, Serialize, Deserialize)]
@@ -89,6 +90,7 @@ impl From<Task> for DbTask {
             created_at: Default::default(),
             completed_at: value.completed_at(),
             priority: value.priority().map(priority_to_str),
+            deleted_at: None,
         }
     }
 }

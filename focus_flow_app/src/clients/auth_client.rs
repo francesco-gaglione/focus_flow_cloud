@@ -1,5 +1,5 @@
 use dioxus::signals::{ReadableExt, Signal, WritableExt};
-use shared::auth::{LoginDto, LoginResponseDto, RefreshDto, RefreshResponseDto};
+use shared::auth::{LoginDto, LoginResponseDto, LogoutResponseDto, RefreshDto, RefreshResponseDto};
 
 use crate::clients::http_client::{ApiClient, ApiError, ApiResult};
 
@@ -26,6 +26,14 @@ pub async fn login(username: &str, password: &str) -> ApiResult<LoginResponseDto
     }
 
     Ok(response)
+}
+
+pub async fn logout() -> ApiResult<LogoutResponseDto> {
+    let api_signal = dioxus::core::try_consume_context::<Signal<ApiClient>>()
+        .ok_or_else(|| ApiError::ClientError("ApiClient signal not found".to_string()))?;
+    let api = (*api_signal.read()).clone();
+    api.post_raw::<(), LogoutResponseDto>("/api/auth/logout", None, None, &())
+        .await
 }
 
 pub async fn refresh_api(refresh_token: &str) -> ApiResult<RefreshResponseDto> {

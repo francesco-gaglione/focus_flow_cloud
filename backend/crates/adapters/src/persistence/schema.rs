@@ -58,6 +58,7 @@ diesel::table! {
         completed_at -> Nullable<Timestamptz>,
         #[max_length = 10]
         priority -> Nullable<Varchar>,
+        deleted_at -> Nullable<Timestamptz>,
     }
 }
 

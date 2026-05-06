@@ -429,3 +429,33 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
+.sd-foot .who {
+    flex: 1;
+    min-width: 0;
+}
+.sd-logout {
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    color: var(--text-subtle);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-left: auto;
+    transition:
+        background var(--dur-fast) var(--ease-tech),
+        border-color var(--dur-fast) var(--ease-tech),
+        color var(--dur-fast) var(--ease-tech);
+}
+.sd-logout:hover {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: var(--danger);
+    color: var(--danger);
+}
+.sd-logout svg {
+    width: 14px;
+    height: 14px;
+}

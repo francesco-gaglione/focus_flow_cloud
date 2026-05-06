@@ -50,7 +50,9 @@ impl TaskPersistence for PostgresPersistence {
     async fn find_all(&self, completed: Option<bool>) -> PersistenceResult<Vec<Task>> {
         let tasks = self
             .with_transaction(move |conn| {
-                let mut query = schema::tasks::table.into_boxed();
+                let mut query = schema::tasks::table
+                    .filter(schema::tasks::deleted_at.is_null())
+                    .into_boxed();
 
                 if completed.is_some() && completed.unwrap() == true {
                     query = query.filter(schema::tasks::completed_at.is_not_null());
@@ -96,6 +98,7 @@ impl TaskPersistence for PostgresPersistence {
             .interact(move |conn| {
                 let db_task = schema::tasks::table
                     .filter(schema::tasks::id.eq(task_id))
+                    .filter(schema::tasks::deleted_at.is_null())
                     .select(DbTask::as_select())
                     .first(conn)
                     .optional()?;
@@ -142,6 +145,7 @@ impl TaskPersistence for PostgresPersistence {
         let tasks = conn
             .interact(move |conn| {
                 let mut query = schema::tasks::table
+                    .filter(schema::tasks::deleted_at.is_null())
                     .filter(schema::tasks::scheduled_date.is_not_null())
                     .into_boxed();
 
@@ -214,6 +218,7 @@ impl TaskPersistence for PostgresPersistence {
             .with_transaction(move |conn| {
                 let updated_db_task = diesel::update(schema::tasks::table)
                     .filter(schema::tasks::id.eq(task_id))
+                    .filter(schema::tasks::deleted_at.is_null())
                     .set(&update_dto)
                     .returning(DbTask::as_returning())
                     .get_result(conn)
@@ -259,10 +264,13 @@ impl TaskPersistence for PostgresPersistence {
             .await
             .map_err(|e| PersistenceError::Unexpected(e.to_string()))?;
 
+        let now = Utc::now();
         let affected_rows = conn
             .interact(move |conn| {
-                diesel::delete(schema::tasks::table)
+                diesel::update(schema::tasks::table)
                     .filter(schema::tasks::id.eq(task_id))
+                    .filter(schema::tasks::deleted_at.is_null())
+                    .set(schema::tasks::deleted_at.eq(now))
                     .execute(conn)
             })
             .await
