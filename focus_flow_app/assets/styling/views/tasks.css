@@ -356,33 +356,26 @@
     background: rgba(99, 102, 241, 0.12);
 }
 
-/* Date label wrapper — positions calendar icon + native input */
+/* Date button — reset browser button styles, inherit todo-sub typography */
 .todo-date-wrap {
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 3px;
-}
-.todo-date-input {
     appearance: none;
     -webkit-appearance: none;
     background: transparent;
     border: none;
-    outline: none;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: inherit;
-    letter-spacing: var(--tracking-data);
-    text-transform: uppercase;
-    cursor: pointer;
     padding: 0;
-    width: 80px;
-}
-.todo-date-input::-webkit-calendar-picker-indicator {
-    display: none;
+    margin: 0;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
 }
 .todo-no-date {
-    opacity: 0.45;
+    opacity: 0.55;
 }
 
 /* Subtask progress bar */
@@ -527,6 +520,10 @@
 .todo-due.overdue {
     color: var(--danger);
     font-weight: 600;
+}
+.todo-due-time {
+    opacity: 0.75;
+    font-size: 10px;
 }
 .todo-meta-icon {
     width: 11px;
@@ -728,4 +725,117 @@
 }
 .prio-sheet-urgent {
     color: #7c3aed;
+}
+
+/* ============================================================
+   DATE PICKER SHEET
+   ============================================================ */
+.date-sheet-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.date-sheet-section {
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 14px 16px;
+    margin: 5px;
+}
+.date-sheet-section-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: var(--tracking-data);
+    text-transform: uppercase;
+    color: var(--text-subtle);
+    margin-bottom: 12px;
+}
+
+/* Override dioxus-primitives date picker input in our sheet */
+.date-sheet-section [class*="dx-date"],
+.date-sheet-section [class*="dx-calendar"] {
+    background: transparent !important;
+    color: var(--text) !important;
+    font-family: var(--font-mono) !important;
+}
+.date-sheet-section [class*="dx-date-picker-input"],
+.date-sheet-section [class*="dx-date-input"] {
+    background: var(--bg) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--r-sm) !important;
+    color: var(--text) !important;
+    font-size: 16px !important;
+}
+
+.date-sheet-time-input {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 20px;
+    font-weight: 500;
+    padding: 12px 14px;
+    outline: none;
+    color-scheme: dark;
+}
+.date-sheet-time-input:focus {
+    border-color: var(--accent);
+    box-shadow: var(--shadow-focus);
+}
+.date-sheet-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+}
+.date-sheet-clear-btn {
+    appearance: none;
+    flex: 1;
+    padding: 14px;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    color: var(--text-subtle);
+    font-family: var(--font-ui);
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+        background var(--dur-fast) var(--ease-tech),
+        border-color var(--dur-fast) var(--ease-tech),
+        color var(--dur-fast) var(--ease-tech);
+}
+.date-sheet-clear-btn:hover {
+    background: var(--ds-gray-200);
+    border-color: var(--border-strong);
+    color: var(--text);
+}
+.date-sheet-clear-btn:active {
+    transform: scale(0.98);
+}
+.date-sheet-confirm-btn {
+    appearance: none;
+    flex: 2;
+    padding: 14px;
+    background: var(--accent);
+    border: none;
+    border-radius: var(--r-md);
+    color: #fff;
+    font-family: var(--font-ui);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity var(--dur-fast) var(--ease-tech);
+}
+.date-sheet-confirm-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+.date-sheet-confirm-btn:not(:disabled):active {
+    transform: scale(0.98);
 }

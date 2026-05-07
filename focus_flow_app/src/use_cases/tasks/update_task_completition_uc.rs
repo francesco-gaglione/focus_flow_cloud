@@ -15,6 +15,6 @@ pub async fn update_task_completition_uc(
     task_id: &str,
     completed: Option<bool>,
 ) -> CompleteTaskResult<()> {
-    update_task(task_id, None, None, None, completed).await?;
+    update_task(task_id, None, None, None, completed, None).await?;
     Ok(())
 }

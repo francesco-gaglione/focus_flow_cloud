@@ -5,8 +5,8 @@ use dioxus::{
 };
 use shared::task::{
     CreateSubtaskDto, CreateSubtaskResponseDto, CreateTaskDto, CreateTaskResponseDto,
-    DeleteTaskResponseDto, TasksResponseDto, UpdateSubTaskDto, UpdateSubTaskResponseDto,
-    UpdateTaskDto, UpdateTaskResponseDto,
+    DeleteTaskResponseDto, TaskPriority, TasksResponseDto, UpdateSubTaskDto,
+    UpdateSubTaskResponseDto, UpdateTaskDto, UpdateTaskResponseDto,
 };
 
 use crate::clients::http_client::{ApiClient, ApiError, ApiResult};
@@ -42,6 +42,7 @@ pub async fn update_task(
     description: Option<String>,
     due_date: Option<DateTime<Utc>>,
     completed: Option<bool>,
+    priority: Option<TaskPriority>,
 ) -> ApiResult<()> {
     let api_signal = dioxus::core::try_consume_context::<Signal<ApiClient>>()
         .ok_or_else(|| ApiError::ClientError("ApiClient signal not found".to_string()))?;
@@ -51,6 +52,7 @@ pub async fn update_task(
         description: description,
         due_date: due_date.map(|d| d.timestamp()),
         completed: completed,
+        priority: priority,
     };
 
     debug!("Completing task: {:?}", complete_task_dto);
@@ -65,7 +67,11 @@ pub async fn update_task(
     Ok(())
 }
 
-pub async fn create_subtask(task_id: &str, title: String, description: Option<String>) -> ApiResult<String> {
+pub async fn create_subtask(
+    task_id: &str,
+    title: String,
+    description: Option<String>,
+) -> ApiResult<String> {
     let api_signal = dioxus::core::try_consume_context::<Signal<ApiClient>>()
         .ok_or_else(|| ApiError::ClientError("ApiClient signal not found".to_string()))?;
     let api = (*api_signal.read()).clone();

@@ -22,6 +22,10 @@
    TOKENS — DARK BASE
    ============================================================ */
 :root {
+    /* Force dark mode for dioxus-primitives components (app is always dark) */
+    --dark: initial;
+    --light: ;
+
     /* Fonts */
     --font-sans:
         "Geist", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,

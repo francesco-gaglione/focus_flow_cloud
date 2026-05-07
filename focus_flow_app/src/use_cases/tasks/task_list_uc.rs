@@ -1,4 +1,4 @@
-use chrono::{DateTime, Local, Utc};
+use chrono::{DateTime, Local, Timelike, Utc};
 use dioxus::logger::tracing::debug;
 use shared::task::{TaskPriority, TasksResponseDto};
 
@@ -48,6 +48,7 @@ pub struct TodoTask {
     pub priority: Option<TaskPriority>,
     pub due: TaskDue,
     pub due_date_set: bool,
+    pub due_time: Option<String>,
     pub completed_at: Option<chrono::NaiveDateTime>,
     pub done: bool,
     pub subtasks: Vec<TodoSubtask>,
@@ -94,6 +95,16 @@ pub async fn task_list_uc(category_id: Option<&str>) -> TaskListResult<TaskList>
         let tomorrow = today.succ_opt().unwrap_or(today);
 
         let due_date_set = task.due_date.is_some();
+        let due_time = task.due_date.and_then(|ts| {
+            DateTime::from_timestamp(ts, 0).map(|dt: DateTime<Utc>| {
+                let local = dt.with_timezone(&Local);
+                if local.hour() != 0 || local.minute() != 0 {
+                    Some(local.format("%H:%M").to_string())
+                } else {
+                    None
+                }
+            }).flatten()
+        });
         let due = match task.due_date {
             Some(ts) => {
                 let date = DateTime::from_timestamp(ts, 0)
@@ -141,6 +152,7 @@ pub async fn task_list_uc(category_id: Option<&str>) -> TaskListResult<TaskList>
             priority: task.priority,
             due,
             due_date_set,
+            due_time,
             completed_at: task.completed_at.and_then(|ts| {
                 DateTime::from_timestamp(ts, 0)
                     .map(|dt: DateTime<Utc>| dt.with_timezone(&Local).naive_local())

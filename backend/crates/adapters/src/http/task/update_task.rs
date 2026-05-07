@@ -6,8 +6,9 @@ use application::use_cases::task::update_task::{UpdateTaskCommand, UpdateTaskErr
 use axum::extract::{Path, State};
 use axum::Json;
 use chrono::DateTime;
+use domain::entities::tasks::task_priority::TaskPriority as DomainPriority;
 use serde::{Deserialize, Serialize};
-use shared::task::{UpdateTaskDto, UpdateTaskResponseDto};
+use shared::task::{TaskPriority, UpdateTaskDto, UpdateTaskResponseDto};
 use utoipa::ToSchema;
 use uuid::Uuid;
 use validator::Validate;
@@ -77,7 +78,12 @@ pub async fn update_task_api(
         title: payload.title,
         description: payload.description,
         due_date,
-        priority: None,
+        priority: payload.priority.map(|p| match p {
+            TaskPriority::Low => DomainPriority::Low,
+            TaskPriority::Medium => DomainPriority::Medium,
+            TaskPriority::High => DomainPriority::High,
+            TaskPriority::Urgent => DomainPriority::Urgent,
+        }),
         completed: payload.completed,
     };
 

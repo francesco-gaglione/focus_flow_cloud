@@ -1,5 +1,7 @@
+use chrono::Datelike;
 use dioxus::prelude::*;
 use shared::task::TaskPriority;
+use time::Date as TimeDate;
 
 use crate::use_cases::tasks::task_list_uc::{TaskDue, TodoTask};
 
@@ -28,18 +30,25 @@ pub struct TaskRowProps {
 pub fn TaskRow(props: TaskRowProps) -> Element {
     let task = &props.task;
 
-    // ── local editable state ─────────────────────────────────────────────
-    let initial_date = match &task.due {
-        TaskDue::Overdue(d) | TaskDue::Today(d) | TaskDue::Tomorrow(d) | TaskDue::Upcoming(d) => {
-            d.format("%Y-%m-%d").to_string()
-        }
-    };
-    let mut local_date_str = use_signal(move || initial_date.clone());
     let has_explicit_date = task.due_date_set;
 
-    // ── priority sheet context (provided by parent view) ─────────────────
+    // Compute current date as time::Date for the picker context
+    let current_time_date: Option<TimeDate> = if has_explicit_date {
+        match &task.due {
+            TaskDue::Overdue(d) | TaskDue::Today(d) | TaskDue::Tomorrow(d) | TaskDue::Upcoming(d) => {
+                time::Month::try_from(d.month() as u8).ok()
+                    .and_then(|m| TimeDate::from_calendar_date(d.year(), m, d.day() as u8).ok())
+            }
+        }
+    } else {
+        None
+    };
+
+    // ── sheet contexts (provided by parent view) ──────────────────────────
     let prio_sheet_ctx =
         dioxus::core::try_consume_context::<Signal<Option<(String, Option<TaskPriority>)>>>();
+    let date_sheet_ctx =
+        dioxus::core::try_consume_context::<Signal<Option<(String, Option<TimeDate>)>>>();
 
     // ── menu state ───────────────────────────────────────────────────────
     let mut expanded = use_signal(|| false);
@@ -195,34 +204,37 @@ pub fn TaskRow(props: TaskRowProps) -> Element {
                             span { class: "todo-cat", "@{cat}" }
                         }
 
-                        if has_explicit_date {
-                            label { class: "{due_class} todo-date-wrap",
-                                svg { class: "todo-meta-icon", view_box: "0 0 12 12",
-                                    rect { x: "1", y: "2", width: "10", height: "9", rx: "1.5", stroke: "currentColor", stroke_width: "1.4", fill: "none" }
-                                    line { x1: "4", y1: "1", x2: "4", y2: "3", stroke: "currentColor", stroke_width: "1.4", stroke_linecap: "round" }
-                                    line { x1: "8", y1: "1", x2: "8", y2: "3", stroke: "currentColor", stroke_width: "1.4", stroke_linecap: "round" }
-                                }
-                                input {
-                                    class: "todo-date-input",
-                                    r#type: "date",
-                                    value: "{local_date_str}",
-                                    oninput: move |e| {
-                                        let v = e.value();
-                                        local_date_str.set(v.clone());
-                                        if let Some(ref cb) = on_due_date_change {
-                                            cb.call((date_task_id.clone(), v));
+                        {
+                            let btn_class = if has_explicit_date {
+                                format!("{} todo-date-wrap", due_class)
+                            } else {
+                                "todo-due todo-no-date todo-date-wrap".to_string()
+                            };
+                            let due_display = task.due.to_string();
+                            rsx! {
+                                button {
+                                    class: "{btn_class}",
+                                    r#type: "button",
+                                    onclick: move |e| {
+                                        e.stop_propagation();
+                                        if let Some(mut ctx) = date_sheet_ctx {
+                                            ctx.set(Some((date_task_id.clone(), current_time_date)));
                                         }
                                     },
+                                    svg { class: "todo-meta-icon", view_box: "0 0 12 12",
+                                        rect { x: "1", y: "2", width: "10", height: "9", rx: "1.5", stroke: "currentColor", stroke_width: "1.4", fill: "none" }
+                                        line { x1: "4", y1: "1", x2: "4", y2: "3", stroke: "currentColor", stroke_width: "1.4", stroke_linecap: "round" }
+                                        line { x1: "8", y1: "1", x2: "8", y2: "3", stroke: "currentColor", stroke_width: "1.4", stroke_linecap: "round" }
+                                    }
+                                    if has_explicit_date {
+                                "{due_display}"
+                                if let Some(t) = task.due_time.as_deref() {
+                                    span { class: "todo-due-time", " {t}" }
                                 }
-                            }
-                        } else {
-                            span { class: "todo-due todo-no-date",
-                                svg { class: "todo-meta-icon", view_box: "0 0 12 12",
-                                    rect { x: "1", y: "2", width: "10", height: "9", rx: "1.5", stroke: "currentColor", stroke_width: "1.4", fill: "none" }
-                                    line { x1: "4", y1: "1", x2: "4", y2: "3", stroke: "currentColor", stroke_width: "1.4", stroke_linecap: "round" }
-                                    line { x1: "8", y1: "1", x2: "8", y2: "3", stroke: "currentColor", stroke_width: "1.4", stroke_linecap: "round" }
-                                }
+                            } else {
                                 "No date"
+                            }
+                                }
                             }
                         }
                     }

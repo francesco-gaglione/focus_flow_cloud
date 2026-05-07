@@ -90,6 +90,7 @@ pub struct UpdateTaskDto {
     pub description: Option<String>,
     pub due_date: Option<i64>,
     pub completed: Option<bool>,
+    pub priority: Option<TaskPriority>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
