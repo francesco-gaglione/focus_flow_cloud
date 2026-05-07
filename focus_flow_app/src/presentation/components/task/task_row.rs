@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use shared::task::TaskPriority;
 
-use crate::use_cases::tasks::task_list_uc::TodoTask;
+use crate::use_cases::tasks::task_list_uc::{TaskDue, TodoTask};
 
 #[derive(Props, Clone, PartialEq)]
 pub struct TaskRowProps {
@@ -14,44 +14,110 @@ pub struct TaskRowProps {
     pub on_start_timer: Option<EventHandler<(String, String)>>,
     #[props(optional)]
     pub on_add_subtask: Option<EventHandler<(String, String)>>,
+    /// Called with (task_id, new_priority) when priority is changed locally.
+    /// Wire up when API is ready.
+    #[props(optional)]
+    pub on_priority_change: Option<EventHandler<(String, Option<TaskPriority>)>>,
+    /// Called with (task_id, iso_date "YYYY-MM-DD" or empty) when date is changed.
+    /// Wire up when API is ready.
+    #[props(optional)]
+    pub on_due_date_change: Option<EventHandler<(String, String)>>,
 }
 
 #[component]
 pub fn TaskRow(props: TaskRowProps) -> Element {
     let task = &props.task;
+
+    // ── local editable state ─────────────────────────────────────────────
+    let initial_date = match &task.due {
+        TaskDue::Overdue(d) | TaskDue::Today(d) | TaskDue::Tomorrow(d) | TaskDue::Upcoming(d) => {
+            d.format("%Y-%m-%d").to_string()
+        }
+    };
+    let mut local_date_str = use_signal(move || initial_date.clone());
+    let has_explicit_date = task.due_date_set;
+
+    // ── priority sheet context (provided by parent view) ─────────────────
+    let prio_sheet_ctx =
+        dioxus::core::try_consume_context::<Signal<Option<(String, Option<TaskPriority>)>>>();
+
+    // ── menu state ───────────────────────────────────────────────────────
     let mut expanded = use_signal(|| false);
     let mut show_menu = use_signal(|| false);
     let mut menu_x: Signal<f64> = use_signal(|| 0.0);
     let mut menu_y: Signal<f64> = use_signal(|| 0.0);
 
-    let row_class = if task.done {
-        "todo-row done"
-    } else {
-        "todo-row"
+    // ── derived display values ───────────────────────────────────────────
+    let (due_mod, is_overdue, is_today) = match &task.due {
+        TaskDue::Overdue(_) => ("overdue", true, false),
+        TaskDue::Today(_) => ("today", false, true),
+        _ => ("", false, false),
     };
-    let due_label = task.due.to_string();
-    let cat_color = task.cat_color.as_deref().unwrap_or("white").to_string();
+    let due_class = format!("todo-due {}", due_mod);
+
+    // Left stripe: priority color overrides category color
+    let cat_color = task.cat_color.as_deref().unwrap_or("#888").to_string();
+    let stripe_color = match task.priority {
+        Some(TaskPriority::Low) => "#6b7280".to_string(),
+        Some(TaskPriority::Medium) => "#d97706".to_string(),
+        Some(TaskPriority::High) => "#ef4444".to_string(),
+        Some(TaskPriority::Urgent) => "#7c3aed".to_string(),
+        None => cat_color.clone(),
+    };
+
+    // Row class includes urgency tint modifiers
+    let row_class = {
+        let mut c = if task.done {
+            "todo-row done"
+        } else {
+            "todo-row"
+        }
+        .to_string();
+        if !task.done {
+            if is_overdue {
+                c.push_str(" overdue-row");
+            } else if is_today {
+                c.push_str(" today-row");
+            }
+        }
+        c
+    };
+
+    // Priority badge values — always rendered (shows "—" when none)
+    let (p_lvl, p_lbl) = match task.priority {
+        Some(TaskPriority::Low) => ("low", "LOW"),
+        Some(TaskPriority::Medium) => ("medium", "MED"),
+        Some(TaskPriority::High) => ("high", "HIGH"),
+        Some(TaskPriority::Urgent) => ("urgent", "URGENT"),
+        None => ("none", "—"),
+    };
+
+    // Subtask progress
+    let subtask_total = task.subtasks.len();
+    let subtask_done = task.subtasks.iter().filter(|s| s.is_completed).count();
+    let has_subtasks = subtask_total > 0;
+    let subtask_pct = if subtask_total > 0 {
+        subtask_done * 100 / subtask_total
+    } else {
+        0
+    };
+
+    let done = task.done;
     let id = task.id.clone();
+    let priority_task_id = task.id.clone();
+    let date_task_id = task.id.clone();
     let delete_id = task.id.clone();
     let timer_id = task.id.clone();
     let timer_title = task.title.clone();
     let on_delete = props.on_delete.clone();
     let on_start_timer = props.on_start_timer.clone();
     let on_add_subtask = props.on_add_subtask.clone();
+    let on_due_date_change = props.on_due_date_change.clone();
+    let current_priority = task.priority;
     let has_timer = on_start_timer.is_some();
     let has_add_subtask = on_add_subtask.is_some();
     let add_task_id = task.id.clone();
-    let priority_label = task.priority.as_ref().map(|p| match p {
-        TaskPriority::Low => ("low", "LOW"),
-        TaskPriority::Medium => ("medium", "MED"),
-        TaskPriority::High => ("high", "HIGH"),
-        TaskPriority::Urgent => ("urgent", "URGENT"),
-    });
     let mut new_subtask_title = use_signal(String::new);
-    let subtask_total = task.subtasks.len();
-    let subtask_done = task.subtasks.iter().filter(|s| s.is_completed).count();
-    let has_subtasks = subtask_total > 0;
-    let done = task.done;
 
     struct SubtaskItem {
         task_id: String,
@@ -92,9 +158,11 @@ pub fn TaskRow(props: TaskRowProps) -> Element {
                 menu_y.set(p.y);
                 show_menu.set(true);
             },
+
             div {
                 class: "{row_class}",
-                style: "--cat: {cat_color}",
+                style: "--cat: {stripe_color}",
+
                 div {
                     class: "todo-check",
                     onclick: move |_| props.on_toggle.call((id.clone(), !done)),
@@ -102,26 +170,86 @@ pub fn TaskRow(props: TaskRowProps) -> Element {
                         path { d: "M3 8l3 3 7-7" }
                     }
                 }
+
                 div { class: "todo-body",
                     div { class: "todo-title", "{task.title}" }
-                    if task.description.is_some() {
-                        div { class: "todo-description", "{task.description.clone().unwrap()}" }
+                    if let Some(desc) = task.description.as_deref() {
+                        div { class: "todo-description", "{desc}" }
                     }
+
                     div { class: "todo-sub",
-                        if let Some((lvl, lbl)) = priority_label {
-                            span { class: "todo-priority todo-priority-{lvl}", "{lbl}" }
-                            span { "·" }
+                        button {
+                            class: "todo-priority todo-priority-{p_lvl}",
+                            r#type: "button",
+                            title: "Tap to change priority",
+                            onclick: move |e| {
+                                e.stop_propagation();
+                                if let Some(mut ctx) = prio_sheet_ctx {
+                                    ctx.set(Some((priority_task_id.clone(), current_priority)));
+                                }
+                            },
+                            "{p_lbl}"
                         }
+
                         if let Some(cat) = task.cat.as_deref() {
                             span { class: "todo-cat", "@{cat}" }
                         }
-                        span { "·" }
-                        span { "{due_label}" }
-                        if has_subtasks || has_add_subtask {
-                            span { "·" }
-                            span { class: "todo-subtask-ct", "{subtask_done}/{subtask_total}" }
+
+                        if has_explicit_date {
+                            label { class: "{due_class} todo-date-wrap",
+                                svg { class: "todo-meta-icon", view_box: "0 0 12 12",
+                                    rect { x: "1", y: "2", width: "10", height: "9", rx: "1.5", stroke: "currentColor", stroke_width: "1.4", fill: "none" }
+                                    line { x1: "4", y1: "1", x2: "4", y2: "3", stroke: "currentColor", stroke_width: "1.4", stroke_linecap: "round" }
+                                    line { x1: "8", y1: "1", x2: "8", y2: "3", stroke: "currentColor", stroke_width: "1.4", stroke_linecap: "round" }
+                                }
+                                input {
+                                    class: "todo-date-input",
+                                    r#type: "date",
+                                    value: "{local_date_str}",
+                                    oninput: move |e| {
+                                        let v = e.value();
+                                        local_date_str.set(v.clone());
+                                        if let Some(ref cb) = on_due_date_change {
+                                            cb.call((date_task_id.clone(), v));
+                                        }
+                                    },
+                                }
+                            }
+                        } else {
+                            span { class: "todo-due todo-no-date",
+                                svg { class: "todo-meta-icon", view_box: "0 0 12 12",
+                                    rect { x: "1", y: "2", width: "10", height: "9", rx: "1.5", stroke: "currentColor", stroke_width: "1.4", fill: "none" }
+                                    line { x1: "4", y1: "1", x2: "4", y2: "3", stroke: "currentColor", stroke_width: "1.4", stroke_linecap: "round" }
+                                    line { x1: "8", y1: "1", x2: "8", y2: "3", stroke: "currentColor", stroke_width: "1.4", stroke_linecap: "round" }
+                                }
+                                "No date"
+                            }
                         }
                     }
+
+                    // Subtask progress bar
+                    if has_subtasks {
+                        div { class: "todo-progress",
+                            div { class: "todo-progress-bar-track",
+                                div { class: "todo-progress-bar", style: "width: {subtask_pct}%" }
+                            }
+                            span { class: "todo-progress-label", "{subtask_done}/{subtask_total}" }
+                        }
+                    }
+                }
+
+                // ── Actions ───────────────────────────────────────────────
+                button {
+                    class: "todo-more",
+                    r#type: "button",
+                    onclick: move |e| {
+                        e.stop_propagation();
+                        let p = e.client_coordinates();
+                        menu_x.set(p.x);
+                        menu_y.set(p.y);
+                        show_menu.set(true);
+                    },
+                    "⋯"
                 }
                 if can_expand {
                     button {
@@ -143,10 +271,12 @@ pub fn TaskRow(props: TaskRowProps) -> Element {
                     }
                 }
             }
+
+            // ── Subtask panel ─────────────────────────────────────────────
             if can_expand && *expanded.read() {
                 div {
                     class: "todo-subtask-list",
-                    style: "--cat: {cat_color}",
+                    style: "--cat: {stripe_color}",
                     for sub in subtask_items {
                         div { class: "todo-subtask-item",
                             div {
@@ -192,6 +322,7 @@ pub fn TaskRow(props: TaskRowProps) -> Element {
             }
         }
 
+        // ── Context menu ──────────────────────────────────────────────────
         if *show_menu.read() {
             div {
                 class: "ctx-overlay",
@@ -203,7 +334,7 @@ pub fn TaskRow(props: TaskRowProps) -> Element {
             }
             div {
                 class: "ctx-menu",
-                style: "left: {menu_x}px; top: {menu_y}px;",
+                style: "left: min({menu_x}px, calc(100vw - 184px)); top: {menu_y}px;",
                 if has_timer {
                     button {
                         class: "ctx-item",
@@ -238,5 +369,6 @@ pub fn TaskRow(props: TaskRowProps) -> Element {
                 }
             }
         }
+
     }
 }

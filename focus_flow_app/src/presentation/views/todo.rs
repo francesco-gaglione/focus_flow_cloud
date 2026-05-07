@@ -3,9 +3,14 @@ use std::time::Duration;
 use dioxus::prelude::*;
 use dioxus_primitives::toast::{use_toast, ToastOptions};
 
+use shared::task::TaskPriority;
+
 use crate::{
     components::select::{Select, SelectList, SelectOption, SelectTrigger, SelectValue},
-    presentation::components::task::{create_task_sheet::CreateTaskSheet, task_row::TaskRow},
+    presentation::components::{
+        common_components::bottom_sheet::BottomSheet,
+        task::{create_task_sheet::CreateTaskSheet, task_row::TaskRow},
+    },
     use_cases::tasks::{
         create_subtask_uc::create_subtask_uc,
         create_task_uc::{create_task_uc, CreateTaskCommand},
@@ -27,6 +32,8 @@ pub fn Todo() -> Element {
     let mut cat_filter = use_signal(|| "all".to_string());
     let mut show_modal = use_signal(|| false);
     let toast_api = use_toast();
+    let mut prio_sheet: Signal<Option<(String, Option<TaskPriority>)>> =
+        use_context_provider(|| Signal::new(None));
 
     let mut fetch_task_list = use_resource(move || async move {
         //TODO review the get all task api and consider to add some filters so the app
@@ -286,6 +293,50 @@ pub fn Todo() -> Element {
                 });
             },
             on_close: move |_| show_modal.set(false),
+        }
+
+        // Priority picker sheet
+        {
+            let sheet_state = prio_sheet.read().clone();
+            let task_id = sheet_state.as_ref().map(|(id, _)| id.clone()).unwrap_or_default();
+            let current = sheet_state.as_ref().map(|(_, p)| *p).unwrap_or(None);
+            rsx! {
+                BottomSheet {
+                    show: sheet_state.is_some(),
+                    title: "Set priority".to_string(),
+                    on_close: move |_| prio_sheet.set(None),
+                    div { class: "prio-sheet-options",
+                        for (variant, label, class_mod) in [
+                            (None, "None", "none"),
+                            (Some(TaskPriority::Low), "Low", "low"),
+                            (Some(TaskPriority::Medium), "Medium", "medium"),
+                            (Some(TaskPriority::High), "High", "high"),
+                            (Some(TaskPriority::Urgent), "Urgent", "urgent"),
+                        ] {
+                            {
+                                let tid = task_id.clone();
+                                rsx! {
+                                    button {
+                                        class: "prio-sheet-btn prio-sheet-{class_mod}",
+                                        r#type: "button",
+                                        onclick: move |_| {
+                                            tasks.write().iter_mut()
+                                                .find(|t| t.id == tid)
+                                                .map(|t| t.priority = variant);
+                                            prio_sheet.set(None);
+                                        },
+                                        span { class: "prio-sheet-dot" }
+                                        "{label}"
+                                        if current == variant {
+                                            span { class: "prio-sheet-check", "✓" }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
