@@ -4,7 +4,7 @@ use uuid::Uuid;
 
 use crate::entities::{
     reminder::Reminder,
-    tasks::{subtask::Subtask, task_priority::TaskPriority},
+    tasks::{subtask::Subtask, task_priority::TaskPriority, task_schedule::TaskSchedule},
 };
 
 #[derive(Debug, Clone, Error, PartialEq)]
@@ -24,7 +24,7 @@ pub struct Task {
     priority: Option<TaskPriority>,
     category_id: Option<Uuid>,
     sub_tasks: Vec<Subtask>,
-    due_date: Option<DateTime<Utc>>,
+    schedule: TaskSchedule,
     completed_at: Option<DateTime<Utc>>,
     reminders: Vec<Reminder>,
 }
@@ -33,7 +33,7 @@ impl Task {
     pub fn new(
         user_id: Uuid,
         title: String,
-        due_date: Option<DateTime<Utc>>,
+        schedule: TaskSchedule,
         description: Option<String>,
     ) -> Self {
         Self {
@@ -44,7 +44,7 @@ impl Task {
             priority: None,
             category_id: None,
             sub_tasks: Vec::new(),
-            due_date,
+            schedule,
             completed_at: None,
             reminders: Vec::new(),
         }
@@ -58,7 +58,7 @@ impl Task {
         priority: Option<TaskPriority>,
         category_id: Option<Uuid>,
         sub_tasks: Vec<Subtask>,
-        due_date: Option<DateTime<Utc>>,
+        schedule: TaskSchedule,
         completed_at: Option<DateTime<Utc>>,
         reminders: Vec<Reminder>,
     ) -> Self {
@@ -70,7 +70,7 @@ impl Task {
             priority,
             category_id,
             sub_tasks,
-            due_date,
+            schedule,
             completed_at,
             reminders,
         }
@@ -81,9 +81,7 @@ impl Task {
     }
 
     pub fn is_overdue(&self) -> bool {
-        self.due_date
-            .map(|d| d < Utc::now() && !self.is_completed())
-            .unwrap_or(false)
+        self.schedule.is_overdue()
     }
 
     pub fn overdue_reminders(&self) -> Vec<&Reminder> {
@@ -126,8 +124,8 @@ impl Task {
         self.description = description;
     }
 
-    pub fn update_due_date(&mut self, due_date: Option<DateTime<Utc>>) {
-        self.due_date = due_date;
+    pub fn update_schedule(&mut self, schedule: TaskSchedule) {
+        self.schedule = schedule;
     }
 
     pub fn update_priority(&mut self, priority: Option<TaskPriority>) {
@@ -148,10 +146,6 @@ impl Task {
 
     pub fn set_priority(&mut self, priority: TaskPriority) {
         self.priority = Some(priority);
-    }
-
-    pub fn set_due_date(&mut self, due_date: Option<DateTime<Utc>>) {
-        self.due_date = due_date;
     }
 
     pub fn add_subtask(&mut self, subtask: Subtask) {
@@ -213,8 +207,8 @@ impl Task {
         self.category_id
     }
 
-    pub fn due_date(&self) -> Option<DateTime<Utc>> {
-        self.due_date
+    pub fn schedule(&self) -> TaskSchedule {
+        self.schedule.clone()
     }
 
     pub fn completed_at(&self) -> Option<DateTime<Utc>> {
@@ -247,23 +241,25 @@ mod tests {
 
     use crate::entities::{
         reminder::Reminder,
-        tasks::{subtask::Subtask, task::Task, task_priority::TaskPriority},
+        tasks::{
+            subtask::Subtask, task::Task, task_priority::TaskPriority, task_schedule::TaskSchedule,
+        },
     };
 
     #[test]
     fn test_task_creation() {
         let user_id = Uuid::new_v4();
         let title = "Test Task";
-        let date = Utc::now() + Duration::from_mins(10);
+        let schedule = TaskSchedule::Unscheduled;
         let description = "Test description";
         let task = Task::new(
             user_id,
             title.to_string(),
-            Some(date),
+            schedule.clone(),
             Some(description.to_string()),
         );
         assert_eq!(task.title(), title);
-        assert_eq!(task.due_date(), Some(date));
+        assert_eq!(task.schedule(), schedule);
         assert_eq!(task.description(), Some(description));
     }
 
@@ -271,16 +267,16 @@ mod tests {
     fn test_task_getters() {
         let user_id = Uuid::new_v4();
         let title = "Test Task";
-        let date = Utc::now() + Duration::from_mins(10);
+        let schedule = TaskSchedule::Unscheduled;
         let description = "Test description";
         let task = Task::new(
             user_id,
             title.to_string(),
-            Some(date),
+            schedule.clone(),
             Some(description.to_string()),
         );
         assert_eq!(task.title(), title);
-        assert_eq!(task.due_date(), Some(date));
+        assert_eq!(task.schedule(), schedule);
         assert_eq!(task.description(), Some(description));
         assert_eq!(task.priority(), None);
         assert_eq!(task.completed(), false);
@@ -290,16 +286,21 @@ mod tests {
     #[test]
     fn test_task_updates() {
         let user_id = Uuid::new_v4();
-        let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
+        let mut task = Task::new(
+            user_id,
+            "Test Task".to_string(),
+            TaskSchedule::Unscheduled,
+            None,
+        );
         task.update_title("Updated Task".to_string());
         task.update_description(Some("Updated description".to_string()));
         assert_eq!(task.title(), "Updated Task");
         assert_eq!(task.description(), Some("Updated description"));
         task.update_priority(Some(TaskPriority::High));
         assert_eq!(task.priority(), Some(TaskPriority::High));
-        let new_due = Utc::now() + Duration::from_mins(10);
-        task.update_due_date(Some(new_due));
-        assert_eq!(task.due_date(), Some(new_due));
+        let date = Utc::now() + Duration::from_mins(10);
+        task.update_schedule(TaskSchedule::At { starts_at: date });
+        assert_eq!(task.schedule(), TaskSchedule::At { starts_at: date });
         task.mark_completed().unwrap();
         assert_eq!(task.completed(), true);
         let new_user_id = Uuid::new_v4();
@@ -310,7 +311,12 @@ mod tests {
     #[test]
     fn test_task_subtasks() {
         let user_id = Uuid::new_v4();
-        let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
+        let mut task = Task::new(
+            user_id,
+            "Test Task".to_string(),
+            TaskSchedule::Unscheduled,
+            None,
+        );
         let subtask = Subtask::new("Subtask 1".to_string(), 0, None, None);
         task.add_subtask(subtask);
         assert_eq!(task.sub_tasks().len(), 1);
@@ -322,7 +328,12 @@ mod tests {
     #[test]
     fn test_task_subtask_deletion() {
         let user_id = Uuid::new_v4();
-        let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
+        let mut task = Task::new(
+            user_id,
+            "Test Task".to_string(),
+            TaskSchedule::Unscheduled,
+            None,
+        );
         let subtask = Subtask::new("Subtask 1".to_string(), 0, None, None);
         task.add_subtask(subtask);
         assert_eq!(task.sub_tasks().len(), 1);
@@ -333,7 +344,12 @@ mod tests {
     #[test]
     fn test_task_subtask_update() {
         let user_id = Uuid::new_v4();
-        let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
+        let mut task = Task::new(
+            user_id,
+            "Test Task".to_string(),
+            TaskSchedule::Unscheduled,
+            None,
+        );
         let subtask = Subtask::new("Subtask 1".to_string(), 0, None, None);
         task.add_subtask(subtask);
         assert_eq!(task.sub_tasks().len(), 1);
@@ -344,7 +360,12 @@ mod tests {
     #[test]
     fn test_task_subtask_completion() {
         let user_id = Uuid::new_v4();
-        let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
+        let mut task = Task::new(
+            user_id,
+            "Test Task".to_string(),
+            TaskSchedule::Unscheduled,
+            None,
+        );
         let subtask = Subtask::new("Subtask 1".to_string(), 0, None, None);
         task.add_subtask(subtask);
         task.sub_tasks_mut()[0].mark_completed();
@@ -358,7 +379,12 @@ mod tests {
         // B and C in range [1,2] shift -1 → B:0, C:1; A gets 2
         // Vec positions unchanged: [0]=A, [1]=B, [2]=C
         let user_id = Uuid::new_v4();
-        let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
+        let mut task = Task::new(
+            user_id,
+            "Test Task".to_string(),
+            TaskSchedule::Unscheduled,
+            None,
+        );
         task.add_subtask(Subtask::new("A".to_string(), 0, None, None));
         task.add_subtask(Subtask::new("B".to_string(), 1, None, None));
         task.add_subtask(Subtask::new("C".to_string(), 2, None, None));
@@ -379,7 +405,12 @@ mod tests {
         // A and B in range [0,1] shift +1 → A:1, B:2; C gets 0
         // Vec positions unchanged: [0]=A, [1]=B, [2]=C
         let user_id = Uuid::new_v4();
-        let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
+        let mut task = Task::new(
+            user_id,
+            "Test Task".to_string(),
+            TaskSchedule::Unscheduled,
+            None,
+        );
         task.add_subtask(Subtask::new("A".to_string(), 0, None, None));
         task.add_subtask(Subtask::new("B".to_string(), 1, None, None));
         task.add_subtask(Subtask::new("C".to_string(), 2, None, None));
@@ -398,7 +429,12 @@ mod tests {
     fn test_subtask_order_no_op() {
         // move to same sort_order → nothing changes
         let user_id = Uuid::new_v4();
-        let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
+        let mut task = Task::new(
+            user_id,
+            "Test Task".to_string(),
+            TaskSchedule::Unscheduled,
+            None,
+        );
         task.add_subtask(Subtask::new("A".to_string(), 0, None, None));
         task.add_subtask(Subtask::new("B".to_string(), 1, None, None));
 
@@ -412,7 +448,12 @@ mod tests {
     fn test_subtask_order_invalid_index() {
         // out-of-bounds index → no panic, no change
         let user_id = Uuid::new_v4();
-        let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
+        let mut task = Task::new(
+            user_id,
+            "Test Task".to_string(),
+            TaskSchedule::Unscheduled,
+            None,
+        );
         task.add_subtask(Subtask::new("A".to_string(), 0, None, None));
 
         task.set_subtask_order(99, 5);
@@ -426,7 +467,12 @@ mod tests {
         // B in range [1,1] shifts -1 → B:0; A gets 1
         // Vec positions unchanged: [0]=A, [1]=B
         let user_id = Uuid::new_v4();
-        let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
+        let mut task = Task::new(
+            user_id,
+            "Test Task".to_string(),
+            TaskSchedule::Unscheduled,
+            None,
+        );
         task.add_subtask(Subtask::new("A".to_string(), 0, None, None));
         task.add_subtask(Subtask::new("B".to_string(), 1, None, None));
 
@@ -441,7 +487,12 @@ mod tests {
     #[test]
     fn test_task_completion() {
         let user_id = Uuid::new_v4();
-        let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
+        let mut task = Task::new(
+            user_id,
+            "Test Task".to_string(),
+            TaskSchedule::Unscheduled,
+            None,
+        );
         let subtask = Subtask::new("Subtask 1".to_string(), 0, None, None);
         task.add_subtask(subtask);
         let res = task.complete();
@@ -456,7 +507,12 @@ mod tests {
     #[test]
     fn test_task_reminders() {
         let user_id = Uuid::new_v4();
-        let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
+        let mut task = Task::new(
+            user_id,
+            "Test Task".to_string(),
+            TaskSchedule::Unscheduled,
+            None,
+        );
         let reminder = Reminder::new(
             "Test Reminder".to_string(),
             Utc::now() + Duration::from_secs(20),
@@ -469,7 +525,12 @@ mod tests {
     #[test]
     fn test_task_reminder_overdue() {
         let user_id = Uuid::new_v4();
-        let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
+        let mut task = Task::new(
+            user_id,
+            "Test Task".to_string(),
+            TaskSchedule::Unscheduled,
+            None,
+        );
         let reminder = Reminder::new(
             "Test Reminder".to_string(),
             Utc::now() - Duration::from_secs(20),
@@ -484,7 +545,12 @@ mod tests {
     #[test]
     fn test_task_reminder_overdue_sent() {
         let user_id = Uuid::new_v4();
-        let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
+        let mut task = Task::new(
+            user_id,
+            "Test Task".to_string(),
+            TaskSchedule::Unscheduled,
+            None,
+        );
         let reminder = Reminder::new(
             "Test Reminder".to_string(),
             Utc::now() - Duration::from_secs(20),
@@ -502,7 +568,12 @@ mod tests {
     #[test]
     fn test_task_priority() {
         let user_id = Uuid::new_v4();
-        let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
+        let mut task = Task::new(
+            user_id,
+            "Test Task".to_string(),
+            TaskSchedule::Unscheduled,
+            None,
+        );
         assert_eq!(task.priority(), None);
         task.set_priority(TaskPriority::High);
         assert_eq!(task.priority(), Some(TaskPriority::High));
@@ -511,32 +582,32 @@ mod tests {
     }
 
     #[test]
-    fn test_task_due_date() {
-        let user_id = Uuid::new_v4();
-        let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
-        assert_eq!(task.due_date(), None);
-        let due_date = Utc::now() + Duration::from_secs(30);
-        task.set_due_date(Some(due_date));
-        assert_eq!(task.due_date(), Some(due_date));
-        let new_due_date = Utc::now() + Duration::from_secs(60);
-        task.set_due_date(Some(new_due_date));
-        assert_eq!(task.due_date(), Some(new_due_date));
-    }
-
-    #[test]
     fn test_task_overdue() {
         let user_id = Uuid::new_v4();
-        let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
-        assert_eq!(task.due_date(), None);
+        let mut task = Task::new(
+            user_id,
+            "Test Task".to_string(),
+            TaskSchedule::Unscheduled,
+            None,
+        );
+        assert_eq!(task.schedule(), TaskSchedule::Unscheduled);
         let due_date = Utc::now() - Duration::from_secs(30);
-        task.set_due_date(Some(due_date));
+        let schedule = TaskSchedule::At {
+            starts_at: due_date,
+        };
+        task.update_schedule(schedule);
         assert!(task.is_overdue())
     }
 
     #[test]
     fn test_task_category_id() {
         let user_id = Uuid::new_v4();
-        let mut task = Task::new(user_id, "Test Task".to_string(), None, None);
+        let mut task = Task::new(
+            user_id,
+            "Test Task".to_string(),
+            TaskSchedule::Unscheduled,
+            None,
+        );
         assert_eq!(task.category_id(), None);
 
         let category_id = Uuid::new_v4();
@@ -560,7 +631,7 @@ mod tests {
             None,
             Some(category_id),
             Vec::new(),
-            None,
+            TaskSchedule::Unscheduled,
             None,
             Vec::new(),
         );

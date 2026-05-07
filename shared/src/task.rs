@@ -10,7 +10,7 @@ pub struct TaskDto {
     pub title: String,
     pub description: Option<String>,
     pub priority: Option<TaskPriority>,
-    pub due_date: Option<i64>,
+    pub schedule: TaskScheduleDto,
     pub completed_at: Option<i64>,
     pub subtasks: Vec<SubtaskDto>,
     pub category_id: Option<Uuid>,
@@ -35,6 +35,16 @@ pub enum TaskPriority {
     Medium,
     High,
     Urgent,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
+#[serde(rename_all = "camelCase")]
+pub enum TaskScheduleDto {
+    Unscheduled,
+    AllDay { date: i64 },
+    At { starts_at: i64 },
+    Span { starts_at: i64, duration: i64 },
 }
 
 #[derive(Debug, Serialize, Deserialize, Validate)]
@@ -63,7 +73,7 @@ pub struct CreateTaskDto {
     pub title: String,
     #[validate(length(max = 255, message = "Description must not exceed 255 characters"))]
     pub description: Option<String>,
-    pub due_date: Option<i64>,
+    pub schedule: Option<TaskScheduleDto>,
     #[validate(nested)]
     pub subtasks: Option<Vec<CreateSubtaskDto>>,
     pub category_id: Option<Uuid>,
@@ -88,7 +98,7 @@ pub struct UpdateTaskDto {
     pub title: Option<String>,
     #[validate(length(max = 255, message = "Description must not exceed 255 characters"))]
     pub description: Option<String>,
-    pub due_date: Option<i64>,
+    pub schedule: Option<TaskScheduleDto>,
     pub completed: Option<bool>,
     pub priority: Option<TaskPriority>,
 }

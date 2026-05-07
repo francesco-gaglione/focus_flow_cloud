@@ -1,69 +1,4 @@
 /* ============================================================
-   FILTER CHIPS
-   ============================================================ */
-.filter-strip {
-    display: flex;
-    gap: 6px;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    padding: 4px 0 12px;
-    scroll-snap-type: x mandatory;
-}
-.filter-strip::-webkit-scrollbar {
-    display: none;
-}
-
-.chip {
-    flex-shrink: 0;
-    scroll-snap-align: start;
-    appearance: none;
-    background: var(--bg-raised);
-    border: 1px solid var(--border);
-    border-radius: var(--r-full);
-    color: var(--text-subtle);
-    font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: var(--tracking-data);
-    text-transform: uppercase;
-    padding: 5px 12px;
-    height: 28px;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    transition:
-        background var(--dur-fast) var(--ease-tech),
-        border-color var(--dur-fast) var(--ease-tech),
-        color var(--dur-fast) var(--ease-tech);
-}
-.chip:hover {
-    background: var(--ds-gray-200);
-    border-color: var(--border-strong);
-    color: var(--text-muted);
-}
-.chip:active {
-    background: var(--ds-gray-300);
-}
-.chip.active {
-    background: var(--accent-soft);
-    border-color: var(--accent);
-    color: var(--accent);
-}
-
-.chip .count {
-    background: var(--ds-gray-300);
-    color: var(--text-subtle);
-    padding: 1px 5px;
-    font-size: 10px;
-    border-radius: var(--r-full);
-}
-.chip.active .count {
-    background: var(--accent);
-    color: #fff;
-}
-
-/* ============================================================
    SECTION HEADERS — colored accent line for today/overdue
    ============================================================ */
 .section-head {
@@ -110,31 +45,6 @@
     gap: 8px;
 }
 
-.section-delete-all-btn {
-    appearance: none;
-    background: transparent;
-    border: 1px solid var(--danger);
-    border-radius: var(--r-sm);
-    color: var(--danger);
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: var(--tracking-data);
-    text-transform: uppercase;
-    padding: 3px 8px;
-    height: 22px;
-    cursor: pointer;
-    transition:
-        background var(--dur-fast) var(--ease-tech),
-        color var(--dur-fast) var(--ease-tech);
-}
-.section-delete-all-btn:hover {
-    background: var(--danger);
-    color: #fff;
-}
-.section-delete-all-btn:active {
-    transform: scale(0.97);
-}
 
 /* ============================================================
    FILTER SELECTS — override primitives theme vars with our tokens
@@ -385,19 +295,6 @@
     gap: 6px;
     margin-top: 6px;
 }
-.todo-progress-bar-track {
-    flex: 1;
-    height: 3px;
-    background: var(--border);
-    border-radius: 2px;
-    overflow: hidden;
-}
-.todo-progress-bar {
-    height: 3px;
-    background: var(--accent);
-    border-radius: 2px;
-    transition: width var(--dur-base) var(--ease-tech);
-}
 .todo-progress-label {
     font-family: var(--font-mono);
     font-size: 10px;
@@ -561,82 +458,6 @@
 }
 
 /* ============================================================
-   SUBTASK — sheet rows + inline count
-   ============================================================ */
-.sheet-subtask-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    background: var(--bg-raised);
-    border: 1px solid var(--border);
-    border-radius: var(--r-md);
-    margin-bottom: 4px;
-}
-.sheet-subtask-title {
-    flex: 1;
-    font-size: 14px;
-    color: var(--text-muted);
-    line-height: 1.4;
-}
-.sheet-subtask-rm {
-    width: 24px;
-    height: 24px;
-    background: transparent;
-    border: 0;
-    color: var(--text-subtle);
-    cursor: pointer;
-    font-size: 18px;
-    line-height: 1;
-    border-radius: var(--r-sm);
-    display: grid;
-    place-items: center;
-    flex-shrink: 0;
-    transition: color var(--dur-fast) var(--ease-tech);
-}
-.sheet-subtask-rm:hover {
-    color: var(--danger);
-}
-
-.sheet-subtask-add {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    margin-top: 4px;
-}
-.sheet-subtask-add .sheet-input {
-    flex: 1;
-    height: 38px;
-    font-size: 14px;
-}
-.sheet-subtask-add-btn {
-    width: 38px;
-    height: 38px;
-    flex-shrink: 0;
-    background: var(--bg-raised);
-    border: 1px solid var(--border);
-    border-radius: var(--r-md);
-    color: var(--accent);
-    cursor: pointer;
-    display: grid;
-    place-items: center;
-    transition:
-        background var(--dur-fast) var(--ease-tech),
-        border-color var(--dur-fast) var(--ease-tech);
-}
-.sheet-subtask-add-btn:hover {
-    background: var(--accent-soft);
-    border-color: var(--accent);
-}
-.sheet-subtask-add-btn svg {
-    width: 14px;
-    height: 14px;
-    stroke: currentColor;
-    fill: none;
-    stroke-width: 1.8;
-}
-
-/* ============================================================
    PRIORITY PICKER BOTTOM SHEET
    ============================================================ */
 .prio-sheet-options {
@@ -771,7 +592,6 @@
 
 .date-sheet-time-input {
     display: block;
-    width: 100%;
     box-sizing: border-box;
     background: var(--bg);
     border: 1px solid var(--border);
@@ -792,50 +612,4 @@
     display: flex;
     gap: 8px;
     margin-top: 4px;
-}
-.date-sheet-clear-btn {
-    appearance: none;
-    flex: 1;
-    padding: 14px;
-    background: var(--bg-raised);
-    border: 1px solid var(--border);
-    border-radius: var(--r-md);
-    color: var(--text-subtle);
-    font-family: var(--font-ui);
-    font-size: 15px;
-    font-weight: 500;
-    cursor: pointer;
-    transition:
-        background var(--dur-fast) var(--ease-tech),
-        border-color var(--dur-fast) var(--ease-tech),
-        color var(--dur-fast) var(--ease-tech);
-}
-.date-sheet-clear-btn:hover {
-    background: var(--ds-gray-200);
-    border-color: var(--border-strong);
-    color: var(--text);
-}
-.date-sheet-clear-btn:active {
-    transform: scale(0.98);
-}
-.date-sheet-confirm-btn {
-    appearance: none;
-    flex: 2;
-    padding: 14px;
-    background: var(--accent);
-    border: none;
-    border-radius: var(--r-md);
-    color: #fff;
-    font-family: var(--font-ui);
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: opacity var(--dur-fast) var(--ease-tech);
-}
-.date-sheet-confirm-btn:disabled {
-    opacity: 0.4;
-    cursor: default;
-}
-.date-sheet-confirm-btn:not(:disabled):active {
-    transform: scale(0.98);
 }

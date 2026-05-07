@@ -1,11 +1,10 @@
-use chrono::{DateTime, Utc};
 use dioxus::{
     logger::tracing::debug,
     signals::{ReadableExt, Signal},
 };
 use shared::task::{
     CreateSubtaskDto, CreateSubtaskResponseDto, CreateTaskDto, CreateTaskResponseDto,
-    DeleteTaskResponseDto, TaskPriority, TasksResponseDto, UpdateSubTaskDto,
+    DeleteTaskResponseDto, TaskPriority, TaskScheduleDto, TasksResponseDto, UpdateSubTaskDto,
     UpdateSubTaskResponseDto, UpdateTaskDto, UpdateTaskResponseDto,
 };
 
@@ -40,28 +39,27 @@ pub async fn update_task(
     task_id: &str,
     title: Option<String>,
     description: Option<String>,
-    due_date: Option<DateTime<Utc>>,
+    schedule: Option<TaskScheduleDto>,
     completed: Option<bool>,
     priority: Option<TaskPriority>,
 ) -> ApiResult<()> {
     let api_signal = dioxus::core::try_consume_context::<Signal<ApiClient>>()
         .ok_or_else(|| ApiError::ClientError("ApiClient signal not found".to_string()))?;
     let api = (*api_signal.read()).clone();
-    let complete_task_dto = UpdateTaskDto {
-        title: title,
-        description: description,
-        due_date: due_date.map(|d| d.timestamp()),
-        completed: completed,
-        priority: priority,
+    let dto = UpdateTaskDto {
+        title,
+        description,
+        schedule,
+        completed,
+        priority,
     };
-
-    debug!("Completing task: {:?}", complete_task_dto);
+    debug!("Updating task: {:?}", dto);
     let _ = api
         .patch::<UpdateTaskDto, UpdateTaskResponseDto>(
             &format!("/api/task/{}", task_id),
             None,
             None,
-            &complete_task_dto,
+            &dto,
         )
         .await?;
     Ok(())
@@ -91,7 +89,6 @@ pub async fn udpate_subtask(
         .ok_or_else(|| ApiError::ClientError("ApiClient signal not found".to_string()))?;
     let api = (*api_signal.read()).clone();
     let delelete_task_dto = UpdateSubTaskDto { completed };
-
     debug!("Completing subtask: {:?}", delelete_task_dto);
     let _ = api
         .patch::<UpdateSubTaskDto, UpdateSubTaskResponseDto>(

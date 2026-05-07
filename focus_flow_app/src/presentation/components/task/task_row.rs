@@ -1,9 +1,10 @@
-use chrono::Datelike;
 use dioxus::prelude::*;
 use shared::task::TaskPriority;
-use time::Date as TimeDate;
 
-use crate::use_cases::tasks::task_list_uc::{TaskDue, TodoTask};
+use crate::{
+    components::progress::{Progress, ProgressIndicator},
+    use_cases::tasks::task_list_uc::{TaskDue, TaskSchedule, TodoTask},
+};
 
 #[derive(Props, Clone, PartialEq)]
 pub struct TaskRowProps {
@@ -16,12 +17,8 @@ pub struct TaskRowProps {
     pub on_start_timer: Option<EventHandler<(String, String)>>,
     #[props(optional)]
     pub on_add_subtask: Option<EventHandler<(String, String)>>,
-    /// Called with (task_id, new_priority) when priority is changed locally.
-    /// Wire up when API is ready.
     #[props(optional)]
     pub on_priority_change: Option<EventHandler<(String, Option<TaskPriority>)>>,
-    /// Called with (task_id, iso_date "YYYY-MM-DD" or empty) when date is changed.
-    /// Wire up when API is ready.
     #[props(optional)]
     pub on_due_date_change: Option<EventHandler<(String, String)>>,
 }
@@ -30,25 +27,11 @@ pub struct TaskRowProps {
 pub fn TaskRow(props: TaskRowProps) -> Element {
     let task = &props.task;
 
-    let has_explicit_date = task.due_date_set;
-
-    // Compute current date as time::Date for the picker context
-    let current_time_date: Option<TimeDate> = if has_explicit_date {
-        match &task.due {
-            TaskDue::Overdue(d) | TaskDue::Today(d) | TaskDue::Tomorrow(d) | TaskDue::Upcoming(d) => {
-                time::Month::try_from(d.month() as u8).ok()
-                    .and_then(|m| TimeDate::from_calendar_date(d.year(), m, d.day() as u8).ok())
-            }
-        }
-    } else {
-        None
-    };
-
     // ── sheet contexts (provided by parent view) ──────────────────────────
     let prio_sheet_ctx =
         dioxus::core::try_consume_context::<Signal<Option<(String, Option<TaskPriority>)>>>();
     let date_sheet_ctx =
-        dioxus::core::try_consume_context::<Signal<Option<(String, Option<TimeDate>)>>>();
+        dioxus::core::try_consume_context::<Signal<Option<(String, TaskSchedule)>>>();
 
     // ── menu state ───────────────────────────────────────────────────────
     let mut expanded = use_signal(|| false);
@@ -64,7 +47,6 @@ pub fn TaskRow(props: TaskRowProps) -> Element {
     };
     let due_class = format!("todo-due {}", due_mod);
 
-    // Left stripe: priority color overrides category color
     let cat_color = task.cat_color.as_deref().unwrap_or("#888").to_string();
     let stripe_color = match task.priority {
         Some(TaskPriority::Low) => "#6b7280".to_string(),
@@ -74,25 +56,15 @@ pub fn TaskRow(props: TaskRowProps) -> Element {
         None => cat_color.clone(),
     };
 
-    // Row class includes urgency tint modifiers
     let row_class = {
-        let mut c = if task.done {
-            "todo-row done"
-        } else {
-            "todo-row"
-        }
-        .to_string();
+        let mut c = if task.done { "todo-row done" } else { "todo-row" }.to_string();
         if !task.done {
-            if is_overdue {
-                c.push_str(" overdue-row");
-            } else if is_today {
-                c.push_str(" today-row");
-            }
+            if is_overdue { c.push_str(" overdue-row"); }
+            else if is_today { c.push_str(" today-row"); }
         }
         c
     };
 
-    // Priority badge values — always rendered (shows "—" when none)
     let (p_lvl, p_lbl) = match task.priority {
         Some(TaskPriority::Low) => ("low", "LOW"),
         Some(TaskPriority::Medium) => ("medium", "MED"),
@@ -101,15 +73,9 @@ pub fn TaskRow(props: TaskRowProps) -> Element {
         None => ("none", "—"),
     };
 
-    // Subtask progress
     let subtask_total = task.subtasks.len();
     let subtask_done = task.subtasks.iter().filter(|s| s.is_completed).count();
     let has_subtasks = subtask_total > 0;
-    let subtask_pct = if subtask_total > 0 {
-        subtask_done * 100 / subtask_total
-    } else {
-        0
-    };
 
     let done = task.done;
     let id = task.id.clone();
@@ -121,12 +87,14 @@ pub fn TaskRow(props: TaskRowProps) -> Element {
     let on_delete = props.on_delete.clone();
     let on_start_timer = props.on_start_timer.clone();
     let on_add_subtask = props.on_add_subtask.clone();
-    let on_due_date_change = props.on_due_date_change.clone();
     let current_priority = task.priority;
+    let current_schedule = task.schedule.clone();
     let has_timer = on_start_timer.is_some();
     let has_add_subtask = on_add_subtask.is_some();
     let add_task_id = task.id.clone();
     let mut new_subtask_title = use_signal(String::new);
+
+    let has_explicit_date = task.due_date_set;
 
     struct SubtaskItem {
         task_id: String,
@@ -146,16 +114,8 @@ pub fn TaskRow(props: TaskRowProps) -> Element {
         .collect();
 
     let can_expand = has_subtasks || has_add_subtask;
-    let wrap_class = if can_expand && *expanded.read() {
-        "todo-row-wrap expanded"
-    } else {
-        "todo-row-wrap"
-    };
-    let expand_btn_class = if *expanded.read() {
-        "todo-expand-btn open"
-    } else {
-        "todo-expand-btn"
-    };
+    let wrap_class = if can_expand && *expanded.read() { "todo-row-wrap expanded" } else { "todo-row-wrap" };
+    let expand_btn_class = if *expanded.read() { "todo-expand-btn open" } else { "todo-expand-btn" };
 
     rsx! {
         div {
@@ -211,6 +171,8 @@ pub fn TaskRow(props: TaskRowProps) -> Element {
                                 "todo-due todo-no-date todo-date-wrap".to_string()
                             };
                             let due_display = task.due.to_string();
+                            let is_all_day = task.schedule.is_all_day();
+                            let end_time = task.schedule.end_time_str();
                             rsx! {
                                 button {
                                     class: "{btn_class}",
@@ -218,7 +180,7 @@ pub fn TaskRow(props: TaskRowProps) -> Element {
                                     onclick: move |e| {
                                         e.stop_propagation();
                                         if let Some(mut ctx) = date_sheet_ctx {
-                                            ctx.set(Some((date_task_id.clone(), current_time_date)));
+                                            ctx.set(Some((date_task_id.clone(), current_schedule.clone())));
                                         }
                                     },
                                     svg { class: "todo-meta-icon", view_box: "0 0 12 12",
@@ -227,30 +189,36 @@ pub fn TaskRow(props: TaskRowProps) -> Element {
                                         line { x1: "8", y1: "1", x2: "8", y2: "3", stroke: "currentColor", stroke_width: "1.4", stroke_linecap: "round" }
                                     }
                                     if has_explicit_date {
-                                "{due_display}"
-                                if let Some(t) = task.due_time.as_deref() {
-                                    span { class: "todo-due-time", " {t}" }
-                                }
-                            } else {
-                                "No date"
-                            }
+                                        "{due_display}"
+                                        if is_all_day {
+                                            span { class: "todo-due-time", " · all day" }
+                                        } else if let Some(t) = task.due_time.as_deref() {
+                                            span { class: "todo-due-time", " {t}" }
+                                            if let Some(ref end) = end_time {
+                                                span { class: "todo-due-time", " – {end}" }
+                                            }
+                                        }
+                                    } else {
+                                        "No date"
+                                    }
                                 }
                             }
                         }
                     }
 
-                    // Subtask progress bar
                     if has_subtasks {
                         div { class: "todo-progress",
-                            div { class: "todo-progress-bar-track",
-                                div { class: "todo-progress-bar", style: "width: {subtask_pct}%" }
+                            Progress {
+                                value: subtask_done as f64,
+                                max: subtask_total as f64,
+                                style: "width: 100%; height: 3px;",
+                                ProgressIndicator {}
                             }
                             span { class: "todo-progress-label", "{subtask_done}/{subtask_total}" }
                         }
                     }
                 }
 
-                // ── Actions ───────────────────────────────────────────────
                 button {
                     class: "todo-more",
                     r#type: "button",
@@ -284,7 +252,6 @@ pub fn TaskRow(props: TaskRowProps) -> Element {
                 }
             }
 
-            // ── Subtask panel ─────────────────────────────────────────────
             if can_expand && *expanded.read() {
                 div {
                     class: "todo-subtask-list",
@@ -334,7 +301,6 @@ pub fn TaskRow(props: TaskRowProps) -> Element {
             }
         }
 
-        // ── Context menu ──────────────────────────────────────────────────
         if *show_menu.read() {
             div {
                 class: "ctx-overlay",
@@ -381,6 +347,5 @@ pub fn TaskRow(props: TaskRowProps) -> Element {
                 }
             }
         }
-
     }
 }

@@ -1,3 +1,8 @@
+-- Undo TaskSchedule columns
+ALTER TABLE tasks DROP COLUMN IF EXISTS schedule_duration_secs;
+ALTER TABLE tasks DROP COLUMN IF EXISTS schedule_all_day_date;
+ALTER TABLE tasks DROP COLUMN IF EXISTS schedule_type;
+
 -- Undo soft-delete additions (last in up.sql, first to undo)
 DROP INDEX IF EXISTS idx_tasks_not_deleted;
 ALTER TABLE tasks DROP COLUMN deleted_at;

@@ -36,6 +36,7 @@ pub trait TaskPersistence: Send + Sync {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use domain::entities::tasks::task_schedule::TaskSchedule;
     use uuid::Uuid;
 
     #[tokio::test]
@@ -44,7 +45,12 @@ mod tests {
         mock.expect_create_task()
             .times(1)
             .returning(|_| Ok(Uuid::new_v4()));
-        let task = Task::new(Uuid::new_v4(), "Title".to_string(), None, None);
+        let task = Task::new(
+            Uuid::new_v4(),
+            "Title".to_string(),
+            TaskSchedule::Unscheduled,
+            None,
+        );
         let result = mock.create_task(task).await;
         assert!(result.is_ok());
     }
@@ -53,19 +59,24 @@ mod tests {
     async fn test_find_all() {
         let mut mock = MockTaskPersistence::new();
         mock.expect_find_all()
-            .with(mockall::predicate::eq(false))
+            .with(mockall::predicate::eq(Some(false)))
             .times(1)
             .returning(|_| Ok(vec![]));
-        let result = mock.find_all(false).await;
+        let result = mock.find_all(Some(false)).await;
         assert!(result.is_ok());
     }
 
     #[tokio::test]
     async fn test_find_by_id() {
         let mut mock = MockTaskPersistence::new();
-        mock.expect_find_by_id()
-            .times(1)
-            .returning(|_| Ok(Task::new(Uuid::new_v4(), "title".to_string(), None, None)));
+        mock.expect_find_by_id().times(1).returning(|_| {
+            Ok(Task::new(
+                Uuid::new_v4(),
+                "title".to_string(),
+                TaskSchedule::Unscheduled,
+                None,
+            ))
+        });
         let result = mock.find_by_id(Uuid::new_v4()).await;
         assert!(result.is_ok());
     }
@@ -79,7 +90,7 @@ mod tests {
                 Ok(vec![Task::new(
                     Uuid::new_v4(),
                     "title".to_string(),
-                    None,
+                    TaskSchedule::Unscheduled,
                     None,
                 )])
             });
@@ -90,10 +101,20 @@ mod tests {
     #[tokio::test]
     async fn test_update_task() {
         let mut mock = MockTaskPersistence::new();
-        mock.expect_update_task()
-            .times(1)
-            .returning(|_| Ok(Task::new(Uuid::new_v4(), "title".to_string(), None, None)));
-        let task = Task::new(Uuid::new_v4(), "title".to_string(), None, None);
+        mock.expect_update_task().times(1).returning(|_| {
+            Ok(Task::new(
+                Uuid::new_v4(),
+                "title".to_string(),
+                TaskSchedule::Unscheduled,
+                None,
+            ))
+        });
+        let task = Task::new(
+            Uuid::new_v4(),
+            "title".to_string(),
+            TaskSchedule::Unscheduled,
+            None,
+        );
         let result = mock.update_task(task).await;
         assert!(result.is_ok());
     }

@@ -129,55 +129,6 @@
     justify-content: center;
     flex-wrap: wrap;
 }
-.pomo-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    height: 48px;
-    padding: 0 24px;
-    border-radius: var(--r-full);
-    border: 1px solid transparent;
-    font-family: var(--font-ui);
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    transition:
-        background var(--dur-fast) var(--ease-tech),
-        transform var(--dur-fast) var(--ease-tech);
-}
-.pomo-btn:active {
-    transform: scale(0.96);
-}
-.pomo-btn svg {
-    flex-shrink: 0;
-}
-.pomo-btn-primary {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: #fff;
-    padding: 0 36px;
-}
-.pomo-btn-primary:hover {
-    background: var(--accent-hover);
-    border-color: var(--accent-hover);
-}
-.pomo-btn-secondary {
-    background: var(--bg-raised);
-    border-color: var(--border);
-    color: var(--text-muted);
-}
-.pomo-btn-secondary:hover {
-    background: var(--ds-gray-200);
-    color: var(--text);
-}
-.pomo-btn-danger {
-    background: var(--danger-soft);
-    border-color: var(--danger);
-    color: var(--danger);
-}
-.pomo-btn-danger:hover {
-    background: rgba(229, 72, 77, 0.2);
-}
 
 /* Extras: score + note */
 .pomo-extras {

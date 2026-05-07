@@ -1,5 +1,6 @@
 use crate::repository_traits::persistence_error::PersistenceError;
 use crate::repository_traits::task_persistence::TaskPersistence;
+use crate::use_cases::task::common::task_schedule_app_dto::TaskScheduleAppDto;
 use chrono::{DateTime, Utc};
 use domain::entities::tasks::subtask::Subtask;
 use domain::entities::tasks::task::Task;
@@ -29,7 +30,7 @@ pub struct TaskOutput {
     pub title: String,
     pub description: Option<String>,
     pub priority: Option<TaskPriority>,
-    pub due_date: Option<DateTime<Utc>>,
+    pub schedule: TaskScheduleAppDto,
     pub completed_at: Option<DateTime<Utc>>,
     pub subtasks: Vec<SubTaskOutput>,
     pub category_id: Option<Uuid>,
@@ -52,7 +53,7 @@ impl From<&Task> for TaskOutput {
             title: value.title().to_string(),
             description: value.description().map(|d| d.to_string()),
             priority: value.priority(),
-            due_date: value.due_date(),
+            schedule: value.schedule().into(),
             completed_at: value.completed_at(),
             subtasks: value.sub_tasks().iter().map(|s| s.into()).collect(),
             category_id: value.category_id().clone(),
@@ -92,13 +93,20 @@ impl GetTasksUseCase {
 
 #[cfg(test)]
 mod tests {
+    use domain::entities::tasks::task_schedule::TaskSchedule;
+
     use super::*;
     use crate::repository_traits::task_persistence::MockTaskPersistence;
 
     #[tokio::test]
     async fn test_get_tasks_success() {
         let mut mock_persistence = MockTaskPersistence::new();
-        let expected_tasks = vec![Task::new(Uuid::new_v4(), "Task 1".to_string(), None, None)];
+        let expected_tasks = vec![Task::new(
+            Uuid::new_v4(),
+            "Task 1".to_string(),
+            TaskSchedule::Unscheduled,
+            None,
+        )];
         let returned_tasks = expected_tasks.clone();
 
         mock_persistence

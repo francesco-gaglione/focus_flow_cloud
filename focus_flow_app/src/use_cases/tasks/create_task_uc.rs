@@ -1,6 +1,5 @@
-use chrono::{DateTime, Utc};
 use dioxus::logger::tracing::debug;
-use shared::task::{CreateSubtaskDto, CreateTaskDto, TaskPriority};
+use shared::task::{CreateSubtaskDto, CreateTaskDto, TaskPriority, TaskScheduleDto};
 use uuid::Uuid;
 
 use crate::clients::{http_client::ApiError, task_http_client::create_task};
@@ -22,7 +21,7 @@ pub type CreateTaskResult<T> = Result<T, CreateTaskError>;
 pub struct CreateTaskCommand {
     pub title: String,
     pub description: Option<String>,
-    pub due_date: Option<DateTime<Utc>>,
+    pub schedule: Option<TaskScheduleDto>,
     pub category_id: Option<String>,
     pub subtasks: Vec<CreateSubtask>,
     pub priority: Option<TaskPriority>,
@@ -55,12 +54,15 @@ pub async fn create_task_uc(command: CreateTaskCommand) -> CreateTaskResult<()> 
         None
     };
 
-    debug!("create_task_uc: title={}, priority={:?}", command.title, command.priority);
+    debug!(
+        "create_task_uc: title={}, priority={:?}",
+        command.title, command.priority
+    );
 
     let dto = CreateTaskDto {
         title: command.title,
         description: command.description,
-        due_date: command.due_date.map(|d| d.timestamp()),
+        schedule: command.schedule,
         subtasks,
         category_id,
         priority: command.priority,

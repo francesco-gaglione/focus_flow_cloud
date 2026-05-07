@@ -1,4 +1,7 @@
 use crate::http::app_state::AppState;
+use crate::http::dto::common::task_dto::{
+    task_schedule_app_dto_to_dto, task_schedule_dto_to_app_dto,
+};
 use crate::http::model::session_model::UserSession;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::TASK_TAG;
@@ -45,14 +48,9 @@ pub async fn create_task_api(
         .map_err(|e| HttpError::BadRequest(e.to_string()))?;
     tracing::info!("Creating task with title");
 
-    let due_date = payload
-        .due_date
-        .map(|s| {
-            DateTime::from_timestamp(s, 0).ok_or_else(|| {
-                tracing::error!("Invalid due date: {}", s);
-                HttpError::BadRequest("Invalid due date".to_string())
-            })
-        })
+    let schedule = payload
+        .schedule
+        .map(|s| task_schedule_dto_to_app_dto(s))
         .transpose()?;
 
     let subtasks = payload.subtasks.map(|items| {
@@ -77,7 +75,7 @@ pub async fn create_task_api(
         user_id: user.user_id,
         title: payload.title,
         description: payload.description,
-        due_date,
+        schedule,
         subtasks,
         category_id: payload.category_id,
         priority,

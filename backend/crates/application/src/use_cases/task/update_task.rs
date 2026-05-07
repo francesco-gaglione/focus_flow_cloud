@@ -1,5 +1,8 @@
-use crate::repository_traits::persistence_error::PersistenceError;
 use crate::repository_traits::task_persistence::TaskPersistence;
+use crate::{
+    repository_traits::persistence_error::PersistenceError,
+    use_cases::task::common::task_schedule_app_dto::TaskScheduleAppDto,
+};
 use chrono::{DateTime, Utc};
 use domain::entities::tasks::task_priority::TaskPriority;
 use std::sync::Arc;
@@ -23,7 +26,7 @@ pub struct UpdateTaskCommand {
     pub id: Uuid,
     pub title: Option<String>,
     pub description: Option<String>,
-    pub due_date: Option<DateTime<Utc>>,
+    pub schedule: Option<TaskScheduleAppDto>,
     pub priority: Option<TaskPriority>,
     pub completed: Option<bool>,
 }
@@ -49,9 +52,9 @@ impl UpdateTaskUseCase {
             info!("Updating description to: {}", description);
             task.update_description(Some(description));
         }
-        if let Some(due_date) = command.due_date {
-            info!("Updating due date to: {}", due_date);
-            task.update_due_date(Some(due_date));
+        if let Some(schedule) = command.schedule {
+            info!("Updating task schedule to: {:?}", schedule);
+            task.update_schedule(schedule.into());
         }
         if let Some(priority) = command.priority {
             info!("Updating priority to: {:?}", priority);
@@ -81,13 +84,18 @@ impl UpdateTaskUseCase {
 mod tests {
     use super::*;
     use crate::repository_traits::task_persistence::MockTaskPersistence;
-    use domain::entities::tasks::task::Task;
+    use domain::entities::tasks::{task::Task, task_schedule::TaskSchedule};
 
     #[tokio::test]
     async fn test_update_task_success() {
         let mut mock_persistence = MockTaskPersistence::new();
         let task_id = Uuid::new_v4();
-        let task = Task::new(task_id, "Old Title".to_string(), None, None);
+        let task = Task::new(
+            task_id,
+            "Old Title".to_string(),
+            TaskSchedule::Unscheduled,
+            None,
+        );
         let task_to_return = task.clone();
 
         mock_persistence
@@ -104,7 +112,7 @@ mod tests {
             id: task_id,
             title: Some("New Title".to_string()),
             description: None,
-            due_date: None,
+            schedule: None,
             priority: None,
             completed: None,
         };
@@ -126,7 +134,7 @@ mod tests {
             id: Uuid::new_v4(),
             title: Some("New Title".to_string()),
             description: None,
-            due_date: None,
+            schedule: None,
             priority: None,
             completed: None,
         };
@@ -140,7 +148,7 @@ mod tests {
     async fn test_update_task_priority() {
         let mut mock_persistence = MockTaskPersistence::new();
         let task_id = Uuid::new_v4();
-        let task = Task::new(task_id, "Task".to_string(), None, None);
+        let task = Task::new(task_id, "Task".to_string(), TaskSchedule::Unscheduled, None);
         let task_to_return = task.clone();
 
         mock_persistence
@@ -157,7 +165,7 @@ mod tests {
             id: task_id,
             title: None,
             description: None,
-            due_date: None,
+            schedule: None,
             priority: Some(TaskPriority::High),
             completed: None,
         };

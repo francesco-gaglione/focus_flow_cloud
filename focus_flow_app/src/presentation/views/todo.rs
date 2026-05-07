@@ -1,13 +1,14 @@
 use std::time::Duration;
 
+use chrono::{Datelike, Local, NaiveDate, NaiveTime, TimeZone};
 use dioxus::prelude::*;
 use dioxus_primitives::toast::{use_toast, ToastOptions};
-
-use shared::task::TaskPriority;
+use shared::task::{TaskPriority, TaskScheduleDto};
 use time::Date as TimeDate;
 
 use crate::{
     components::{
+        button::{Button, ButtonVariant},
         date_picker::{DatePicker, DatePickerInput},
         select::{Select, SelectList, SelectOption, SelectTrigger, SelectValue},
     },
@@ -19,7 +20,7 @@ use crate::{
         create_subtask_uc::create_subtask_uc,
         create_task_uc::{create_task_uc, CreateTaskCommand},
         delete_task_uc::delete_task_uc,
-        task_list_uc::{task_list_uc, TaskDue, TodoCategory, TodoTask},
+        task_list_uc::{task_list_uc, TaskDue, TaskSchedule, TodoCategory, TodoTask},
         update_subtask_completition_uc::update_subtask_completition_uc,
         update_task_completition_uc::update_task_completition_uc,
         update_task_due_date_uc::update_task_due_date_uc,
@@ -27,6 +28,67 @@ use crate::{
     },
     Route,
 };
+
+fn schedule_to_time_date(schedule: &TaskSchedule) -> Option<TimeDate> {
+    let naive = schedule.naive_date()?;
+    time::Month::try_from(naive.month() as u8)
+        .ok()
+        .and_then(|m| TimeDate::from_calendar_date(naive.year(), m, naive.day() as u8).ok())
+}
+
+fn compute_duration_mins(start_str: &str, end_str: &str) -> i64 {
+    let parse = |s: &str| NaiveTime::parse_from_str(s.trim(), "%H:%M").ok();
+    if let (Some(start), Some(end)) = (parse(start_str), parse(end_str)) {
+        use chrono::Timelike;
+        let s = start.hour() as i64 * 60 + start.minute() as i64;
+        let e = end.hour() as i64 * 60 + end.minute() as i64;
+        if e > s {
+            e - s
+        } else {
+            0
+        }
+    } else {
+        0
+    }
+}
+
+fn build_schedule_dto(
+    date: TimeDate,
+    start_str: &str,
+    is_all_day: bool,
+    end_str: &str,
+) -> TaskScheduleDto {
+    let naive_date = NaiveDate::from_ymd_opt(date.year(), date.month() as u32, date.day() as u32)
+        .unwrap_or_else(|| Local::now().date_naive());
+
+    if is_all_day || start_str.trim().is_empty() {
+        let ts = naive_date
+            .and_hms_opt(0, 0, 0)
+            .map(|ndt| {
+                chrono::DateTime::<chrono::Utc>::from_naive_utc_and_offset(ndt, chrono::Utc)
+                    .timestamp()
+            })
+            .unwrap_or(0);
+        TaskScheduleDto::AllDay { date: ts }
+    } else {
+        let naive_time = NaiveTime::parse_from_str(start_str.trim(), "%H:%M")
+            .unwrap_or_else(|_| NaiveTime::from_hms_opt(0, 0, 0).unwrap());
+        let ts = Local
+            .from_local_datetime(&naive_date.and_time(naive_time))
+            .single()
+            .map(|dt| dt.timestamp())
+            .unwrap_or_else(|| chrono::Utc::now().timestamp());
+        let duration_mins = compute_duration_mins(start_str, end_str);
+        if duration_mins > 0 {
+            TaskScheduleDto::Span {
+                starts_at: ts,
+                duration: duration_mins * 60,
+            }
+        } else {
+            TaskScheduleDto::At { starts_at: ts }
+        }
+    }
+}
 
 #[component]
 pub fn Todo() -> Element {
@@ -38,23 +100,29 @@ pub fn Todo() -> Element {
     let mut cat_filter = use_signal(|| "all".to_string());
     let mut show_modal = use_signal(|| false);
     let toast_api = use_toast();
+
     let mut prio_sheet: Signal<Option<(String, Option<TaskPriority>)>> =
         use_context_provider(|| Signal::new(None));
-    let mut date_sheet: Signal<Option<(String, Option<TimeDate>)>> =
+    // date_sheet carries task_id + current TaskSchedule for pre-populating the picker
+    let mut date_sheet: Signal<Option<(String, TaskSchedule)>> =
         use_context_provider(|| Signal::new(None));
+
     let mut picker_date: Signal<Option<TimeDate>> = use_signal(|| None);
-    let mut picker_time: Signal<String> = use_signal(|| "00:00".to_string());
-    // Sync picker_date when date_sheet opens
+    let mut picker_time: Signal<String> = use_signal(|| String::new());
+    let mut picker_end_time: Signal<String> = use_signal(|| String::new());
+    let mut picker_is_all_day: Signal<bool> = use_signal(|| true);
+
+    // Sync picker state when date_sheet opens
     use_effect(move || {
-        if let Some((_, d)) = date_sheet.read().as_ref() {
-            picker_date.set(*d);
-            picker_time.set("00:00".to_string());
+        if let Some((_, schedule)) = date_sheet.read().as_ref() {
+            picker_date.set(schedule_to_time_date(schedule));
+            picker_is_all_day.set(schedule.is_all_day() || !schedule.is_scheduled());
+            picker_time.set(schedule.time_str().unwrap_or_default());
+            picker_end_time.set(schedule.end_time_str().unwrap_or_default());
         }
     });
 
     let mut fetch_task_list = use_resource(move || async move {
-        //TODO review the get all task api and consider to add some filters so the app
-        // doesn't load all tasks at once
         match task_list_uc(None).await {
             Ok(res) => {
                 tasks.set(res.tasks);
@@ -312,7 +380,7 @@ pub fn Todo() -> Element {
             on_close: move |_| show_modal.set(false),
         }
 
-        // Date picker sheet — outside scroll, uses library DatePicker
+        // ── Date picker sheet ─────────────────────────────────────────────
         {
             let sheet = date_sheet.read().clone();
             let tid = sheet.as_ref().map(|(id, _)| id.clone()).unwrap_or_default();
@@ -320,9 +388,10 @@ pub fn Todo() -> Element {
             rsx! {
                 BottomSheet {
                     show: sheet.is_some(),
-                    title: "Set due date".to_string(),
+                    title: "Set schedule".to_string(),
                     on_close: move |_| date_sheet.set(None),
                     div { class: "date-sheet-body",
+                        // Date row
                         div { class: "date-sheet-section",
                             span { class: "date-sheet-section-label", "Date" }
                             DatePicker {
@@ -331,49 +400,83 @@ pub fn Todo() -> Element {
                                 DatePickerInput {}
                             }
                         }
-                        div { class: "date-sheet-section",
-                            span { class: "date-sheet-section-label", "Time" }
-                            input {
-                                class: "date-sheet-time-input",
-                                r#type: "time",
-                                value: "{picker_time}",
-                                oninput: move |e| picker_time.set(e.value()),
+                        // All-day toggle
+                        if picker_date.read().is_some() {
+                            div { class: "date-sheet-section",
+                                label { class: "flex items-center gap-2 cursor-pointer",
+                                    input {
+                                        r#type: "checkbox",
+                                        class: "accent-accent w-4 h-4 cursor-pointer",
+                                        checked: *picker_is_all_day.read(),
+                                        oninput: move |e: FormEvent| {
+                                            picker_is_all_day.set(e.value() == "true");
+                                            if e.value() == "true" {
+                                                picker_time.set(String::new());
+                                                picker_end_time.set(String::new());
+                                            }
+                                        },
+                                    }
+                                    span { class: "date-sheet-section-label", "All day" }
+                                }
                             }
+                            div {
+                                class: "flex flex-row",
+                                // From / To time rows — only when not all-day
+                                if !*picker_is_all_day.read() {
+                                    div { class: "date-sheet-section",
+                                    span { class: "date-sheet-section-label", "From" }
+                                    input {
+                                            class: "date-sheet-time-input",
+                                            r#type: "time",
+                                            value: "{picker_time}",
+                                            oninput: move |e| picker_time.set(e.value()),
+                                        }
+                                    }
+                                    div { class: "date-sheet-section",
+                                        span { class: "date-sheet-section-label", "To" }
+                                        input {
+                                            class: "date-sheet-time-input",
+                                            r#type: "time",
+                                            placeholder: "optional",
+                                            value: "{picker_end_time}",
+                                            oninput: move |e| picker_end_time.set(e.value()),
+                                        }
+                                    }
+                                }
+                            }
+
                         }
                     }
                     div { class: "date-sheet-actions",
-                        button {
-                            class: "date-sheet-clear-btn",
+                        Button {
+                            variant: ButtonVariant::Outline,
                             r#type: "button",
                             onclick: move |_| {
                                 let t = tid_clear.clone();
                                 spawn(async move {
-                                    match update_task_due_date_uc(&t, None).await {
+                                    match update_task_due_date_uc(&t, Some(TaskScheduleDto::Unscheduled)).await {
                                         Ok(_) => { fetch_task_list.restart(); date_sheet.set(None); }
-                                        Err(e) => error!("Error clearing due date: {}", e),
+                                        Err(e) => error!("Error clearing schedule: {}", e),
                                     }
                                 });
                             },
                             "Clear"
                         }
-                        button {
-                            class: "date-sheet-confirm-btn",
+                        Button {
+                            variant: ButtonVariant::Primary,
                             r#type: "button",
                             disabled: picker_date.read().is_none(),
                             onclick: move |_| {
                                 if let Some(d) = *picker_date.read() {
                                     let tid2 = tid.clone();
                                     let time_str = picker_time.read().clone();
-                                    let (h, m) = time_str.split_once(':')
-                                        .and_then(|(h, m)| Some((h.parse::<u32>().ok()?, m.parse::<u32>().ok()?)))
-                                        .unwrap_or((0, 0));
-                                    let naive = chrono::NaiveDate::from_ymd_opt(d.year(), d.month() as u32, d.day() as u32)
-                                        .and_then(|nd| nd.and_hms_opt(h, m, 0))
-                                        .map(|ndt| chrono::DateTime::<chrono::Utc>::from_naive_utc_and_offset(ndt, chrono::Utc));
+                                    let end_str = picker_end_time.read().clone();
+                                    let all_day = *picker_is_all_day.read();
+                                    let schedule = build_schedule_dto(d, &time_str, all_day, &end_str);
                                     spawn(async move {
-                                        match update_task_due_date_uc(&tid2, naive).await {
+                                        match update_task_due_date_uc(&tid2, Some(schedule)).await {
                                             Ok(_) => { fetch_task_list.restart(); date_sheet.set(None); }
-                                            Err(e) => error!("Error updating due date: {}", e),
+                                            Err(e) => error!("Error updating schedule: {}", e),
                                         }
                                     });
                                 }
@@ -385,7 +488,7 @@ pub fn Todo() -> Element {
             }
         }
 
-        // Priority picker sheet
+        // ── Priority picker sheet ─────────────────────────────────────────
         {
             let sheet_state = prio_sheet.read().clone();
             let task_id = sheet_state.as_ref().map(|(id, _)| id.clone()).unwrap_or_default();
@@ -395,7 +498,7 @@ pub fn Todo() -> Element {
                     show: sheet_state.is_some(),
                     title: "Set priority".to_string(),
                     on_close: move |_| prio_sheet.set(None),
-                    div { class: "prio-sheet-options",
+                    div { class: "prio-sheet-options p-5",
                         for (variant, label, class_mod) in [
                             (None, "None", "none"),
                             (Some(TaskPriority::Low), "Low", "low"),
@@ -466,9 +569,10 @@ fn TaskSection(props: TaskSectionProps) -> Element {
                 div { class: "section-head-right",
                     span { class: "count", "{count} {word}" }
                     if let Some(on_delete_all) = props.on_delete_all {
-                        button {
-                            class: "section-delete-all-btn",
+                        Button {
+                            variant: ButtonVariant::Destructive,
                             r#type: "button",
+                            style: "padding: 4px 10px; font-size: 0.75rem;",
                             onclick: move |_| on_delete_all.call(()),
                             "Delete all"
                         }

@@ -32,16 +32,13 @@ enum Route {
             #[route("/cards")]   Flashcards {},
 }
 
+const CSS_TAILWIND: Asset = asset!("/assets/tailwind.css");
 const CSS_DX_THEME: Asset = asset!("/assets/dx-components-theme.css");
-const CSS_TOKENS: Asset = asset!("/assets/styling/tokens.css");
-const CSS_BASE: Asset = asset!("/assets/styling/base.css");
 const CSS_COMPONENTS: Asset = asset!("/assets/styling/components.css");
 const CSS_LAYOUT: Asset = asset!("/assets/styling/layout.css");
-const CSS_SHEET: Asset = asset!("/assets/styling/sheet.css");
 const CSS_TASKS: Asset = asset!("/assets/styling/views/tasks.css");
 const CSS_CALENDAR: Asset = asset!("/assets/styling/views/calendar.css");
 const CSS_STATS: Asset = asset!("/assets/styling/views/stats.css");
-const CSS_AUTH: Asset = asset!("/assets/styling/views/auth.css");
 const CSS_FLASHCARDS: Asset = asset!("/assets/styling/views/flashcards.css");
 const CSS_POMODORO: Asset = asset!("/assets/styling/views/pomodoro.css");
 
@@ -80,16 +77,13 @@ fn App() -> Element {
     use_context_provider(|| Signal::new(Option::<(String, String)>::None)); // (task_id, task_title) for timer
 
     rsx! {
+        document::Link { rel: "stylesheet", href: CSS_TAILWIND }
         document::Link { rel: "stylesheet", href: CSS_DX_THEME }
-        document::Link { rel: "stylesheet", href: CSS_TOKENS }
-        document::Link { rel: "stylesheet", href: CSS_BASE }
         document::Link { rel: "stylesheet", href: CSS_COMPONENTS }
         document::Link { rel: "stylesheet", href: CSS_LAYOUT }
-        document::Link { rel: "stylesheet", href: CSS_SHEET }
         document::Link { rel: "stylesheet", href: CSS_TASKS }
         document::Link { rel: "stylesheet", href: CSS_CALENDAR }
         document::Link { rel: "stylesheet", href: CSS_STATS }
-        document::Link { rel: "stylesheet", href: CSS_AUTH }
         document::Link { rel: "stylesheet", href: CSS_FLASHCARDS }
         document::Link { rel: "stylesheet", href: CSS_POMODORO }
         ToastProvider{

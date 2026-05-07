@@ -1,60 +1,284 @@
-/* This file contains the theme variables for the styled dioxus components. You only
- * need to import this file once in your project root.
+/*
+ * FocusFlow — dx-components theme override
+ * Maps all dioxus-components variables to the FocusFlow design system tokens.
+ * Edit values in tailwind.css @theme instead of here.
  */
 
-html[data-theme="dark"] {
+/* Always-dark: force dx space-toggle into dark mode */
+:root {
   --dark: initial;
   --light: ;
 }
 
-html[data-theme="light"] {
-  --dark: ;
-  --light: initial;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --dark: initial;
-    --light: ;
-  }
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    --dark: ;
-    --light: initial;
-  }
-}
-
+/* ── Variable mapping ───────────────────────────────────────────────── */
 :root {
-  /* Primary colors */
-  --primary-color: var(--dark, #000) var(--light, #fff);
-  --primary-color-1: var(--dark, #0e0e0e) var(--light, #fbfbfb);
-  --primary-color-2: var(--dark, #0a0a0a) var(--light, #fff);
-  --primary-color-3: var(--dark, #141313) var(--light, #f8f8f8);
-  --primary-color-4: var(--dark, #1a1a1a) var(--light, #f8f8f8);
-  --primary-color-5: var(--dark, #262626) var(--light, #f5f5f5);
-  --primary-color-6: var(--dark, #232323) var(--light, #e5e5e5);
-  --primary-color-7: var(--dark, #3e3e3e) var(--light, #b0b0b0);
+  /* Primary = dark surfaces (darker → lighter) */
+  --primary-color:   var(--color-surface);        /* #080808 */
+  --primary-color-1: var(--color-surface);        /* #080808 */
+  --primary-color-2: var(--color-surface-raised); /* #111111 */
+  --primary-color-3: var(--color-surface-card);   /* #181818 */
+  --primary-color-4: var(--color-gray-200);       /* #202020 – hover bg */
+  --primary-color-5: var(--color-gray-300);       /* #2a2a2a – border / elevated hover */
+  --primary-color-6: var(--color-border);         /* #2a2a2a – borders */
+  --primary-color-7: var(--color-border-strong);  /* #494949 – strong borders */
 
-  /* Secondary colors */
-  --secondary-color: var(--dark, #fff) var(--light, #000);
-  --secondary-color-1: var(--dark, #fafafa) var(--light, #000);
-  --secondary-color-2: var(--dark, #e6e6e6) var(--light, #0d0d0d);
-  --secondary-color-3: var(--dark, #dcdcdc) var(--light, #2b2b2b);
-  --secondary-color-4: var(--dark, #d4d4d4) var(--light, #111);
-  --secondary-color-5: var(--dark, #a1a1a1) var(--light, #848484);
-  --secondary-color-6: var(--dark, #5d5d5d) var(--light, #d0d0d0);
+  /* Secondary = text (bright → dim) */
+  --secondary-color:   var(--color-foreground);  /* #ffffff */
+  --secondary-color-1: var(--color-foreground);  /* #ffffff */
+  --secondary-color-2: var(--color-accent);      /* #46a758 – active / checked / primary */
+  --secondary-color-3: var(--color-muted);       /* #efefef */
+  --secondary-color-4: var(--color-muted);       /* #efefef – body text */
+  --secondary-color-5: var(--color-subtle);      /* #7d7d7d – placeholder / disabled */
+  --secondary-color-6: var(--color-border-strong); /* #494949 */
 
-  /* Highlight colors */
-  --focused-border-color: var(--dark, #2b7fff) var(--light, #2b7fff);
-  --primary-success-color: var(--dark, #02271c) var(--light, #ecfdf5);
-  --secondary-success-color: var(--dark, #b6fae3) var(--light, #10b981);
-  --primary-warning-color: var(--dark, #342203) var(--light, #fffbeb);
-  --secondary-warning-color: var(--dark, #feeac7) var(--light, #f59e0b);
-  --primary-error-color: var(--dark, #a22e2e) var(--light, #dc2626);
-  --secondary-error-color: var(--dark, #9b1c1c) var(--light, #ef4444);
-  --contrast-error-color: var(--dark, var(--secondary-color-3)) var(--light, var(--primary-color));
-  --primary-info-color: var(--dark, var(--primary-color-5)) var(--light, var(--primary-color));
-  --secondary-info-color: var(--dark, var(--primary-color-7)) var(--light, var(--secondary-color-3));
+  /* Highlight */
+  --focused-border-color:   var(--color-accent);      /* #46a758 */
+
+  /* Status */
+  --primary-error-color:    var(--color-danger);      /* #e5484d */
+  --secondary-error-color:  var(--color-danger);
+  --contrast-error-color:   var(--color-foreground);  /* white text on error bg */
+
+  --primary-success-color:   var(--color-accent-soft);
+  --secondary-success-color: var(--color-accent);
+
+  --primary-warning-color:   rgba(255, 178, 36, 0.12);
+  --secondary-warning-color: var(--color-warning);   /* #ffb224 */
+
+  --primary-info-color:   rgba(0, 112, 243, 0.12);
+  --secondary-info-color: var(--color-info);         /* #0070f3 */
+}
+
+/* ── Global component tweaks ────────────────────────────────────────── */
+
+/* Inherit Geist everywhere — !important needed because component CSS loads later */
+[class^="dx-"],
+[class*=" dx-"] {
+  font-family: var(--font-sans) !important;
+}
+
+/* Tighten border-radius to match design system (md = 8px) */
+.dx-button,
+.dx-input,
+.dx-select-trigger,
+.dx-select-list,
+.dx-select-option,
+.dx-tabs-list,
+.dx-tabs-trigger,
+.dx-dialog,
+.dx-card,
+.dx-badge,
+.dx-checkbox,
+.dx-accordion-item {
+  border-radius: var(--radius-md);
+}
+
+/* ── Button — accent primary, white text ────────────────────────────── */
+.dx-button[data-style="primary"] {
+  background-color: var(--color-accent);
+  color: var(--color-foreground);
+}
+.dx-button[data-style="primary"]:not(:disabled):hover {
+  background-color: var(--color-accent-hover);
+}
+
+/* ── Badge — accent primary, dark text ─────────────────────────────── */
+.dx-badge[data-style="primary"] {
+  background-color: var(--color-accent-soft);
+  color: var(--color-accent);
+  box-shadow: 0 0 0 1px var(--color-accent);
+}
+
+/* ── Switch / Checkbox — accent when checked ────────────────────────── */
+.dx-switch[data-state="checked"] {
+  background-color: var(--color-accent);
+}
+.dx-switch-thumb {
+  background-color: var(--color-foreground);
+}
+.dx-switch[data-state="checked"] .dx-switch-thumb {
+  background-color: var(--color-surface-raised);
+}
+
+.dx-checkbox[data-state="checked"] {
+  background-color: var(--color-accent);
+  box-shadow: none;
+  color: var(--color-foreground);
+}
+
+/* ── Dialog — stronger backdrop ─────────────────────────────────────── */
+.dx-dialog-backdrop {
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+}
+.dx-dialog {
+  background: var(--color-surface-raised);
+  border-color: var(--color-border);
+  color: var(--color-foreground);
+  box-shadow: var(--shadow-lg);
+  font-family: var(--font-sans);
+}
+.dx-dialog-title {
+  color: var(--color-foreground);
+}
+.dx-dialog-description {
+  color: var(--color-subtle);
+}
+.dx-dialog-close {
+  color: var(--color-subtle);
+}
+.dx-dialog-close:hover {
+  color: var(--color-foreground);
+}
+
+/* ── Card ────────────────────────────────────────────────────────────── */
+.dx-card {
+  border-radius: var(--radius-lg);
+}
+
+/* ── Separator ───────────────────────────────────────────────────────── */
+.dx-separator {
+  background-color: var(--color-border);
+}
+
+/* ── Accordion ───────────────────────────────────────────────────────── */
+.dx-accordion-item {
+  border-color: var(--color-border);
+}
+
+/* ── Skeleton ────────────────────────────────────────────────────────── */
+.dx-skeleton {
+  background-color: var(--color-surface-card);
+}
+
+/* ── Progress ────────────────────────────────────────────────────────── */
+.dx-progress-track {
+  background-color: var(--color-border);
+}
+.dx-progress-indicator {
+  background-color: var(--color-accent);
+}
+
+/* ── Slider ──────────────────────────────────────────────────────────── */
+.dx-slider-track {
+  background-color: var(--color-border);
+}
+.dx-slider-range {
+  background-color: var(--color-accent);
+}
+.dx-slider-thumb {
+  background-color: var(--color-accent);
+  border-color: var(--color-surface);
+}
+
+/* ── Toast ───────────────────────────────────────────────────────────── */
+.dx-toast {
+  background-color: var(--color-surface-card);
+  border: 1px solid var(--color-border);
+  color: var(--color-foreground);
+  box-shadow: var(--shadow-lg);
+  font-family: var(--font-sans);
+}
+
+/* ── Tooltip ─────────────────────────────────────────────────────────── */
+.dx-tooltip-content {
+  background-color: var(--color-surface-card);
+  border: 1px solid var(--color-border);
+  color: var(--color-muted);
+  box-shadow: var(--shadow-sm);
+  font-family: var(--font-sans);
+  font-size: 12px;
+}
+
+/* ── Popover / Hover Card ─────────────────────────────────────────────── */
+.dx-popover-content,
+.dx-hover-card-content {
+  background-color: var(--color-surface-card);
+  border: 1px solid var(--color-border);
+  color: var(--color-foreground);
+  box-shadow: var(--shadow-md);
+  font-family: var(--font-sans);
+}
+
+/* ── Context Menu / Dropdown ─────────────────────────────────────────── */
+.dx-context-menu-content,
+.dx-dropdown-menu-content {
+  background-color: var(--color-surface-card);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-lg);
+  font-family: var(--font-sans);
+}
+.dx-context-menu-item,
+.dx-dropdown-menu-item {
+  color: var(--color-muted);
+}
+.dx-context-menu-item:hover,
+.dx-dropdown-menu-item:hover {
+  background-color: var(--color-gray-200);
+  color: var(--color-foreground);
+}
+
+/* ── Sheet ───────────────────────────────────────────────────────────── */
+.dx-sheet-content {
+  background-color: var(--color-surface-raised);
+  border-color: var(--color-border);
+  font-family: var(--font-sans);
+}
+.dx-sheet-overlay {
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+}
+
+/* ── Sidebar ─────────────────────────────────────────────────────────── */
+.dx-sidebar {
+  background-color: var(--color-surface-raised);
+  border-color: var(--color-border);
+  font-family: var(--font-sans);
+}
+
+/* ── Navbar ──────────────────────────────────────────────────────────── */
+.dx-navbar {
+  background-color: var(--color-surface-raised);
+  border-bottom: 1px solid var(--color-border);
+  font-family: var(--font-sans);
+}
+
+/* ── Input / Textarea ─────────────────────────────────────────────────── */
+.dx-input,
+.dx-textarea {
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+}
+
+/* ── Scroll area ─────────────────────────────────────────────────────── */
+.dx-scroll-area-scrollbar-thumb {
+  background-color: var(--color-border-strong);
+}
+.dx-scroll-area-scrollbar-thumb:hover {
+  background-color: var(--color-subtle);
+}
+
+/* ── Input / Textarea ─────────────────────────────────────────────────── */
+.dx-input {
+  width: 100%;
+  background-color: var(--color-surface-raised);
+  box-shadow: inset 0 0 0 1px var(--color-border);
+  color: var(--color-muted);
+}
+.dx-input::placeholder {
+  color: var(--color-subtle);
+}
+.dx-input:hover:not(:disabled) {
+  background-color: var(--color-surface-card);
+  box-shadow: inset 0 0 0 1px var(--color-border-strong);
+}
+.dx-input:focus-visible {
+  background-color: var(--color-surface-raised);
+  box-shadow: inset 0 0 0 1px var(--color-accent), var(--shadow-focus);
+  outline: none;
+}
+
+/* ── Progress ─────────────────────────────────────────────────────────── */
+.dx-progress .dx-progress-indicator {
+  background-color: var(--color-success);
 }

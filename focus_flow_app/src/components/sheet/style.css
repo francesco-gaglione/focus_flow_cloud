@@ -47,7 +47,7 @@
   background: var(--primary-color-2);
   box-shadow: 0 4px 20px rgb(0 0 0 / 20%);
   color: var(--secondary-color-4);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: inherit;
   gap: 1rem;
   will-change: transform;
 }

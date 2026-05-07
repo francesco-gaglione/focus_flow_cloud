@@ -6,7 +6,10 @@ use futures_util::{SinkExt, StreamExt};
 use serde::{Deserialize, Serialize};
 use tokio_tungstenite::{connect_async, tungstenite::protocol::Message};
 
-use crate::state::{app_state::AppState, auth_state::AuthState};
+use crate::{
+    components::button::{Button, ButtonVariant},
+    state::{app_state::AppState, auth_state::AuthState},
+};
 
 #[derive(Debug, Clone, Deserialize, PartialEq)]
 enum WsSessionType {
@@ -350,8 +353,8 @@ pub fn Pomodoro() -> Element {
             // Controls
             div { class: "pomo-controls",
                 if !is_work {
-                    button {
-                        class: "pomo-btn pomo-btn-primary",
+                    Button {
+                        variant: ButtonVariant::Primary,
                         onclick: move |_| {
                             if let Some(tx) = ws_tx.read().as_ref() {
                                 let _ = tx.send(WsCmd::Start);
@@ -364,8 +367,8 @@ pub fn Pomodoro() -> Element {
                     }
                 }
                 if is_work {
-                    button {
-                        class: "pomo-btn pomo-btn-secondary",
+                    Button {
+                        variant: ButtonVariant::Secondary,
                         onclick: move |_| {
                             if let Some(tx) = ws_tx.read().as_ref() {
                                 let _ = tx.send(WsCmd::TakeBreak);
@@ -379,8 +382,8 @@ pub fn Pomodoro() -> Element {
                     }
                 }
                 if has_session {
-                    button {
-                        class: "pomo-btn pomo-btn-danger",
+                    Button {
+                        variant: ButtonVariant::Destructive,
                         onclick: move |_| {
                             if let Some(tx) = ws_tx.read().as_ref() {
                                 let _ = tx.send(WsCmd::Terminate);

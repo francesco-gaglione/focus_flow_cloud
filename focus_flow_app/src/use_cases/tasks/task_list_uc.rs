@@ -1,6 +1,6 @@
 use chrono::{DateTime, Local, Timelike, Utc};
 use dioxus::logger::tracing::debug;
-use shared::task::{TaskPriority, TasksResponseDto};
+use shared::task::{TaskPriority, TaskScheduleDto, TasksResponseDto};
 
 use crate::clients::{
     category_http_client::get_all_categories, http_client::ApiError,
@@ -37,6 +37,83 @@ pub struct TodoSubtask {
     pub sort_order: i16,
 }
 
+/// App-layer schedule — parsed chrono types, no raw timestamps.
+#[derive(Clone, PartialEq, Debug)]
+pub enum TaskSchedule {
+    Unscheduled,
+    AllDay { date: chrono::NaiveDate },
+    At { starts_at: chrono::DateTime<Local> },
+    Span { starts_at: chrono::DateTime<Local>, duration_secs: i64 },
+}
+
+impl TaskSchedule {
+    pub fn is_scheduled(&self) -> bool {
+        !matches!(self, TaskSchedule::Unscheduled)
+    }
+
+    pub fn naive_date(&self) -> Option<chrono::NaiveDate> {
+        match self {
+            TaskSchedule::Unscheduled => None,
+            TaskSchedule::AllDay { date } => Some(*date),
+            TaskSchedule::At { starts_at } => Some(starts_at.date_naive()),
+            TaskSchedule::Span { starts_at, .. } => Some(starts_at.date_naive()),
+        }
+    }
+
+    pub fn time_str(&self) -> Option<String> {
+        match self {
+            TaskSchedule::At { starts_at } if starts_at.hour() != 0 || starts_at.minute() != 0 => {
+                Some(starts_at.format("%H:%M").to_string())
+            }
+            TaskSchedule::Span { starts_at, .. } => {
+                Some(starts_at.format("%H:%M").to_string())
+            }
+            _ => None,
+        }
+    }
+
+    pub fn is_all_day(&self) -> bool {
+        matches!(self, TaskSchedule::AllDay { .. })
+    }
+
+    pub fn duration_label(&self) -> Option<String> {
+        match self {
+            TaskSchedule::Span { duration_secs, .. } => {
+                let total_mins = duration_secs / 60;
+                if total_mins == 0 { return None; }
+                let h = total_mins / 60;
+                let m = total_mins % 60;
+                Some(if h > 0 && m > 0 {
+                    format!("{}h{}m", h, m)
+                } else if h > 0 {
+                    format!("{}h", h)
+                } else {
+                    format!("{}m", m)
+                })
+            }
+            _ => None,
+        }
+    }
+
+    pub fn duration_mins(&self) -> Option<i64> {
+        match self {
+            TaskSchedule::Span { duration_secs, .. } => Some(duration_secs / 60),
+            _ => None,
+        }
+    }
+
+    /// HH:MM of start + duration end, for pre-populating "end time" input.
+    pub fn end_time_str(&self) -> Option<String> {
+        match self {
+            TaskSchedule::Span { starts_at, duration_secs } => {
+                let end = *starts_at + chrono::Duration::seconds(*duration_secs);
+                Some(end.format("%H:%M").to_string())
+            }
+            _ => None,
+        }
+    }
+}
+
 #[derive(Clone, PartialEq)]
 pub struct TodoTask {
     pub id: String,
@@ -46,6 +123,7 @@ pub struct TodoTask {
     pub cat_id: Option<String>,
     pub cat_color: Option<String>,
     pub priority: Option<TaskPriority>,
+    pub schedule: TaskSchedule,
     pub due: TaskDue,
     pub due_date_set: bool,
     pub due_time: Option<String>,
@@ -73,11 +151,49 @@ impl std::fmt::Display for TaskDue {
     }
 }
 
-//Fetch all tasks and related info for todo page
+fn parse_schedule(dto: TaskScheduleDto) -> TaskSchedule {
+    match dto {
+        TaskScheduleDto::Unscheduled => TaskSchedule::Unscheduled,
+        TaskScheduleDto::AllDay { date } => {
+            let naive = DateTime::from_timestamp(date, 0)
+                .map(|dt: DateTime<Utc>| dt.date_naive())
+                .unwrap_or_else(|| Local::now().date_naive());
+            TaskSchedule::AllDay { date: naive }
+        }
+        TaskScheduleDto::At { starts_at } => {
+            let dt = DateTime::from_timestamp(starts_at, 0)
+                .map(|dt: DateTime<Utc>| dt.with_timezone(&Local))
+                .unwrap_or_else(|| Local::now());
+            TaskSchedule::At { starts_at: dt }
+        }
+        TaskScheduleDto::Span { starts_at, duration } => {
+            let dt = DateTime::from_timestamp(starts_at, 0)
+                .map(|dt: DateTime<Utc>| dt.with_timezone(&Local))
+                .unwrap_or_else(|| Local::now());
+            TaskSchedule::Span { starts_at: dt, duration_secs: duration }
+        }
+    }
+}
+
+fn categorize_due(date: chrono::NaiveDate, today: chrono::NaiveDate, tomorrow: chrono::NaiveDate) -> TaskDue {
+    if date < today {
+        TaskDue::Overdue(date)
+    } else if date == today {
+        TaskDue::Today(date)
+    } else if date == tomorrow {
+        TaskDue::Tomorrow(date)
+    } else {
+        TaskDue::Upcoming(date)
+    }
+}
+
 pub async fn task_list_uc(category_id: Option<&str>) -> TaskListResult<TaskList> {
     let tasks_dto: TasksResponseDto = get_all_tasks().await?;
     debug!("Tasks dto: {:?}", tasks_dto);
     let categories = get_all_categories().await?;
+
+    let today = Local::now().date_naive();
+    let tomorrow = today.succ_opt().unwrap_or(today);
 
     let mut todo_tasks: Vec<TodoTask> = vec![];
 
@@ -91,35 +207,11 @@ pub async fn task_list_uc(category_id: Option<&str>) -> TaskListResult<TaskList>
             None
         };
 
-        let today = Local::now().date_naive();
-        let tomorrow = today.succ_opt().unwrap_or(today);
-
-        let due_date_set = task.due_date.is_some();
-        let due_time = task.due_date.and_then(|ts| {
-            DateTime::from_timestamp(ts, 0).map(|dt: DateTime<Utc>| {
-                let local = dt.with_timezone(&Local);
-                if local.hour() != 0 || local.minute() != 0 {
-                    Some(local.format("%H:%M").to_string())
-                } else {
-                    None
-                }
-            }).flatten()
-        });
-        let due = match task.due_date {
-            Some(ts) => {
-                let date = DateTime::from_timestamp(ts, 0)
-                    .map(|dt: DateTime<Utc>| dt.with_timezone(&Local).date_naive())
-                    .unwrap_or(today);
-                if date < today {
-                    TaskDue::Overdue(date)
-                } else if date == today {
-                    TaskDue::Today(date)
-                } else if date == tomorrow {
-                    TaskDue::Tomorrow(date)
-                } else {
-                    TaskDue::Upcoming(date)
-                }
-            }
+        let schedule = parse_schedule(task.schedule);
+        let due_date_set = schedule.is_scheduled();
+        let due_time = schedule.time_str();
+        let due = match schedule.naive_date() {
+            Some(date) => categorize_due(date, today, tomorrow),
             None => TaskDue::Upcoming(today),
         };
 
@@ -138,18 +230,11 @@ pub async fn task_list_uc(category_id: Option<&str>) -> TaskListResult<TaskList>
             id: task.id,
             title: task.title,
             description: task.description,
-            cat: if category.is_some() {
-                Some(category.unwrap().name.clone())
-            } else {
-                None
-            },
+            cat: category.map(|c| c.name.clone()),
             cat_id: task.category_id.map(|c| c.to_string()),
-            cat_color: if category.is_some() {
-                Some(category.unwrap().color.clone())
-            } else {
-                None
-            },
+            cat_color: category.map(|c| c.color.clone()),
             priority: task.priority,
+            schedule,
             due,
             due_date_set,
             due_time,
@@ -158,7 +243,7 @@ pub async fn task_list_uc(category_id: Option<&str>) -> TaskListResult<TaskList>
                     .map(|dt: DateTime<Utc>| dt.with_timezone(&Local).naive_local())
             }),
             done: task.completed_at.is_some(),
-            subtasks: subtasks,
+            subtasks,
         });
     }
 

@@ -2809,6 +2809,7 @@ dependencies = [
  "dioxus-primitives",
  "dioxus-std",
  "futures-util",
+ "palette",
  "reqwest",
  "serde",
  "serde_json",

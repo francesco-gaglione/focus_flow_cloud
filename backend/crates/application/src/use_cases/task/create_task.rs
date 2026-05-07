@@ -1,7 +1,12 @@
-use crate::repository_traits::persistence_error::PersistenceError;
 use crate::repository_traits::task_persistence::TaskPersistence;
-use chrono::{DateTime, Utc};
-use domain::entities::tasks::{subtask::Subtask, task::Task, task_priority::TaskPriority};
+use crate::{
+    repository_traits::persistence_error::PersistenceError,
+    use_cases::task::common::task_schedule_app_dto::TaskScheduleAppDto,
+};
+use chrono::{DateTime, Duration, NaiveDate, Utc};
+use domain::entities::tasks::{
+    subtask::Subtask, task::Task, task_priority::TaskPriority, task_schedule::TaskSchedule,
+};
 use std::sync::Arc;
 use thiserror::Error;
 use tracing::instrument;
@@ -21,7 +26,7 @@ pub struct CreateTaskCommand {
     pub title: String,
     pub description: Option<String>,
     pub category_id: Option<Uuid>,
-    pub due_date: Option<DateTime<Utc>>,
+    pub schedule: Option<TaskScheduleAppDto>,
     pub subtasks: Option<Vec<CreateSubtaskCommand>>,
     pub priority: Option<TaskPriority>,
 }
@@ -47,7 +52,7 @@ impl CreateTaskUseCase {
         let mut task = Task::new(
             command.user_id,
             command.title,
-            command.due_date,
+            command.schedule.unwrap_or_default().into(),
             command.description,
         );
 
@@ -97,7 +102,7 @@ mod tests {
             user_id: Uuid::new_v4(),
             title: "New Task".to_string(),
             description: None,
-            due_date: None,
+            schedule: None,
             subtasks: None,
             category_id: Some(Uuid::new_v4()),
             priority: None,
@@ -123,9 +128,12 @@ mod tests {
             user_id: Uuid::new_v4(),
             title: "New Task".to_string(),
             description: None,
-            due_date: Some(Utc::now() + chrono::Duration::minutes(15)),
+            schedule: Some(TaskScheduleAppDto::AllDay {
+                date: NaiveDate::from_ymd(2025, 1, 1),
+            }),
             category_id: Some(Uuid::new_v4()),
             subtasks: None,
+            priority: None,
         };
 
         let result = use_case.execute(command).await;
@@ -150,8 +158,9 @@ mod tests {
             title: "New Task".to_string(),
             description: None,
             category_id: Some(Uuid::new_v4()),
-            due_date: None,
+            schedule: None,
             subtasks: None,
+            priority: None,
         };
 
         let result = use_case.execute(command).await;

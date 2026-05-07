@@ -59,6 +59,10 @@ diesel::table! {
         #[max_length = 10]
         priority -> Nullable<Varchar>,
         deleted_at -> Nullable<Timestamptz>,
+        #[max_length = 12]
+        schedule_type -> Varchar,
+        schedule_all_day_date -> Nullable<Date>,
+        schedule_duration_secs -> Nullable<Int8>,
     }
 }
 

@@ -1,4 +1,5 @@
 use crate::http::app_state::AppState;
+use crate::http::dto::common::task_dto::task_schedule_dto_to_app_dto;
 use crate::http::dto::validators::validate_uuid::validate_uuid;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::TASK_TAG;
@@ -65,19 +66,16 @@ pub async fn update_task_api(
     let task_id = Uuid::parse_str(&path.id)
         .map_err(|_| HttpError::BadRequest("Task id malformed".to_string()))?;
 
-    let due_date = payload
-        .due_date
-        .map(|s| {
-            DateTime::from_timestamp(s, 0)
-                .ok_or_else(|| HttpError::BadRequest("Invalid due date".to_string()))
-        })
+    let schedule = payload
+        .schedule
+        .map(|s| task_schedule_dto_to_app_dto(s))
         .transpose()?;
 
     let command = UpdateTaskCommand {
         id: task_id,
         title: payload.title,
         description: payload.description,
-        due_date,
+        schedule,
         priority: payload.priority.map(|p| match p {
             TaskPriority::Low => DomainPriority::Low,
             TaskPriority::Medium => DomainPriority::Medium,

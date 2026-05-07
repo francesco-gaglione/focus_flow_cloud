@@ -1,0 +1,26 @@
+.dx-toggle {
+  display: inline-flex;
+  width: fit-content;
+  min-width: 2rem;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding-right: 0.5rem;
+  padding-left: 0.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  background-color: transparent;
+  color: var(--secondary-color-4);
+  font-size: 14px;
+  outline: none;
+}
+
+.dx-toggle:hover, .dx-toggle:focus-visible {
+  background-color: var(--primary-color-4);
+  cursor: pointer;
+}
+
+.dx-toggle[data-state="on"] {
+  background-color: var(--primary-color-7);
+  color: var(--secondary-color-1);
+}

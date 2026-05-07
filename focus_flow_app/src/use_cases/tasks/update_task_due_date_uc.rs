@@ -1,9 +1,9 @@
-use chrono::{DateTime, Utc};
+use shared::task::TaskScheduleDto;
 
 use crate::clients::{http_client::ApiError, task_http_client::update_task};
 
 #[derive(Debug, thiserror::Error)]
-pub enum UpdateTaskDueDateError {
+pub enum UpdateTaskScheduleError {
     #[error("Generic error: {0}")]
     Generic(String),
 
@@ -11,12 +11,13 @@ pub enum UpdateTaskDueDateError {
     ApiError(#[from] ApiError),
 }
 
-pub type UpdateTaskDueDateResult<T> = Result<T, UpdateTaskDueDateError>;
+pub type UpdateTaskScheduleResult<T> = Result<T, UpdateTaskScheduleError>;
 
+/// Pass `None` to leave schedule unchanged, `Some(TaskScheduleDto::Unscheduled)` to clear it.
 pub async fn update_task_due_date_uc(
     task_id: &str,
-    due_date: Option<DateTime<Utc>>,
-) -> UpdateTaskDueDateResult<()> {
-    update_task(task_id, None, None, due_date, None, None).await?;
+    schedule: Option<TaskScheduleDto>,
+) -> UpdateTaskScheduleResult<()> {
+    update_task(task_id, None, None, schedule, None, None).await?;
     Ok(())
 }

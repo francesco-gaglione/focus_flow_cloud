@@ -48,3 +48,11 @@ ALTER TABLE focus_session DROP COLUMN category_id;
 ALTER TABLE tasks ADD COLUMN deleted_at TIMESTAMPTZ;
 
 CREATE INDEX idx_tasks_not_deleted ON tasks (user_id) WHERE deleted_at IS NULL;
+
+-- TaskSchedule support
+ALTER TABLE tasks
+    ADD COLUMN IF NOT EXISTS schedule_type VARCHAR(12) NOT NULL DEFAULT 'unscheduled'
+    CHECK (schedule_type IN ('unscheduled', 'all_day', 'at', 'span'));
+
+ALTER TABLE tasks ADD COLUMN IF NOT EXISTS schedule_all_day_date DATE;
+ALTER TABLE tasks ADD COLUMN IF NOT EXISTS schedule_duration_secs BIGINT;
