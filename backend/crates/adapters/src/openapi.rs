@@ -1,8 +1,5 @@
-use crate::http::category::create_category::{CreateCategoryDto, CreateCategoryResponseDto};
-use crate::http::category::delete_categories::DeleteCategoriesDto;
+use crate::http::category::create_category::CreateCategoryDto;
 use crate::http::category::get_all_categories::GetAllCategoryResponseDto;
-use crate::http::category::get_category::GetCategoryResponseDto;
-use crate::http::category::update_category::{UpdateCategoryDto, UpdateCategoryResponseDto};
 use crate::http::session::create_manual_session::{
     CreateManualSessionDto, CreateManualSessionResponseDto,
 };
@@ -19,6 +16,9 @@ use crate::http::users::get_info::UserInfoResponseDto;
 use crate::http::users::update_password::UpdatePasswordDto;
 use crate::http::users::update_username::UpdateUsernameDto;
 use shared::auth::{LoginDto, LoginResponseDto, LogoutResponseDto, RefreshDto, RefreshResponseDto};
+use shared::category::{
+    CreateCategoryResponseDto, DeleteCategoriesDto, UpdateCategoryDto, UpdateCategoryResponseDto,
+};
 use shared::task::{
     CreateSubtaskDto, CreateSubtaskResponseDto, CreateTaskResponseDto, TasksResponseDto,
     UpdateSubTaskDto, UpdateSubTaskResponseDto, UpdateTaskDto,
@@ -71,7 +71,6 @@ impl Modify for SecurityAddon {
     paths(
         crate::http::category::create_category::create_category_api,
         crate::http::category::update_category::update_category_api,
-        crate::http::category::get_category::get_category,
         crate::http::category::delete_categories::delete_categories_api,
         crate::http::category::get_all_categories::get_all_categories_api,
         crate::http::users::create_user::create_user_api,
@@ -100,7 +99,6 @@ impl Modify for SecurityAddon {
         schemas(UpdateTaskDto, CreateTaskResponseDto),
         schemas(DeleteCategoriesDto),
         schemas(GetAllCategoryResponseDto),
-        schemas(GetCategoryResponseDto),
         schemas(TasksResponseDto),
         schemas(UpdateSubTaskDto, UpdateSubTaskResponseDto),
         schemas(CreateSubtaskDto, CreateSubtaskResponseDto),

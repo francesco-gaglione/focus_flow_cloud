@@ -1,5 +1,5 @@
 use crate::http::app_state::AppState;
-use crate::http::dto::validators::validate_uuid::validate_uuid;
+use shared::validators::validate_uuid::validate_uuid;
 use crate::http::model::session_model::UserSession;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::TASK_TAG;

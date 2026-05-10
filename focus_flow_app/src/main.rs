@@ -8,7 +8,7 @@ mod state;
 mod use_cases;
 
 use presentation::views::{
-    Calendar, Flashcards, FlashcardsLayout, Layout, Pomodoro, Stats, TasksLayout, Todo,
+    Calendar, Categories, Flashcards, FlashcardsLayout, Layout, Pomodoro, Stats, TasksLayout, Todo,
 };
 
 use crate::{
@@ -23,10 +23,11 @@ use crate::{
 enum Route {
     #[layout(Layout)]
         #[layout(TasksLayout)]
-            #[route("/")]        Todo {},
-            #[route("/calendar")] Calendar {},
-            #[route("/stats")]   Stats {},
-            #[route("/timer")]   Pomodoro {},
+            #[route("/")]              Todo {},
+            #[route("/calendar")]      Calendar {},
+            #[route("/stats")]         Stats {},
+            #[route("/timer")]         Pomodoro {},
+            #[route("/categories")]    Categories {},
         #[end_layout]
         #[layout(FlashcardsLayout)]
             #[route("/cards")]   Flashcards {},

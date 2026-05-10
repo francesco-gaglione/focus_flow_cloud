@@ -38,7 +38,7 @@ pub fn Layout() -> Element {
 
     let route = use_route::<Route>();
     let active_section = match route {
-        Route::Todo {} | Route::Calendar {} | Route::Stats {} | Route::Pomodoro {} => "tasks",
+        Route::Todo {} | Route::Calendar {} | Route::Stats {} | Route::Pomodoro {} | Route::Categories {} => "tasks",
         Route::Flashcards {} => "flashcards",
     };
 

@@ -161,7 +161,16 @@ pub fn TaskRow(props: TaskRowProps) -> Element {
                         }
 
                         if let Some(cat) = task.cat.as_deref() {
-                            span { class: "todo-cat", "@{cat}" }
+                            {
+                                let color = task.cat_color.as_deref().unwrap_or("#888");
+                                rsx! {
+                                    span {
+                                        class: "todo-cat",
+                                        style: "color:{color};background:color-mix(in srgb,{color} 15%,transparent);border-color:color-mix(in srgb,{color} 30%,transparent);",
+                                        "@{cat}"
+                                    }
+                                }
+                            }
                         }
 
                         {

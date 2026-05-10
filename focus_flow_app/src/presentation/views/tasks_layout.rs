@@ -27,8 +27,10 @@ pub fn TasksLayout() -> Element {
         Route::Calendar {} => ("A month, <em>at a glance</em>.", "calendar"),
         Route::Stats {} => ("Your <em>quiet</em> wins.", "stats"),
         Route::Pomodoro {} => ("Pomodoro, <em>deep work.</em>", "timer"),
+        Route::Categories {} => ("Categories.", "categories"),
         _ => ("Today.", "todo"),
     };
+    let on_categories = active_tab == "categories";
 
     rsx! {
         div { class: "shrink-0 px-4 pt-2 pb-4 flex items-center gap-3 bg-surface relative z-[5]",
@@ -45,6 +47,19 @@ pub fn TasksLayout() -> Element {
                 div {
                     class: "text-[22px] font-bold leading-[1.15] tracking-[-0.03em] text-foreground whitespace-nowrap overflow-hidden text-ellipsis [&_em]:text-accent [&_em]:not-italic",
                     dangerous_inner_html: title_html
+                }
+            }
+            Link {
+                to: Route::Categories {},
+                class: if on_categories {
+                    "size-9 bg-accent-soft border border-accent rounded-sm text-accent grid place-items-center cursor-pointer shrink-0 transition-[background,border-color,color] duration-fast ease-tech"
+                } else {
+                    "size-9 bg-surface-card border border-border rounded-sm text-subtle grid place-items-center cursor-pointer shrink-0 transition-[background,border-color,color] duration-fast ease-tech hover:bg-gray-200 hover:border-border-strong hover:text-foreground active:bg-gray-300"
+                },
+                title: "Manage categories",
+                svg { view_box: "0 0 16 16", width: "16", height: "16", stroke: "currentColor", fill: "none", stroke_width: "1.6", stroke_linecap: "round", stroke_linejoin: "round",
+                    path { d: "M9 3H3a1 1 0 00-1 1v2a1 1 0 001 1h6l3 3 3-3V4a1 1 0 00-1-1h-2" }
+                    path { d: "M9 9H3a1 1 0 00-1 1v2a1 1 0 001 1h6" }
                 }
             }
         }

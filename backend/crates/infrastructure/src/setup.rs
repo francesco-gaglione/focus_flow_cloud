@@ -20,7 +20,6 @@ use application::use_cases::{
     category::{
         create_category_usecase::CreateCategoryUseCases,
         delete_categories_usecase::DeleteCategoriesUseCases,
-        delete_category_usecase::DeleteCategoryUseCases, get_category_usecase::GetCategoryUseCases,
         update_category_usecase::UpdateCategoryUseCases,
     },
     focus_session::{
@@ -101,9 +100,7 @@ pub async fn init_app_state(
     // Category Use Cases
     let create_category_uc = Arc::new(CreateCategoryUseCases::new(postgres_arc.clone()));
     let delete_categories_uc = Arc::new(DeleteCategoriesUseCases::new(postgres_arc.clone()));
-    let delete_category_uc = Arc::new(DeleteCategoryUseCases::new(postgres_arc.clone()));
     let get_all_category_uc = Arc::new(GetAllCategoryUseCases::new(postgres_arc.clone()));
-    let get_category_uc = Arc::new(GetCategoryUseCases::new(postgres_arc.clone()));
     let update_category_uc = Arc::new(UpdateCategoryUseCases::new(postgres_arc.clone()));
 
     // Task Use Cases
@@ -203,8 +200,6 @@ pub async fn init_app_state(
         get_all_category_uc,
         create_category_uc,
         delete_categories_uc,
-        delete_category_uc,
-        get_category_uc,
         update_category_uc,
         get_tasks_uc,
         create_task_uc,

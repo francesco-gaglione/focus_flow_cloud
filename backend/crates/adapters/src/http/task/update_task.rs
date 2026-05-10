@@ -1,6 +1,6 @@
 use crate::http::app_state::AppState;
 use crate::http::dto::common::task_dto::task_schedule_dto_to_app_dto;
-use crate::http::dto::validators::validate_uuid::validate_uuid;
+use shared::validators::validate_uuid::validate_uuid;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::TASK_TAG;
 use application::use_cases::task::update_task::{UpdateTaskCommand, UpdateTaskError};

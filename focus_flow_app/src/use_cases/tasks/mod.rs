@@ -1,3 +1,6 @@
+pub mod create_category_uc;
+pub mod delete_category_uc;
+pub mod update_category_uc;
 pub mod create_subtask_uc;
 pub mod create_task_uc;
 pub mod delete_task_uc;

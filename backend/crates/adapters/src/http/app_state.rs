@@ -23,7 +23,6 @@ use application::use_cases::{
     category::{
         create_category_usecase::CreateCategoryUseCases,
         delete_categories_usecase::DeleteCategoriesUseCases,
-        delete_category_usecase::DeleteCategoryUseCases, get_category_usecase::GetCategoryUseCases,
         update_category_usecase::UpdateCategoryUseCases,
     },
     focus_session::{
@@ -52,8 +51,6 @@ pub struct AppState {
     // Category Use Cases
     pub create_category_uc: Arc<CreateCategoryUseCases>,
     pub delete_categories_uc: Arc<DeleteCategoriesUseCases>,
-    pub delete_category_uc: Arc<DeleteCategoryUseCases>,
-    pub get_category_uc: Arc<GetCategoryUseCases>,
     pub get_all_category_uc: Arc<GetAllCategoryUseCases>,
     pub update_category_uc: Arc<UpdateCategoryUseCases>,
 

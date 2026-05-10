@@ -66,7 +66,7 @@ mod tests {
 
     use crate::{
         repository_traits::category_persistence::MockCategoryPersistence,
-        use_cases::category::get_category_usecase::GetCategoryUseCases,
+        use_cases::category::get_all_category_usecase::GetAllCategoryUseCases,
     };
     use domain::entities::tasks::category::Category;
 
@@ -90,11 +90,11 @@ mod tests {
             .times(1)
             .returning(move |_| Ok(category_to_return.clone()));
 
-        let usecase = GetCategoryUseCases::new(Arc::new(mock_persistence));
-        let result = usecase.execute(category_id).await;
+        let usecase = GetAllCategoryUseCases::new(Arc::new(mock_persistence));
+        let result = usecase.execute().await;
 
         assert!(result.is_ok());
         let result = result.unwrap();
-        assert_eq!(result.name, category.name());
+        assert_eq!(result.get(0).unwrap().name, category.name());
     }
 }
