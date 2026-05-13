@@ -1,268 +1,342 @@
+use chrono::Datelike;
 use dioxus::prelude::*;
+use shared::stats::OverdueTrendTypeDto;
 
-// ── sample data ───────────────────────────────────────────────────────────────
+use crate::use_cases::stats::get_stats_uc::{get_stats_uc, StatsData};
 
-const DONE_TODAY: u32 = 5;
-const DONE_WEEK: u32 = 23;
-const DONE_WEEK_DELTA: i32 = 4;
-
-const DONE_30D: u32 = 47;
-const AVG_PER_DAY: &str = "3.2";
-
-const FOCUS_WEEK: u32 = 12;
-const FOCUS_AVG_MINS: u32 = 24;
-const FOCUS_BEST_DAY: &str = "Tue";
-const FOCUS_BEST_COUNT: u32 = 5;
-
-const PEAK_HOURS: [(&str, u32); 8] = [
-    ("08", 8), ("10", 12), ("12", 4), ("14", 6),
-    ("16", 2), ("18", 4), ("20", 1), ("22", 0),
+const CAT_COLORS: [&str; 7] = [
+    "#0070f3", "#12a594", "#ffb224", "#7c3aed", "#ef4444", "#d97706", "#6b7280",
 ];
-const PEAK_MAX: u32 = 12;
-const PEAK_LABEL: &str = "10:00 – 12:00";
-
-const PRIORITY_DATA: [(&str, &str, u32, u32); 4] = [
-    ("Urgent",  "#7c3aed", 8,  17),
-    ("High",    "#ef4444", 15, 32),
-    ("Medium",  "#d97706", 18, 38),
-    ("Low / —", "#6b7280", 6,  13),
-];
-
-const OVERDUE_TREND: [u32; 5] = [12, 9, 7, 5, 4];
-const OVERDUE_DELTA: i32 = -3;
-const OVERDUE_CURRENT: u32 = 4;
-
-const BAR_HEIGHTS: [u32; 14] = [40, 20, 70, 55, 30, 80, 60, 45, 90, 35, 65, 75, 50, 85];
-const BAR_LABELS: [&str; 14] = [
-    "14", "13", "12", "11", "10", "9", "8", "7", "6", "5", "4", "3", "2", "TDY",
-];
-const HEATMAP: [u8; 56] = [
-    0, 1, 2, 1, 0, 1, 3, 1, 2, 3, 2, 1, 0, 2, 2, 3, 4, 3, 2, 1, 3, 1, 2, 3, 2, 1, 2, 2, 0, 1, 2, 3,
-    1, 0, 1, 2, 3, 4, 3, 2, 1, 0, 1, 2, 3, 2, 3, 4, 2, 0, 1, 2, 1, 0, 0, 0,
-];
-
-// ── Stats ─────────────────────────────────────────────────────────────────────
 
 #[component]
 pub fn Stats() -> Element {
-    let peak_data: Vec<(&str, u32, u32, bool)> = PEAK_HOURS.iter()
-        .map(|(lbl, cnt)| {
-            let pct = if PEAK_MAX > 0 { cnt * 100 / PEAK_MAX } else { 0 };
-            (*lbl, *cnt, pct, *cnt == PEAK_MAX)
+    let mut stats_data = use_signal(|| StatsData::default());
+    let mut is_loading = use_signal(|| true);
+    let mut load_error: Signal<Option<String>> = use_signal(|| None);
+
+    let _ = use_resource(move || async move {
+        match get_stats_uc().await {
+            Ok(res) => {
+                is_loading.set(false);
+                stats_data.set(res);
+            }
+            Err(e) => {
+                load_error.set(Some(e.to_string()));
+                is_loading.set(false);
+            }
+        }
+    });
+
+    let stats = stats_data.read().stats.clone();
+    let category_colors = stats_data.read().category_colors.clone();
+
+    let counts = stats.completed_tasks_counts.clone();
+    let peak_window = stats.peak_window.clone();
+    let priority = stats.completed_by_priority.clone();
+    let focus = stats.completed_focus_sessions.clone();
+    let overdue_dto = stats.overdue_trend.clone();
+    let cats = stats.count_by_category.clone();
+    let days14 = stats.last_14d.clone();
+    let weeks8 = stats.last_8w.clone();
+
+    let peak_max = peak_window.iter().map(|p| p.count).max().unwrap_or(0);
+    let peak_data: Vec<(String, usize, u32, bool)> = peak_window
+        .iter()
+        .map(|p| {
+            let lbl = p.start.get(..5).unwrap_or(&p.start).to_string();
+            let pct = if peak_max > 0 {
+                (p.count * 100 / peak_max) as u32
+            } else {
+                0
+            };
+            (lbl, p.count, pct, p.count == peak_max && peak_max > 0)
         })
         .collect();
 
-    let ov_max = OVERDUE_TREND.iter().max().copied().unwrap_or(1);
-    let overdue_bars: Vec<(u32, bool)> = OVERDUE_TREND.iter().enumerate()
-        .map(|(i, &v)| (v * 32 / ov_max, i == OVERDUE_TREND.len() - 1))
+    let priority_total = (priority.low + priority.medium + priority.high + priority.urgent).max(1);
+    let p_urgent_pct = (priority.urgent * 100 / priority_total) as u32;
+    let p_high_pct = (priority.high * 100 / priority_total) as u32;
+    let p_medium_pct = (priority.medium * 100 / priority_total) as u32;
+    let p_low_pct = (priority.low * 100 / priority_total) as u32;
+
+    let focus_count = focus.count;
+    let focus_avg_mins = if focus.avg_duration_secs > 0 {
+        focus.avg_duration_secs / 60
+    } else {
+        0
+    };
+
+    let trend_val = overdue_dto.trend_value.abs();
+    let (delta_cls, delta_txt, overdue_display) = match overdue_dto.trend_type {
+        OverdueTrendTypeDto::Decreasing => (
+            "overdue-delta good",
+            format!("{:.0}% fewer overdue vs last week", trend_val),
+            format!("↓{:.0}%", trend_val),
+        ),
+        OverdueTrendTypeDto::Increasing => (
+            "overdue-delta bad",
+            format!("{:.0}% more overdue vs last week", trend_val),
+            format!("↑{:.0}%", trend_val),
+        ),
+        OverdueTrendTypeDto::Stable => (
+            "overdue-delta",
+            "No change from last week".to_string(),
+            "→ 0%".to_string(),
+        ),
+    };
+
+    let cat_total: u64 = cats.iter().map(|c| c.count).sum::<u64>().max(1);
+
+    let max14 = days14.iter().map(|d| d.count).max().unwrap_or(0).max(1);
+    let bar14: Vec<(u32, bool, bool, String)> = days14
+        .iter()
+        .enumerate()
+        .map(|(i, d)| {
+            let h = (d.count * 100 / max14) as u32;
+            let is_today = i == days14.len().saturating_sub(1);
+            let is_muted = d.count == 0;
+            let lbl = if is_today {
+                "TDY".to_string()
+            } else {
+                d.day.day().to_string()
+            };
+            (h, is_today, is_muted, lbl)
+        })
         .collect();
 
-    let (delta_sym, delta_cls, delta_txt) = if OVERDUE_DELTA <= 0 {
-        ("↓", "overdue-delta good", format!("{} fewer than last week", OVERDUE_DELTA.unsigned_abs()))
-    } else {
-        ("↑", "overdue-delta bad", format!("{} more than last week", OVERDUE_DELTA))
-    };
-    let overdue_display = format!("{}{}", delta_sym, OVERDUE_CURRENT);
+    let max_week = weeks8.iter().map(|w| w.count).max().unwrap_or(0);
+    let heatmap_levels: Vec<u8> = weeks8
+        .iter()
+        .flat_map(|w| {
+            let level = if max_week == 0 {
+                0u8
+            } else {
+                ((w.count * 4 / max_week).min(4)) as u8
+            };
+            vec![level; 7]
+        })
+        .collect();
 
-    let week_delta_str = if DONE_WEEK_DELTA >= 0 {
-        format!("↑ +{} from last week", DONE_WEEK_DELTA)
+    let week_delta = counts.week_delta;
+    let week_delta_str = if week_delta >= 0 {
+        format!("↑ +{} from last week", week_delta)
     } else {
-        format!("↓ {} from last week", DONE_WEEK_DELTA.unsigned_abs())
+        format!("↓ {} from last week", week_delta.abs())
     };
-    let week_badge_cls = if DONE_WEEK_DELTA >= 0 { "stats-hero-badge positive" } else { "stats-hero-badge negative" };
+    let week_badge_cls = if week_delta >= 0 {
+        "font-mono text-[10px] tracking-[var(--tracking-data)] uppercase mt-1 inline-block px-[7px] py-[2px] rounded-full text-success bg-[color-mix(in_srgb,#46a758_12%,transparent)]"
+    } else {
+        "font-mono text-[10px] tracking-[var(--tracking-data)] uppercase mt-1 inline-block px-[7px] py-[2px] rounded-full text-[#ef4444] bg-[color-mix(in_srgb,#ef4444_12%,transparent)]"
+    };
+    let day_avg = format!("{:.1}", counts.day_avg);
 
     rsx! {
         div { class: "scroll",
 
-            // ── Hero (no hint — self-explanatory) ────────────────────────
-            div { class: "stats-hero",
-                div { class: "stats-card",
-                    div { class: "stats-title", "Done today" }
-                    div { class: "stats-big",
-                        em { style: "color:var(--color-success,#46a758);", "{DONE_TODAY}" }
-                        span { class: "unit", " tasks" }
-                    }
-                    div { class: "stats-hero-badge positive", "keep going ✦" }
-                }
-                div { class: "stats-card",
-                    div { class: "stats-title", "This week" }
-                    div { class: "stats-big", em { "{DONE_WEEK}" } span { class: "unit", " tasks" } }
-                    div { class: "{week_badge_cls}", "{week_delta_str}" }
-                }
-            }
+            if *is_loading.read() {
+                div { class: "font-mono text-xs text-subtle text-center py-8 tracking-[var(--tracking-data)] uppercase", "Loading…" }
+            } else if let Some(err) = load_error.read().as_ref() {
+                div { class: "font-mono text-xs text-[#ef4444] text-center py-8", "{err}" }
+            } else {
 
-            // ── Trio ─────────────────────────────────────────────────────
-            div { class: "stats-trio",
-                HintCard {
-                    title: "Done · 30d",
-                    hint: "Total tasks completed in the last 30 days. Rolling window.",
-                    div { class: "stats-big", em { "{DONE_30D}" } }
-                }
-                HintCard {
-                    title: "Avg / day",
-                    hint: "Average tasks completed per day over 30 days. Use as a baseline, not a target.",
-                    div { class: "stats-big", "{AVG_PER_DAY}" }
-                }
-                HintCard {
-                    title: "Focus · 7d",
-                    hint: "Pomodoro sessions completed this week.",
-                    div { class: "stats-big", em { "{FOCUS_WEEK}" } }
-                }
-            }
-
-            // ── Peak window ───────────────────────────────────────────────
-            HintCard {
-                title: "Peak window",
-                subtitle: "// when you flow",
-                hint: "Hours when you complete the most tasks. Schedule demanding work here.",
-                div { class: "peak-chart",
-                    for (lbl, cnt, pct, is_peak) in peak_data {
-                        div { class: "peak-row",
-                            span { class: "peak-label", "{lbl}:00" }
-                            div { class: "peak-track",
-                                div {
-                                    class: if is_peak { "peak-fill peak-top" } else { "peak-fill" },
-                                    style: "width:{pct}%;",
-                                }
-                            }
-                            span { class: "peak-count", "{cnt}" }
+                div { class: "stats-hero grid grid-cols-2 gap-2 mb-3",
+                    div { class: "stats-card",
+                        div { class: "stats-title", "Done today" }
+                        div { class: "stats-big",
+                            em { style: "color:var(--color-success,#46a758);", "{counts.completed_today}" }
+                            span { class: "unit", " tasks" }
                         }
+                        div { class: "font-mono text-[10px] tracking-[var(--tracking-data)] uppercase mt-1 inline-block px-[7px] py-[2px] rounded-full text-success bg-[color-mix(in_srgb,#46a758_12%,transparent)]", "keep going ✦" }
+                    }
+                    div { class: "stats-card",
+                        div { class: "stats-title", "This week" }
+                        div { class: "stats-big",
+                            em { "{counts.completed_this_week}" }
+                            span { class: "unit", " tasks" }
+                        }
+                        div { class: "{week_badge_cls}", "{week_delta_str}" }
                     }
                 }
-                div { class: "peak-note", "⚡ Your peak: {PEAK_LABEL}" }
-            }
 
-            // ── Priority mix + Focus sessions ─────────────────────────────
-            div { class: "stats-pair",
+                div { class: "stats-trio grid grid-cols-3 gap-2 mb-3",
+                    HintCard {
+                        title: "Done · 30d",
+                        hint: "Total tasks completed in the last 30 days. Rolling window.",
+                        div { class: "stats-big", em { "{counts.completed_this_month}" } }
+                    }
+                    HintCard {
+                        title: "Avg / day",
+                        hint: "Average tasks completed per day over 30 days. Use as a baseline, not a target.",
+                        div { class: "stats-big", "{day_avg}" }
+                    }
+                    HintCard {
+                        title: "Focus · 7d",
+                        hint: "Pomodoro sessions completed this week.",
+                        div { class: "stats-big", em { "{counts.focus_sessions}" } }
+                    }
+                }
+
                 HintCard {
-                    title: "Priority mix",
-                    hint: "Breakdown of completed tasks by priority. Useful to spot if you tend to complete easier tasks over more important ones.",
-                    div { class: "breakdown",
-                        for (lbl, color, cnt, pct) in PRIORITY_DATA {
-                            PriorityRow { label: lbl, color, count: cnt, pct }
-                        }
-                    }
-                }
-                HintCard {
-                    title: "Focus sessions",
-                    hint: "Pomodoro session stats. Average duration reflects your actual focus window.",
-                    div { class: "stats-big",
-                        em { "{FOCUS_WEEK}" }
-                        span { class: "unit", " this wk" }
-                    }
-                    div { class: "focus-details",
-                        div { class: "focus-detail-row",
-                            span { class: "focus-detail-label", "Avg" }
-                            span { class: "focus-detail-val", "{FOCUS_AVG_MINS} min" }
-                        }
-                        div { class: "focus-detail-row",
-                            span { class: "focus-detail-label", "Best" }
-                            span { class: "focus-detail-val", "{FOCUS_BEST_DAY} · {FOCUS_BEST_COUNT}" }
-                        }
-                    }
-                }
-            }
-
-            // ── Overdue trend ─────────────────────────────────────────────
-            HintCard {
-                title: "Overdue trend",
-                subtitle: "// direction matters",
-                hint: "Overdue task count week over week. Direction matters more than the absolute number.",
-                div { class: "overdue-trend",
-                    span { class: "{delta_cls}", "{overdue_display}" }
-                    div { class: "overdue-info",
-                        span { class: "overdue-label", "{delta_txt}" }
-                        span { class: "overdue-sub", "{OVERDUE_CURRENT} overdue right now" }
-                    }
-                    div { class: "overdue-mini-bars",
-                        for (h_px, is_last) in overdue_bars {
-                            div {
-                                class: if is_last { "overdue-mini-bar last" } else { "overdue-mini-bar" },
-                                style: "height:{h_px}px;",
-                            }
-                        }
-                    }
-                }
-            }
-
-            // ── Category balance ──────────────────────────────────────────
-            HintCard {
-                title: "Category balance",
-                subtitle: "// neglected?",
-                hint: "Tasks completed per category. Low numbers in a category may signal it is getting less attention.",
-                div { class: "breakdown",
-                    BreakdownRow { label: "@work",     color: "#0070f3", pct: 42 }
-                    BreakdownRow { label: "@personal", color: "#12a594", pct: 38 }
-                    BreakdownRow { label: "@errand",   color: "#ffb224", pct: 20 }
-                }
-            }
-
-            // ── 14-day rhythm ─────────────────────────────────────────────
-            HintCard {
-                title: "Last 14 days",
-                subtitle: "// rhythm",
-                hint: "Task completions over the last 14 days. Look at the pattern, not individual days.",
-                div { class: "barchart",
-                    for (i, h) in BAR_HEIGHTS.iter().enumerate() {
-                        {
-                            let is_today = i == 13;
-                            let is_muted = *h == 0;
-                            let bar_class = if is_muted { "bar muted" } else if is_today { "bar today" } else { "bar" };
-                            let height_pct = format!("{}%", h);
-                            rsx! {
-                                div { class: "{bar_class}",
-                                    span { class: "col", style: "height: {height_pct}" }
+                    title: "Peak window",
+                    subtitle: "// when you flow",
+                    hint: "Hours when you complete the most tasks. Schedule demanding work here.",
+                    if peak_data.is_empty() {
+                        div { class: "font-mono text-xs text-subtle py-2", "No data yet" }
+                    } else {
+                        div { class: "peak-chart",
+                            for (lbl, cnt, pct, is_peak) in peak_data {
+                                div { class: "peak-row",
+                                    span { class: "peak-label", "{lbl}" }
+                                    div { class: "peak-track",
+                                        div {
+                                            class: if is_peak { "peak-fill peak-top" } else { "peak-fill" },
+                                            style: "width:{pct}%;",
+                                        }
+                                    }
+                                    span { class: "peak-count", "{cnt}" }
                                 }
                             }
                         }
                     }
                 }
-                div { class: "barchart-labels",
-                    for (i, lbl) in BAR_LABELS.iter().enumerate() {
-                        {
-                            let cls = if i == 13 { "today" } else { "" };
-                            rsx! { span { class: "{cls}", "{lbl}" } }
-                        }
-                    }
-                }
-            }
 
-            // ── 8-week heatmap ────────────────────────────────────────────
-            HintCard {
-                title: "Last 8 weeks",
-                subtitle: "// no shame",
-                hint: "8 weeks of activity at a glance. A reference for patterns, not a streak tracker.",
-                div { class: "heatmap",
-                    for level in HEATMAP.iter() {
-                        {
-                            let cls = match level {
-                                1 => "cell hl-1",
-                                2 => "cell hl-2",
-                                3 => "cell hl-3",
-                                4 => "cell hl-4",
-                                _ => "cell",
-                            };
-                            rsx! { div { class: "{cls}" } }
+                div { class: "stats-pair grid grid-cols-2 gap-2 mb-3",
+                    HintCard {
+                        title: "Priority mix",
+                        hint: "Breakdown of completed tasks by priority. Useful to spot if you tend to complete easier tasks over more important ones.",
+                        div { class: "breakdown",
+                            PriorityRow { label: "Urgent", color: "#7c3aed", count: priority.urgent, pct: p_urgent_pct }
+                            PriorityRow { label: "High",   color: "#ef4444", count: priority.high,   pct: p_high_pct   }
+                            PriorityRow { label: "Medium", color: "#d97706", count: priority.medium,  pct: p_medium_pct }
+                            PriorityRow { label: "Low / —",color: "#6b7280", count: priority.low,    pct: p_low_pct    }
+                        }
+                    }
+                    HintCard {
+                        title: "Focus sessions",
+                        hint: "Pomodoro session stats. Average duration reflects your actual focus window.",
+                        div { class: "stats-big",
+                            em { "{focus_count}" }
+                            span { class: "unit", " this wk" }
+                        }
+                        div { class: "focus-details",
+                            div { class: "focus-detail-row",
+                                span { class: "focus-detail-label", "Avg" }
+                                span { class: "focus-detail-val", "{focus_avg_mins} min" }
+                            }
                         }
                     }
                 }
-                div { class: "heatmap-legend",
-                    span { "less" }
-                    div { class: "scale",
-                        span {}
-                        span { class: "hl-1" }
-                        span { class: "hl-2" }
-                        span { class: "hl-3" }
-                        span { class: "hl-4" }
+
+                HintCard {
+                    title: "Overdue trend",
+                    subtitle: "// direction matters",
+                    hint: "Overdue task count week over week. Direction matters more than the absolute number.",
+                    div { class: "overdue-trend",
+                        span { class: "{delta_cls}", "{overdue_display}" }
+                        div { class: "overdue-info",
+                            span { class: "overdue-label", "{delta_txt}" }
+                        }
                     }
-                    span { "more" }
+                }
+
+                HintCard {
+                    title: "Category balance",
+                    subtitle: "// neglected?",
+                    hint: "Tasks completed per category. Low numbers in a category may signal it is getting less attention.",
+                    if cats.is_empty() {
+                        div { class: "font-mono text-xs text-subtle py-2", "No data yet" }
+                    } else {
+                        div { class: "breakdown",
+                            for (i, cat) in cats.iter().enumerate() {
+                                {
+                                    let color = category_colors
+                                        .get(&cat.category_id.to_string())
+                                        .cloned()
+                                        .unwrap_or_else(|| CAT_COLORS[i % CAT_COLORS.len()].to_string());
+                                    let pct = (cat.count * 100 / cat_total) as u32;
+                                    rsx! {
+                                        BreakdownRow {
+                                            label: cat.category_name.clone(),
+                                            color,
+                                            count: cat.count,
+                                            pct,
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                HintCard {
+                    title: "Last 14 days",
+                    subtitle: "// rhythm",
+                    hint: "Task completions over the last 14 days. Look at the pattern, not individual days.",
+                    if bar14.is_empty() {
+                        div { class: "font-mono text-xs text-subtle py-2", "No data yet" }
+                    } else {
+                        div { class: "barchart",
+                            for (h, is_today, is_muted, _lbl) in bar14.iter() {
+                                {
+                                    let bar_cls = if *is_muted { "bar muted" } else if *is_today { "bar today" } else { "bar" };
+                                    let height = format!("{}%", h);
+                                    rsx! {
+                                        div { class: "{bar_cls}",
+                                            span { class: "col", style: "height:{height};" }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        div { class: "barchart-labels",
+                            for (_h, is_today, _is_muted, lbl) in bar14.iter() {
+                                {
+                                    let cls = if *is_today { "today" } else { "" };
+                                    rsx! { span { class: "{cls}", "{lbl}" } }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                HintCard {
+                    title: "Last 8 weeks",
+                    subtitle: "// no shame",
+                    hint: "8 weeks of activity at a glance. A reference for patterns, not a streak tracker.",
+                    if heatmap_levels.is_empty() {
+                        div { class: "font-mono text-xs text-subtle py-2", "No data yet" }
+                    } else {
+                        div { class: "heatmap",
+                            for level in heatmap_levels.iter() {
+                                {
+                                    let cls = match level {
+                                        1 => "cell hl-1",
+                                        2 => "cell hl-2",
+                                        3 => "cell hl-3",
+                                        4 => "cell hl-4",
+                                        _ => "cell",
+                                    };
+                                    rsx! { div { class: "{cls}" } }
+                                }
+                            }
+                        }
+                        div { class: "heatmap-legend",
+                            span { "less" }
+                            div { class: "scale",
+                                span {}
+                                span { class: "hl-1" }
+                                span { class: "hl-2" }
+                                span { class: "hl-3" }
+                                span { class: "hl-4" }
+                            }
+                            span { "more" }
+                        }
+                    }
                 }
             }
         }
     }
 }
-
-// ── HintCard ──────────────────────────────────────────────────────────────────
 
 #[derive(Props, Clone, PartialEq)]
 struct HintCardProps {
@@ -306,13 +380,11 @@ fn HintCard(props: HintCardProps) -> Element {
     }
 }
 
-// ── sub-components ────────────────────────────────────────────────────────────
-
 #[derive(Props, Clone, PartialEq)]
 struct PriorityRowProps {
     label: &'static str,
     color: &'static str,
-    count: u32,
+    count: usize,
     pct: u32,
 }
 
@@ -332,8 +404,9 @@ fn PriorityRow(props: PriorityRowProps) -> Element {
 
 #[derive(Props, Clone, PartialEq)]
 struct BreakdownRowProps {
-    label: &'static str,
-    color: &'static str,
+    label: String,
+    color: String,
+    count: u64,
     pct: u32,
 }
 
@@ -346,7 +419,7 @@ fn BreakdownRow(props: BreakdownRowProps) -> Element {
             div { class: "breakdown-track",
                 div { class: "breakdown-fill", style: "--c:{props.color};width:{width};" }
             }
-            span { class: "breakdown-pct", "{props.pct}%" }
+            span { class: "breakdown-pct", "{props.count}" }
         }
     }
 }

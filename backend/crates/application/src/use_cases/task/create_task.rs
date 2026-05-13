@@ -60,9 +60,7 @@ impl CreateTaskUseCase {
             task.update_category_id(command.category_id.unwrap());
         }
 
-        if let Some(priority) = command.priority {
-            task.set_priority(priority);
-        }
+        task.set_priority(command.priority.unwrap_or(TaskPriority::Low));
 
         if command.subtasks.is_some() {
             for (index, s) in command.subtasks.unwrap().iter().enumerate() {

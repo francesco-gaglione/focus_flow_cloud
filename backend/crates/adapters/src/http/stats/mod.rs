@@ -1,2 +1,2 @@
-pub mod calculate_stats_by_period;
+pub mod get_stats;
 pub mod routes;

@@ -96,10 +96,12 @@ pub fn Calendar() -> Element {
     let month_label = if mode == "week" {
         let mon = week_monday(cur);
         let sun = mon + Duration::days(6);
+        let m1 = &month_name(mon.month())[..3];
+        let m2 = &month_name(sun.month())[..3];
         if mon.month() == sun.month() {
-            format!("{} {} – {}, {}", month_name(mon.month()), mon.day(), sun.day(), mon.year())
+            format!("{} {}–{}", m1, mon.day(), sun.day())
         } else {
-            format!("{} {} – {} {}, {}", month_name(mon.month()), mon.day(), month_name(sun.month()), sun.day(), sun.year())
+            format!("{} {}–{} {}", m1, mon.day(), m2, sun.day())
         }
     } else {
         format!("{} {}", month_name(cur.month()), cur.year())
@@ -108,7 +110,7 @@ pub fn Calendar() -> Element {
     rsx! {
         div { class: "scroll",
 
-            div { class: "cal-nav",
+            div { class: "flex items-center justify-between mb-[14px]",
                 div { class: "cal-toggle",
                     button {
                         class: if mode == "month" { "active" } else { "" },
@@ -122,7 +124,7 @@ pub fn Calendar() -> Element {
                     }
                 }
 
-                div { class: "cal-nav-btns",
+                div { class: "cal-nav-btns flex gap-[6px] items-center",
                     button {
                         onclick: move |_| {
                             let d = *current_date.read();
@@ -139,11 +141,15 @@ pub fn Calendar() -> Element {
                         }
                     }
 
-                    div { class: "cal-month-pick",
-                        span { class: "cal-month", "{month_label}" }
+                    div { class: "relative cursor-pointer flex items-center overflow-hidden",
+                        span {
+                            class: "cal-month",
+                            style: if mode == "week" { "font-size:15px;" } else { "" },
+                            "{month_label}"
+                        }
                         input {
                             r#type: "month",
-                            class: "cal-month-input",
+                            class: "absolute inset-0 opacity-0 cursor-pointer",
                             value: "{month_val}",
                             oninput: move |e| {
                                 let v = e.value();
@@ -273,20 +279,20 @@ fn MonthView(props: MonthViewProps) -> Element {
             }
         }
 
-        div { class: "day-detail",
-            div { class: "day-detail-head",
-                span { class: "date", "{sel_head}" }
-                span { class: "meta", "{sel_count_str}" }
+        div { class: "bg-surface-raised border border-border rounded-md p-[14px]",
+            div { class: "flex items-baseline justify-between mb-[10px] pb-2 border-b border-border",
+                span { class: "text-[16px] font-semibold text-foreground tracking-tight", "{sel_head}" }
+                span { class: "font-mono text-xs text-subtle tracking-[var(--tracking-data)] uppercase", "{sel_count_str}" }
             }
             if sel_tasks.is_empty() {
-                div { class: "cal-empty", "// quiet day · breathe" }
+                div { class: "text-center py-6 px-3 font-mono text-xs text-subtle tracking-[var(--tracking-data)] uppercase", "// quiet day · breathe" }
             } else {
-                div { class: "day-task-list",
+                div { class: "flex flex-col",
                     for (title, color, cat) in sel_tasks {
-                        div { class: "day-task-row",
-                            div { class: "day-task-stripe", style: "background:{color};" }
-                            div { class: "day-task-body",
-                                div { class: "day-task-title", "{title}" }
+                        div { class: "flex gap-[10px] items-start py-2 border-b border-border last:border-b-0",
+                            div { class: "w-[3px] rounded-[99px] self-stretch flex-shrink-0 min-h-[18px]", style: "background:{color};" }
+                            div { class: "flex-1 min-w-0",
+                                div { class: "text-sm text-foreground leading-[1.4] mb-[2px]", "{title}" }
                                 if let Some(c) = cat {
                                     span {
                                         class: "todo-cat",
@@ -317,17 +323,43 @@ fn WeekView(props: WeekViewProps) -> Element {
     let now = Local::now();
     let monday = week_monday(props.current_date);
 
+    // Compute timeline bounds from tasks in this week; fall back to defaults.
+    let mut dyn_start = TIMELINE_START;
+    let mut dyn_end = TIMELINE_END;
+    for i in 0..7i64 {
+        let date = monday + Duration::days(i);
+        for task in props.tasks.iter().filter(|t| t.schedule.naive_date() == Some(date)) {
+            match &task.schedule {
+                TaskSchedule::At { starts_at } => {
+                    let h = starts_at.hour();
+                    if h < dyn_start { dyn_start = h; }
+                    if h + 1 > dyn_end { dyn_end = (h + 1).min(24); }
+                }
+                TaskSchedule::Span { starts_at, duration_secs } => {
+                    let h = starts_at.hour();
+                    let end_h = {
+                        let total_mins = h * 60 + starts_at.minute() + (*duration_secs as u32) / 60;
+                        ((total_mins + 59) / 60).min(24)
+                    };
+                    if h < dyn_start { dyn_start = h; }
+                    if end_h > dyn_end { dyn_end = end_h; }
+                }
+                _ => {}
+            }
+        }
+    }
+
     let now_top: Option<f64> = {
         let h = now.hour() as f64;
         let m = now.minute() as f64;
-        if h >= TIMELINE_START as f64 && h < TIMELINE_END as f64 {
-            Some((h - TIMELINE_START as f64 + m / 60.0) * HOUR_PX)
+        if h >= dyn_start as f64 && h < dyn_end as f64 {
+            Some((h - dyn_start as f64 + m / 60.0) * HOUR_PX)
         } else {
             None
         }
     };
 
-    let total_height = (TIMELINE_END - TIMELINE_START) as f64 * HOUR_PX;
+    let total_height = (dyn_end - dyn_start) as f64 * HOUR_PX;
 
     let header_data: Vec<(NaiveDate, bool)> = (0..7i64)
         .map(|i| { let d = monday + Duration::days(i); (d, d == today) })
@@ -351,10 +383,10 @@ fn WeekView(props: WeekViewProps) -> Element {
                 TaskSchedule::At { starts_at } => {
                     let h = starts_at.hour() as f64;
                     let m = starts_at.minute() as f64;
-                    if h >= TIMELINE_START as f64 && h < TIMELINE_END as f64 {
+                    if h >= dyn_start as f64 && h < dyn_end as f64 {
                         timed.push(TimedItem {
                             title: task.title.clone(), color,
-                            top_px: (h - TIMELINE_START as f64 + m / 60.0) * HOUR_PX,
+                            top_px: (h - dyn_start as f64 + m / 60.0) * HOUR_PX,
                             height_px: 28.0,
                         });
                     }
@@ -362,10 +394,10 @@ fn WeekView(props: WeekViewProps) -> Element {
                 TaskSchedule::Span { starts_at, duration_secs } => {
                     let h = starts_at.hour() as f64;
                     let m = starts_at.minute() as f64;
-                    if h >= TIMELINE_START as f64 && h < TIMELINE_END as f64 {
+                    if h >= dyn_start as f64 && h < dyn_end as f64 {
                         timed.push(TimedItem {
                             title: task.title.clone(), color,
-                            top_px: (h - TIMELINE_START as f64 + m / 60.0) * HOUR_PX,
+                            top_px: (h - dyn_start as f64 + m / 60.0) * HOUR_PX,
                             height_px: (*duration_secs as f64 / 3600.0 * HOUR_PX).max(28.0),
                         });
                     }
@@ -381,55 +413,55 @@ fn WeekView(props: WeekViewProps) -> Element {
     let has_allday = allday_data.iter().any(|a| !a.is_empty());
 
     rsx! {
-        div { class: "week-view",
+        div { class: "flex flex-col min-h-0",
 
-            div { class: "week-header",
-                div { class: "week-gutter" }
+            div { class: "flex items-stretch border-b border-border",
+                div { class: "w-[52px] flex-shrink-0" }
                 for (date, is_today) in header_data {
                     div {
-                        class: if is_today { "week-col-head is-today" } else { "week-col-head" },
-                        span { class: "week-dow", "{weekday_short(date.weekday())}" }
-                        span { class: "week-day-num", "{date.day()}" }
+                        class: if is_today { "flex-1 flex flex-col items-center py-2 px-1 gap-[2px] border-l border-border bg-accent-soft" } else { "flex-1 flex flex-col items-center py-2 px-1 gap-[2px] border-l border-border" },
+                        span { class: "font-mono text-[9px] text-subtle uppercase tracking-[var(--tracking-data)]", "{weekday_short(date.weekday())}" }
+                        span { class: if is_today { "text-lg font-bold tracking-tight text-accent leading-none" } else { "text-lg font-bold tracking-tight text-foreground leading-none" }, "{date.day()}" }
                     }
                 }
             }
 
             if has_allday {
-                div { class: "week-allday-strip",
-                    div { class: "week-gutter",
-                        span { class: "week-allday-label", "all day" }
+                div { class: "flex border-b border-border min-h-[28px]",
+                    div { class: "w-[52px] flex-shrink-0 flex items-center justify-end pr-2",
+                        span { class: "font-mono text-[9px] text-subtle uppercase tracking-[var(--tracking-data)] leading-none text-right", "all day" }
                     }
                     for chips in allday_data {
-                        div { class: "week-allday-col",
+                        div { class: "flex-1 py-1 px-[2px] flex flex-col gap-[2px] border-l border-border",
                             for (title, color) in chips {
-                                div { class: "week-chip", style: "background:{color};", "{title}" }
+                                div { class: "text-[10px] py-[1px] px-1 rounded-[3px] text-white truncate leading-[16px]", style: "background:{color};", "{title}" }
                             }
                         }
                     }
                 }
             }
 
-            div { class: "week-scroll",
-                div { class: "week-timeline-inner", style: "height:{total_height}px;",
+            div { class: "overflow-y-auto flex-1",
+                div { class: "flex relative", style: "height:{total_height}px;",
 
-                    div { class: "week-gutter week-gutter-abs",
-                        for h in TIMELINE_START..TIMELINE_END {
+                    div { class: "w-[52px] flex-shrink-0 flex items-start justify-end pr-2 relative",
+                        for h in dyn_start..dyn_end {
                             span {
                                 class: "week-hour-label",
-                                style: "top:{(h - TIMELINE_START) as f64 * HOUR_PX}px;",
+                                style: "top:{(h - dyn_start) as f64 * HOUR_PX}px;",
                                 "{h:02}:00"
                             }
                         }
                     }
 
-                    div { class: "week-cols",
+                    div { class: "flex-1 flex",
                         for (is_today, timed) in timeline_data {
                             div {
-                                class: if is_today { "week-col is-today" } else { "week-col" },
-                                for h in TIMELINE_START..TIMELINE_END {
+                                class: if is_today { "flex-1 relative border-l border-border bg-[color-mix(in_srgb,var(--accent)_4%,transparent)]" } else { "flex-1 relative border-l border-border" },
+                                for h in dyn_start..dyn_end {
                                     div {
                                         class: "week-gridline",
-                                        style: "top:{(h - TIMELINE_START) as f64 * HOUR_PX}px;",
+                                        style: "top:{(h - dyn_start) as f64 * HOUR_PX}px;",
                                     }
                                 }
                                 if is_today {

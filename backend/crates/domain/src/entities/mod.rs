@@ -2,7 +2,6 @@ pub mod focus_session;
 pub mod focus_session_type;
 pub mod pomodoro;
 pub mod reminder;
-pub mod stats;
 pub mod tasks;
 pub mod user;
 pub mod user_role;

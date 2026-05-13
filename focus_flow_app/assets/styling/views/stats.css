@@ -53,12 +53,6 @@
     color: var(--text-subtle);
 }
 
-.stats-trio {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    margin-bottom: 12px;
-}
 .stats-trio .stats-card {
     padding: 12px 10px;
     margin: 0;
@@ -270,46 +264,13 @@
 }
 
 /* ── Hero ──────────────────────────────────────────────────────────────────── */
-.stats-hero {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-bottom: 12px;
-}
 .stats-hero .stats-card {
     margin: 0;
 }
 .stats-hero .stats-big {
     font-size: 40px;
 }
-.stats-hero-badge {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: var(--tracking-data);
-    text-transform: uppercase;
-    margin-top: 4px;
-    display: inline-block;
-    padding: 2px 7px;
-    border-radius: var(--r-full);
-    color: var(--text-subtle);
-    background: var(--bg-sunk);
-}
-.stats-hero-badge.positive {
-    color: var(--color-success, #46a758);
-    background: color-mix(in srgb, #46a758 12%, transparent);
-}
-.stats-hero-badge.negative {
-    color: #ef4444;
-    background: color-mix(in srgb, #ef4444 12%, transparent);
-}
-
 /* ── Stats pair (2-col) ────────────────────────────────────────────────────── */
-.stats-pair {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-bottom: 12px;
-}
 .stats-pair .stats-card {
     margin: 0;
 }

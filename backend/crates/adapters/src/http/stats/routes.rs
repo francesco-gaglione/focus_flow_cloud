@@ -1,8 +1,8 @@
 use crate::http::app_state::AppState;
-use crate::http::stats::calculate_stats_by_period::calculate_stats_by_period_api;
+use crate::http::stats::get_stats::get_stats_api;
 use axum::routing::get;
 use axum::Router;
 
 pub fn router() -> Router<AppState> {
-    Router::new().route("/period", get(calculate_stats_by_period_api))
+    Router::new().route("/", get(get_stats_api))
 }

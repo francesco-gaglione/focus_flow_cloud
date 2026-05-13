@@ -11,6 +11,7 @@ use application::use_cases::pomodoro_state::update_pomodoro_context::UpdatePomod
 use application::use_cases::task::add_subtask::AddSubTaskUseCase;
 use application::use_cases::task::get_tasks::GetTasksUseCase;
 use application::use_cases::task::update_subtask::UpdateSubTaskUseCase;
+use application::use_cases::stats::get_stats::GetStatsUseCase;
 use application::use_cases::user::get_user_info::GetUserInfoUseCase;
 use application::use_cases::user::login_user::LoginUseCase;
 use application::use_cases::user::refresh_token::RefreshTokenUseCase;
@@ -70,6 +71,9 @@ pub struct AppState {
     pub update_task_uc: Arc<UpdateTaskUseCase>,
     pub update_subtask_uc: Arc<UpdateSubTaskUseCase>,
     pub add_subtask_uc: Arc<AddSubTaskUseCase>,
+
+    // Stats Use Cases
+    pub get_stats_uc: Arc<GetStatsUseCase>,
 
     // Focus Session Use Cases
     pub create_manual_session_uc: Arc<CreateManualSessionUseCase>,

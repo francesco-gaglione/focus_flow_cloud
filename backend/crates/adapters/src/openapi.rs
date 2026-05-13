@@ -5,9 +5,7 @@ use crate::http::session::create_manual_session::{
 };
 use crate::http::session::get_sessions::{GetSessionFiltersDto, GetSessionFiltersResponseDto};
 use crate::http::session::update_session::{UpdateFocusSessionDto, UpdateFocusSessionResponseDto};
-use crate::http::stats::calculate_stats_by_period::{
-    GetStatsByPeriodDto, GetStatsByPeriodResponseDto,
-};
+use shared::stats::GetStatsResponseDto;
 use crate::http::task::delete_tasks::DeleteTasksDto;
 use crate::http::user_setting::get_user_settings::UserSettingsResponseDto;
 use crate::http::user_setting::update_setting::UpdateUserSettingDto;
@@ -89,7 +87,7 @@ impl Modify for SecurityAddon {
         crate::http::session::create_manual_session::create_manual_session_api,
         crate::http::session::update_session::update_session_api,
         crate::http::session::get_sessions::get_sessions,
-        crate::http::stats::calculate_stats_by_period::calculate_stats_by_period_api,
+        crate::http::stats::get_stats::get_stats_api,
         crate::http::user_setting::get_user_settings::get_settings_api,
         crate::http::user_setting::update_setting::update_setting_api,
     ),
@@ -107,7 +105,7 @@ impl Modify for SecurityAddon {
         schemas(CreateManualSessionDto, CreateManualSessionResponseDto),
         schemas(UpdateFocusSessionDto, UpdateFocusSessionResponseDto),
         schemas(GetSessionFiltersDto, GetSessionFiltersResponseDto),
-        schemas(GetStatsByPeriodDto, GetStatsByPeriodResponseDto),
+        schemas(GetStatsResponseDto),
         schemas(UserSettingsResponseDto),
         schemas(UpdateUserSettingDto),
         schemas(CreateUserDto),

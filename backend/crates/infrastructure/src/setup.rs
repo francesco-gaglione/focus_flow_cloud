@@ -7,6 +7,7 @@ use application::use_cases::pomodoro_state::terminate_session::TerminateSessionU
 use application::use_cases::pomodoro_state::update_current_session::UpdateSessionUseCase;
 use application::use_cases::pomodoro_state::update_pomodoro_context::UpdatePomodoroContextUseCase;
 use application::use_cases::task::add_subtask::AddSubTaskUseCase;
+use application::use_cases::stats::get_stats::GetStatsUseCase;
 use application::use_cases::task::get_tasks::GetTasksUseCase;
 use application::use_cases::task::update_subtask::UpdateSubTaskUseCase;
 use application::use_cases::user::get_user_info::GetUserInfoUseCase;
@@ -111,6 +112,13 @@ pub async fn init_app_state(
     let update_subtask_uc = Arc::new(UpdateSubTaskUseCase::new(postgres_arc.clone()));
     let add_subtask_uc = Arc::new(AddSubTaskUseCase::new(postgres_arc.clone()));
 
+    // Stats Use Cases
+    let get_stats_uc = Arc::new(GetStatsUseCase::new(
+        postgres_arc.clone(),
+        postgres_arc.clone(),
+        postgres_arc.clone(),
+    ));
+
     // Focus Session Use Cases
     let create_manual_session_uc = Arc::new(CreateManualSessionUseCase::new(postgres_arc.clone()));
     let update_focus_session_uc = Arc::new(UpdateFocusSessionUseCase::new(postgres_arc.clone()));
@@ -197,6 +205,7 @@ pub async fn init_app_state(
         start_session_uc,
         terminate_session_uc,
         update_current_session_uc,
+        get_stats_uc,
         get_all_category_uc,
         create_category_uc,
         delete_categories_uc,
