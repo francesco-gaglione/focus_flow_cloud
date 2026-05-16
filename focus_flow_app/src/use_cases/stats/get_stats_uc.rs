@@ -24,5 +24,8 @@ pub async fn get_stats_uc() -> Result<StatsData, StatsError> {
         .await
         .map(|r| r.categories.into_iter().map(|c| (c.id, c.color)).collect())
         .unwrap_or_default();
-    Ok(StatsData { stats, category_colors })
+    Ok(StatsData {
+        stats,
+        category_colors,
+    })
 }

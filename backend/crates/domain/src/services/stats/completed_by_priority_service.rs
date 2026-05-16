@@ -5,6 +5,12 @@ use crate::{
 
 pub struct CompletedByPriorityService {}
 
+impl Default for CompletedByPriorityService {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl CompletedByPriorityService {
     pub fn new() -> Self {
         Self {}
@@ -34,14 +40,24 @@ impl CompletedByPriorityService {
 mod tests {
     use uuid::Uuid;
 
-    use crate::entities::tasks::{task::Task, task_priority::TaskPriority, task_schedule::TaskSchedule};
+    use crate::entities::tasks::{
+        task::Task, task_priority::TaskPriority, task_schedule::TaskSchedule,
+    };
 
     use super::*;
 
     fn completed_task(priority: Option<TaskPriority>) -> Task {
         let mut t = Task::reconstitute(
-            Uuid::new_v4(), Uuid::new_v4(), "task".to_string(), None,
-            priority, None, vec![], TaskSchedule::Unscheduled, None, vec![],
+            Uuid::new_v4(),
+            Uuid::new_v4(),
+            "task".to_string(),
+            None,
+            priority,
+            None,
+            vec![],
+            TaskSchedule::Unscheduled,
+            None,
+            vec![],
         );
         t.complete().unwrap();
         t
@@ -49,8 +65,16 @@ mod tests {
 
     fn pending_task(priority: Option<TaskPriority>) -> Task {
         Task::reconstitute(
-            Uuid::new_v4(), Uuid::new_v4(), "task".to_string(), None,
-            priority, None, vec![], TaskSchedule::Unscheduled, None, vec![],
+            Uuid::new_v4(),
+            Uuid::new_v4(),
+            "task".to_string(),
+            None,
+            priority,
+            None,
+            vec![],
+            TaskSchedule::Unscheduled,
+            None,
+            vec![],
         )
     }
 

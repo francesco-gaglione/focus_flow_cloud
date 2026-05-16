@@ -17,9 +17,9 @@ const CARD_CLS: &str = "w-full max-w-[340px] flex flex-col gap-5 p-6 bg-surface-
 pub fn AuthPage() -> Element {
     let mut app_state = use_context::<Signal<AppState>>();
 
-    let mut server_url_input = use_signal(|| String::new());
-    let mut username_input = use_signal(|| String::new());
-    let mut password_input = use_signal(|| String::new());
+    let mut server_url_input = use_signal(String::new);
+    let mut username_input = use_signal(String::new);
+    let mut password_input = use_signal(String::new);
     let mut error_msg = use_signal(|| Option::<String>::None);
     let mut is_loading = use_signal(|| false);
 
@@ -61,7 +61,7 @@ pub fn AuthPage() -> Element {
                             if !url.is_empty() {
                                 storage::set_item("server_url", &url);
                                 app_state.write().set_server_url(url.clone());
-                                update_base_url_uc(&url);
+                                let _ = update_base_url_uc(&url);
                             }
                         },
                         "Continue"

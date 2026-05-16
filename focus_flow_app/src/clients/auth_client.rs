@@ -14,7 +14,7 @@ pub async fn login(username: &str, password: &str) -> ApiResult<LoginResponseDto
     };
 
     let response = {
-        let api = api_signal.read();
+        let api = (*api_signal.read()).clone();
         api.post::<LoginDto, LoginResponseDto>("/api/auth/login", None, None, &request_dto)
             .await?
     };

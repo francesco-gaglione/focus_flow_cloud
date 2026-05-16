@@ -108,8 +108,8 @@ pub fn Todo() -> Element {
         use_context_provider(|| Signal::new(None));
 
     let mut picker_date: Signal<Option<TimeDate>> = use_signal(|| None);
-    let mut picker_time: Signal<String> = use_signal(|| String::new());
-    let mut picker_end_time: Signal<String> = use_signal(|| String::new());
+    let mut picker_time: Signal<String> = use_signal(String::new);
+    let mut picker_end_time: Signal<String> = use_signal(String::new);
     let mut picker_is_all_day: Signal<bool> = use_signal(|| true);
 
     // Sync picker state when date_sheet opens

@@ -1,10 +1,7 @@
 use dioxus::signals::{ReadableExt, Signal, WritableExt};
 
 use crate::{
-    clients::{
-        auth_client::refresh_api,
-        http_client::ApiClient,
-    },
+    clients::{auth_client::refresh_api, http_client::ApiClient},
     services::storage::{remove_item, set_item},
     state::auth_state::AuthState,
 };
@@ -17,7 +14,9 @@ pub async fn refresh_uc() -> Result<(), ()> {
     match refresh_api(&refresh_token).await {
         Ok(response) => {
             if let Some(mut api_signal) = dioxus::core::try_consume_context::<Signal<ApiClient>>() {
-                api_signal.write().set_auth_token(Some(response.token.clone()));
+                api_signal
+                    .write()
+                    .set_auth_token(Some(response.token.clone()));
             }
             if let Some(mut auth_state) = dioxus::core::try_consume_context::<Signal<AuthState>>() {
                 let mut wr = auth_state.write();

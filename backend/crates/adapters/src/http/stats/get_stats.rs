@@ -4,9 +4,9 @@ use application::use_cases::stats::get_stats::{
 use axum::extract::{Extension, State};
 use axum::Json;
 use shared::stats::{
-    CategoryCountDto, CompletedByPriorityDto, CompletedFocusSessionsDto,
-    CompletedTasksCountsDto, DayCountDto, GetStatsResponseDto, OverdueTrendDto,
-    OverdueTrendTypeDto, PeakWindowRangeDto, WeekCountDto,
+    CategoryCountDto, CompletedByPriorityDto, CompletedFocusSessionsDto, CompletedTasksCountsDto,
+    DayCountDto, GetStatsResponseDto, OverdueTrendDto, OverdueTrendTypeDto, PeakWindowRangeDto,
+    WeekCountDto,
 };
 
 use crate::http::app_state::AppState;

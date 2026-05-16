@@ -5,7 +5,6 @@ use crate::http::session::create_manual_session::{
 };
 use crate::http::session::get_sessions::{GetSessionFiltersDto, GetSessionFiltersResponseDto};
 use crate::http::session::update_session::{UpdateFocusSessionDto, UpdateFocusSessionResponseDto};
-use shared::stats::GetStatsResponseDto;
 use crate::http::task::delete_tasks::DeleteTasksDto;
 use crate::http::user_setting::get_user_settings::UserSettingsResponseDto;
 use crate::http::user_setting::update_setting::UpdateUserSettingDto;
@@ -17,6 +16,7 @@ use shared::auth::{LoginDto, LoginResponseDto, LogoutResponseDto, RefreshDto, Re
 use shared::category::{
     CreateCategoryResponseDto, DeleteCategoriesDto, UpdateCategoryDto, UpdateCategoryResponseDto,
 };
+use shared::stats::GetStatsResponseDto;
 use shared::task::{
     CreateSubtaskDto, CreateSubtaskResponseDto, CreateTaskResponseDto, TasksResponseDto,
     UpdateSubTaskDto, UpdateSubTaskResponseDto, UpdateTaskDto,

@@ -56,7 +56,7 @@ impl From<&Task> for TaskOutput {
             schedule: value.schedule().into(),
             completed_at: value.completed_at(),
             subtasks: value.sub_tasks().iter().map(|s| s.into()).collect(),
-            category_id: value.category_id().clone(),
+            category_id: value.category_id(),
         }
     }
 }
@@ -111,7 +111,7 @@ mod tests {
 
         mock_persistence
             .expect_find_all()
-            .with(mockall::predicate::eq(Some(false)))
+            .with(mockall::predicate::eq(None))
             .returning(move |_| Ok(returned_tasks.clone()));
 
         let use_case = GetTasksUseCase::new(Arc::new(mock_persistence));

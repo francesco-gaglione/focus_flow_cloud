@@ -10,6 +10,12 @@ use crate::{
 
 pub struct CompletedTasksCountsService {}
 
+impl Default for CompletedTasksCountsService {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl CompletedTasksCountsService {
     pub fn new() -> Self {
         Self {}
@@ -134,7 +140,7 @@ mod test_completed_tasks_counts_service {
         let result = CompletedTasksCountsService::calculate(&tasks, &sessions);
         assert_eq!(result.completed_tasks(), 10);
         assert_eq!(result.week_completed_tasks(), 10);
-        assert_eq!(result.current_week_delta(), -10);
+        assert_eq!(result.current_week_delta(), 10);
         assert_eq!(result.month_completed_tasks(), 10);
         assert!((result.day_avg() - 10.0 / 30.0).abs() < f64::EPSILON);
         assert_eq!(result.focus_sessions(), 0);

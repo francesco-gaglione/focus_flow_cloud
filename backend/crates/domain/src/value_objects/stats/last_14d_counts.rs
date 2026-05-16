@@ -32,6 +32,12 @@ pub struct Last14dCounts {
     counts: Vec<DayCounts>,
 }
 
+impl Default for Last14dCounts {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Last14dCounts {
     pub fn new() -> Self {
         Self { counts: Vec::new() }

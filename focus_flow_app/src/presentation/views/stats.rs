@@ -10,11 +10,11 @@ const CAT_COLORS: [&str; 7] = [
 
 #[component]
 pub fn Stats() -> Element {
-    let mut stats_data = use_signal(|| StatsData::default());
+    let mut stats_data = use_signal(StatsData::default);
     let mut is_loading = use_signal(|| true);
     let mut load_error: Signal<Option<String>> = use_signal(|| None);
 
-    let _ = use_resource(move || async move {
+    let _resource = use_resource(move || async move {
         match get_stats_uc().await {
             Ok(res) => {
                 is_loading.set(false);
@@ -44,11 +44,7 @@ pub fn Stats() -> Element {
         .iter()
         .map(|p| {
             let lbl = p.start.get(..5).unwrap_or(&p.start).to_string();
-            let pct = if peak_max > 0 {
-                (p.count * 100 / peak_max) as u32
-            } else {
-                0
-            };
+            let pct = (p.count * 100).checked_div(peak_max).unwrap_or(0) as u32;
             (lbl, p.count, pct, p.count == peak_max && peak_max > 0)
         })
         .collect();
@@ -108,11 +104,7 @@ pub fn Stats() -> Element {
     let heatmap_levels: Vec<u8> = weeks8
         .iter()
         .flat_map(|w| {
-            let level = if max_week == 0 {
-                0u8
-            } else {
-                ((w.count * 4 / max_week).min(4)) as u8
-            };
+            let level = ((w.count * 4).checked_div(max_week).unwrap_or(0).min(4)) as u8;
             vec![level; 7]
         })
         .collect();

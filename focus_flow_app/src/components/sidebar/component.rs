@@ -7,9 +7,9 @@ use crate::components::tooltip::{Tooltip, TooltipContent, TooltipTrigger};
 use dioxus::core::use_drop;
 use dioxus::prelude::*;
 use dioxus_primitives::dioxus_attributes::attributes;
+use dioxus_primitives::icon;
 use dioxus_primitives::merge_attributes;
 use dioxus_primitives::use_controlled;
-use dioxus_primitives::icon;
 
 // constants
 const SIDEBAR_WIDTH: &str = "16rem";

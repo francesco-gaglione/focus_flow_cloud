@@ -1,8 +1,14 @@
-use chrono::{Datelike, Days, Utc};
+use chrono::{Datelike, Days};
 
 use crate::{entities::tasks::task::Task, value_objects::stats::last_8w_counts::Last8wCounts};
 
 pub struct Last8wCountsService {}
+
+impl Default for Last8wCountsService {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 impl Last8wCountsService {
     pub fn new() -> Self {
@@ -66,7 +72,12 @@ mod tests {
     }
 
     fn pending() -> Task {
-        Task::new(Uuid::new_v4(), "task".to_string(), TaskSchedule::Unscheduled, None)
+        Task::new(
+            Uuid::new_v4(),
+            "task".to_string(),
+            TaskSchedule::Unscheduled,
+            None,
+        )
     }
 
     #[test]

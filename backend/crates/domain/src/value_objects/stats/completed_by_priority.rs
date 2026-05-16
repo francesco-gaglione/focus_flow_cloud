@@ -6,6 +6,12 @@ pub struct CompletedByPriority {
     counts: HashMap<TaskPriority, usize>,
 }
 
+impl Default for CompletedByPriority {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl CompletedByPriority {
     pub fn new() -> Self {
         Self {

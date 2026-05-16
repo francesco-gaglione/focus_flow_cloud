@@ -57,19 +57,14 @@ pub struct CompletedFocusSessionsDto {
     pub avg_duration_secs: i64,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
 #[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum OverdueTrendTypeDto {
     Increasing,
     Decreasing,
+    #[default]
     Stable,
-}
-
-impl Default for OverdueTrendTypeDto {
-    fn default() -> Self {
-        Self::Stable
-    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]

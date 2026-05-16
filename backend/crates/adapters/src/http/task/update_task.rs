@@ -1,15 +1,14 @@
 use crate::http::app_state::AppState;
 use crate::http::dto::common::task_dto::task_schedule_dto_to_app_dto;
-use shared::validators::validate_uuid::validate_uuid;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::TASK_TAG;
 use application::use_cases::task::update_task::{UpdateTaskCommand, UpdateTaskError};
 use axum::extract::{Path, State};
 use axum::Json;
-use chrono::DateTime;
 use domain::entities::tasks::task_priority::TaskPriority as DomainPriority;
 use serde::{Deserialize, Serialize};
 use shared::task::{TaskPriority, UpdateTaskDto, UpdateTaskResponseDto};
+use shared::validators::validate_uuid::validate_uuid;
 use utoipa::ToSchema;
 use uuid::Uuid;
 use validator::Validate;
@@ -68,7 +67,7 @@ pub async fn update_task_api(
 
     let schedule = payload
         .schedule
-        .map(|s| task_schedule_dto_to_app_dto(s))
+        .map(task_schedule_dto_to_app_dto)
         .transpose()?;
 
     let command = UpdateTaskCommand {

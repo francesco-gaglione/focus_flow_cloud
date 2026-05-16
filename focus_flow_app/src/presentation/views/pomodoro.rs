@@ -104,7 +104,7 @@ pub fn Pomodoro() -> Element {
     let mut tick = use_signal(|| 0u64);
 
     // 1-second tick → re-render for live timer
-    let _ = use_resource(move || async move {
+    let _resource = use_resource(move || async move {
         loop {
             tokio::time::sleep(Duration::from_secs(1)).await;
             *tick.write() += 1;

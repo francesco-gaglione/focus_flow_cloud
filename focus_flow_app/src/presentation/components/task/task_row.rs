@@ -57,10 +57,18 @@ pub fn TaskRow(props: TaskRowProps) -> Element {
     };
 
     let row_class = {
-        let mut c = if task.done { "todo-row done" } else { "todo-row" }.to_string();
+        let mut c = if task.done {
+            "todo-row done"
+        } else {
+            "todo-row"
+        }
+        .to_string();
         if !task.done {
-            if is_overdue { c.push_str(" overdue-row"); }
-            else if is_today { c.push_str(" today-row"); }
+            if is_overdue {
+                c.push_str(" overdue-row");
+            } else if is_today {
+                c.push_str(" today-row");
+            }
         }
         c
     };
@@ -84,9 +92,9 @@ pub fn TaskRow(props: TaskRowProps) -> Element {
     let delete_id = task.id.clone();
     let timer_id = task.id.clone();
     let timer_title = task.title.clone();
-    let on_delete = props.on_delete.clone();
-    let on_start_timer = props.on_start_timer.clone();
-    let on_add_subtask = props.on_add_subtask.clone();
+    let on_delete = props.on_delete;
+    let on_start_timer = props.on_start_timer;
+    let on_add_subtask = props.on_add_subtask;
     let current_priority = task.priority;
     let current_schedule = task.schedule.clone();
     let has_timer = on_start_timer.is_some();
@@ -114,8 +122,16 @@ pub fn TaskRow(props: TaskRowProps) -> Element {
         .collect();
 
     let can_expand = has_subtasks || has_add_subtask;
-    let wrap_class = if can_expand && *expanded.read() { "todo-row-wrap expanded" } else { "todo-row-wrap" };
-    let expand_btn_class = if *expanded.read() { "todo-expand-btn open" } else { "todo-expand-btn" };
+    let wrap_class = if can_expand && *expanded.read() {
+        "todo-row-wrap expanded"
+    } else {
+        "todo-row-wrap"
+    };
+    let expand_btn_class = if *expanded.read() {
+        "todo-expand-btn open"
+    } else {
+        "todo-expand-btn"
+    };
 
     rsx! {
         div {

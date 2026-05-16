@@ -203,8 +203,7 @@ impl GetStatsUseCase {
             .await?;
         let categories = self.category_persistence.find_all().await?;
 
-        let completed_tasks_counts =
-            CompletedTasksCountsService::calculate(&tasks, &sessions);
+        let completed_tasks_counts = CompletedTasksCountsService::calculate(&tasks, &sessions);
         let peak_window = PeakWindowService::new().calculate(&tasks)?;
         let completed_by_priority = CompletedByPriorityService::calculate(&tasks);
         let completed_focus_sessions = CompletedFocusSessionsService::calculate(&sessions);
@@ -276,9 +275,7 @@ mod tests {
             .returning(|_| Ok(vec![]));
 
         let mut mock_categories = MockCategoryPersistence::new();
-        mock_categories
-            .expect_find_all()
-            .returning(|| Ok(vec![]));
+        mock_categories.expect_find_all().returning(|| Ok(vec![]));
 
         let use_case = GetStatsUseCase::new(
             Arc::new(mock_tasks),
@@ -314,7 +311,9 @@ mod tests {
         );
 
         let result = use_case
-            .execute(GetStatsCommand { user_id: Uuid::new_v4() })
+            .execute(GetStatsCommand {
+                user_id: Uuid::new_v4(),
+            })
             .await;
         assert!(matches!(result, Err(GetStatsError::PersistenceError(_))));
     }

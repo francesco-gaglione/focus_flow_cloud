@@ -59,7 +59,7 @@ mod tests {
     fn new_completed_task_counts() {
         let stat = CompletedTasksCounts::new(10, 20, -4, 47, 3.2, 12);
         assert_eq!(stat.completed_tasks(), 10);
-        assert_eq!(stat.week_completed_tasks(), 10);
+        assert_eq!(stat.week_completed_tasks(), 20);
         assert_eq!(stat.current_week_delta(), -4);
         assert_eq!(stat.month_completed_tasks(), 47);
         assert_eq!(stat.day_avg(), 3.2);

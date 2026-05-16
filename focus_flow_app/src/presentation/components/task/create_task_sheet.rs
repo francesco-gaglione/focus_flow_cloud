@@ -25,20 +25,32 @@ fn compute_duration_mins(start_str: &str, end_str: &str) -> i64 {
     if let (Some(start), Some(end)) = (parse(start_str), parse(end_str)) {
         let s = start.hour() as i64 * 60 + start.minute() as i64;
         let e = end.hour() as i64 * 60 + end.minute() as i64;
-        if e > s { e - s } else { 0 }
+        if e > s {
+            e - s
+        } else {
+            0
+        }
     } else {
         0
     }
 }
 
-fn build_schedule(date: TimeDate, start_str: &str, is_all_day: bool, end_str: &str) -> TaskScheduleDto {
+fn build_schedule(
+    date: TimeDate,
+    start_str: &str,
+    is_all_day: bool,
+    end_str: &str,
+) -> TaskScheduleDto {
     let naive_date = NaiveDate::from_ymd_opt(date.year(), date.month() as u32, date.day() as u32)
         .unwrap_or_else(|| Local::now().date_naive());
 
     if is_all_day || start_str.trim().is_empty() {
         let ts = naive_date
             .and_hms_opt(0, 0, 0)
-            .map(|ndt| chrono::DateTime::<chrono::Utc>::from_naive_utc_and_offset(ndt, chrono::Utc).timestamp())
+            .map(|ndt| {
+                chrono::DateTime::<chrono::Utc>::from_naive_utc_and_offset(ndt, chrono::Utc)
+                    .timestamp()
+            })
             .unwrap_or(0);
         TaskScheduleDto::AllDay { date: ts }
     } else {
@@ -51,7 +63,10 @@ fn build_schedule(date: TimeDate, start_str: &str, is_all_day: bool, end_str: &s
             .unwrap_or_else(|| chrono::Utc::now().timestamp());
         let duration_mins = compute_duration_mins(start_str, end_str);
         if duration_mins > 0 {
-            TaskScheduleDto::Span { starts_at: ts, duration: duration_mins * 60 }
+            TaskScheduleDto::Span {
+                starts_at: ts,
+                duration: duration_mins * 60,
+            }
         } else {
             TaskScheduleDto::At { starts_at: ts }
         }
@@ -87,7 +102,7 @@ pub fn CreateTaskSheet(props: CreateTaskSheetProps) -> Element {
         }
     };
 
-    let on_close = props.on_close.clone();
+    let on_close = props.on_close;
     let mut close = move || {
         title.set(String::new());
         description.set(String::new());

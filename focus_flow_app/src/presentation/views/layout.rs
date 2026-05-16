@@ -1,8 +1,6 @@
 use crate::{
-    clients::auth_client::logout,
-    presentation::views::auth_page::AuthPage,
-    state::auth_state::AuthState,
-    Route,
+    clients::auth_client::logout, presentation::views::auth_page::AuthPage,
+    state::auth_state::AuthState, Route,
 };
 use dioxus::prelude::*;
 
@@ -38,7 +36,11 @@ pub fn Layout() -> Element {
 
     let route = use_route::<Route>();
     let active_section = match route {
-        Route::Todo {} | Route::Calendar {} | Route::Stats {} | Route::Pomodoro {} | Route::Categories {} => "tasks",
+        Route::Todo {}
+        | Route::Calendar {}
+        | Route::Stats {}
+        | Route::Pomodoro {}
+        | Route::Categories {} => "tasks",
         Route::Flashcards {} => "flashcards",
     };
 

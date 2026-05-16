@@ -5,6 +5,12 @@ use crate::{
 
 pub struct CountByCategoryService {}
 
+impl Default for CountByCategoryService {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl CountByCategoryService {
     pub fn new() -> Self {
         Self {}
@@ -16,9 +22,7 @@ impl CountByCategoryService {
             .map(|cat| {
                 let count = tasks
                     .iter()
-                    .filter(|t| {
-                        t.completed_at().is_some() && t.category_id() == Some(cat.id())
-                    })
+                    .filter(|t| t.completed_at().is_some() && t.category_id() == Some(cat.id()))
                     .count() as u64;
                 CategoryCount::new(cat.clone(), count)
             })
@@ -41,14 +45,24 @@ mod tests {
     }
 
     fn completed_task_with_category(category_id: Uuid) -> Task {
-        let mut t = Task::new(Uuid::new_v4(), "task".to_string(), TaskSchedule::Unscheduled, None);
+        let mut t = Task::new(
+            Uuid::new_v4(),
+            "task".to_string(),
+            TaskSchedule::Unscheduled,
+            None,
+        );
         t.update_category_id(category_id);
         t.complete().unwrap();
         t
     }
 
     fn pending_task_with_category(category_id: Uuid) -> Task {
-        let mut t = Task::new(Uuid::new_v4(), "task".to_string(), TaskSchedule::Unscheduled, None);
+        let mut t = Task::new(
+            Uuid::new_v4(),
+            "task".to_string(),
+            TaskSchedule::Unscheduled,
+            None,
+        );
         t.update_category_id(category_id);
         t
     }

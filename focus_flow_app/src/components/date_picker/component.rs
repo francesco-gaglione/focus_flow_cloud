@@ -1,11 +1,11 @@
 use dioxus::prelude::*;
 
+use dioxus_primitives::icon;
 use dioxus_primitives::{
     date_picker::{self, DatePickerInputProps, DatePickerProps, DateRangePickerProps},
     popover::{PopoverContentProps, PopoverTriggerProps},
     ContentAlign, ContentSide,
 };
-use dioxus_primitives::icon;
 
 use super::super::calendar::*;
 use super::super::popover::*;

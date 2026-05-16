@@ -63,7 +63,7 @@ impl From<DbSubtask> for Subtask {
             value.description,
             Some(value.id),
         );
-        if let Some(_) = value.completed_at {
+        if value.completed_at.is_some() {
             subtask.mark_completed();
         }
         subtask

@@ -4,7 +4,7 @@ use adapters::http::{
     task::{
         complete_task::CompleteTaskDto,
         create_task::CreateTaskDto,
-        delete_tasks::{DeleteTasksDto, DeleteTaskResponseDto},
+        delete_tasks::{DeleteTaskResponseDto, DeleteTasksDto},
         get_tasks::TasksResponseDto,
         orphan_tasks::OrphanTasksResponseDto,
         update_task::{UpdateTaskDto, UpdateTaskResponseDto},

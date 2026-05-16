@@ -1,11 +1,11 @@
 use crate::http::app_state::AppState;
-use shared::validators::validate_uuid::validate_uuid;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::TASK_TAG;
 use application::use_cases::task::delete_task::DeleteTaskError;
 use axum::extract::{Query, State};
 use axum::Json;
 use serde::{Deserialize, Serialize};
+use shared::validators::validate_uuid::validate_uuid;
 use utoipa::ToSchema;
 use validator::Validate;
 

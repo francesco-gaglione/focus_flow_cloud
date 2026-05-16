@@ -39,6 +39,12 @@ impl From<PwTimeRangeError> for PeakWindowServiceError {
 
 pub struct PeakWindowService {}
 
+impl Default for PeakWindowService {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl PeakWindowService {
     pub fn new() -> Self {
         Self {}
@@ -203,15 +209,15 @@ mod tests_calculate_peak_window {
     #[test]
     fn test_tasks_spread_across_windows() {
         let tasks = vec![
-            completed_at(t(6, 30)),  // 6-8
-            completed_at(t(9, 0)),   // 8-10
-            completed_at(t(11, 0)),  // 10-12
-            completed_at(t(13, 0)),  // 12-14
-            completed_at(t(15, 0)),  // 14-16
-            completed_at(t(17, 0)),  // 16-18
-            completed_at(t(19, 0)),  // 18-20
-            completed_at(t(21, 0)),  // 20-22
-            completed_at(t(23, 0)),  // 22-24
+            completed_at(t(6, 30)), // 6-8
+            completed_at(t(9, 0)),  // 8-10
+            completed_at(t(11, 0)), // 10-12
+            completed_at(t(13, 0)), // 12-14
+            completed_at(t(15, 0)), // 14-16
+            completed_at(t(17, 0)), // 16-18
+            completed_at(t(19, 0)), // 18-20
+            completed_at(t(21, 0)), // 20-22
+            completed_at(t(23, 0)), // 22-24
         ];
         let result = svc().calculate(&tasks).unwrap();
         let ranges = result.time_ranges();
@@ -238,6 +244,10 @@ mod tests_calculate_peak_window {
         let ranges = svc().calculate(&tasks).unwrap();
         let ranges = ranges.time_ranges();
         assert_eq!(ranges[2].count(), 2); // 10:00-12:00
-        assert!(ranges.iter().enumerate().filter(|(i, _)| *i != 2).all(|(_, r)| r.count() == 0));
+        assert!(ranges
+            .iter()
+            .enumerate()
+            .filter(|(i, _)| *i != 2)
+            .all(|(_, r)| r.count() == 0));
     }
 }

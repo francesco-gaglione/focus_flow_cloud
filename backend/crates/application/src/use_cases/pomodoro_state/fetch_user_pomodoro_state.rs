@@ -130,9 +130,14 @@ mod tests {
 
     #[tokio::test]
     async fn test_fetch_success_with_running_session() {
+        use domain::entities::focus_session_type::FocusSessionType;
+
         let mut mock_repo = MockPomodoroStateRepository::new();
         let user_id = Uuid::new_v4();
-        let state = PomodoroState::new();
+        let mut state = PomodoroState::new();
+        state
+            .start_new_session(user_id, FocusSessionType::Work, None)
+            .unwrap();
 
         mock_repo
             .expect_fetch_user_state()

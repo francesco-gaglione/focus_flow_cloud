@@ -3,8 +3,7 @@ use dioxus::prelude::*;
 use crate::{
     clients::category_http_client::get_all_categories,
     use_cases::tasks::{
-        create_category_uc::create_category_uc,
-        delete_category_uc::delete_category_uc,
+        create_category_uc::create_category_uc, delete_category_uc::delete_category_uc,
         update_category_uc::update_category_uc,
     },
 };
@@ -46,7 +45,11 @@ pub fn Categories() -> Element {
             cats.set(
                 res.categories
                     .into_iter()
-                    .map(|c| CatItem { id: c.id, name: c.name, color: c.color })
+                    .map(|c| CatItem {
+                        id: c.id,
+                        name: c.name,
+                        color: c.color,
+                    })
                     .collect(),
             );
         }

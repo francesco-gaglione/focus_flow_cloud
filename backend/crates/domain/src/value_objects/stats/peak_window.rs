@@ -47,6 +47,12 @@ pub struct PeakWindow {
     time_ranges: Vec<PwTimeRange>,
 }
 
+impl Default for PeakWindow {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl PeakWindow {
     pub fn new() -> Self {
         Self {

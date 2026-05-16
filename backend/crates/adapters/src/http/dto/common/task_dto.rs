@@ -1,4 +1,4 @@
-use chrono::{DateTime, Duration, NaiveDate, Utc};
+use chrono::{DateTime, Duration, Utc};
 pub use shared::task::TaskDto;
 
 use application::use_cases::task::{
@@ -93,6 +93,6 @@ pub fn from_task_output(v: &TaskOutput) -> TaskDto {
                 sort_order: s.sort_order,
             })
             .collect(),
-        category_id: v.category_id.clone(),
+        category_id: v.category_id,
     }
 }

@@ -44,7 +44,10 @@ mod tests {
             date: now.date_naive()
         }
         .is_overdue());
-        assert!(!TaskSchedule::At { starts_at: now }.is_overdue());
+        assert!(!TaskSchedule::At {
+            starts_at: now + Duration::seconds(60)
+        }
+        .is_overdue());
         assert!(!TaskSchedule::Span {
             starts_at: now,
             duration: Duration::days(1),

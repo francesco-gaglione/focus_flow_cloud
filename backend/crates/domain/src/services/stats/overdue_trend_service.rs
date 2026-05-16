@@ -7,6 +7,12 @@ use crate::{
 
 pub struct OverdueTrendService {}
 
+impl Default for OverdueTrendService {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl OverdueTrendService {
     pub fn new() -> Self {
         Self {}
@@ -21,7 +27,7 @@ impl OverdueTrendService {
             .iter()
             .filter(|t| {
                 t.completed_at().is_none()
-                    && schedule_date(t).map_or(false, |d| d >= week_ago && d <= today)
+                    && schedule_date(t).is_some_and(|d| d >= week_ago && d <= today)
             })
             .count() as i64;
 
@@ -29,7 +35,7 @@ impl OverdueTrendService {
             .iter()
             .filter(|t| {
                 t.completed_at().is_none()
-                    && schedule_date(t).map_or(false, |d| d >= two_weeks_ago && d < week_ago)
+                    && schedule_date(t).is_some_and(|d| d >= two_weeks_ago && d < week_ago)
             })
             .count() as i64;
 
@@ -155,7 +161,12 @@ mod tests {
 
     #[test]
     fn test_unscheduled_not_counted() {
-        let task = Task::new(Uuid::new_v4(), "task".to_string(), TaskSchedule::Unscheduled, None);
+        let task = Task::new(
+            Uuid::new_v4(),
+            "task".to_string(),
+            TaskSchedule::Unscheduled,
+            None,
+        );
         let result = OverdueTrendService::calculate(&[task]);
         assert!(matches!(result.trend_type, OverdueTrendType::Stable));
     }

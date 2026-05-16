@@ -30,7 +30,10 @@ impl TaskPersistence for PostgresPersistence {
                     .returning(DbTask::as_returning())
                     .get_result(conn)?;
 
-                debug!("create_task: returned db_task priority={:?}", db_task.priority);
+                debug!(
+                    "create_task: returned db_task priority={:?}",
+                    db_task.priority
+                );
 
                 if !subtasks.is_empty() {
                     diesel::insert_into(schema::subtasks::table)
@@ -54,9 +57,9 @@ impl TaskPersistence for PostgresPersistence {
                     .filter(schema::tasks::deleted_at.is_null())
                     .into_boxed();
 
-                if completed.is_some() && completed.unwrap() == true {
+                if completed.is_some() && completed.unwrap() {
                     query = query.filter(schema::tasks::completed_at.is_not_null());
-                } else if completed.is_some() && completed.unwrap() == false {
+                } else if completed.is_some() && !completed.unwrap() {
                     query = query.filter(schema::tasks::completed_at.is_null());
                 }
 
@@ -224,7 +227,10 @@ impl TaskPersistence for PostgresPersistence {
                     .get_result(conn)
                     .optional()?;
 
-                debug!("update_task result completed_at={:?}", updated_db_task.as_ref().map(|t: &DbTask| t.completed_at));
+                debug!(
+                    "update_task result completed_at={:?}",
+                    updated_db_task.as_ref().map(|t: &DbTask| t.completed_at)
+                );
 
                 let Some(updated_db_task) = updated_db_task else {
                     return Err(diesel::result::Error::NotFound);

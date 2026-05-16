@@ -50,6 +50,7 @@ impl Task {
         }
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub fn reconstitute(
         id: Uuid,
         user_id: Uuid,

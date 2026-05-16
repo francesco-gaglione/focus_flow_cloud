@@ -49,7 +49,9 @@ pub fn SelectMulti<T: Clone + PartialEq + 'static>(props: SelectMultiProps<T>) -
 
 #[component]
 pub fn SelectTrigger(props: SelectTriggerProps) -> Element {
-    let base = attributes!(button { class: "dx-select-trigger" });
+    let base = attributes!(button {
+        class: "dx-select-trigger"
+    });
     let merged = merge_attributes(vec![base, props.attributes]);
 
     rsx! {
@@ -78,7 +80,9 @@ pub fn SelectValue(props: SelectValueProps) -> Element {
 
 #[component]
 pub fn SelectList(props: SelectListProps) -> Element {
-    let base = attributes!(div { class: "dx-select-list" });
+    let base = attributes!(div {
+        class: "dx-select-list"
+    });
     let merged = merge_attributes(vec![base, props.attributes]);
 
     rsx! {
@@ -92,7 +96,9 @@ pub fn SelectList(props: SelectListProps) -> Element {
 
 #[component]
 pub fn SelectGroup(props: SelectGroupProps) -> Element {
-    let base = attributes!(div { class: "dx-select-group" });
+    let base = attributes!(div {
+        class: "dx-select-group"
+    });
     let merged = merge_attributes(vec![base, props.attributes]);
 
     rsx! {
@@ -107,7 +113,9 @@ pub fn SelectGroup(props: SelectGroupProps) -> Element {
 
 #[component]
 pub fn SelectGroupLabel(props: SelectGroupLabelProps) -> Element {
-    let base = attributes!(div { class: "dx-select-group-label" });
+    let base = attributes!(div {
+        class: "dx-select-group-label"
+    });
     let merged = merge_attributes(vec![base, props.attributes]);
 
     rsx! {
@@ -121,7 +129,9 @@ pub fn SelectGroupLabel(props: SelectGroupLabelProps) -> Element {
 
 #[component]
 pub fn SelectOption<T: Clone + PartialEq + 'static>(props: SelectOptionProps<T>) -> Element {
-    let base = attributes!(div { class: "dx-select-option" });
+    let base = attributes!(div {
+        class: "dx-select-option"
+    });
     let merged = merge_attributes(vec![base, props.attributes]);
 
     rsx! {

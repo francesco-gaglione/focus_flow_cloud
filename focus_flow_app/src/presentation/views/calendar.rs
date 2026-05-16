@@ -18,7 +18,10 @@ fn task_color(task: &TodoTask) -> String {
         Some(TaskPriority::High) => "#ef4444".to_string(),
         Some(TaskPriority::Medium) => "#d97706".to_string(),
         Some(TaskPriority::Low) => "#6b7280".to_string(),
-        None => task.cat_color.clone().unwrap_or_else(|| "#888888".to_string()),
+        None => task
+            .cat_color
+            .clone()
+            .unwrap_or_else(|| "#888888".to_string()),
     }
 }
 
@@ -38,24 +41,41 @@ fn days_in_month(year: i32, month: u32) -> u32 {
 
 fn month_name(m: u32) -> &'static str {
     match m {
-        1 => "January", 2 => "February", 3 => "March", 4 => "April",
-        5 => "May", 6 => "June", 7 => "July", 8 => "August",
-        9 => "September", 10 => "October", 11 => "November", _ => "December",
+        1 => "January",
+        2 => "February",
+        3 => "March",
+        4 => "April",
+        5 => "May",
+        6 => "June",
+        7 => "July",
+        8 => "August",
+        9 => "September",
+        10 => "October",
+        11 => "November",
+        _ => "December",
     }
 }
 
 fn weekday_name(w: Weekday) -> &'static str {
     match w {
-        Weekday::Mon => "Monday", Weekday::Tue => "Tuesday",
-        Weekday::Wed => "Wednesday", Weekday::Thu => "Thursday",
-        Weekday::Fri => "Friday", Weekday::Sat => "Saturday", Weekday::Sun => "Sunday",
+        Weekday::Mon => "Monday",
+        Weekday::Tue => "Tuesday",
+        Weekday::Wed => "Wednesday",
+        Weekday::Thu => "Thursday",
+        Weekday::Fri => "Friday",
+        Weekday::Sat => "Saturday",
+        Weekday::Sun => "Sunday",
     }
 }
 
 fn weekday_short(w: Weekday) -> &'static str {
     match w {
-        Weekday::Mon => "Mon", Weekday::Tue => "Tue", Weekday::Wed => "Wed",
-        Weekday::Thu => "Thu", Weekday::Fri => "Fri", Weekday::Sat => "Sat",
+        Weekday::Mon => "Mon",
+        Weekday::Tue => "Tue",
+        Weekday::Wed => "Wed",
+        Weekday::Thu => "Thu",
+        Weekday::Fri => "Fri",
+        Weekday::Sat => "Sat",
         Weekday::Sun => "Sun",
     }
 }
@@ -220,7 +240,9 @@ fn MonthView(props: MonthViewProps) -> Element {
     let cells: Vec<DayCell> = (1..=dim)
         .map(|d| {
             let date = NaiveDate::from_ymd_opt(year, month, d).unwrap_or(first);
-            let chips = props.tasks.iter()
+            let chips = props
+                .tasks
+                .iter()
                 .filter(|t| t.schedule.naive_date() == Some(date))
                 .map(|t| (t.title.clone(), task_color(t)))
                 .collect();
@@ -229,14 +251,23 @@ fn MonthView(props: MonthViewProps) -> Element {
         .collect();
 
     let sel = *selected.read();
-    let sel_tasks: Vec<(String, String, Option<String>)> = props.tasks.iter()
+    let sel_tasks: Vec<(String, String, Option<String>)> = props
+        .tasks
+        .iter()
         .filter(|t| t.schedule.naive_date() == Some(sel))
         .map(|t| (t.title.clone(), task_color(t), t.cat.clone()))
         .collect();
     let sel_count = sel_tasks.len();
-    let sel_count_str = format!("{} task{}", sel_count, if sel_count == 1 { "" } else { "s" });
-    let sel_head = format!("{}, {} {}{}",
-        weekday_name(sel.weekday()), month_name(sel.month()), sel.day(),
+    let sel_count_str = format!(
+        "{} task{}",
+        sel_count,
+        if sel_count == 1 { "" } else { "s" }
+    );
+    let sel_head = format!(
+        "{}, {} {}{}",
+        weekday_name(sel.weekday()),
+        month_name(sel.month()),
+        sel.day(),
         if sel == today { " · today" } else { "" }
     );
 
@@ -328,21 +359,36 @@ fn WeekView(props: WeekViewProps) -> Element {
     let mut dyn_end = TIMELINE_END;
     for i in 0..7i64 {
         let date = monday + Duration::days(i);
-        for task in props.tasks.iter().filter(|t| t.schedule.naive_date() == Some(date)) {
+        for task in props
+            .tasks
+            .iter()
+            .filter(|t| t.schedule.naive_date() == Some(date))
+        {
             match &task.schedule {
                 TaskSchedule::At { starts_at } => {
                     let h = starts_at.hour();
-                    if h < dyn_start { dyn_start = h; }
-                    if h + 1 > dyn_end { dyn_end = (h + 1).min(24); }
+                    if h < dyn_start {
+                        dyn_start = h;
+                    }
+                    if h + 1 > dyn_end {
+                        dyn_end = (h + 1).min(24);
+                    }
                 }
-                TaskSchedule::Span { starts_at, duration_secs } => {
+                TaskSchedule::Span {
+                    starts_at,
+                    duration_secs,
+                } => {
                     let h = starts_at.hour();
                     let end_h = {
                         let total_mins = h * 60 + starts_at.minute() + (*duration_secs as u32) / 60;
-                        ((total_mins + 59) / 60).min(24)
+                        total_mins.div_ceil(60).min(24)
                     };
-                    if h < dyn_start { dyn_start = h; }
-                    if end_h > dyn_end { dyn_end = end_h; }
+                    if h < dyn_start {
+                        dyn_start = h;
+                    }
+                    if end_h > dyn_end {
+                        dyn_end = end_h;
+                    }
                 }
                 _ => {}
             }
@@ -362,7 +408,10 @@ fn WeekView(props: WeekViewProps) -> Element {
     let total_height = (dyn_end - dyn_start) as f64 * HOUR_PX;
 
     let header_data: Vec<(NaiveDate, bool)> = (0..7i64)
-        .map(|i| { let d = monday + Duration::days(i); (d, d == today) })
+        .map(|i| {
+            let d = monday + Duration::days(i);
+            (d, d == today)
+        })
         .collect();
 
     let mut allday_data: Vec<Vec<(String, String)>> = vec![];
@@ -374,7 +423,11 @@ fn WeekView(props: WeekViewProps) -> Element {
         let mut allday: Vec<(String, String)> = vec![];
         let mut timed: Vec<TimedItem> = vec![];
 
-        for task in props.tasks.iter().filter(|t| t.schedule.naive_date() == Some(date)) {
+        for task in props
+            .tasks
+            .iter()
+            .filter(|t| t.schedule.naive_date() == Some(date))
+        {
             let color = task_color(task);
             match &task.schedule {
                 TaskSchedule::AllDay { .. } => {
@@ -385,18 +438,23 @@ fn WeekView(props: WeekViewProps) -> Element {
                     let m = starts_at.minute() as f64;
                     if h >= dyn_start as f64 && h < dyn_end as f64 {
                         timed.push(TimedItem {
-                            title: task.title.clone(), color,
+                            title: task.title.clone(),
+                            color,
                             top_px: (h - dyn_start as f64 + m / 60.0) * HOUR_PX,
                             height_px: 28.0,
                         });
                     }
                 }
-                TaskSchedule::Span { starts_at, duration_secs } => {
+                TaskSchedule::Span {
+                    starts_at,
+                    duration_secs,
+                } => {
                     let h = starts_at.hour() as f64;
                     let m = starts_at.minute() as f64;
                     if h >= dyn_start as f64 && h < dyn_end as f64 {
                         timed.push(TimedItem {
-                            title: task.title.clone(), color,
+                            title: task.title.clone(),
+                            color,
                             top_px: (h - dyn_start as f64 + m / 60.0) * HOUR_PX,
                             height_px: (*duration_secs as f64 / 3600.0 * HOUR_PX).max(28.0),
                         });

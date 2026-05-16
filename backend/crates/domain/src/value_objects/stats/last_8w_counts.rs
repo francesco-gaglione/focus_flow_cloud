@@ -38,6 +38,12 @@ fn current_week_start() -> NaiveDate {
         .unwrap_or(today)
 }
 
+impl Default for Last8wCounts {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Last8wCounts {
     pub fn new() -> Self {
         Self { counts: Vec::new() }

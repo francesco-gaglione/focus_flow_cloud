@@ -2,6 +2,12 @@ use crate::{entities::tasks::task::Task, value_objects::stats::last_14d_counts::
 
 pub struct Last14dCountsService {}
 
+impl Default for Last14dCountsService {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Last14dCountsService {
     pub fn new() -> Self {
         Self {}
@@ -55,7 +61,12 @@ mod tests {
     }
 
     fn pending() -> Task {
-        Task::new(Uuid::new_v4(), "task".to_string(), TaskSchedule::Unscheduled, None)
+        Task::new(
+            Uuid::new_v4(),
+            "task".to_string(),
+            TaskSchedule::Unscheduled,
+            None,
+        )
     }
 
     #[test]
@@ -75,7 +86,11 @@ mod tests {
 
     #[test]
     fn test_multiple_tasks_same_day_accumulate() {
-        let tasks = vec![completed_on(today()), completed_on(today()), completed_on(today())];
+        let tasks = vec![
+            completed_on(today()),
+            completed_on(today()),
+            completed_on(today()),
+        ];
         let result = Last14dCountsService::calculate(&tasks);
         assert_eq!(result.counts().len(), 1);
         assert_eq!(result.find_by_day(today()).unwrap().count(), 3);

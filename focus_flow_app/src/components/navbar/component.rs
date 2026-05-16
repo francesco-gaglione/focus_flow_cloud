@@ -1,8 +1,8 @@
 use dioxus::prelude::*;
+use dioxus_primitives::icon;
 use dioxus_primitives::navbar::{
     self, NavbarContentProps, NavbarItemProps, NavbarNavProps, NavbarProps, NavbarTriggerProps,
 };
-use dioxus_primitives::icon;
 
 #[component]
 pub fn Navbar(props: NavbarProps) -> Element {

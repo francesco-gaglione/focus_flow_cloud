@@ -7,6 +7,12 @@ use crate::{
 
 pub struct CompletedFocusSessionsService {}
 
+impl Default for CompletedFocusSessionsService {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl CompletedFocusSessionsService {
     pub fn new() -> Self {
         Self {}

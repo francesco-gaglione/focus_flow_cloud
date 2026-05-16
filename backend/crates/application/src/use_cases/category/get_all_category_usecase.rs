@@ -60,7 +60,6 @@ impl GetAllCategoryUseCases {
 
 #[cfg(test)]
 mod tests {
-    use mockall::predicate;
     use std::sync::Arc;
     use uuid::Uuid;
 
@@ -72,9 +71,8 @@ mod tests {
 
     #[tokio::test]
     async fn test_get_category_usecase() {
-        let category_id = Uuid::new_v4();
         let category = Category::reconstitute(
-            category_id,
+            Uuid::new_v4(),
             Uuid::new_v4(),
             "Test Category".to_string(),
             "#FFFFFF".to_string(),
@@ -85,16 +83,15 @@ mod tests {
         let category_to_return = category.clone();
 
         mock_persistence
-            .expect_find_by_id()
-            .with(predicate::eq(category_id))
+            .expect_find_all()
             .times(1)
-            .returning(move |_| Ok(category_to_return.clone()));
+            .returning(move || Ok(vec![category_to_return.clone()]));
 
         let usecase = GetAllCategoryUseCases::new(Arc::new(mock_persistence));
         let result = usecase.execute().await;
 
         assert!(result.is_ok());
         let result = result.unwrap();
-        assert_eq!(result.get(0).unwrap().name, category.name());
+        assert_eq!(result[0].name, category.name());
     }
 }

@@ -26,7 +26,9 @@ pub fn Collapsible(props: CollapsibleProps) -> Element {
 
 #[component]
 pub fn CollapsibleTrigger(props: CollapsibleTriggerProps) -> Element {
-    let base = attributes!(button { class: "dx-collapsible-trigger" });
+    let base = attributes!(button {
+        class: "dx-collapsible-trigger"
+    });
     let merged = merge_attributes(vec![base, props.attributes]);
 
     let show_icon = props.r#as.is_none();

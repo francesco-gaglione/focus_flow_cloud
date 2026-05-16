@@ -1,8 +1,9 @@
 use chrono::{DateTime, Duration, NaiveDate, Utc};
 use domain::entities::tasks::task_schedule::TaskSchedule;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub enum TaskScheduleAppDto {
+    #[default]
     Unscheduled,
     AllDay {
         date: NaiveDate,
@@ -14,12 +15,6 @@ pub enum TaskScheduleAppDto {
         starts_at: DateTime<Utc>,
         duration: Duration,
     },
-}
-
-impl Default for TaskScheduleAppDto {
-    fn default() -> Self {
-        Self::Unscheduled
-    }
 }
 
 impl From<TaskSchedule> for TaskScheduleAppDto {
@@ -39,9 +34,9 @@ impl From<TaskSchedule> for TaskScheduleAppDto {
     }
 }
 
-impl Into<TaskSchedule> for TaskScheduleAppDto {
-    fn into(self) -> TaskSchedule {
-        match self {
+impl From<TaskScheduleAppDto> for TaskSchedule {
+    fn from(val: TaskScheduleAppDto) -> Self {
+        match val {
             TaskScheduleAppDto::Unscheduled => TaskSchedule::Unscheduled,
             TaskScheduleAppDto::AllDay { date } => TaskSchedule::AllDay { date },
             TaskScheduleAppDto::At { starts_at } => TaskSchedule::At { starts_at },

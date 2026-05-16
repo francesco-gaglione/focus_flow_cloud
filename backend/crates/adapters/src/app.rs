@@ -47,28 +47,29 @@ pub fn create_app(app_state: AppState) -> Router {
         )
         .layer(ServiceBuilder::new().layer(RequestIdLayer))
         .layer(
-            TraceLayer::new_for_http().make_span_with(|request: &http::Request<_>| {
-                let request_id = request
-                    .extensions()
-                    .get::<RequestId>()
-                    .map(|id| id.0)
-                    .unwrap_or_else(Uuid::new_v4);
-                let path = request.uri().path();
-                let method = request.method();
-                tracing::info_span!(
-                    "http_request",
-                    otel.name = format!("{method} {path}"),
-                    http.method = %method,
-                    http.target = %path,
-                    http.status_code = tracing::field::Empty,
-                    request_id = %request_id,
-                    user_id = tracing::field::Empty,
-                )
-            })
-            .on_response(
-                tower_http::trace::DefaultOnResponse::new()
-                    .level(tracing::Level::INFO)
-                    .include_headers(false),
-            ),
+            TraceLayer::new_for_http()
+                .make_span_with(|request: &http::Request<_>| {
+                    let request_id = request
+                        .extensions()
+                        .get::<RequestId>()
+                        .map(|id| id.0)
+                        .unwrap_or_else(Uuid::new_v4);
+                    let path = request.uri().path();
+                    let method = request.method();
+                    tracing::info_span!(
+                        "http_request",
+                        otel.name = format!("{method} {path}"),
+                        http.method = %method,
+                        http.target = %path,
+                        http.status_code = tracing::field::Empty,
+                        request_id = %request_id,
+                        user_id = tracing::field::Empty,
+                    )
+                })
+                .on_response(
+                    tower_http::trace::DefaultOnResponse::new()
+                        .level(tracing::Level::INFO)
+                        .include_headers(false),
+                ),
         )
 }

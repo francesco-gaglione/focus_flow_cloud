@@ -3,10 +3,7 @@ use crate::{
     repository_traits::persistence_error::PersistenceError,
     use_cases::task::common::task_schedule_app_dto::TaskScheduleAppDto,
 };
-use chrono::{DateTime, Duration, NaiveDate, Utc};
-use domain::entities::tasks::{
-    subtask::Subtask, task::Task, task_priority::TaskPriority, task_schedule::TaskSchedule,
-};
+use domain::entities::tasks::{subtask::Subtask, task::Task, task_priority::TaskPriority};
 use std::sync::Arc;
 use thiserror::Error;
 use tracing::instrument;
@@ -56,14 +53,14 @@ impl CreateTaskUseCase {
             command.description,
         );
 
-        if command.category_id.is_some() {
-            task.update_category_id(command.category_id.unwrap());
+        if let Some(cat_id) = command.category_id {
+            task.update_category_id(cat_id);
         }
 
         task.set_priority(command.priority.unwrap_or(TaskPriority::Low));
 
-        if command.subtasks.is_some() {
-            for (index, s) in command.subtasks.unwrap().iter().enumerate() {
+        if let Some(subtasks) = command.subtasks {
+            for (index, s) in subtasks.iter().enumerate() {
                 task.add_subtask(Subtask::new(
                     s.title.clone(),
                     index as i16,
@@ -85,6 +82,7 @@ impl CreateTaskUseCase {
 mod tests {
     use super::*;
     use crate::repository_traits::task_persistence::MockTaskPersistence;
+    use chrono::NaiveDate;
 
     #[tokio::test]
     async fn test_create_task_success() {
