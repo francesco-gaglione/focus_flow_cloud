@@ -2823,7 +2823,7 @@ dependencies = [
 
 [[package]]
 name = "focus_flow_cloud"
-version = "4.0.1"
+version = "4.0.2"
 dependencies = [
  "adapters",
  "application",

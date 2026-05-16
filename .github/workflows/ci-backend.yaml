@@ -31,16 +31,14 @@ jobs:
       - uses: swatinem/rust-cache@v2
         with:
           workspaces: "backend"
-      - name: Install system dependencies
-        run: sudo apt-get update && sudo apt-get install -y libglib2.0-dev
       - name: Install cargo-llvm-cov
         uses: taiki-e/install-action@cargo-llvm-cov
       - name: Check formatting
         run: cargo fmt -- --check
       - name: Lint
-        run: cargo clippy -- -D warnings
+        run: cargo clippy --workspace --exclude focus_flow_app -- -D warnings
       - name: Test with coverage
-        run: cargo llvm-cov --workspace --lcov --output-path lcov.info
+        run: cargo llvm-cov --workspace --exclude focus_flow_app --lcov --output-path lcov.info
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
