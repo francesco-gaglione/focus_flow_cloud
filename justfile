@@ -77,6 +77,15 @@ app-serve-desktop:
 app-serve-ios:
     cd focus_flow_app && dx serve --platform ios --port 9090
 
+# Patch iOS bundle with icons (run in a second terminal while dx serve --ios is running)
+app-patch-ios-icons:
+    python3 scripts/patch_ios_icons.py
+
+# Bundle iOS for deployment (build + patch icons + install to simulator)
+app-bundle-ios:
+    cd focus_flow_app && dx bundle --ios
+    python3 scripts/patch_ios_icons.py
+
 # Serve app (iOS)
 app-serve-android:
     cd focus_flow_app && dx serve --platform android --port 9090

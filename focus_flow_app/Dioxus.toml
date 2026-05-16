@@ -3,6 +3,8 @@ name = "focus_flow_app"
 
 [bundle]
 identifier = "com.francescogaglione.focusflow"
+publisher = "Francesco Gaglione"
+icon = ["assets/icon.icns", "assets/icon.png"]
 
 [serve]
 port = 9090
