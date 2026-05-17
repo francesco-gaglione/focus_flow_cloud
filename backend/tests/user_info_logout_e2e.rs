@@ -1,10 +1,9 @@
 mod common;
 
-use adapters::http::auth::login::{LoginDto, LoginResponseDto};
-use adapters::http::auth::logout::LogoutResponseDto;
 use adapters::http::users::create_user::CreateUserDto;
 use adapters::http::users::get_info::UserInfoResponseDto;
 use reqwest::StatusCode;
+use shared::auth::{LoginDto, LoginResponseDto, LogoutResponseDto};
 
 #[tokio::test]
 async fn test_get_user_info_and_logout() {

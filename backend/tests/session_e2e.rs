@@ -7,10 +7,10 @@ use adapters::http::{
         create_manual_session::CreateManualSessionDto, get_sessions::GetSessionFiltersResponseDto,
         update_session::UpdateFocusSessionDto,
     },
-    task::{create_task::CreateTaskDto, get_tasks::TasksResponseDto},
     users::create_user::CreateUserDto,
 };
 use chrono::Utc;
+use shared::task::{CreateTaskDto, TaskScheduleDto, TasksResponseDto};
 use tracing::info;
 
 use crate::common::setup;
@@ -19,19 +19,14 @@ use crate::common::setup;
 async fn create_new_session_and_list() {
     let context = setup().await;
 
-    // Create Category to link to the task
-    let create_category_dto = CreateCategoryDto {
-        name: "Work".to_string(),
-        description: Some("Work related tasks".to_string()),
-        color: Some("#FF5733".to_string()),
-    };
-    let category_body = context.create_category(&create_category_dto).await;
-
     // Create Task
     let create_task_dto = CreateTaskDto {
         title: "Task".to_string(),
         description: Some("Work related tasks".to_string()),
-        due_date: None,
+        schedule: Some(TaskScheduleDto::Unscheduled),
+        subtasks: None,
+        category_id: None,
+        priority: None,
     };
 
     let create_task_body = context.create_task(&create_task_dto).await;
@@ -59,7 +54,6 @@ async fn create_new_session_and_list() {
     // Create manual work session
     let create_manual_session_dto = CreateManualSessionDto {
         task_id: Some(create_task_body.id.clone()),
-        category_id: Some(category_body.category_id.clone()),
         session_type: SessionTypeEnum::Work,
         concentration_score: Some(1),
         started_at: chrono::Utc::now().timestamp(),
@@ -97,10 +91,6 @@ async fn create_new_session_and_list() {
     assert!(body
         .focus_sessions
         .iter()
-        .any(|s| s.category_id.eq(&Some(category_body.category_id.clone()))));
-    assert!(body
-        .focus_sessions
-        .iter()
         .any(|s| s.session_type.eq(&SessionTypeEnum::Work)));
     assert!(body
         .focus_sessions
@@ -127,14 +117,12 @@ async fn update_session_and_list() {
     // Create Category to link to the task
     let create_category_dto = CreateCategoryDto {
         name: "Work".to_string(),
-        description: Some("Work related tasks".to_string()),
         color: Some("#FF5733".to_string()),
     };
     let category_body = context.create_category(&create_category_dto).await;
 
     let create_category_dto = CreateCategoryDto {
         name: "Study".to_string(),
-        description: Some("Study related tasks".to_string()),
         color: Some("#FF5734".to_string()),
     };
     let category_body_2 = context.create_category(&create_category_dto).await;
@@ -143,7 +131,10 @@ async fn update_session_and_list() {
     let create_task_dto = CreateTaskDto {
         title: "Task".to_string(),
         description: Some("Work related tasks".to_string()),
-        due_date: None,
+        schedule: None,
+        subtasks: None,
+        category_id: None,
+        priority: None,
     };
 
     let create_task_body = context.create_task(&create_task_dto).await;
@@ -151,7 +142,10 @@ async fn update_session_and_list() {
     let create_task_dto = CreateTaskDto {
         title: "Task".to_string(),
         description: Some("Work related tasks".to_string()),
-        due_date: None,
+        schedule: None,
+        subtasks: None,
+        category_id: None,
+        priority: None,
     };
 
     let create_task_body_2 = context.create_task(&create_task_dto).await;
@@ -159,7 +153,6 @@ async fn update_session_and_list() {
     // Create Manual Session
     let create_manual_session_dto = CreateManualSessionDto {
         task_id: Some(create_task_body.id.clone()),
-        category_id: Some(category_body.category_id.clone()),
         session_type: SessionTypeEnum::Work,
         concentration_score: Some(1),
         started_at: chrono::Utc::now().timestamp(),
@@ -174,7 +167,6 @@ async fn update_session_and_list() {
 
     // Update Manual Session
     let update_manual_session_dto = UpdateFocusSessionDto {
-        category_id: Some(category_body_2.category_id.clone()),
         task_id: Some(create_task_body_2.id.clone()),
         concentration_score: Some(2),
         started_at: Some(Utc::now().timestamp()),
@@ -212,7 +204,6 @@ async fn update_session_and_list() {
     let session = body.focus_sessions.first().unwrap();
     info!("Focus sessions: {:?}", body.focus_sessions);
     assert_eq!(session.notes, Some("Notes updated".to_string()));
-    assert_eq!(session.category_id, Some(category_body_2.category_id));
     assert_eq!(session.task_id, Some(create_task_body_2.id));
     assert_eq!(session.concentration_score, Some(2));
     assert_eq!(session.actual_duration, Some(7200));
@@ -225,7 +216,6 @@ async fn find_sessions_with_filters() {
     // Create Session with Notes
     let session_with_notes = CreateManualSessionDto {
         task_id: None,
-        category_id: None,
         session_type: SessionTypeEnum::Work,
         concentration_score: Some(5),
         started_at: Utc::now().timestamp(),
@@ -237,7 +227,6 @@ async fn find_sessions_with_filters() {
     // Create Session without Notes
     let session_no_notes = CreateManualSessionDto {
         task_id: None,
-        category_id: None,
         session_type: SessionTypeEnum::ShortBreak,
         concentration_score: None,
         started_at: Utc::now().timestamp() - 3600,
@@ -298,7 +287,6 @@ async fn find_sessions_with_category_and_notes() {
     // 1. Create Category
     let create_category_dto = CreateCategoryDto {
         name: "Work".to_string(),
-        description: Some("Work related tasks".to_string()),
         color: Some("#FF5733".to_string()),
     };
     let category = context.create_category(&create_category_dto).await;
@@ -306,7 +294,6 @@ async fn find_sessions_with_category_and_notes() {
     // 2. Create Session with Category and Notes
     let session = CreateManualSessionDto {
         task_id: None,
-        category_id: Some(category.category_id.clone()),
         session_type: SessionTypeEnum::Work,
         concentration_score: Some(5),
         started_at: Utc::now().timestamp(),
@@ -334,10 +321,6 @@ async fn find_sessions_with_category_and_notes() {
         .expect("Failed to deserialize response");
 
     assert_eq!(body.focus_sessions.len(), 1);
-    assert_eq!(
-        body.focus_sessions[0].category_id,
-        Some(category.category_id.clone())
-    );
     assert!(body.focus_sessions[0].notes.is_some());
 }
 
@@ -348,7 +331,6 @@ async fn find_sessions_by_task_category() {
     // 1. Create Category
     let create_category_dto = CreateCategoryDto {
         name: "Work".to_string(),
-        description: Some("Work related tasks".to_string()),
         color: Some("#FF5733".to_string()),
     };
     let category = context.create_category(&create_category_dto).await;
@@ -357,14 +339,16 @@ async fn find_sessions_by_task_category() {
     let create_task_dto = CreateTaskDto {
         title: "Task 1".to_string(),
         description: None,
-        due_date: None,
+        schedule: None,
+        subtasks: None,
+        category_id: None,
+        priority: None,
     };
     let task = context.create_task(&create_task_dto).await;
 
     // 3. Create Session linked to Task (but NO category_id explicitly)
     let session = CreateManualSessionDto {
         task_id: Some(task.id.clone()),
-        category_id: None, // Implicitly belongs to category via task
         session_type: SessionTypeEnum::Work,
         concentration_score: Some(5),
         started_at: Utc::now().timestamp(),
@@ -409,7 +393,6 @@ async fn test_user_isolation() {
     // 1. Create Session for User A (Admin)
     let session_a = CreateManualSessionDto {
         task_id: None,
-        category_id: None,
         session_type: SessionTypeEnum::Work,
         concentration_score: None,
         started_at: Utc::now().timestamp(),

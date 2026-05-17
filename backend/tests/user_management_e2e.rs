@@ -1,10 +1,10 @@
 mod common;
 
-use adapters::http::auth::login::{LoginDto, LoginResponseDto};
 use adapters::http::users::create_user::CreateUserDto;
 use adapters::http::users::update_password::UpdatePasswordDto;
 use adapters::http::users::update_username::UpdateUsernameDto;
 use reqwest::StatusCode;
+use shared::auth::{LoginDto, LoginResponseDto};
 
 #[tokio::test]
 async fn test_update_username_and_password() {
