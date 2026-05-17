@@ -1,15 +1,12 @@
 mod common;
+
 use adapters::http::{
-    category::create_category::CreateCategoryDto,
-    task::{
-        create_task::CreateTaskDto,
-        delete_tasks::{DeleteTasksDto, DeleteTasksResponseDto},
-        get_tasks::TasksResponseDto,
-        orphan_tasks::OrphanTasksResponseDto,
-        update_task::{UpdateTaskDto, UpdateTaskResponseDto},
-    },
+    category::create_category::CreateCategoryDto, task::delete_tasks::DeleteTaskResponseDto,
 };
 use chrono::Utc;
+use shared::task::{
+    CreateTaskDto, TaskScheduleDto, TasksResponseDto, UpdateTaskDto, UpdateTaskResponseDto,
+};
 
 use crate::common::setup;
 
@@ -17,26 +14,25 @@ use crate::common::setup;
 async fn create_new_task_and_list() {
     let context = setup().await;
 
-    // Create Category to link to the task
+    // Create Category
     let create_category_dto = CreateCategoryDto {
         name: "Work".to_string(),
-        description: Some("Work related tasks".to_string()),
         color: Some("#FF5733".to_string()),
     };
-    let category_body = context.create_category(&create_category_dto).await;
+    context.create_category(&create_category_dto).await;
 
     // Create Task
     let create_task_dto = CreateTaskDto {
-        name: "Task".to_string(),
+        title: "Task".to_string(),
         description: Some("Work related tasks".to_string()),
-        category_id: Some(category_body.category_id),
-        scheduled_date: None,
-        scheduled_end_date: None,
+        schedule: None,
+        subtasks: None,
+        category_id: None,
+        priority: None,
     };
 
     let create_task_body = context.create_task(&create_task_dto).await;
 
-    // Fetch tasks and check if the task was created
     let response = context
         .client
         .get(format!("{}/api/task", context.base_url))
@@ -51,52 +47,47 @@ async fn create_new_task_and_list() {
         .expect("Failed to deserialize response");
     assert!(body.tasks.len() == 1);
     assert!(body.tasks.iter().any(|t| t.id.eq(&create_task_body.id)));
-    assert!(body.tasks.iter().any(|t| t.name.eq("Task")));
+    assert!(body.tasks.iter().any(|t| t.title.eq("Task")));
 }
 
 #[tokio::test]
 async fn create_new_orphan_and_list() {
     let context = setup().await;
 
-    // Create Category to link to the task
-    let create_category_dto = CreateCategoryDto {
-        name: "Work".to_string(),
-        description: Some("Work related tasks".to_string()),
-        color: Some("#FF5733".to_string()),
-    };
-    let category_body = context.create_category(&create_category_dto).await;
-    assert!(category_body.category_id.len() > 0);
-
-    // Create Task
+    // Create Task without category
     let create_task_dto = CreateTaskDto {
-        name: "Orphan".to_string(),
+        title: "Orphan".to_string(),
         description: Some("Work related tasks".to_string()),
+        schedule: None,
+        subtasks: None,
         category_id: None,
-        scheduled_date: None,
-        scheduled_end_date: None,
+        priority: None,
     };
 
     let create_task_body = context.create_task(&create_task_dto).await;
 
-    // Fetch tasks and check if the task was created
     let response = context
         .client
-        .get(format!("{}/api/task/orphans", context.base_url))
+        .get(format!("{}/api/task", context.base_url))
         .send()
         .await
         .expect("Failed to execute request");
 
     assert_eq!(response.status(), 200);
-    let body: OrphanTasksResponseDto = response
+    let body: TasksResponseDto = response
         .json()
         .await
         .expect("Failed to deserialize response");
-    assert!(body.orphan_tasks.len() == 1);
-    assert!(body
-        .orphan_tasks
+
+    let orphans: Vec<_> = body
+        .tasks
         .iter()
-        .any(|t| t.id.eq(&create_task_body.id)));
-    assert!(body.orphan_tasks.iter().any(|t| t.name.eq("Orphan")));
+        .filter(|t| t.category_id.is_none())
+        .collect();
+
+    assert_eq!(orphans.len(), 1);
+    assert!(orphans.iter().any(|t| t.id.eq(&create_task_body.id)));
+    assert!(orphans.iter().any(|t| t.title.eq("Orphan")));
 }
 
 #[tokio::test]
@@ -104,15 +95,17 @@ async fn create_scheduled_task_and_list() {
     let context = setup().await;
 
     let now = Utc::now();
-    let start_task_date = now.date_naive().and_hms_opt(11, 0, 0).unwrap().and_utc();
-    let end_task_date = now.date_naive().and_hms_opt(11, 30, 0).unwrap().and_utc();
+    let due = now.date_naive().and_hms_opt(11, 0, 0).unwrap().and_utc();
 
     let create_task_dto = CreateTaskDto {
-        name: "Task to update".to_string(),
+        title: "Scheduled Task".to_string(),
         description: Some("Description".to_string()),
+        schedule: Some(TaskScheduleDto::At {
+            starts_at: due.timestamp(),
+        }),
+        subtasks: None,
         category_id: None,
-        scheduled_date: Some(start_task_date.timestamp()),
-        scheduled_end_date: Some(end_task_date.timestamp()),
+        priority: None,
     };
 
     context.create_task(&create_task_dto).await;
@@ -126,9 +119,11 @@ async fn create_scheduled_task_and_list() {
 
     let tasks_body: TasksResponseDto = tasks_res.json().await.expect("Failed to deserialize tasks");
     assert_eq!(tasks_body.tasks.len(), 1);
-    let task = tasks_body.tasks.get(0).unwrap();
-    assert_eq!(task.scheduled_date, Some(start_task_date.timestamp()));
-    assert_eq!(task.scheduled_end_date, Some(end_task_date.timestamp()));
+    let task = tasks_body.tasks.first().unwrap();
+    match &task.schedule {
+        TaskScheduleDto::At { starts_at } => assert_eq!(*starts_at, due.timestamp()),
+        _ => panic!("Expected At schedule"),
+    }
 }
 
 #[tokio::test]
@@ -137,29 +132,29 @@ async fn update_task_test() {
 
     // Create Task
     let create_task_dto = CreateTaskDto {
-        name: "Task to update".to_string(),
+        title: "Task to update".to_string(),
         description: Some("Description".to_string()),
+        schedule: None,
+        subtasks: None,
         category_id: None,
-        scheduled_date: None,
-        scheduled_end_date: None,
+        priority: None,
     };
 
     let create_body = context.create_task(&create_task_dto).await;
     let task_id = create_body.id;
 
-    // Update Task
+    // Update Task title
     let update_dto = UpdateTaskDto {
-        category_id: None,
-        name: Some("Updated Task Name".to_string()),
+        title: Some("Updated Task Name".to_string()),
         description: Some("Updated Description".to_string()),
-        scheduled_date: None,
-        scheduled_end_date: None,
-        completed_at: Some(chrono::Utc::now().timestamp()),
+        schedule: None,
+        completed: None,
+        priority: None,
     };
 
     let update_res = context
         .client
-        .put(format!("{}/api/task/{}", context.base_url, task_id))
+        .patch(format!("{}/api/task/{}", context.base_url, task_id))
         .json(&update_dto)
         .send()
         .await
@@ -172,6 +167,25 @@ async fn update_task_test() {
         .expect("Failed to deserialize update response");
 
     assert_eq!(update_body.success, true);
+
+    // Complete the task via PATCH with completed flag
+    let complete_dto = UpdateTaskDto {
+        title: None,
+        description: None,
+        schedule: None,
+        completed: Some(true),
+        priority: None,
+    };
+
+    let complete_res = context
+        .client
+        .patch(format!("{}/api/task/{}", context.base_url, task_id))
+        .json(&complete_dto)
+        .send()
+        .await
+        .expect("Failed to complete task");
+
+    assert_eq!(complete_res.status(), 200);
 
     let tasks_res = context
         .client
@@ -190,35 +204,32 @@ async fn delete_tasks_test() {
 
     // Create Task
     let create_task_dto = CreateTaskDto {
-        name: "Task to delete".to_string(),
+        title: "Task to delete".to_string(),
         description: None,
+        schedule: None,
+        subtasks: None,
         category_id: None,
-        scheduled_date: None,
-        scheduled_end_date: None,
+        priority: None,
     };
 
     let create_body = context.create_task(&create_task_dto).await;
     let task_id = create_body.id;
 
-    // Delete Task
-    let delete_dto = DeleteTasksDto {
-        task_ids: vec![task_id.clone()],
-    };
-
+    // Delete Task via query param
     let delete_res = context
         .client
         .delete(format!("{}/api/task", context.base_url))
-        .json(&delete_dto)
+        .query(&[("taskId", task_id.as_str())])
         .send()
         .await
         .expect("Failed to delete task");
 
     assert_eq!(delete_res.status(), 200);
-    let delete_body: DeleteTasksResponseDto = delete_res
+    let delete_body: DeleteTaskResponseDto = delete_res
         .json()
         .await
         .expect("Failed to deserialize delete response");
-    assert!(delete_body.deleted_ids.contains(&task_id));
+    assert_eq!(delete_body.deleted_id, task_id);
 
     // Verify it's gone
     let list_res = context

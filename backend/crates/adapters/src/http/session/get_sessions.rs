@@ -1,11 +1,11 @@
 use crate::http::app_state::AppState;
-use crate::http::dto::validators::validate_uuids::validate_uuids;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::SESSION_TAG;
 use application::use_cases::focus_session::find_sessions_by_filters::{
     ConcentrationScoreFilter, FindSessionByFiltersError, FindSessionFiltersCommand,
     FocusSessionDateFilter, FocusSessionOutput,
 };
+use shared::validators::validate_uuids::validate_uuids;
 
 impl From<FindSessionByFiltersError> for HttpError {
     fn from(value: FindSessionByFiltersError) -> Self {
@@ -32,7 +32,8 @@ use utoipa::{IntoParams, ToSchema};
 use validator::Validate;
 
 use crate::http::dto::common::{
-    focus_session::FocusSessionDto, session_type_enum::SessionTypeEnum,
+    focus_session::FocusSessionDto,
+    session_type_enum::{domain_to_enum, SessionTypeEnum},
 };
 use crate::http::model::session_model::UserSession;
 
@@ -89,19 +90,16 @@ pub struct GetSessionFiltersResponseDto {
     pub focus_sessions: Vec<FocusSessionDto>,
 }
 
-impl From<FocusSessionOutput> for FocusSessionDto {
-    fn from(value: FocusSessionOutput) -> Self {
-        Self {
-            id: value.id.to_string(),
-            category_id: value.category_id.map(|id| id.to_string()),
-            task_id: value.task_id.map(|id| id.to_string()),
-            session_type: value.session_type.into(),
-            actual_duration: Some(value.actual_duration),
-            concentration_score: value.concentration_score,
-            notes: value.notes,
-            started_at: value.started_at.timestamp(),
-            ended_at: Some(value.ended_at.timestamp()),
-        }
+fn focus_session_to_dto(value: FocusSessionOutput) -> FocusSessionDto {
+    FocusSessionDto {
+        id: value.id.to_string(),
+        task_id: value.task_id.map(|id| id.to_string()),
+        session_type: domain_to_enum(value.session_type),
+        actual_duration: Some(value.actual_duration),
+        concentration_score: value.concentration_score,
+        notes: value.notes,
+        started_at: value.started_at.timestamp(),
+        ended_at: Some(value.ended_at.timestamp()),
     }
 }
 
@@ -174,7 +172,6 @@ pub async fn get_sessions(
     let filters = FindSessionFiltersCommand {
         user_id: session.user_id,
         date_range,
-        category_ids: query.category_ids.clone(),
         task_ids: query.task_ids.clone(),
         session_type,
         concentration_score_range,
@@ -184,7 +181,7 @@ pub async fn get_sessions(
     let sessions = state.find_sessions_by_filters_uc.execute(filters).await?;
 
     let response_dto = GetSessionFiltersResponseDto {
-        focus_sessions: sessions.into_iter().map(|session| session.into()).collect(),
+        focus_sessions: sessions.into_iter().map(focus_session_to_dto).collect(),
     };
 
     Ok(Json(response_dto))

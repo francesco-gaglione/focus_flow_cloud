@@ -1,0 +1,67 @@
+[workspace]
+members = [
+    "shared",
+    "backend/crates/*",
+    "backend",
+]
+resolver = "2"
+
+[workspace.dependencies]
+# Core dependencies
+chrono = { version = "0.4.42", features = ["serde"] }
+uuid = { version = "1.18.1", features = ["v4", "serde"] }
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.145"
+tokio = { version = "1.47.1", features = ["full"] }
+async-trait = "0.1.89"
+thiserror = "2.0.16"
+http = "1.3.1"
+futures-util = { version = "0.3", default-features = false, features = ["sink", "std"] }
+rand = "0.8"
+regex = "1.11.3"
+config = "0.13"
+lazy_static = "1.5.0"
+secrecy = { version = "0.10.3", features = ["serde"] }
+
+# Web framework and utilities
+axum = { version = "0.8.6", features = ["ws"] }
+tower = { version = "0.5", features = ["util"] }
+tower-http = { version = "0.6.6", features = ["trace", "cors"] }
+matchit = "0.8.4"
+tokio-tungstenite = "0.28.0"
+
+# OpenTelemetry and tracing
+opentelemetry = { version = "0.27", features = ["trace"] }
+opentelemetry_sdk = { version = "0.27", features = ["trace", "rt-tokio"] }
+opentelemetry-otlp = { version = "0.27", features = ["tonic"] }
+tracing = "0.1.41"
+tracing-opentelemetry = "0.28"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+tracing-bunyan-formatter = "0.3"
+tracing-log = "0.2"
+
+# Database
+diesel = { version = "2", features = ["postgres", "uuid", "chrono", "r2d2"] }
+diesel_migrations = "2"
+deadpool-diesel = { version = "0.6.1", features = ["postgres"] }
+
+# Validation
+validator = { version = "0.20.0", features = ["derive"] }
+
+# Session management
+tower-sessions = { version = "0.14.0", features = ["memory-store"] }
+
+# Documentation
+utoipa = { version = "5.4.0", features = ["axum_extras", "chrono", "uuid"] }
+utoipa-axum = "0.2.0"
+utoipa-swagger-ui = { version = "9.0.2", features = ["axum"] }
+utoipa-scalar = { version = "0.3", features = ["axum"] }
+
+# Utilities
+dotenvy = "0.15.7"
+mockall = "0.11"
+testcontainers = "0.23"
+testcontainers-modules = { version = "0.11", features = ["postgres"] }
+
+# Shared crate
+shared = { path = "./shared" }

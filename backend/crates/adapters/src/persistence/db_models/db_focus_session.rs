@@ -13,7 +13,6 @@ pub struct DbFocusSession {
     pub id: Uuid,
     pub user_id: Uuid,
     pub task_id: Option<Uuid>,
-    pub category_id: Option<Uuid>,
     pub session_type: String,
     pub actual_duration: Option<i64>,
     pub concentration_score: Option<i32>,
@@ -29,7 +28,6 @@ pub struct NewDbFocusSession {
     pub id: Uuid,
     pub user_id: Uuid,
     pub task_id: Option<Uuid>,
-    pub category_id: Option<Uuid>,
     pub session_type: String,
     pub concentration_score: Option<i32>,
     pub notes: Option<String>,
@@ -42,7 +40,6 @@ pub struct NewDbFocusSession {
 #[diesel(table_name = schema::focus_session)]
 pub struct UpdateDbFocusSession {
     pub task_id: Option<Uuid>,
-    pub category_id: Option<Uuid>,
     pub actual_duration: Option<i64>,
     pub concentration_score: Option<i32>,
     pub notes: Option<String>,
@@ -55,7 +52,6 @@ impl From<DbFocusSession> for FocusSession<TerminatedSession> {
         Self::reconstitute(
             value.id,
             value.user_id,
-            value.category_id,
             value.task_id,
             FocusSessionType::from_str(&value.session_type).unwrap(),
             value.actual_duration,
@@ -73,7 +69,6 @@ impl From<FocusSession<TerminatedSession>> for NewDbFocusSession {
             id: value.id(),
             user_id: value.user_id(),
             task_id: value.task_id(),
-            category_id: value.category_id(),
             session_type: value.session_type().to_string(),
             concentration_score: value.concentration_score(),
             notes: value.note(),
@@ -88,7 +83,6 @@ impl From<FocusSession<TerminatedSession>> for UpdateDbFocusSession {
     fn from(value: FocusSession<TerminatedSession>) -> Self {
         Self {
             task_id: value.task_id(),
-            category_id: value.category_id(),
             actual_duration: Some(value.actual_duration()),
             concentration_score: value.concentration_score(),
             notes: value.note(),

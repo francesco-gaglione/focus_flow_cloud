@@ -1,3 +1,4 @@
+use application::use_cases::category::get_all_category_usecase::GetAllCategoryUseCases;
 use application::use_cases::focus_session::update_focus_session::UpdateFocusSessionUseCase;
 use application::use_cases::pomodoro_state::fetch_user_pomodoro_state::FetchUserPomodoroStateUseCase;
 use application::use_cases::pomodoro_state::init_pomodoro_state::InitPomodoroStateUseCase;
@@ -5,9 +6,10 @@ use application::use_cases::pomodoro_state::start_session::StartSessionUseCase;
 use application::use_cases::pomodoro_state::terminate_session::TerminateSessionUseCase;
 use application::use_cases::pomodoro_state::update_current_session::UpdateSessionUseCase;
 use application::use_cases::pomodoro_state::update_pomodoro_context::UpdatePomodoroContextUseCase;
-use application::use_cases::task::complete_task::CompleteTaskUseCase;
-use application::use_cases::task::get_scheduled_tasks::GetScheduledTasksUseCase;
+use application::use_cases::stats::get_stats::GetStatsUseCase;
+use application::use_cases::task::add_subtask::AddSubTaskUseCase;
 use application::use_cases::task::get_tasks::GetTasksUseCase;
+use application::use_cases::task::update_subtask::UpdateSubTaskUseCase;
 use application::use_cases::user::get_user_info::GetUserInfoUseCase;
 use application::use_cases::user::refresh_token::RefreshTokenUseCase;
 use application::use_cases::user::register_user::RegisterUserUseCase;
@@ -19,18 +21,15 @@ use application::use_cases::{
     category::{
         create_category_usecase::CreateCategoryUseCases,
         delete_categories_usecase::DeleteCategoriesUseCases,
-        delete_category_usecase::DeleteCategoryUseCases,
-        get_category_and_task_usecase::GetCategoryAndTaskUseCases,
-        get_category_usecase::GetCategoryUseCases, update_category_usecase::UpdateCategoryUseCases,
+        update_category_usecase::UpdateCategoryUseCases,
     },
     focus_session::{
         create_manual_session::CreateManualSessionUseCase,
         find_sessions_by_filters::FindSessionsByFiltersUseCase,
     },
-    stats::calculate_stats_by_period::CalculateStatsByPeriodUseCase,
     task::{
-        create_task::CreateTaskUseCase, delete_tasks::DeleteTasksUseCase,
-        orphan_tasks::OrphanTasksUseCase, update_task::UpdateTaskUseCase,
+        create_task::CreateTaskUseCase, delete_task::DeleteTaskUseCase,
+        update_task::UpdateTaskUseCase,
     },
     user::login_user::LoginUseCase,
 };
@@ -96,42 +95,35 @@ pub async fn init_app_state(
     let terminate_session_uc = Arc::new(TerminateSessionUseCase::new(
         pomodoro_state_arc.clone(),
         postgres_arc.clone(),
-        postgres_arc.clone(),
     ));
     let update_current_session_uc = Arc::new(UpdateSessionUseCase::new(pomodoro_state_arc.clone()));
 
     // Category Use Cases
     let create_category_uc = Arc::new(CreateCategoryUseCases::new(postgres_arc.clone()));
     let delete_categories_uc = Arc::new(DeleteCategoriesUseCases::new(postgres_arc.clone()));
-    let delete_category_uc = Arc::new(DeleteCategoryUseCases::new(postgres_arc.clone()));
-    let get_category_and_task_uc = Arc::new(GetCategoryAndTaskUseCases::new(
-        postgres_arc.clone(),
-        postgres_arc.clone(),
-    ));
-    let get_category_uc = Arc::new(GetCategoryUseCases::new(postgres_arc.clone()));
+    let get_all_category_uc = Arc::new(GetAllCategoryUseCases::new(postgres_arc.clone()));
     let update_category_uc = Arc::new(UpdateCategoryUseCases::new(postgres_arc.clone()));
 
     // Task Use Cases
     let create_task_uc = Arc::new(CreateTaskUseCase::new(postgres_arc.clone()));
     let get_tasks_uc = Arc::new(GetTasksUseCase::new(postgres_arc.clone()));
-    let delete_tasks_uc = Arc::new(DeleteTasksUseCase::new(postgres_arc.clone()));
-    let orphan_tasks_uc = Arc::new(OrphanTasksUseCase::new(postgres_arc.clone()));
+    let delete_tasks_uc = Arc::new(DeleteTaskUseCase::new(postgres_arc.clone()));
     let update_task_uc = Arc::new(UpdateTaskUseCase::new(postgres_arc.clone()));
-    let complete_task_uc = Arc::new(CompleteTaskUseCase::new(postgres_arc.clone()));
-    let get_scheduled_task_uc = Arc::new(GetScheduledTasksUseCase::new(postgres_arc.clone()));
+    let update_subtask_uc = Arc::new(UpdateSubTaskUseCase::new(postgres_arc.clone()));
+    let add_subtask_uc = Arc::new(AddSubTaskUseCase::new(postgres_arc.clone()));
+
+    // Stats Use Cases
+    let get_stats_uc = Arc::new(GetStatsUseCase::new(
+        postgres_arc.clone(),
+        postgres_arc.clone(),
+        postgres_arc.clone(),
+    ));
 
     // Focus Session Use Cases
     let create_manual_session_uc = Arc::new(CreateManualSessionUseCase::new(postgres_arc.clone()));
     let update_focus_session_uc = Arc::new(UpdateFocusSessionUseCase::new(postgres_arc.clone()));
     let find_sessions_by_filters_uc =
         Arc::new(FindSessionsByFiltersUseCase::new(postgres_arc.clone()));
-
-    // Stats Use Cases
-    let calculate_stats_by_period_uc = Arc::new(CalculateStatsByPeriodUseCase::new(
-        postgres_arc.clone(),
-        postgres_arc.clone(),
-        postgres_arc.clone(),
-    ));
 
     // User Setting Use Cases
     let get_user_settings_uc = Arc::new(GetSettingsUseCase::new(postgres_arc.clone()));
@@ -213,23 +205,20 @@ pub async fn init_app_state(
         start_session_uc,
         terminate_session_uc,
         update_current_session_uc,
+        get_stats_uc,
+        get_all_category_uc,
         create_category_uc,
         delete_categories_uc,
-        delete_category_uc,
-        get_category_and_task_uc,
-        get_category_uc,
         update_category_uc,
         get_tasks_uc,
         create_task_uc,
         delete_tasks_uc,
-        orphan_tasks_uc,
         update_task_uc,
-        complete_task_uc,
-        get_scheduled_task_uc,
+        update_subtask_uc,
+        add_subtask_uc,
         create_manual_session_uc,
         update_focus_session_uc,
         find_sessions_by_filters_uc,
-        calculate_stats_by_period_uc,
         update_user_setting_uc,
         get_user_settings_uc,
         register_user_uc,

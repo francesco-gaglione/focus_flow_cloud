@@ -2,9 +2,7 @@ mod common;
 
 use crate::common::setup;
 use adapters::http::category::create_category::CreateCategoryDto;
-use adapters::http::category::get_categories_and_tasks::GetCategoriesResponseDto;
-use adapters::http::category::get_category::GetCategoryResponseDto;
-use adapters::http::category::update_category::{UpdateCategoryDto, UpdateCategoryResponseDto};
+use shared::category::{GetAllCategoryResponseDto, UpdateCategoryDto, UpdateCategoryResponseDto};
 
 #[tokio::test]
 async fn create_and_list_category() {
@@ -12,7 +10,6 @@ async fn create_and_list_category() {
 
     let create_dto = CreateCategoryDto {
         name: "Work".to_string(),
-        description: Some("Work related tasks".to_string()),
         color: Some("#FF5733".to_string()),
     };
 
@@ -22,13 +19,13 @@ async fn create_and_list_category() {
     // List Categories
     let response = context
         .client
-        .get(format!("{}/api/category", context.base_url))
+        .get(format!("{}/api/category/categories", context.base_url))
         .send()
         .await
         .expect("Failed to execute request");
 
     assert_eq!(response.status(), 200);
-    let body: GetCategoriesResponseDto = response
+    let body: GetAllCategoryResponseDto = response
         .json()
         .await
         .expect("Failed to deserialize response");
@@ -39,7 +36,6 @@ async fn create_and_list_category() {
         .iter()
         .find(|c| c.name == "Work")
         .expect("Category not found");
-    assert_eq!(category.description, Some("Work related tasks".to_string()));
     assert_eq!(category.color, "#FF5733");
 }
 
@@ -49,7 +45,6 @@ async fn create_category_only_mandatory_fields_and_list_categories() {
 
     let create_dto = CreateCategoryDto {
         name: "Mandatory fields".to_string(),
-        description: None,
         color: Some("#FF5733".to_string()),
     };
 
@@ -57,13 +52,13 @@ async fn create_category_only_mandatory_fields_and_list_categories() {
 
     let response = context
         .client
-        .get(format!("{}/api/category", context.base_url))
+        .get(format!("{}/api/category/categories", context.base_url))
         .send()
         .await
         .expect("Failed to execute request");
 
     assert_eq!(response.status(), 200);
-    let body: GetCategoriesResponseDto = response
+    let body: GetAllCategoryResponseDto = response
         .json()
         .await
         .expect("Failed to deserialize response");
@@ -74,33 +69,30 @@ async fn create_category_only_mandatory_fields_and_list_categories() {
         .iter()
         .find(|c| c.name == "Mandatory fields")
         .expect("Category not found");
-    assert_eq!(category.description, None);
     assert_eq!(category.color, "#FF5733");
 }
 
 #[tokio::test]
-async fn update_category_and_get_by_id() {
+async fn update_category_and_verify() {
     let context = setup().await;
 
-    // Create category and check it is created
+    // Create category
     let create_dto = CreateCategoryDto {
         name: "Mandatory fields".to_string(),
-        description: None,
         color: Some("#FF5733".to_string()),
     };
     let body_response = context.create_category(&create_dto).await;
 
-    assert!(body_response.category_id.len() > 0);
+    assert!(!body_response.category_id.is_empty());
 
-    // Update category and check it is updated
+    // Update category
     let update_dto = UpdateCategoryDto {
         name: Some("Updated Mandatory fields".to_string()),
-        description: Some("Updated description".to_string()),
         color: Some("#00FF00".to_string()),
     };
     let response = context
         .client
-        .put(format!(
+        .patch(format!(
             "{}/api/category/{}",
             context.base_url, body_response.category_id
         ))
@@ -117,29 +109,28 @@ async fn update_category_and_get_by_id() {
 
     assert_eq!(update_response.success, true);
 
-    // Get category by id and check the response
-    let response = context
+    // Verify update via list
+    let list_response = context
         .client
-        .get(format!(
-            "{}/api/category/{}",
-            context.base_url, body_response.category_id
-        ))
+        .get(format!("{}/api/category/categories", context.base_url))
         .send()
         .await
         .expect("Failed to execute request");
 
-    assert_eq!(response.status(), 200);
-    let body_response: GetCategoryResponseDto = response
+    assert_eq!(list_response.status(), 200);
+    let list_body: GetAllCategoryResponseDto = list_response
         .json()
         .await
-        .expect("Failed to deserialize message");
+        .expect("Failed to deserialize list");
 
-    assert_eq!(body_response.category.name, "Updated Mandatory fields");
-    assert_eq!(
-        body_response.category.description,
-        Some("Updated description".to_string())
-    );
-    assert_eq!(body_response.category.color, "#00FF00".to_string());
+    let updated = list_body
+        .categories
+        .iter()
+        .find(|c| c.id == body_response.category_id)
+        .expect("Updated category not found");
+
+    assert_eq!(updated.name, "Updated Mandatory fields");
+    assert_eq!(updated.color, "#00FF00");
 }
 
 #[tokio::test]
@@ -149,7 +140,6 @@ async fn delete_category() {
     // Create a new category
     let create_dto = CreateCategoryDto {
         name: "Test Category".to_string(),
-        description: Some("Test description".to_string()),
         color: Some("#FF0000".to_string()),
     };
     let body_response = context.create_category(&create_dto).await;
@@ -167,16 +157,21 @@ async fn delete_category() {
 
     assert_eq!(response.status(), 200);
 
-    // Verify that the category was deleted
-    let response = context
+    // Verify deletion via list
+    let list_response = context
         .client
-        .get(format!(
-            "{}/api/category/{}",
-            context.base_url, body_response.category_id
-        ))
+        .get(format!("{}/api/category/categories", context.base_url))
         .send()
         .await
-        .expect("Failed to execute request");
+        .expect("Failed to list categories");
 
-    assert_eq!(response.status(), 404);
+    let list_body: GetAllCategoryResponseDto = list_response
+        .json()
+        .await
+        .expect("Failed to deserialize list");
+
+    assert!(!list_body
+        .categories
+        .iter()
+        .any(|c| c.id == body_response.category_id));
 }

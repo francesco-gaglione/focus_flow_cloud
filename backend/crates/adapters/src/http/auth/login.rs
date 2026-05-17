@@ -6,10 +6,8 @@ use application::use_cases::user::login_user::{LoginCommand, LoginError};
 use axum::extract::State;
 use axum::Json;
 use secrecy::SecretBox;
-use serde::{Deserialize, Serialize};
+use shared::auth::{LoginDto, LoginResponseDto};
 use tower_sessions::Session;
-use utoipa::ToSchema;
-use validator::Validate;
 
 impl From<LoginError> for HttpError {
     fn from(value: LoginError) -> Self {
@@ -19,20 +17,6 @@ impl From<LoginError> for HttpError {
             LoginError::TokenError(_) => HttpError::Unauthorized("".to_string()),
         }
     }
-}
-
-#[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
-pub struct LoginDto {
-    #[validate(length(min = 1, message = "Username is required"))]
-    pub username: String,
-    #[validate(length(min = 1, message = "Password is required"))]
-    pub password: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
-pub struct LoginResponseDto {
-    pub token: String,
-    pub refresh_token: String,
 }
 
 #[utoipa::path(

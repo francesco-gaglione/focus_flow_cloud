@@ -90,7 +90,7 @@ mod tests {
         let user_id = Uuid::new_v4();
         let mut state = PomodoroState::new();
         state
-            .start_new_session(user_id, FocusSessionType::Work, None, None)
+            .start_new_session(user_id, FocusSessionType::Work, None)
             .unwrap();
 
         mock_repo
@@ -117,7 +117,7 @@ mod tests {
         let user_id = Uuid::new_v4();
         let mut state = PomodoroState::new();
         state
-            .start_new_session(user_id, FocusSessionType::Work, None, None)
+            .start_new_session(user_id, FocusSessionType::Work, None)
             .unwrap();
 
         mock_repo

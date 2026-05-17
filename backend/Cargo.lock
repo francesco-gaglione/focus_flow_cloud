@@ -25,6 +25,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_urlencoded",
+ "shared",
  "testcontainers",
  "testcontainers-modules",
  "thiserror 2.0.17",
@@ -1061,7 +1062,7 @@ checksum = "3f9eec918d3f24069decb9af1554cad7c880e2da24a9afd88aca000531ab82c1"
 
 [[package]]
 name = "focus_flow_cloud"
-version = "4.0.0"
+version = "4.0.1"
 dependencies = [
  "adapters",
  "application",
@@ -3243,6 +3244,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f40ca3c46823713e0d4209592e8d6e826aa57e928f09752619fc696c499637f6"
 dependencies = [
  "lazy_static",
+]
+
+[[package]]
+name = "shared"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "serde",
+ "utoipa",
+ "uuid",
+ "validator",
 ]
 
 [[package]]

@@ -29,24 +29,7 @@ pub fn create_app(app_state: AppState) -> Router {
         .nest("/api", api_routes(app_state.clone()))
         .nest("/ws", ws_routes(app_state.clone()))
         .with_state(app_state.clone())
-        .layer(
-            TraceLayer::new_for_http().make_span_with(|request: &http::Request<_>| {
-                let request_id = request
-                    .extensions()
-                    .get::<RequestId>()
-                    .map(|id| id.0)
-                    .unwrap_or_else(Uuid::new_v4);
-                tracing::info_span!(
-                    "http-request",
-                    method = %request.method(),
-                    uri = %request.uri(),
-                    version = ?request.version(),
-                    request_id = %request_id,
-                    user_id = tracing::field::Empty,
-                )
-            }),
-        )
-        .layer(ServiceBuilder::new().layer(RequestIdLayer))
+        .layer(session_layer)
         .layer(
             CorsLayer::new()
                 .allow_origin(AllowOrigin::mirror_request())
@@ -62,5 +45,31 @@ pub fn create_app(app_state: AppState) -> Router {
                 .allow_headers([header::AUTHORIZATION, header::ACCEPT, header::CONTENT_TYPE])
                 .allow_credentials(true),
         )
-        .layer(session_layer)
+        .layer(ServiceBuilder::new().layer(RequestIdLayer))
+        .layer(
+            TraceLayer::new_for_http()
+                .make_span_with(|request: &http::Request<_>| {
+                    let request_id = request
+                        .extensions()
+                        .get::<RequestId>()
+                        .map(|id| id.0)
+                        .unwrap_or_else(Uuid::new_v4);
+                    let path = request.uri().path();
+                    let method = request.method();
+                    tracing::info_span!(
+                        "http_request",
+                        otel.name = format!("{method} {path}"),
+                        http.method = %method,
+                        http.target = %path,
+                        http.status_code = tracing::field::Empty,
+                        request_id = %request_id,
+                        user_id = tracing::field::Empty,
+                    )
+                })
+                .on_response(
+                    tower_http::trace::DefaultOnResponse::new()
+                        .level(tracing::Level::INFO)
+                        .include_headers(false),
+                ),
+        )
 }

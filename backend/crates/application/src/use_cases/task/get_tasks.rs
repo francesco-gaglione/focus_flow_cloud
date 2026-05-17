@@ -1,7 +1,10 @@
 use crate::repository_traits::persistence_error::PersistenceError;
 use crate::repository_traits::task_persistence::TaskPersistence;
+use crate::use_cases::task::common::task_schedule_app_dto::TaskScheduleAppDto;
 use chrono::{DateTime, Utc};
-use domain::entities::task::Task;
+use domain::entities::tasks::subtask::Subtask;
+use domain::entities::tasks::task::Task;
+use domain::entities::tasks::task_priority::TaskPriority;
 use std::sync::Arc;
 use thiserror::Error;
 use tracing::instrument;
@@ -24,12 +27,22 @@ pub struct GetTasksCommand {
 pub struct TaskOutput {
     pub id: Uuid,
     pub user_id: Uuid,
-    pub category_id: Option<Uuid>,
-    pub name: String,
+    pub title: String,
     pub description: Option<String>,
-    pub scheduled_date: Option<DateTime<Utc>>,
-    pub scheduled_end_date: Option<DateTime<Utc>>,
+    pub priority: Option<TaskPriority>,
+    pub schedule: TaskScheduleAppDto,
     pub completed_at: Option<DateTime<Utc>>,
+    pub subtasks: Vec<SubTaskOutput>,
+    pub category_id: Option<Uuid>,
+}
+
+#[derive(Debug, Clone)]
+pub struct SubTaskOutput {
+    pub id: Uuid,
+    pub title: String,
+    pub description: Option<String>,
+    pub is_completed: bool,
+    pub sort_order: i16,
 }
 
 impl From<&Task> for TaskOutput {
@@ -37,12 +50,25 @@ impl From<&Task> for TaskOutput {
         Self {
             id: value.id(),
             user_id: value.user_id(),
-            category_id: value.category_id(),
-            name: value.name().to_string(),
+            title: value.title().to_string(),
             description: value.description().map(|d| d.to_string()),
-            scheduled_date: value.scheduled_date(),
-            scheduled_end_date: value.scheduled_end_date(),
+            priority: value.priority(),
+            schedule: value.schedule().into(),
             completed_at: value.completed_at(),
+            subtasks: value.sub_tasks().iter().map(|s| s.into()).collect(),
+            category_id: value.category_id(),
+        }
+    }
+}
+
+impl From<&Subtask> for SubTaskOutput {
+    fn from(value: &Subtask) -> Self {
+        Self {
+            id: value.id(),
+            title: value.title().to_string(),
+            description: value.description().map(|d| d.to_string()),
+            is_completed: value.is_completed(),
+            sort_order: value.sort_order(),
         }
     }
 }
@@ -58,37 +84,34 @@ impl GetTasksUseCase {
 
     #[instrument(skip(self))]
     pub async fn execute(&self, command: GetTasksCommand) -> GetTasksResult<Vec<TaskOutput>> {
-        let res = self
-            .task_persistence
-            .find_all(command.completed.unwrap_or(false))
-            .await?;
+        tracing::info!("Fetching tasks with completed: {:?}", command.completed);
+        let res = self.task_persistence.find_all(command.completed).await?;
+        tracing::info!("Fetched {} tasks", res.len());
         Ok(res.iter().map(|t| t.into()).collect())
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use domain::entities::tasks::task_schedule::TaskSchedule;
+
     use super::*;
     use crate::repository_traits::task_persistence::MockTaskPersistence;
 
     #[tokio::test]
     async fn test_get_tasks_success() {
         let mut mock_persistence = MockTaskPersistence::new();
-        let expected_tasks = vec![Task::reconstitute(
-            uuid::Uuid::new_v4(),
-            uuid::Uuid::new_v4(),
-            None,
+        let expected_tasks = vec![Task::new(
+            Uuid::new_v4(),
             "Task 1".to_string(),
-            None,
-            None,
-            None,
+            TaskSchedule::Unscheduled,
             None,
         )];
         let returned_tasks = expected_tasks.clone();
 
         mock_persistence
             .expect_find_all()
-            .with(mockall::predicate::eq(false))
+            .with(mockall::predicate::eq(None))
             .returning(move |_| Ok(returned_tasks.clone()));
 
         let use_case = GetTasksUseCase::new(Arc::new(mock_persistence));
@@ -96,7 +119,7 @@ mod tests {
         let result = use_case.execute(command).await;
 
         assert!(result.is_ok());
-        assert_eq!(result.iter().len(), 1);
+        assert_eq!(result.unwrap().len(), 1);
     }
 
     #[tokio::test]
@@ -105,7 +128,7 @@ mod tests {
 
         mock_persistence
             .expect_find_all()
-            .with(mockall::predicate::eq(true))
+            .with(mockall::predicate::eq(Some(true)))
             .returning(move |_| Ok(vec![]));
 
         let use_case = GetTasksUseCase::new(Arc::new(mock_persistence));
@@ -115,6 +138,6 @@ mod tests {
         let result = use_case.execute(command).await;
 
         assert!(result.is_ok());
-        assert_eq!(result.iter().len(), 1);
+        assert_eq!(result.unwrap().len(), 0);
     }
 }

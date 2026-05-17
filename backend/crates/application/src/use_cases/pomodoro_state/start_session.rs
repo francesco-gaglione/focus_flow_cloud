@@ -76,7 +76,6 @@ impl StartSessionUseCase {
         user_state.start_new_session(
             command.user_id,
             FocusSessionType::Work,
-            user_state.category_id(),
             user_state.task_id(),
         )?;
 
@@ -127,7 +126,7 @@ mod tests {
         let user_id = Uuid::new_v4();
         let mut state = PomodoroState::new();
         state
-            .start_new_session(user_id, FocusSessionType::ShortBreak, None, None)
+            .start_new_session(user_id, FocusSessionType::ShortBreak, None)
             .unwrap();
         std::thread::sleep(std::time::Duration::from_secs(1));
 
@@ -154,7 +153,7 @@ mod tests {
         let user_id = Uuid::new_v4();
         let mut state = PomodoroState::new();
         state
-            .start_new_session(user_id, FocusSessionType::Work, None, None)
+            .start_new_session(user_id, FocusSessionType::Work, None)
             .unwrap();
 
         mock_pomodoro_repo

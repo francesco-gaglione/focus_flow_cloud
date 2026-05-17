@@ -1,0 +1,30 @@
+[application]
+name = "focus_flow_app"
+
+[bundle]
+identifier = "com.francescogaglione.focusflow"
+publisher = "Francesco Gaglione"
+icon = ["assets/icon.icns", "assets/icon.png"]
+
+[serve]
+port = 9090
+
+[web.app]
+
+# HTML title tag content
+title = "Focus Flow"
+
+# include `assets` in web platform
+[web.resource]
+
+# Additional CSS style files
+style = []
+
+# Additional JavaScript files
+script = []
+
+[web.resource.dev]
+
+# Javascript code file
+# serve: [dev-server] only
+script = []

@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <!-- Subtle green radial glow — hero-level, not on a component -->
+    <radialGradient id="glow" cx="50%" cy="48%" r="52%">
+      <stop offset="0%"   stop-color="#46a758" stop-opacity="0.14"/>
+      <stop offset="100%" stop-color="#46a758" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Green glow behind the F mark -->
+    <radialGradient id="markglow" cx="42%" cy="50%" r="40%">
+      <stop offset="0%"   stop-color="#46a758" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#46a758" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Dot grid -->
+    <pattern id="dots" width="32" height="32" patternUnits="userSpaceOnUse">
+      <circle cx="16" cy="16" r="1.5" fill="rgba(255,255,255,0.04)"/>
+    </pattern>
+  </defs>
+
+  <!-- Base -->
+  <rect width="1024" height="1024" fill="#0f1116"/>
+
+  <!-- Glow layers -->
+  <rect width="1024" height="1024" fill="url(#glow)"/>
+  <rect width="1024" height="1024" fill="url(#markglow)"/>
+
+  <!-- Dot grid -->
+  <rect width="1024" height="1024" fill="url(#dots)"/ 
+
+  <!-- Thin inner border — card-like depth -->
+  <rect x="28" y="28" width="968" height="968" rx="8"
+        fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1.5"/>
+
+  <!-- ═══ F lettermark ═══
+       Vertical: x=230 w=108 y=180 h=664
+       Top bar:  x=230 w=564 y=180 h=108
+       Mid bar:  x=230 w=408 y=396 h=108
+       Proportions: gap between bars = 108px = bar height
+  -->
+
+  <!-- Vertical stroke — green -->
+  <rect x="230" y="180" width="108" height="664" fill="#46a758" rx="7"/>
+
+  <!-- Top bar — green -->
+  <rect x="230" y="180" width="564" height="108" fill="#46a758" rx="7"/>
+
+  <!-- Middle bar — white (the accent "Flow" strike) -->
+  <rect x="230" y="396" width="408" height="108" fill="#ffffff" rx="7"/>
+
+  <!-- Corner mark — mono slash, very subtle -->
+  <text x="794" y="844"
+        font-family="ui-monospace,'SF Mono',Menlo,monospace"
+        font-size="60" font-weight="700"
+        fill="rgba(70,167,88,0.22)"
+        text-anchor="end">//</text>
+</svg>

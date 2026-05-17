@@ -19,7 +19,6 @@ pub struct PomodoroStateInMermoryImpl {
 #[derive(Clone, Debug)]
 pub struct PomodoroStateInMemoryStore {
     pub user_id: Uuid,
-    pub selected_category_id: Option<Uuid>,
     pub selected_task_id: Option<Uuid>,
     pub running_session: Option<FocusSession<RunningSession>>,
     pub consecutive: Vec<FocusSession<TerminatedSession>>,
@@ -29,7 +28,6 @@ impl PomodoroStateInMemoryStore {
     pub fn new(user_id: Uuid) -> Self {
         Self {
             user_id,
-            selected_category_id: None,
             selected_task_id: None,
             running_session: None,
             consecutive: Vec::new(),
@@ -41,9 +39,6 @@ impl From<PomodoroStateInMemoryStore> for PomodoroState {
     fn from(value: PomodoroStateInMemoryStore) -> Self {
         let mut state = Self::new();
 
-        if let Some(category_id) = value.selected_category_id {
-            state.update_category_id(category_id);
-        };
         if let Some(task_id) = value.selected_task_id {
             state.update_task_id(task_id);
         }
@@ -62,7 +57,6 @@ impl From<PomodoroState> for PomodoroStateInMemoryStore {
     fn from(mut value: PomodoroState) -> Self {
         Self {
             user_id: value.user_id(),
-            selected_category_id: value.category_id(),
             selected_task_id: value.task_id(),
             running_session: value.current_session(),
             consecutive: value.consecutive_sessions().to_vec(),

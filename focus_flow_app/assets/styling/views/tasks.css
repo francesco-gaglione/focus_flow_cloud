@@ -1,0 +1,615 @@
+/* ============================================================
+   SECTION HEADERS — colored accent line for today/overdue
+   ============================================================ */
+.section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 20px 0 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+}
+.section-head .lbl {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-subtle);
+    letter-spacing: var(--tracking-data);
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.section-head .lbl::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: var(--r-full);
+    background: var(--border-strong);
+}
+.section-head .lbl.danger {
+    color: var(--danger);
+}
+.section-head .lbl.danger::before {
+    background: var(--danger);
+}
+.section-head .lbl.today {
+    color: var(--accent);
+}
+.section-head .lbl.today::before {
+    background: var(--accent);
+}
+.section-head-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+
+/* ============================================================
+   FILTER SELECTS — override primitives theme vars with our tokens
+   ============================================================ */
+.filter-bar .dx-select-trigger {
+    background: var(--bg-raised) !important;
+    box-shadow: inset 0 0 0 1px var(--border) !important;
+    color: var(--text) !important;
+    border-radius: var(--r-md) !important;
+    font-family: var(--font-ui) !important;
+    font-size: 14px !important;
+}
+.filter-bar .dx-select-trigger span[data-placeholder="true"] {
+    color: var(--text-subtle) !important;
+}
+.filter-bar .dx-select-trigger:hover {
+    background: var(--ds-gray-200) !important;
+    color: var(--text) !important;
+}
+.filter-bar .dx-select-list {
+    background: var(--bg-elev) !important;
+    box-shadow:
+        inset 0 0 0 1px var(--border),
+        var(--shadow-lg, 0 8px 24px rgba(0, 0, 0, 0.4)) !important;
+    border-radius: var(--r-md) !important;
+}
+.filter-bar .dx-select-option {
+    color: var(--text) !important;
+    font-family: var(--font-ui) !important;
+    font-size: 14px !important;
+}
+.filter-bar .dx-select-option:hover,
+.filter-bar .dx-select-option:focus-visible {
+    background: var(--ds-gray-300) !important;
+    color: var(--text) !important;
+}
+.filter-bar .dx-select-expand-icon {
+    stroke: var(--text-subtle) !important;
+}
+
+.section-head .count {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-subtle);
+    letter-spacing: var(--tracking-data);
+    background: var(--bg-raised);
+    padding: 2px 8px;
+    border-radius: var(--r-full);
+    border: 1px solid var(--border);
+}
+
+/* ============================================================
+   FILTER BAR (dropdowns)
+   ============================================================ */
+.filter-bar {
+    flex-shrink: 0;
+    display: flex;
+    gap: 8px;
+    padding: 0 16px 14px;
+}
+.filter-select-wrap {
+    flex: 1;
+    position: relative;
+}
+.filter-select-wrap .dx-select {
+    width: 100%;
+}
+.filter-select-wrap .dx-select-trigger {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* ============================================================
+   TASK ROW — circular check, 4px left stripe, elevated card
+   ============================================================ */
+.todo-row-wrap {
+    margin-bottom: 6px;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.todo-row {
+    display: grid;
+    grid-template-columns: 26px 1fr auto auto;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 12px 14px 16px;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--cat, var(--accent));
+    border-radius: 0 var(--r-md) var(--r-md) 0;
+    transition:
+        background var(--dur-fast) var(--ease-tech),
+        border-color var(--dur-fast) var(--ease-tech);
+    position: relative;
+}
+.todo-row-wrap.expanded .todo-row {
+    border-radius: 0 var(--r-md) 0 0;
+    border-bottom-color: var(--bg-raised);
+}
+.todo-row:hover {
+    background: var(--ds-gray-200);
+}
+.todo-row.done {
+    opacity: 0.45;
+}
+.todo-row.done .todo-title {
+    text-decoration: line-through;
+    text-decoration-color: var(--border-strong);
+}
+
+/* Expand/collapse chevron */
+.todo-expand-btn {
+    width: 28px;
+    height: 28px;
+    background: transparent;
+    border: 0;
+    color: var(--text-subtle);
+    cursor: pointer;
+    border-radius: var(--r-sm);
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    transition:
+        color var(--dur-fast) var(--ease-tech),
+        background var(--dur-fast) var(--ease-tech);
+}
+.todo-expand-btn:hover {
+    color: var(--text);
+    background: var(--ds-gray-300);
+}
+.todo-expand-btn svg {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.6;
+    transition: transform var(--dur-base) var(--ease-tech);
+}
+.todo-expand-btn.open svg {
+    transform: rotate(180deg);
+}
+
+/* Subtask list */
+.todo-subtask-list {
+    background: var(--bg-sunk);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-left: 4px solid var(--cat, var(--accent));
+    border-radius: 0 0 var(--r-md) 0;
+}
+.todo-subtask-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px 9px 14px;
+}
+.todo-subtask-item + .todo-subtask-item {
+    border-top: 1px solid var(--border);
+}
+.todo-subtask-check {
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid var(--border-strong);
+    border-radius: var(--r-xs);
+    background: var(--bg);
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+}
+.todo-subtask-check.done {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+.todo-subtask-check svg {
+    width: 9px;
+    height: 9px;
+}
+.todo-subtask-title {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+.todo-subtask-title.done {
+    text-decoration: line-through;
+    text-decoration-color: var(--border-strong);
+    color: var(--text-subtle);
+}
+
+/* Inline add-subtask row */
+.todo-subtask-add-row {
+    padding: 6px 12px 6px 14px;
+}
+.todo-subtask-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+.todo-subtask-input::placeholder {
+    color: var(--text-subtle);
+    font-style: italic;
+}
+
+/* Urgency row tints */
+.todo-row.overdue-row {
+    background: rgba(239, 68, 68, 0.06);
+}
+.todo-row.today-row {
+    background: rgba(99, 102, 241, 0.06);
+}
+.todo-row.overdue-row:hover {
+    background: rgba(239, 68, 68, 0.12);
+}
+.todo-row.today-row:hover {
+    background: rgba(99, 102, 241, 0.12);
+}
+
+/* Date button — reset browser button styles, inherit todo-sub typography */
+.todo-date-wrap {
+    appearance: none;
+    -webkit-appearance: none;
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+}
+.todo-no-date {
+    opacity: 0.55;
+}
+
+/* Subtask progress bar */
+.todo-progress {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+}
+.todo-progress-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-subtle);
+    letter-spacing: var(--tracking-data);
+    flex-shrink: 0;
+}
+
+/* Circular checkbox */
+.todo-check {
+    width: 22px;
+    height: 22px;
+    border: 1.5px solid var(--border-strong);
+    border-radius: var(--r-full);
+    background: var(--bg);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition:
+        background var(--dur-fast) var(--ease-tech),
+        border-color var(--dur-fast) var(--ease-tech);
+}
+.todo-check:hover {
+    border-color: var(--accent);
+}
+.todo-check-icon {
+    width: 11px;
+    height: 11px;
+    stroke: #fff;
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0;
+    transform: scale(0.5);
+    transition:
+        opacity var(--dur-fast) var(--ease-tech),
+        transform var(--dur-fast) var(--ease-tech);
+}
+.todo-row.done .todo-check {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+.todo-row.done .todo-check-icon {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.todo-body {
+    min-width: 0;
+}
+.todo-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.4;
+    margin-bottom: 4px;
+    word-wrap: break-word;
+}
+.todo-description {
+    font-size: 12px;
+    font-weight: 300;
+    color: var(--text);
+    line-height: 1.4;
+    margin-bottom: 4px;
+    word-wrap: break-word;
+}
+.todo-sub {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-subtle);
+    letter-spacing: var(--tracking-data);
+    text-transform: uppercase;
+    flex-wrap: wrap;
+    row-gap: 4px;
+}
+.todo-priority {
+    font-weight: 600;
+    padding: 2px 6px;
+    border: none;
+    border-radius: var(--r-xs);
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+}
+.todo-priority-low {
+    color: #6b7280;
+    background: rgba(107, 114, 128, 0.15);
+}
+.todo-priority-medium {
+    color: #d97706;
+    background: rgba(217, 119, 6, 0.15);
+}
+.todo-priority-high {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.15);
+}
+.todo-priority-urgent {
+    color: #7c3aed;
+    background: rgba(124, 58, 237, 0.15);
+}
+
+.todo-cat {
+    color: var(--cat, var(--accent));
+    font-weight: 600;
+}
+.todo-due {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    color: var(--text-subtle);
+}
+.todo-due.today {
+    color: var(--accent);
+}
+.todo-due.overdue {
+    color: var(--danger);
+    font-weight: 600;
+}
+.todo-due-time {
+    opacity: 0.75;
+    font-size: 10px;
+}
+.todo-meta-icon {
+    width: 11px;
+    height: 11px;
+    flex-shrink: 0;
+    vertical-align: middle;
+}
+
+.todo-more {
+    width: 28px;
+    height: 28px;
+    background: transparent;
+    border: 0;
+    color: var(--text-subtle);
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    border-radius: var(--r-sm);
+    display: grid;
+    place-items: center;
+    transition:
+        color var(--dur-fast) var(--ease-tech),
+        background var(--dur-fast) var(--ease-tech);
+}
+.todo-more:hover {
+    color: var(--text);
+    background: var(--ds-gray-300);
+}
+
+.todo-subtask-ct {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    color: var(--text-subtle);
+}
+
+/* ============================================================
+   PRIORITY PICKER BOTTOM SHEET
+   ============================================================ */
+.prio-sheet-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.prio-sheet-btn {
+    appearance: none;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    padding: 16px 18px;
+    background: var(--bg-raised);
+    border: 1.5px solid var(--border);
+    border-radius: var(--r-md);
+    font-family: var(--font-ui);
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text);
+    cursor: pointer;
+    transition:
+        background var(--dur-fast) var(--ease-tech),
+        border-color var(--dur-fast) var(--ease-tech);
+}
+.prio-sheet-btn:active {
+    transform: scale(0.98);
+}
+.prio-sheet-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: var(--r-full);
+    flex-shrink: 0;
+    background: var(--border-strong);
+}
+.prio-sheet-check {
+    margin-left: auto;
+    font-size: 16px;
+    color: var(--accent);
+}
+
+/* Per-priority colors */
+.prio-sheet-none {
+    border-color: var(--border);
+}
+.prio-sheet-none .prio-sheet-dot {
+    background: var(--border-strong);
+}
+
+.prio-sheet-low {
+    border-color: rgba(107, 114, 128, 0.4);
+}
+.prio-sheet-low .prio-sheet-dot {
+    background: #6b7280;
+}
+.prio-sheet-low {
+    color: #6b7280;
+}
+
+.prio-sheet-medium {
+    border-color: rgba(217, 119, 6, 0.4);
+}
+.prio-sheet-medium .prio-sheet-dot {
+    background: #d97706;
+}
+.prio-sheet-medium {
+    color: #d97706;
+}
+
+.prio-sheet-high {
+    border-color: rgba(239, 68, 68, 0.4);
+}
+.prio-sheet-high .prio-sheet-dot {
+    background: #ef4444;
+}
+.prio-sheet-high {
+    color: #ef4444;
+}
+
+.prio-sheet-urgent {
+    border-color: rgba(124, 58, 237, 0.4);
+}
+.prio-sheet-urgent .prio-sheet-dot {
+    background: #7c3aed;
+}
+.prio-sheet-urgent {
+    color: #7c3aed;
+}
+
+/* ============================================================
+   DATE PICKER SHEET
+   ============================================================ */
+.date-sheet-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.date-sheet-section {
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 14px 16px;
+    margin: 5px;
+}
+.date-sheet-section-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: var(--tracking-data);
+    text-transform: uppercase;
+    color: var(--text-subtle);
+    margin-bottom: 12px;
+}
+
+/* Override dioxus-primitives date picker input in our sheet */
+.date-sheet-section [class*="dx-date"],
+.date-sheet-section [class*="dx-calendar"] {
+    background: transparent !important;
+    color: var(--text) !important;
+    font-family: var(--font-mono) !important;
+}
+.date-sheet-section [class*="dx-date-picker-input"],
+.date-sheet-section [class*="dx-date-input"] {
+    background: var(--bg) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--r-sm) !important;
+    color: var(--text) !important;
+    font-size: 16px !important;
+}
+
+.date-sheet-time-input {
+    display: block;
+    box-sizing: border-box;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 20px;
+    font-weight: 500;
+    padding: 12px 14px;
+    outline: none;
+    color-scheme: dark;
+}
+.date-sheet-time-input:focus {
+    border-color: var(--accent);
+    box-shadow: var(--shadow-focus);
+}
+.date-sheet-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+}

@@ -9,6 +9,7 @@ use axum::{extract::State, Extension, Json};
 use lazy_static::lazy_static;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
+use shared::category::CreateCategoryResponseDto;
 use tracing::debug;
 use utoipa::ToSchema;
 use validator::Validate;
@@ -35,15 +36,8 @@ impl From<CreateCategoryError> for HttpError {
 pub struct CreateCategoryDto {
     #[validate(length(min = 1, max = 255))]
     pub name: String,
-    #[validate(length(max = 255))]
-    pub description: Option<String>,
     #[validate(regex(path = *COLOR_REGEX, message = "Color must be a valid hex code"))]
     pub color: Option<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
-pub struct CreateCategoryResponseDto {
-    pub category_id: String,
 }
 
 #[utoipa::path(
@@ -78,7 +72,6 @@ pub async fn create_category_api(
         .execute(CreateCategoryCommand {
             user_id: user.user_id,
             name: payload.name,
-            description: payload.description,
             color: payload.color,
         })
         .await?;

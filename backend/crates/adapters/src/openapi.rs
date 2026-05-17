@@ -1,32 +1,26 @@
-use crate::http::auth::login::{LoginDto, LoginResponseDto};
-use crate::http::auth::logout::LogoutResponseDto;
-use crate::http::auth::refresh::{RefreshDto, RefreshResponseDto};
-use crate::http::category::create_category::{CreateCategoryDto, CreateCategoryResponseDto};
-use crate::http::category::delete_categories::DeleteCategoriesDto;
-use crate::http::category::get_categories_and_tasks::GetCategoriesResponseDto;
-use crate::http::category::get_category::GetCategoryResponseDto;
-use crate::http::category::update_category::{UpdateCategoryDto, UpdateCategoryResponseDto};
+use crate::http::category::create_category::CreateCategoryDto;
+use crate::http::category::get_all_categories::GetAllCategoryResponseDto;
 use crate::http::session::create_manual_session::{
     CreateManualSessionDto, CreateManualSessionResponseDto,
 };
 use crate::http::session::get_sessions::{GetSessionFiltersDto, GetSessionFiltersResponseDto};
 use crate::http::session::update_session::{UpdateFocusSessionDto, UpdateFocusSessionResponseDto};
-use crate::http::stats::calculate_stats_by_period::{
-    GetStatsByPeriodDto, GetStatsByPeriodResponseDto,
-};
-use crate::http::task::complete_task::{CompleteTaskDto, CompleteTaskResponseDto};
-use crate::http::task::create_task::CreateTaskResponseDto;
 use crate::http::task::delete_tasks::DeleteTasksDto;
-use crate::http::task::get_scheduled_tasks::ScheduledTasksResponseDto;
-use crate::http::task::get_tasks::TasksResponseDto;
-use crate::http::task::orphan_tasks::OrphanTasksResponseDto;
-use crate::http::task::update_task::UpdateTaskDto;
 use crate::http::user_setting::get_user_settings::UserSettingsResponseDto;
 use crate::http::user_setting::update_setting::UpdateUserSettingDto;
 use crate::http::users::create_user::CreateUserDto;
 use crate::http::users::get_info::UserInfoResponseDto;
 use crate::http::users::update_password::UpdatePasswordDto;
 use crate::http::users::update_username::UpdateUsernameDto;
+use shared::auth::{LoginDto, LoginResponseDto, LogoutResponseDto, RefreshDto, RefreshResponseDto};
+use shared::category::{
+    CreateCategoryResponseDto, DeleteCategoriesDto, UpdateCategoryDto, UpdateCategoryResponseDto,
+};
+use shared::stats::GetStatsResponseDto;
+use shared::task::{
+    CreateSubtaskDto, CreateSubtaskResponseDto, CreateTaskResponseDto, TasksResponseDto,
+    UpdateSubTaskDto, UpdateSubTaskResponseDto, UpdateTaskDto,
+};
 use utoipa::openapi::security::{HttpAuthScheme, HttpBuilder, SecurityScheme};
 use utoipa::{Modify, OpenApi};
 
@@ -75,9 +69,8 @@ impl Modify for SecurityAddon {
     paths(
         crate::http::category::create_category::create_category_api,
         crate::http::category::update_category::update_category_api,
-        crate::http::category::get_categories_and_tasks::get_categories_and_tasks_api,
-        crate::http::category::get_category::get_category,
         crate::http::category::delete_categories::delete_categories_api,
+        crate::http::category::get_all_categories::get_all_categories_api,
         crate::http::users::create_user::create_user_api,
         crate::http::users::update_password::update_password_api,
         crate::http::users::update_username::update_username_api,
@@ -87,15 +80,14 @@ impl Modify for SecurityAddon {
         crate::http::auth::logout::logout_api,
         crate::http::task::get_tasks::get_tasks_api,
         crate::http::task::update_task::update_task_api,
+        crate::http::task::update_subtask::update_subtask_api,
+        crate::http::task::create_subtask::create_subtask_api,
         crate::http::task::delete_tasks::delete_tasks_api,
-        crate::http::task::orphan_tasks::fetch_orphan_tasks_api,
         crate::http::task::create_task::create_task_api,
-        crate::http::task::complete_task::complete_task_api,
-        crate::http::task::get_scheduled_tasks::get_scheduled_tasks_api,
         crate::http::session::create_manual_session::create_manual_session_api,
         crate::http::session::update_session::update_session_api,
         crate::http::session::get_sessions::get_sessions,
-        crate::http::stats::calculate_stats_by_period::calculate_stats_by_period_api,
+        crate::http::stats::get_stats::get_stats_api,
         crate::http::user_setting::get_user_settings::get_settings_api,
         crate::http::user_setting::update_setting::update_setting_api,
     ),
@@ -103,19 +95,17 @@ impl Modify for SecurityAddon {
         schemas(CreateCategoryDto, CreateCategoryResponseDto),
         schemas(UpdateCategoryDto, UpdateCategoryResponseDto),
         schemas(UpdateTaskDto, CreateTaskResponseDto),
-        schemas(DeleteCategoriesDto, GetCategoriesResponseDto),
-        schemas(GetCategoryResponseDto),
-        schemas(GetCategoriesResponseDto),
-        schemas(OrphanTasksResponseDto),
+        schemas(DeleteCategoriesDto),
+        schemas(GetAllCategoryResponseDto),
         schemas(TasksResponseDto),
-        schemas(CompleteTaskResponseDto, CompleteTaskDto),
+        schemas(UpdateSubTaskDto, UpdateSubTaskResponseDto),
+        schemas(CreateSubtaskDto, CreateSubtaskResponseDto),
         schemas(UpdateTaskDto, CreateTaskResponseDto),
         schemas(DeleteTasksDto, CreateTaskResponseDto),
-        schemas(ScheduledTasksResponseDto),
         schemas(CreateManualSessionDto, CreateManualSessionResponseDto),
         schemas(UpdateFocusSessionDto, UpdateFocusSessionResponseDto),
         schemas(GetSessionFiltersDto, GetSessionFiltersResponseDto),
-        schemas(GetStatsByPeriodDto, GetStatsByPeriodResponseDto),
+        schemas(GetStatsResponseDto),
         schemas(UserSettingsResponseDto),
         schemas(UpdateUserSettingDto),
         schemas(CreateUserDto),

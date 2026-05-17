@@ -1,7 +1,5 @@
 use crate::http::app_state::AppState;
-use crate::http::dto::{
-    common::session_type_enum::SessionTypeEnum, validators::validate_uuid::validate_uuid,
-};
+use crate::http::dto::common::session_type_enum::{enum_to_domain, SessionTypeEnum};
 use crate::http::model::session_model::UserSession;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::SESSION_TAG;
@@ -11,6 +9,7 @@ use application::use_cases::focus_session::create_manual_session::{
 use axum::{extract::State, Extension, Json};
 use chrono::DateTime;
 use serde::{Deserialize, Serialize};
+use shared::validators::validate_uuid::validate_uuid;
 use tracing::debug;
 use utoipa::ToSchema;
 use uuid::Uuid;
@@ -34,9 +33,6 @@ impl From<CreateManualSessionError> for HttpError {
 pub struct CreateManualSessionDto {
     #[validate(custom(function = "validate_uuid"))]
     pub task_id: Option<String>,
-
-    #[validate(custom(function = "validate_uuid"))]
-    pub category_id: Option<String>,
 
     pub session_type: SessionTypeEnum,
 
@@ -85,11 +81,6 @@ pub async fn create_manual_session_api(
         .validate()
         .map_err(|e| HttpError::BadRequest(e.to_string()))?;
 
-    let category_id = payload
-        .category_id
-        .map(|id| Uuid::parse_str(id.as_str()))
-        .transpose()
-        .map_err(|_| HttpError::BadRequest("Invalid category id".to_string()))?;
     let task_id = payload
         .task_id
         .map(|id| Uuid::parse_str(id.as_str()))
@@ -104,9 +95,8 @@ pub async fn create_manual_session_api(
 
     let command = CreateManualFocusSessionCommand {
         user_id: user.user_id,
-        category_id,
         task_id,
-        session_type: payload.session_type.into(),
+        session_type: enum_to_domain(payload.session_type),
         concentration_score: payload.concentration_score,
         notes: payload.notes,
         started_at,

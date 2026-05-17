@@ -54,31 +54,48 @@ backend-check: backend-fmt-check backend-lint backend-test
     @echo "Backend checks passed!"
 
 # ============================================================================
-# APP (Flutter)
+# APP (Dioxus)
 # ============================================================================
 
-# Get app dependencies
-app-pub-get:
-    cd app && flutter pub get
+# Build app (debug)
+app-build:
+    cd focus_flow_app && dx build
 
-# Build App APK (Debug)
-app-build-apk-debug:
-    cd app && flutter build apk --debug
+# Build app (release)
+app-build-release:
+    cd focus_flow_app && dx bundle --release
 
-# Build App APK (Release)
-app-build-apk-release:
-    cd app && flutter build apk --release
+# Serve app (web, hot reload)
+app-serve:
+    cd focus_flow_app && dx serve
+
+# Serve app (desktop)
+app-serve-desktop:
+    cd focus_flow_app && dx serve --platform desktop --port 9090
+
+# Serve app (iOS)
+app-serve-ios:
+    cd focus_flow_app && dx serve --platform ios --port 9090
+
+# Patch iOS bundle with icons (run in a second terminal while dx serve --ios is running)
+app-patch-ios-icons:
+    python3 scripts/patch_ios_icons.py
+
+# Bundle iOS for deployment (build + patch icons + install to simulator)
+app-bundle-ios:
+    cd focus_flow_app && dx bundle --ios
+    python3 scripts/patch_ios_icons.py
+
+# Serve app (iOS)
+app-serve-android:
+    cd focus_flow_app && dx serve --platform android --port 9090
 
 # Run app tests
 app-test:
-    cd app && flutter test
-
-# Analyze app code
-app-analyze:
-    cd app && flutter analyze
+    cd focus_flow_app && cargo test
 
 # Run all app checks
-app-check: app-pub-get app-analyze app-test
+app-check: app-test
     @echo "App checks passed!"
 
 # ============================================================================
@@ -94,8 +111,8 @@ doc-serve:
 
 # Install all dependencies
 install:
-    cd app && flutter pub get
-    # Rust doesn't strictly need an install step, but we can verify toolchain?
+    cd backend && cargo fetch
+    cd focus_flow_app && cargo fetch
     @echo "Dependencies installed."
 
 # Run all tests (backend and app)
@@ -217,7 +234,7 @@ _bump_semver part target:
 
     # Paths
     be_cargo = 'backend/Cargo.toml'
-    app_pub = 'app/pubspec.yaml'
+    app_cargo = 'focus_flow_app/Cargo.toml'
 
     files_to_commit = []
     tag_name = ''
@@ -239,19 +256,18 @@ _bump_semver part target:
 
     # 2. Bump App
     if target in ['app', 'both']:
-        curr = get_version(app_pub, r'^version: (.*?)\+')
+        curr = get_version(app_cargo, r'^version = \"(.*?)\"')
         next_v = bump(curr, part)
         print(f'Bumping App: {curr} -> {next_v}')
 
-        with open(app_pub, 'r') as f: s = f.read()
-        s = re.sub(r'(^version: )(.*?)(\+)', f'\\\\g<1>{next_v}\\\\g<3>', s, flags=re.MULTILINE)
-        with open(app_pub, 'w') as f: f.write(s)
+        with open(app_cargo, 'r') as f: s = f.read()
+        s = re.sub(r'(^version = \")(.*?)(\")', f'\\\\g<1>{next_v}\\\\g<3>', s, flags=re.MULTILINE)
+        with open(app_cargo, 'w') as f: f.write(s)
 
-        files_to_commit.append(app_pub)
+        files_to_commit.append(app_cargo)
         if target == 'app':
             tag_name = f'app-v{next_v}'
-        # If target is both, we usually use vX.Y.Z, but let's sync app-v and backend-v consistency
-        # Actually for 'both', we use simple vX.Y.Z as tag
+        # If target is both, use simple vX.Y.Z tag
 
     # 3. Determine Tag for 'both'
     if target == 'both':

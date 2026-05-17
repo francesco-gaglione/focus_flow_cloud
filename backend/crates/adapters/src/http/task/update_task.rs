@@ -1,24 +1,28 @@
 use crate::http::app_state::AppState;
-use crate::http::dto::validators::validate_uuid::validate_uuid;
+use crate::http::dto::common::task_dto::task_schedule_dto_to_app_dto;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::TASK_TAG;
 use application::use_cases::task::update_task::{UpdateTaskCommand, UpdateTaskError};
+use axum::extract::{Path, State};
+use axum::Json;
+use domain::entities::tasks::task_priority::TaskPriority as DomainPriority;
+use serde::{Deserialize, Serialize};
+use shared::task::{TaskPriority, UpdateTaskDto, UpdateTaskResponseDto};
+use shared::validators::validate_uuid::validate_uuid;
+use utoipa::ToSchema;
+use uuid::Uuid;
+use validator::Validate;
 
 impl From<UpdateTaskError> for HttpError {
     fn from(value: UpdateTaskError) -> Self {
         match value {
             UpdateTaskError::PersistenceError(e) => HttpError::GenericError(e.to_string()),
-            UpdateTaskError::TaskError(e) => HttpError::BadRequest(e.to_string()),
+            UpdateTaskError::UncompletedSubTasks => HttpError::BadRequest(
+                "Sub-tasks must be completed before marking task as completed".to_string(),
+            ),
         }
     }
 }
-use axum::extract::{Path, State};
-use axum::Json;
-use chrono::DateTime;
-use serde::{Deserialize, Serialize};
-use utoipa::ToSchema;
-use uuid::Uuid;
-use validator::Validate;
 
 #[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
 pub struct UpdateTaskPathDto {
@@ -26,37 +30,8 @@ pub struct UpdateTaskPathDto {
     pub id: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
-#[serde(rename_all = "camelCase")]
-pub struct UpdateTaskDto {
-    #[validate(custom(function = "validate_uuid"))]
-    pub category_id: Option<String>,
-
-    #[validate(length(
-        min = 1,
-        max = 255,
-        message = "Name must be between 1 and 255 characters"
-    ))]
-    pub name: Option<String>,
-
-    #[validate(length(max = 255, message = "Description must not exceed 255 characters"))]
-    pub description: Option<String>,
-
-    pub scheduled_date: Option<i64>, //timestamp in seconds
-
-    pub scheduled_end_date: Option<i64>, //timestamp in seconds
-
-    pub completed_at: Option<i64>,
-}
-
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
-#[serde(rename_all = "camelCase")]
-pub struct UpdateTaskResponseDto {
-    pub success: bool,
-}
-
 #[utoipa::path(
-    put,
+    patch,
     path = "/api/task/{id}",
     tag = TASK_TAG,
     summary = "Update a task",
@@ -90,43 +65,23 @@ pub async fn update_task_api(
     let task_id = Uuid::parse_str(&path.id)
         .map_err(|_| HttpError::BadRequest("Task id malformed".to_string()))?;
 
-    let category_id = payload
-        .category_id
-        .map(|id| Uuid::parse_str(&id))
-        .transpose()
-        .map_err(|_| HttpError::BadRequest("Invalid category id".to_string()))?;
-
-    let scheduled_date = payload
-        .scheduled_date
-        .map(|s| {
-            DateTime::from_timestamp(s, 0)
-                .ok_or_else(|| HttpError::BadRequest("Invalid scheduled date".to_string()))
-        })
-        .transpose()?;
-    let scheduled_end_date = payload
-        .scheduled_end_date
-        .map(|s| {
-            DateTime::from_timestamp(s, 0)
-                .ok_or_else(|| HttpError::BadRequest("Invalid scheduled end date".to_string()))
-        })
-        .transpose()?;
-
-    let completed_at = payload
-        .completed_at
-        .map(|s| {
-            DateTime::from_timestamp(s, 0)
-                .ok_or_else(|| HttpError::BadRequest("Invalid scheduled end date".to_string()))
-        })
+    let schedule = payload
+        .schedule
+        .map(task_schedule_dto_to_app_dto)
         .transpose()?;
 
     let command = UpdateTaskCommand {
         id: task_id,
-        category_id,
-        name: payload.name,
+        title: payload.title,
         description: payload.description,
-        scheduled_date,
-        scheduled_end_date,
-        completed_at,
+        schedule,
+        priority: payload.priority.map(|p| match p {
+            TaskPriority::Low => DomainPriority::Low,
+            TaskPriority::Medium => DomainPriority::Medium,
+            TaskPriority::High => DomainPriority::High,
+            TaskPriority::Urgent => DomainPriority::Urgent,
+        }),
+        completed: payload.completed,
     };
 
     state.update_task_uc.execute(command).await?;

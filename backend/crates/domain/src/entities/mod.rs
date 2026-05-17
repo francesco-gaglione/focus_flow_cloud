@@ -1,9 +1,8 @@
-pub mod category;
 pub mod focus_session;
 pub mod focus_session_type;
 pub mod pomodoro;
-pub mod stats;
-pub mod task;
+pub mod reminder;
+pub mod tasks;
 pub mod user;
 pub mod user_role;
 pub mod user_setting;

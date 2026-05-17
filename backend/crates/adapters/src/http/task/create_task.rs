@@ -1,48 +1,22 @@
 use crate::http::app_state::AppState;
-use crate::http::dto::validators::validate_uuid::validate_uuid;
+use crate::http::dto::common::task_dto::task_schedule_dto_to_app_dto;
 use crate::http::model::session_model::UserSession;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::TASK_TAG;
-use application::use_cases::task::create_task::{CreateTaskCommand, CreateTaskError};
+use application::use_cases::task::create_task::{
+    CreateSubtaskCommand, CreateTaskCommand, CreateTaskError,
+};
+use axum::{extract::State, Extension, Json};
+use domain::entities::tasks::task_priority::TaskPriority as DomainPriority;
+use shared::task::{CreateTaskDto, CreateTaskResponseDto, TaskPriority as SharedPriority};
+use validator::Validate;
 
 impl From<CreateTaskError> for HttpError {
     fn from(value: CreateTaskError) -> Self {
         match value {
             CreateTaskError::PersistenceError(e) => HttpError::GenericError(e.to_string()),
-            CreateTaskError::TaskError(e) => HttpError::BadRequest(e.to_string()),
         }
     }
-}
-use axum::{extract::State, Extension, Json};
-use chrono::DateTime;
-use serde::{Deserialize, Serialize};
-use utoipa::ToSchema;
-use validator::Validate;
-
-#[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
-#[serde(rename_all = "camelCase")]
-pub struct CreateTaskDto {
-    #[validate(custom(function = "validate_uuid"))]
-    pub category_id: Option<String>,
-
-    #[validate(length(
-        min = 1,
-        max = 255,
-        message = "Name must be between 1 and 255 characters"
-    ))]
-    pub name: String,
-
-    #[validate(length(max = 255, message = "Description must not exceed 255 characters"))]
-    pub description: Option<String>,
-
-    pub scheduled_date: Option<i64>, //timestamp in seconds
-
-    pub scheduled_end_date: Option<i64>, //timestamp in seconds
-}
-
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
-pub struct CreateTaskResponseDto {
-    pub id: String,
 }
 
 #[utoipa::path(
@@ -55,7 +29,6 @@ pub struct CreateTaskResponseDto {
         (status = 201, description = "Task created successfully", body = CreateTaskResponseDto),
         (status = 400, description = "Bad request - validation error"),
         (status = 401, description = "Unauthorized"),
-        (status = 409, description = "Task already exists"),
         (status = 500, description = "Internal server error")
     ),
     security(
@@ -70,39 +43,45 @@ pub async fn create_task_api(
     payload
         .validate()
         .map_err(|e| HttpError::BadRequest(e.to_string()))?;
+    tracing::info!("Creating task with title");
 
-    let category_id = payload
-        .category_id
-        .as_ref()
-        .map(|id| id.parse::<uuid::Uuid>())
-        .transpose()
-        .map_err(|_| HttpError::BadRequest("Invalid category id".to_string()))?;
+    let schedule = payload
+        .schedule
+        .map(task_schedule_dto_to_app_dto)
+        .transpose()?;
 
-    let scheduled_date = payload
-        .scheduled_date
-        .map(|s| {
-            DateTime::from_timestamp(s, 0)
-                .ok_or_else(|| HttpError::BadRequest("Invalid scheduled date".to_string()))
-        })
-        .transpose()?;
-    let scheduled_end_date = payload
-        .scheduled_end_date
-        .map(|s| {
-            DateTime::from_timestamp(s, 0)
-                .ok_or_else(|| HttpError::BadRequest("Invalid scheduled end date".to_string()))
-        })
-        .transpose()?;
+    let subtasks = payload.subtasks.map(|items| {
+        items
+            .into_iter()
+            .map(|s| CreateSubtaskCommand {
+                user_id: user.user_id,
+                title: s.title,
+                description: s.description,
+            })
+            .collect()
+    });
+
+    let priority = payload.priority.map(|p| match p {
+        SharedPriority::Low => DomainPriority::Low,
+        SharedPriority::Medium => DomainPriority::Medium,
+        SharedPriority::High => DomainPriority::High,
+        SharedPriority::Urgent => DomainPriority::Urgent,
+    });
 
     let command = CreateTaskCommand {
         user_id: user.user_id,
-        name: payload.name,
+        title: payload.title,
         description: payload.description,
-        category_id,
-        scheduled_date,
-        scheduled_end_date,
+        schedule,
+        subtasks,
+        category_id: payload.category_id,
+        priority,
     };
 
+    tracing::info!("Creating task with command: {:?}", command);
+
     let id = state.create_task_uc.execute(command).await?;
+    tracing::info!("Task created successfully: {}", id);
 
     Ok(Json(CreateTaskResponseDto { id: id.to_string() }))
 }

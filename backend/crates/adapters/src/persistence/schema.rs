@@ -6,7 +6,6 @@ diesel::table! {
         user_id -> Uuid,
         #[max_length = 255]
         name -> Varchar,
-        description -> Nullable<Text>,
         #[max_length = 7]
         color -> Varchar,
         created_at -> Timestamptz,
@@ -20,7 +19,6 @@ diesel::table! {
         id -> Uuid,
         user_id -> Uuid,
         task_id -> Nullable<Uuid>,
-        category_id -> Nullable<Uuid>,
         #[max_length = 20]
         session_type -> Varchar,
         actual_duration -> Nullable<Int8>,
@@ -33,19 +31,38 @@ diesel::table! {
 }
 
 diesel::table! {
+    subtasks (id) {
+        id -> Uuid,
+        task_id -> Uuid,
+        user_id -> Uuid,
+        #[max_length = 255]
+        title -> Varchar,
+        description -> Nullable<Text>,
+        completed_at -> Nullable<Timestamptz>,
+        sort_order -> Int2,
+        created_at -> Timestamptz,
+    }
+}
+
+diesel::table! {
     tasks (id) {
         id -> Uuid,
         user_id -> Uuid,
         template_id -> Nullable<Uuid>,
         category_id -> Nullable<Uuid>,
         #[max_length = 255]
-        name -> Varchar,
+        title -> Varchar,
         description -> Nullable<Text>,
         scheduled_date -> Nullable<Timestamptz>,
         created_at -> Timestamptz,
         completed_at -> Nullable<Timestamptz>,
+        #[max_length = 10]
+        priority -> Nullable<Varchar>,
         deleted_at -> Nullable<Timestamptz>,
-        scheduled_end_date -> Nullable<Timestamptz>,
+        #[max_length = 12]
+        schedule_type -> Varchar,
+        schedule_all_day_date -> Nullable<Date>,
+        schedule_duration_secs -> Nullable<Int8>,
     }
 }
 
@@ -77,9 +94,10 @@ diesel::table! {
 }
 
 diesel::joinable!(categories -> users (user_id));
-diesel::joinable!(focus_session -> categories (category_id));
 diesel::joinable!(focus_session -> tasks (task_id));
 diesel::joinable!(focus_session -> users (user_id));
+diesel::joinable!(subtasks -> tasks (task_id));
+diesel::joinable!(subtasks -> users (user_id));
 diesel::joinable!(tasks -> categories (category_id));
 diesel::joinable!(tasks -> users (user_id));
 diesel::joinable!(user_settings -> users (user_id));
@@ -87,6 +105,7 @@ diesel::joinable!(user_settings -> users (user_id));
 diesel::allow_tables_to_appear_in_same_query!(
     categories,
     focus_session,
+    subtasks,
     tasks,
     user_settings,
     users,

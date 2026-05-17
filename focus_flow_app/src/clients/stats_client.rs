@@ -1,0 +1,11 @@
+use dioxus::signals::{ReadableExt, Signal};
+use shared::stats::GetStatsResponseDto;
+
+use crate::clients::http_client::{ApiClient, ApiError, ApiResult};
+
+pub async fn get_stats() -> ApiResult<GetStatsResponseDto> {
+    let api_signal = dioxus::core::try_consume_context::<Signal<ApiClient>>()
+        .ok_or_else(|| ApiError::ClientError("ApiClient signal not found".to_string()))?;
+    let api = (*api_signal.read()).clone();
+    api.get("/api/stats", None, None).await
+}

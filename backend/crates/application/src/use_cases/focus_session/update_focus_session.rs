@@ -22,7 +22,6 @@ pub type UpdateFocusSessionResult<T> = Result<T, UpdateFocusSessionError>;
 #[derive(Debug, Clone)]
 pub struct UpdateFocusSessionCommand {
     pub session_id: Uuid,
-    pub category_id: Option<Uuid>,
     pub task_id: Option<Uuid>,
     pub concentration_score: Option<i32>,
     pub notes: Option<String>,
@@ -50,10 +49,6 @@ impl UpdateFocusSessionUseCase {
             .session_persistence
             .find_session_by_id(update_session.session_id)
             .await?;
-
-        if let Some(category_id) = update_session.category_id {
-            session.update_category_id(category_id);
-        }
 
         if let Some(task_id) = update_session.task_id {
             session.update_task_id(task_id);
@@ -89,7 +84,6 @@ mod tests {
     async fn update_focus_session() {
         let session_id = uuid::Uuid::new_v4();
         let task_id = uuid::Uuid::new_v4();
-        let category_id = uuid::Uuid::new_v4();
         let concentration_score = 4;
         let notes = "Test notes".to_string();
         let started_at = chrono::Utc::now();
@@ -104,7 +98,6 @@ mod tests {
             .returning(move |_| {
                 Ok(FocusSession::<TerminatedSession>::new(
                     uuid::Uuid::new_v4(),
-                    Some(category_id.clone()),
                     Some(task_id.clone()),
                     FocusSessionType::Work,
                     Some(3600),
@@ -120,7 +113,6 @@ mod tests {
             .execute(UpdateFocusSessionCommand {
                 session_id,
                 task_id: Some(task_id),
-                category_id: Some(category_id),
                 concentration_score: Some(concentration_score),
                 notes: Some(notes),
                 started_at: Some(started_at),

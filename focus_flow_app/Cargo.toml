@@ -1,0 +1,35 @@
+[workspace]
+
+[package]
+name = "focus_flow_app"
+version = "5.0.0-alpha.1"
+authors = ["Francesco Pio Gaglione <francesco.gaglione.p@gmail.com>"]
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+dioxus = { version = "0.7.1", features = ["router"] }
+shared = { path = "../shared" }
+thiserror = "2.0.16"
+reqwest = { version = "0.12", features = ["json"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0.145"
+dioxus-std = { version = "0.5", features = ["storage"] }
+chrono = { version = "0.4.42", features = ["serde"] }
+uuid = { version = "1", features = ["v4", "serde"] }
+time = { version = "0.3", features = ["macros"] }
+dioxus-primitives = { git = "https://github.com/DioxusLabs/components", version = "0.0.1", default-features = false, features = ["router"] }
+tokio = { version = "1", features = ["sync", "time", "macros"] }
+tokio-tungstenite = { version = "0.24", default-features = false, features = ["connect", "handshake"] }
+futures-util = { version = "0.3", default-features = false, features = ["sink", "std"] }
+palette = { version = "0.7.6", default-features = false }
+
+[features]
+default = ["mobile"]
+# The feature that are only required for the web = ["dioxus/web"] build target should be optional and only enabled in the web = ["dioxus/web"] feature
+web = ["dioxus/web"]
+# The feature that are only required for the desktop = ["dioxus/desktop"] build target should be optional and only enabled in the desktop = ["dioxus/desktop"] feature
+desktop = ["dioxus/desktop"]
+# The feature that are only required for the mobile = ["dioxus/mobile"] build target should be optional and only enabled in the mobile = ["dioxus/mobile"] feature
+mobile = ["dioxus/mobile"]

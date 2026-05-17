@@ -1,4 +1,5 @@
 use crate::config::AppConfig;
+use application::use_cases::category::get_all_category_usecase::GetAllCategoryUseCases;
 use application::use_cases::focus_session::update_focus_session::UpdateFocusSessionUseCase;
 use application::use_cases::pomodoro_state::fetch_user_pomodoro_state::FetchUserPomodoroStateUseCase;
 use application::use_cases::pomodoro_state::init_pomodoro_state::InitPomodoroStateUseCase;
@@ -7,9 +8,10 @@ use application::use_cases::pomodoro_state::start_session::StartSessionUseCase;
 use application::use_cases::pomodoro_state::terminate_session::TerminateSessionUseCase;
 use application::use_cases::pomodoro_state::update_current_session::UpdateSessionUseCase;
 use application::use_cases::pomodoro_state::update_pomodoro_context::UpdatePomodoroContextUseCase;
-use application::use_cases::task::complete_task::CompleteTaskUseCase;
-use application::use_cases::task::get_scheduled_tasks::GetScheduledTasksUseCase;
+use application::use_cases::stats::get_stats::GetStatsUseCase;
+use application::use_cases::task::add_subtask::AddSubTaskUseCase;
 use application::use_cases::task::get_tasks::GetTasksUseCase;
+use application::use_cases::task::update_subtask::UpdateSubTaskUseCase;
 use application::use_cases::user::get_user_info::GetUserInfoUseCase;
 use application::use_cases::user::login_user::LoginUseCase;
 use application::use_cases::user::refresh_token::RefreshTokenUseCase;
@@ -22,18 +24,15 @@ use application::use_cases::{
     category::{
         create_category_usecase::CreateCategoryUseCases,
         delete_categories_usecase::DeleteCategoriesUseCases,
-        delete_category_usecase::DeleteCategoryUseCases,
-        get_category_and_task_usecase::GetCategoryAndTaskUseCases,
-        get_category_usecase::GetCategoryUseCases, update_category_usecase::UpdateCategoryUseCases,
+        update_category_usecase::UpdateCategoryUseCases,
     },
     focus_session::{
         create_manual_session::CreateManualSessionUseCase,
         find_sessions_by_filters::FindSessionsByFiltersUseCase,
     },
-    stats::calculate_stats_by_period::CalculateStatsByPeriodUseCase,
     task::{
-        create_task::CreateTaskUseCase, delete_tasks::DeleteTasksUseCase,
-        orphan_tasks::OrphanTasksUseCase, update_task::UpdateTaskUseCase,
+        create_task::CreateTaskUseCase, delete_task::DeleteTaskUseCase,
+        update_task::UpdateTaskUseCase,
     },
 };
 use axum::extract::ws::Message;
@@ -53,9 +52,7 @@ pub struct AppState {
     // Category Use Cases
     pub create_category_uc: Arc<CreateCategoryUseCases>,
     pub delete_categories_uc: Arc<DeleteCategoriesUseCases>,
-    pub delete_category_uc: Arc<DeleteCategoryUseCases>,
-    pub get_category_and_task_uc: Arc<GetCategoryAndTaskUseCases>,
-    pub get_category_uc: Arc<GetCategoryUseCases>,
+    pub get_all_category_uc: Arc<GetAllCategoryUseCases>,
     pub update_category_uc: Arc<UpdateCategoryUseCases>,
 
     // Pomodoro state use cases
@@ -69,20 +66,19 @@ pub struct AppState {
 
     // Task Use Cases
     pub create_task_uc: Arc<CreateTaskUseCase>,
-    pub delete_tasks_uc: Arc<DeleteTasksUseCase>,
-    pub orphan_tasks_uc: Arc<OrphanTasksUseCase>,
+    pub delete_tasks_uc: Arc<DeleteTaskUseCase>,
     pub get_tasks_uc: Arc<GetTasksUseCase>,
     pub update_task_uc: Arc<UpdateTaskUseCase>,
-    pub complete_task_uc: Arc<CompleteTaskUseCase>,
-    pub get_scheduled_task_uc: Arc<GetScheduledTasksUseCase>,
+    pub update_subtask_uc: Arc<UpdateSubTaskUseCase>,
+    pub add_subtask_uc: Arc<AddSubTaskUseCase>,
+
+    // Stats Use Cases
+    pub get_stats_uc: Arc<GetStatsUseCase>,
 
     // Focus Session Use Cases
     pub create_manual_session_uc: Arc<CreateManualSessionUseCase>,
     pub update_focus_session_uc: Arc<UpdateFocusSessionUseCase>,
     pub find_sessions_by_filters_uc: Arc<FindSessionsByFiltersUseCase>,
-
-    // Stats Use Cases
-    pub calculate_stats_by_period_uc: Arc<CalculateStatsByPeriodUseCase>,
 
     // User Setting Use Cases
     pub update_user_setting_uc: Arc<UpdateSettingUseCase>,
