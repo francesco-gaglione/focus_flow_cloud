@@ -1,5 +1,5 @@
 use dioxus::prelude::*;
-use dioxus_primitives::icon;
+use crate::components::icon::Icon;
 use dioxus_primitives::navbar::{
     self, NavbarContentProps, NavbarItemProps, NavbarNavProps, NavbarProps, NavbarTriggerProps,
 };
@@ -36,7 +36,7 @@ pub fn NavbarTrigger(props: NavbarTriggerProps) -> Element {
     rsx! {
         navbar::NavbarTrigger { class: "dx-navbar-trigger", attributes: props.attributes,
             {props.children}
-            icon::Icon {
+            Icon {
                 class: "dx-navbar-expand-icon",
                 width: "20px",
                 height: "20px",

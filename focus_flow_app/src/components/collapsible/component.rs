@@ -2,8 +2,8 @@ use dioxus::prelude::*;
 use dioxus_primitives::collapsible::{
     self, CollapsibleContentProps, CollapsibleProps, CollapsibleTriggerProps,
 };
+use crate::components::icon::Icon;
 use dioxus_primitives::dioxus_attributes::attributes;
-use dioxus_primitives::icon;
 use dioxus_primitives::merge_attributes;
 
 #[component]
@@ -37,7 +37,7 @@ pub fn CollapsibleTrigger(props: CollapsibleTriggerProps) -> Element {
         collapsible::CollapsibleTrigger { as: props.r#as, attributes: merged,
             {props.children}
             if show_icon {
-                icon::Icon {
+                Icon {
                     class: "dx-collapsible-expand-icon",
                     width: "1rem",
                     height: "1rem",

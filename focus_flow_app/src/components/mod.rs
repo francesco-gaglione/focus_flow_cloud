@@ -17,6 +17,7 @@ pub mod drag_and_drop_list;
 pub mod dropdown_menu;
 pub mod form;
 pub mod hover_card;
+pub mod icon;
 pub mod input;
 pub mod item;
 pub mod label;

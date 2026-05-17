@@ -1,5 +1,5 @@
 use dioxus::prelude::*;
-use dioxus_primitives::icon;
+use crate::components::icon::Icon;
 
 #[derive(Copy, Clone, PartialEq, Default)]
 #[non_exhaustive]
@@ -66,7 +66,7 @@ fn BadgeElement(props: BadgeProps) -> Element {
 pub fn VerifiedIcon() -> Element {
     rsx! {
         // Badge icon from lucide https://lucide.dev/icons/badge-check
-        icon::Icon {
+        Icon {
             width: "12px",
             height: "12px",
             stroke: "var(--secondary-color-4)",

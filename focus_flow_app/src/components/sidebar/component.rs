@@ -7,7 +7,7 @@ use crate::components::tooltip::{Tooltip, TooltipContent, TooltipTrigger};
 use dioxus::core::use_drop;
 use dioxus::prelude::*;
 use dioxus_primitives::dioxus_attributes::attributes;
-use dioxus_primitives::icon;
+use crate::components::icon::Icon;
 use dioxus_primitives::merge_attributes;
 use dioxus_primitives::use_controlled;
 
@@ -368,7 +368,7 @@ pub fn SidebarTrigger(
                 ctx.toggle();
             },
             attributes: merged,
-            icon::Icon {
+            Icon {
                 class: "dx-sidebar-trigger-icon",
                 width: "1rem",
                 height: "1rem",

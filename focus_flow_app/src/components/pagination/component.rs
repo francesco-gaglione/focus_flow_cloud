@@ -1,5 +1,5 @@
 use dioxus::prelude::*;
-use dioxus_primitives::icon;
+use crate::components::icon::Icon;
 
 #[derive(Copy, Clone, PartialEq, Default)]
 #[non_exhaustive]
@@ -151,7 +151,7 @@ pub fn PaginationPrevious(
             onmouseup,
             attributes,
             // ChevronLeft icon from lucide https://lucide.dev/icons/chevron-left
-            icon::Icon {
+            Icon {
                 class: "dx-pagination-icon",
                 width: "1rem",
                 height: "1rem",
@@ -182,7 +182,7 @@ pub fn PaginationNext(
             attributes,
             span { class: "dx-pagination-label", "Next" }
             // ChevronRight icon from lucide https://lucide.dev/icons/chevron-right
-            icon::Icon {
+            Icon {
                 class: "dx-pagination-icon",
                 width: "1rem",
                 height: "1rem",
@@ -203,7 +203,7 @@ pub fn PaginationEllipsis(
             aria_hidden: "true",
             ..attributes,
             // MoreHorizontal icon from lucide https://lucide.dev/icons/more-horizontal
-            icon::Icon {
+            Icon {
                 class: "dx-pagination-icon",
                 width: "1rem",
                 height: "1rem",

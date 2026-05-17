@@ -1,3 +1,5 @@
+[workspace]
+
 [package]
 name = "focus_flow_app"
 version = "5.0.0-alpha.1"

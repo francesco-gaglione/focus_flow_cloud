@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 use dioxus_primitives::accordion::{
     self, AccordionContentProps, AccordionItemProps, AccordionProps, AccordionTriggerProps,
 };
-use dioxus_primitives::icon;
+use crate::components::icon::Icon;
 
 #[component]
 pub fn Accordion(props: AccordionProps) -> Element {
@@ -46,7 +46,7 @@ pub fn AccordionTrigger(props: AccordionTriggerProps) -> Element {
             id: props.id,
             attributes: props.attributes,
             {props.children}
-            icon::Icon {
+            Icon {
                 class: "dx-accordion-expand-icon",
                 width: "20px",
                 height: "20px",

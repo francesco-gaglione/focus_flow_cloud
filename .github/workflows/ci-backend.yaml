@@ -36,9 +36,9 @@ jobs:
       - name: Check formatting
         run: cargo fmt -- --check
       - name: Lint
-        run: cargo clippy --workspace --exclude focus_flow_app -- -D warnings
+        run: cargo clippy --workspace -- -D warnings
       - name: Test with coverage
-        run: cargo llvm-cov --workspace --exclude focus_flow_app --lcov --output-path lcov.info
+        run: cargo llvm-cov --workspace --lcov --output-path lcov.info
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:

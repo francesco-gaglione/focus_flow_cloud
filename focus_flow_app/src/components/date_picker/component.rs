@@ -1,6 +1,6 @@
 use dioxus::prelude::*;
 
-use dioxus_primitives::icon;
+use crate::components::icon::Icon;
 use dioxus_primitives::{
     date_picker::{self, DatePickerInputProps, DatePickerProps, DateRangePickerProps},
     popover::{PopoverContentProps, PopoverTriggerProps},
@@ -23,7 +23,6 @@ pub fn DatePicker(props: DatePickerProps) -> Element {
                 read_only: props.read_only,
                 min_date: props.min_date,
                 max_date: props.max_date,
-                month_count: props.month_count,
                 disabled_ranges: props.disabled_ranges,
                 roving_loop: props.roving_loop,
                 attributes: props.attributes,
@@ -49,7 +48,6 @@ pub fn DateRangePicker(props: DateRangePickerProps) -> Element {
                 read_only: props.read_only,
                 min_date: props.min_date,
                 max_date: props.max_date,
-                month_count: props.month_count,
                 disabled_ranges: props.disabled_ranges,
                 roving_loop: props.roving_loop,
                 attributes: props.attributes,
@@ -123,7 +121,7 @@ pub fn DateRangePickerInput(props: DatePickerInputProps) -> Element {
 pub fn DatePickerPopoverTrigger(props: PopoverTriggerProps) -> Element {
     rsx! {
         PopoverTrigger { aria_label: "Show Calendar", attributes: props.attributes,
-            icon::Icon {
+            Icon {
                 class: "dx-date-picker-expand-icon",
                 width: "20px",
                 height: "20px",

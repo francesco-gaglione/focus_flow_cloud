@@ -3,7 +3,6 @@ members = [
     "shared",
     "backend/crates/*",
     "backend",
-    "focus_flow_app"
 ]
 resolver = "2"
 

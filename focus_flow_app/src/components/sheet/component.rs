@@ -3,7 +3,7 @@ use dioxus_primitives::dialog::{
     self, DialogCtx, DialogDescriptionProps, DialogRootProps, DialogTitleProps,
 };
 use dioxus_primitives::dioxus_attributes::attributes;
-use dioxus_primitives::icon;
+use crate::components::icon::Icon;
 
 #[derive(Debug, Clone, Copy, Default, PartialEq)]
 pub enum SheetSide {
@@ -79,7 +79,7 @@ pub fn SheetContent(
             attributes,
             {children}
             SheetClose { class: "dx-sheet-close",
-                icon::Icon {
+                Icon {
                     class: "dx-sheet-close-icon",
                     width: "20px",
                     height: "20px",

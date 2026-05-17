@@ -4,7 +4,7 @@ use dioxus_primitives::calendar::{
     CalendarNavigationProps, CalendarProps, CalendarSelectMonthProps, CalendarSelectYearProps,
     RangeCalendarProps,
 };
-use dioxus_primitives::icon::Icon;
+use crate::components::icon::Icon;
 
 #[component]
 pub fn Calendar(props: CalendarProps) -> Element {
@@ -23,7 +23,6 @@ pub fn Calendar(props: CalendarProps) -> Element {
             first_day_of_week: props.first_day_of_week,
             min_date: props.min_date,
             max_date: props.max_date,
-            month_count: props.month_count,
             disabled_ranges: props.disabled_ranges,
             attributes: props.attributes,
             {props.children}
@@ -48,7 +47,6 @@ pub fn RangeCalendar(props: RangeCalendarProps) -> Element {
             first_day_of_week: props.first_day_of_week,
             min_date: props.min_date,
             max_date: props.max_date,
-            month_count: props.month_count,
             disabled_ranges: props.disabled_ranges,
             attributes: props.attributes,
             {props.children}
@@ -143,8 +141,6 @@ pub fn CalendarGrid(props: CalendarGridProps) -> Element {
     rsx! {
         calendar::CalendarGrid {
             id: props.id,
-            show_week_numbers: props.show_week_numbers,
-            render_day: props.render_day,
             attributes: props.attributes,
         }
     }

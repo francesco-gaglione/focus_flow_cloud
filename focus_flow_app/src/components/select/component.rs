@@ -3,7 +3,8 @@ use dioxus_primitives::select::{
     self, SelectGroupLabelProps, SelectGroupProps, SelectListProps, SelectMultiProps,
     SelectOptionProps, SelectProps, SelectTriggerProps, SelectValueProps,
 };
-use dioxus_primitives::{dioxus_attributes::attributes, icon, merge_attributes};
+use crate::components::icon::Icon;
+use dioxus_primitives::{dioxus_attributes::attributes, merge_attributes};
 
 #[component]
 pub fn Select<T: Clone + PartialEq + 'static>(props: SelectProps<T>) -> Element {
@@ -57,7 +58,7 @@ pub fn SelectTrigger(props: SelectTriggerProps) -> Element {
     rsx! {
         select::SelectTrigger { attributes: merged,
             {props.children}
-            icon::Icon {
+            Icon {
                 class: "dx-select-expand-icon",
                 width: "20px",
                 height: "20px",
@@ -153,7 +154,7 @@ pub fn SelectOption<T: Clone + PartialEq + 'static>(props: SelectOptionProps<T>)
 pub fn SelectItemIndicator() -> Element {
     rsx! {
         select::SelectItemIndicator {
-            icon::Icon {
+            Icon {
                 class: "dx-select-check-icon",
                 width: "1rem",
                 height: "1rem",
