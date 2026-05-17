@@ -1,5 +1,5 @@
-use dioxus::prelude::*;
 use crate::components::icon::Icon;
+use dioxus::prelude::*;
 
 #[derive(Copy, Clone, PartialEq, Default)]
 #[non_exhaustive]

@@ -1,4 +1,5 @@
 use crate::components::button::{Button, ButtonVariant};
+use crate::components::icon::Icon;
 use crate::components::separator::Separator;
 use crate::components::sheet::{
     Sheet, SheetContent, SheetDescription, SheetHeader, SheetSide, SheetTitle,
@@ -7,7 +8,6 @@ use crate::components::tooltip::{Tooltip, TooltipContent, TooltipTrigger};
 use dioxus::core::use_drop;
 use dioxus::prelude::*;
 use dioxus_primitives::dioxus_attributes::attributes;
-use crate::components::icon::Icon;
 use dioxus_primitives::merge_attributes;
 use dioxus_primitives::use_controlled;
 

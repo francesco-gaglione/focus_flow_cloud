@@ -11,13 +11,22 @@ pub struct ViewBox {
 
 impl ViewBox {
     pub fn new(min_x: u16, min_y: u16, width: u16, height: u16) -> Self {
-        Self { min_x, min_y, width, height }
+        Self {
+            min_x,
+            min_y,
+            width,
+            height,
+        }
     }
 }
 
 impl fmt::Display for ViewBox {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{} {} {} {}", self.min_x, self.min_y, self.width, self.height)
+        write!(
+            f,
+            "{} {} {} {}",
+            self.min_x, self.min_y, self.width, self.height
+        )
     }
 }
 

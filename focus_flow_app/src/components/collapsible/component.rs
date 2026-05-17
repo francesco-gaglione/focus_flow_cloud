@@ -1,8 +1,8 @@
+use crate::components::icon::Icon;
 use dioxus::prelude::*;
 use dioxus_primitives::collapsible::{
     self, CollapsibleContentProps, CollapsibleProps, CollapsibleTriggerProps,
 };
-use crate::components::icon::Icon;
 use dioxus_primitives::dioxus_attributes::attributes;
 use dioxus_primitives::merge_attributes;
 

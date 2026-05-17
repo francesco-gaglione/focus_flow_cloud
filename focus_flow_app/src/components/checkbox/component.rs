@@ -1,6 +1,6 @@
+use crate::components::icon::Icon;
 use dioxus::prelude::*;
 use dioxus_primitives::checkbox::{self, CheckboxProps};
-use crate::components::icon::Icon;
 
 #[component]
 pub fn Checkbox(props: CheckboxProps) -> Element {

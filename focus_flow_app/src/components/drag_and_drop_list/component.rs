@@ -1,8 +1,8 @@
+use crate::components::icon::Icon;
 use dioxus::prelude::*;
 use dioxus_primitives::drag_and_drop_list::{
     self, DragAndDropContext, DragAndDropItemContext, DragAndDropListItemProps,
 };
-use crate::components::icon::Icon;
 
 #[derive(Props, Clone, PartialEq)]
 pub struct DragAndDropListProps {

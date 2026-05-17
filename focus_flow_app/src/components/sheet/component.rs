@@ -1,9 +1,9 @@
+use crate::components::icon::Icon;
 use dioxus::prelude::*;
 use dioxus_primitives::dialog::{
     self, DialogCtx, DialogDescriptionProps, DialogRootProps, DialogTitleProps,
 };
 use dioxus_primitives::dioxus_attributes::attributes;
-use crate::components::icon::Icon;
 
 #[derive(Debug, Clone, Copy, Default, PartialEq)]
 pub enum SheetSide {

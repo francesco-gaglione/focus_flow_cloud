@@ -1,8 +1,8 @@
+use crate::components::icon::Icon;
 use dioxus::prelude::*;
 use dioxus_primitives::accordion::{
     self, AccordionContentProps, AccordionItemProps, AccordionProps, AccordionTriggerProps,
 };
-use crate::components::icon::Icon;
 
 #[component]
 pub fn Accordion(props: AccordionProps) -> Element {

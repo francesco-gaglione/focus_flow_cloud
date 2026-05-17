@@ -1,5 +1,5 @@
-use dioxus::prelude::*;
 use crate::components::icon::Icon;
+use dioxus::prelude::*;
 use dioxus_primitives::navbar::{
     self, NavbarContentProps, NavbarItemProps, NavbarNavProps, NavbarProps, NavbarTriggerProps,
 };

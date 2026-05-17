@@ -1,9 +1,9 @@
+use crate::components::icon::Icon;
 use dioxus::prelude::*;
 use dioxus_primitives::select::{
     self, SelectGroupLabelProps, SelectGroupProps, SelectListProps, SelectMultiProps,
     SelectOptionProps, SelectProps, SelectTriggerProps, SelectValueProps,
 };
-use crate::components::icon::Icon;
 use dioxus_primitives::{dioxus_attributes::attributes, merge_attributes};
 
 #[component]
