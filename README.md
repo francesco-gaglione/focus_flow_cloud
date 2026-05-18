@@ -133,7 +133,7 @@ We use [`just`](https://github.com/casey/just) to manage commands for the entire
 | Command            | Description                  |
 | :----------------- | :--------------------------- |
 | `just backend-run` | Run the Rust backend locally |
-| `just app-run`     | Run the Flutter app          |
+| `just app-serve`   | Run the app                  |
 | `just test-all`    | Run all tests                |
 
 #### 1. Setup Backend (Local)
