@@ -55,7 +55,7 @@ I built this project for my personal use to optimize my daily workflow and decid
 This is a monorepo containing:
 
 - **[`backend/`](backend/)**: The server-side application built with Rust (Axum, Diesel, Tokio).
-- **[`app/`](app/)**: The client-side mobile application built with Flutter (Bloc, Dio, GoRouter).
+- **[`app/`](focus_flow_app/)**: The client-side mobile application built with Dioxus.
 
 ## Features
 
@@ -69,9 +69,9 @@ This is a monorepo containing:
 ### App
 
 - **Timer UI**: Clean, responsive interface for managing sessions.
-- **Task Management**: Create and organize tasks with categories.
+- **Task Management**: Create and organize tasks.
 - **Statistics**: Visual insights into your productivity.
-- **Multi-platform**: Runs on iOS, Android, and Web.
+- **Multi-platform**: Runs on iOS, Android, and Desktop.
 
 ## Getting Started
 
@@ -148,8 +148,7 @@ We use [`just`](https://github.com/casey/just) to manage commands for the entire
 
 #### 2. Setup App (Local)
 
-1.  **Install**: `just app-pub-get`
-2.  **Run**: `cd app && flutter run`
+1.  **Run**: `just app-serve`
 
 ## Contributing
 
