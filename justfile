@@ -209,7 +209,8 @@ _bump_semver part target:
         return bump_type
 
     def bump(version, part):
-        major, minor, patch = map(int, version.split('.'))
+        base = version.split('-')[0]
+        major, minor, patch = map(int, base.split('.'))
         if part == 'major':
             major += 1
             minor = 0
