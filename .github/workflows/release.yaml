@@ -130,13 +130,6 @@ jobs:
 
 
 
-      - name: Debug binaries
-        run: |
-          echo "=== find binary ==="
-          find target -name "focus_flow_cloud" -type f 2>/dev/null || echo "not found"
-          echo "=== amd64 release dir ==="
-          ls target/x86_64-unknown-linux-gnu/release/ 2>/dev/null | head -20 || echo "dir not found"
-
       - name: Prepare binaries
         run: |
           cp target/x86_64-unknown-linux-gnu/release/focus_flow_cloud ./focus_flow_cloud-amd64

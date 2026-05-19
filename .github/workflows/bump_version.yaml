@@ -9,11 +9,8 @@ jobs:
   bump:
     if: |
       contains(github.event.head_commit.message, '[patch]') ||
-      contains(github.event.head_commit.message, '[minor]') ||
-      contains(github.event.head_commit.message, '[major]') ||
-      contains(github.event.head_commit.message, '[alpha.') ||
-      contains(github.event.head_commit.message, '[beta.')  ||
-      contains(github.event.head_commit.message, '[rc.')
+      contains(github.event.head_commit.message, '[minor]') || 
+      contains(github.event.head_commit.message, '[major]')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -51,37 +48,24 @@ jobs:
             echo "Detected Minor Bump"
           elif [[ "$MSG" == *"[patch]"* ]]; then
             echo "part=patch" >> $GITHUB_OUTPUT
-            echo "Detected Patch Bump"
-          elif [[ "$MSG" =~ \[(alpha|beta|rc)\.([0-9]+)\] ]]; then
-            PRE_TYPE="${BASH_REMATCH[1]}"
-            PRE_NUM="${BASH_REMATCH[2]}"
-            echo "part=prerelease" >> $GITHUB_OUTPUT
-            echo "pre_type=${PRE_TYPE}" >> $GITHUB_OUTPUT
-            echo "pre_num=${PRE_NUM}" >> $GITHUB_OUTPUT
-            echo "Detected Pre-release: ${PRE_TYPE}.${PRE_NUM}"
+            echo "Detected Global Patch"
           else
             echo "part=unknown" >> $GITHUB_OUTPUT
             echo "No matching tag found"
             exit 1
           fi
 
-      - name: Bump Version (patch)
+      - name: Bump Version
         if: steps.type.outputs.part == 'patch'
         run: just bump-patch
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+            GITHUB_TOKEN: ${{ secrets.GH_PAT }}
 
-      - name: Bump Version (minor/major)
-        if: steps.type.outputs.part == 'minor' || steps.type.outputs.part == 'major'
+      - name: Bump Version (Other)
+        if: steps.type.outputs.part != 'patch'
         run: just bump-${{ steps.type.outputs.part }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
-
-      - name: Bump Version (pre-release)
-        if: steps.type.outputs.part == 'prerelease'
-        run: just bump-prerelease ${{ steps.type.outputs.pre_type }} ${{ steps.type.outputs.pre_num }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+            GITHUB_TOKEN: ${{ secrets.GH_PAT }}
 
       - name: Push Changes
         # Important: origin must be authenticated with the PAT for protected branch push

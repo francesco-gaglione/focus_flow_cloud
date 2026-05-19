@@ -148,10 +148,6 @@ bump-major:
 bump-auto:
     @just _bump_semver auto both
 
-# Pre-release Bump: just bump-prerelease alpha 1  →  v1.2.3-alpha.1
-bump-prerelease type number:
-    @just _bump_prerelease {{ type }} {{ number }}
-
 # Helper: bumps version based on part and target
 [private]
 _bump_semver part target:
@@ -279,7 +275,7 @@ _bump_semver part target:
 
     # 4. Generate Changelog
     print(f'Generating changelog for {tag_name}...')
-    run_cmd(f'cliff --tag {tag_name} --unreleased --prepend CHANGELOG.md')
+    run_cmd(f'git cliff --tag {tag_name} --unreleased --prepend CHANGELOG.md')
     files_to_commit.append('CHANGELOG.md')
 
     # 5. Commit and Tag
@@ -288,79 +284,6 @@ _bump_semver part target:
     run_cmd(f'git commit -m \"chore: bump {target} to {tag_name}\"')
     run_cmd(f'git tag {tag_name}')
     print(f'Done! Created tag {tag_name}')
-    "
-
-    echo "Push with: git push origin master --tags"
-
-[private]
-_bump_prerelease type number:
-    #!/usr/bin/env bash
-    set -e
-
-    python3 -c "
-    import sys
-    import re
-    import subprocess
-
-    pre_type = '{{ type }}'
-    pre_num  = '{{ number }}'
-
-    allowed = ['alpha', 'beta', 'rc']
-    if pre_type not in allowed:
-        print(f'Error: pre-release type must be one of {allowed}')
-        sys.exit(1)
-
-    def get_version(file):
-        with open(file, 'r') as f:
-            content = f.read()
-        match = re.search(r'^version = \"([\d]+\.[\d]+\.[\d]+)', content, re.MULTILINE)
-        if not match:
-            print('Error: could not find version in', file)
-            sys.exit(1)
-        return match.group(1)
-
-    def set_version(file, new_v):
-        with open(file, 'r') as f:
-            s = f.read()
-        s = re.sub(r'(^version = \")(.*?)(\")', f'\\\\g<1>{new_v}\\\\g<3>', s, flags=re.MULTILINE)
-        with open(file, 'w') as f:
-            f.write(s)
-
-    def run_cmd(cmd):
-        print(f'Running: {cmd}')
-        subprocess.check_call(cmd, shell=True)
-
-    be_cargo  = 'backend/Cargo.toml'
-    app_cargo = 'focus_flow_app/Cargo.toml'
-
-    base_v = get_version(be_cargo)
-    new_v  = f'{base_v}-{pre_type}.{pre_num}'
-    tag    = f'v{new_v}'
-
-    print(f'Pre-release: {base_v} -> {new_v}  (tag: {tag})')
-
-    set_version(be_cargo,  new_v)
-    set_version(app_cargo, new_v)
-
-    try:
-        run_cmd(f'cliff --tag {tag} --unreleased --prepend CHANGELOG.md')
-        run_cmd(f'git add backend/Cargo.toml focus_flow_app/Cargo.toml CHANGELOG.md')
-    except subprocess.CalledProcessError:
-        print('Warning: git-cliff not installed, skipping changelog update')
-        run_cmd(f'git add backend/Cargo.toml focus_flow_app/Cargo.toml')
-
-    staged = subprocess.run('git diff --cached --quiet', shell=True).returncode != 0
-    if staged:
-        run_cmd(f'git commit -m \"chore: pre-release {tag}\"')
-    else:
-        print('No file changes to commit (versions already up to date)')
-
-    existing_tags = subprocess.check_output('git tag', shell=True).decode().split()
-    if tag in existing_tags:
-        print(f'Tag {tag} already exists, skipping tag creation')
-    else:
-        run_cmd(f'git tag {tag}')
-    print(f'Done! Created tag {tag}')
     "
 
     echo "Push with: git push origin master --tags"
