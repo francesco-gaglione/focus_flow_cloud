@@ -2,6 +2,86 @@
 
 All notable changes to this project will be documented in this file.
 
+## [6.0.0] - 2026-05-19
+
+### Features
+
+- First alpha [alpha.1]
+
+### Miscellaneous Tasks
+
+- Pre-release v5.0.0-alpha.1
+
+### Other
+
+- Update README with V5 development notice
+- V5 WIP
+
+* new task, subtask and reminders entities
+
+* new task management
+
+* Shared DTO
+
+* New dioxus app and backend task refactor
+
+* task and subtask refactored
+
+* Task page restructured and api fixes
+
+* Missing file
+
+* Subtasks completition
+
+* new pomodoro page and ws handlers
+
+* Feat: Complete/uncomplete tasks and subtasks. Priority form and view
+update.
+
+* task soft delete
+
+* taskrow ui refactored
+
+* tasks properties updates
+
+* New task schedule logic
+
+* category management
+
+* Calendar view refactor
+
+* Stats ui refactor
+
+* feature: stats page and backend logics
+
+* Cargo check fixes
+
+* Icons and pipeline
+
+* fix build
+
+* fix: exclude focus_flow_app from backend CI workspace builds
+
+* Update ci-app.yaml
+
+* fix build
+
+* fix cargo fmt
+
+* fix: use --no-default-features in app CI to avoid GTK deps on Linux
+
+* fix: add tokio macros feature for select! macro in focus_flow_app
+
+* fix tests
+
+* fmt fix
+- Revise README for app directory and features
+
+Updated app directory and features in README.
+- Rename command from 'app-run' to 'app-serve'
+- Alpha version
+- Undo prerelease bump changes
+
 ## [4.0.2] - 2026-04-19
 
 ### Features
