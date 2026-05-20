@@ -9,7 +9,10 @@ use time::Date as TimeDate;
 use crate::{
     components::{
         button::{Button, ButtonVariant},
-        date_picker::{DatePicker, DatePickerInput},
+        calendar::{
+            Calendar, CalendarGrid, CalendarHeader, CalendarMonthTitle, CalendarNavigation,
+            CalendarNextMonthButton, CalendarPreviousMonthButton, CalendarView,
+        },
         select::{Select, SelectList, SelectOption, SelectTrigger, SelectValue},
     },
     presentation::components::{
@@ -111,14 +114,29 @@ pub fn Todo() -> Element {
     let mut picker_time: Signal<String> = use_signal(String::new);
     let mut picker_end_time: Signal<String> = use_signal(String::new);
     let mut picker_is_all_day: Signal<bool> = use_signal(|| true);
+    let mut picker_show_calendar = use_signal(|| false);
+    let mut picker_cal_view: Signal<TimeDate> = use_signal(|| {
+        let now = Local::now().date_naive();
+        TimeDate::from_calendar_date(
+            now.year(),
+            time::Month::try_from(now.month() as u8).unwrap_or(time::Month::January),
+            now.day() as u8,
+        )
+        .unwrap_or(time::macros::date!(2026-01-01))
+    });
 
-    // Sync picker state when date_sheet opens
+    // Sync picker state when date_sheet opens/closes
     use_effect(move || {
+        picker_show_calendar.set(false);
         if let Some((_, schedule)) = date_sheet.read().as_ref() {
-            picker_date.set(schedule_to_time_date(schedule));
+            let date = schedule_to_time_date(schedule);
+            picker_date.set(date);
             picker_is_all_day.set(schedule.is_all_day() || !schedule.is_scheduled());
             picker_time.set(schedule.time_str().unwrap_or_default());
             picker_end_time.set(schedule.end_time_str().unwrap_or_default());
+            if let Some(d) = date {
+                picker_cal_view.set(d);
+            }
         }
     });
 
@@ -394,10 +412,52 @@ pub fn Todo() -> Element {
                         // Date row
                         div { class: "date-sheet-section",
                             span { class: "date-sheet-section-label", "Date" }
-                            DatePicker {
-                                selected_date: ReadSignal::new(picker_date),
-                                on_value_change: move |d: Option<TimeDate>| picker_date.set(d),
-                                DatePickerInput {}
+                            div { class: "flex gap-2 items-center",
+                                button {
+                                    r#type: "button",
+                                    class: "h-9 px-3 bg-surface-card border border-border rounded-md text-sm font-sans cursor-pointer text-foreground transition-[border-color] duration-fast ease-tech hover:border-accent",
+                                    onclick: move |_| {
+                                        let cur = *picker_show_calendar.read();
+                                        picker_show_calendar.set(!cur);
+                                    },
+                                    if let Some(d) = *picker_date.read() {
+                                        "{d.day()} {d.month()} {d.year()}"
+                                    } else {
+                                        "Pick a date"
+                                    }
+                                }
+                                if picker_date.read().is_some() {
+                                    button {
+                                        r#type: "button",
+                                        class: "size-9 grid place-items-center bg-surface-card border border-border rounded-md text-subtle cursor-pointer text-base hover:text-foreground transition-colors duration-fast",
+                                        onclick: move |_| {
+                                            picker_date.set(None);
+                                            picker_show_calendar.set(false);
+                                        },
+                                        "×"
+                                    }
+                                }
+                            }
+                            if *picker_show_calendar.read() {
+                                Calendar {
+                                    selected_date: ReadSignal::new(picker_date),
+                                    on_date_change: move |d: Option<TimeDate>| {
+                                        picker_date.set(d);
+                                        picker_show_calendar.set(false);
+                                    },
+                                    view_date: ReadSignal::new(picker_cal_view),
+                                    on_view_change: move |d: TimeDate| picker_cal_view.set(d),
+                                    CalendarView {
+                                        CalendarHeader {
+                                            CalendarNavigation {
+                                                CalendarPreviousMonthButton {}
+                                                CalendarMonthTitle { class: "dx-calendar-month-title" }
+                                                CalendarNextMonthButton {}
+                                            }
+                                        }
+                                        CalendarGrid {}
+                                    }
+                                }
                             }
                         }
                         // All-day toggle

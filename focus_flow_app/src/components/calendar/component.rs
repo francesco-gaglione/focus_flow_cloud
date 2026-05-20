@@ -60,9 +60,8 @@ pub fn CalendarView(
     children: Element,
 ) -> Element {
     rsx! {
-        div {
-            class: "dx-calendar-view",
-            ..attributes,
+        calendar::CalendarView {
+            attributes,
             {children}
         }
     }
@@ -78,16 +77,16 @@ pub fn CalendarHeader(props: CalendarHeaderProps) -> Element {
 #[component]
 pub fn CalendarNavigation(props: CalendarNavigationProps) -> Element {
     rsx! {
-        calendar::CalendarNavigation { attributes: props.attributes, {props.children} }
+        calendar::CalendarNavigation { class: "dx-calendar-navigation", {props.children} }
     }
 }
 
 #[component]
 pub fn CalendarPreviousMonthButton(
-    #[props(extends = GlobalAttributes)] attributes: Vec<Attribute>,
+    #[props(extends = GlobalAttributes)] _attributes: Vec<Attribute>,
 ) -> Element {
     rsx! {
-        calendar::CalendarPreviousMonthButton { attributes,
+        calendar::CalendarPreviousMonthButton { class: "dx-calendar-nav-prev",
             Icon {
                 class: "dx-calendar-previous-month-icon",
                 width: "20px",
@@ -100,10 +99,10 @@ pub fn CalendarPreviousMonthButton(
 
 #[component]
 pub fn CalendarNextMonthButton(
-    #[props(extends = GlobalAttributes)] attributes: Vec<Attribute>,
+    #[props(extends = GlobalAttributes)] _attributes: Vec<Attribute>,
 ) -> Element {
     rsx! {
-        calendar::CalendarNextMonthButton { attributes,
+        calendar::CalendarNextMonthButton { class: "dx-calendar-nav-next",
             Icon {
                 class: "dx-calendar-next-month-icon",
                 width: "20px",
@@ -117,10 +116,11 @@ pub fn CalendarNextMonthButton(
 #[component]
 pub fn CalendarSelectMonth(props: CalendarSelectMonthProps) -> Element {
     rsx! {
-        calendar::CalendarSelectMonth {
-            class: "dx-calendar-month-select",
-            attributes: props.attributes,
-            DropDownIcon { }
+        calendar::CalendarSelectMonth { class: "dx-calendar-month-select-container", attributes: props.attributes,
+            calendar::CalendarSelectMonthValue { class: "dx-calendar-month-select-value",
+                DropDownIcon {}
+            }
+            calendar::CalendarSelectMonthSelect { class: "dx-calendar-month-select" }
         }
     }
 }
@@ -128,10 +128,11 @@ pub fn CalendarSelectMonth(props: CalendarSelectMonthProps) -> Element {
 #[component]
 pub fn CalendarSelectYear(props: CalendarSelectYearProps) -> Element {
     rsx! {
-        calendar::CalendarSelectYear {
-            class: "dx-calendar-year-select",
-            attributes: props.attributes,
-            DropDownIcon { }
+        calendar::CalendarSelectYear { class: "dx-calendar-year-select-container", attributes: props.attributes,
+            calendar::CalendarSelectYearValue { class: "dx-calendar-year-select-value",
+                DropDownIcon {}
+            }
+            calendar::CalendarSelectYearSelect { class: "dx-calendar-year-select" }
         }
     }
 }
@@ -140,6 +141,7 @@ pub fn CalendarSelectYear(props: CalendarSelectYearProps) -> Element {
 pub fn CalendarGrid(props: CalendarGridProps) -> Element {
     rsx! {
         calendar::CalendarGrid {
+            class: "dx-calendar-grid",
             id: props.id,
             attributes: props.attributes,
         }
@@ -160,9 +162,9 @@ pub fn CalendarDay(props: CalendarDayProps) -> Element {
 fn DropDownIcon() -> Element {
     rsx! {
         Icon {
-            width: "20px",
-            height: "20px",
-            stroke: "var(--secondary-color-4)",
+            width: "14px",
+            height: "14px",
+            stroke: "currentColor",
             path { d: "m6 9 6 6 6-6" }
         }
     }

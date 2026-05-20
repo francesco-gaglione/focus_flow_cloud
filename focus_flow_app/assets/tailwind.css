@@ -23,6 +23,7 @@
     --text-sm: 13px;
     --text-sm--line-height: calc(1.25 / 0.875);
     --text-base: 14px;
+    --text-base--line-height: calc(1.5 / 1);
     --text-lg: 18px;
     --text-lg--line-height: calc(1.75 / 1.125);
     --text-xl: 24px;
@@ -396,6 +397,9 @@
   }
   .h-7 {
     height: calc(var(--spacing) * 7);
+  }
+  .h-9 {
+    height: calc(var(--spacing) * 9);
   }
   .h-10 {
     height: calc(var(--spacing) * 10);
@@ -851,6 +855,10 @@
   .font-sans {
     font-family: var(--font-sans);
   }
+  .text-base {
+    font-size: var(--text-base);
+    line-height: var(--tw-leading, var(--text-base--line-height));
+  }
   .text-lg {
     font-size: var(--text-lg);
     line-height: var(--tw-leading, var(--text-lg--line-height));
@@ -1071,6 +1079,11 @@
   }
   .transition-\[border-color\,box-shadow\] {
     transition-property: border-color,box-shadow;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
+  }
+  .transition-\[border-color\] {
+    transition-property: border-color;
     transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
     transition-duration: var(--tw-duration, var(--default-transition-duration));
   }

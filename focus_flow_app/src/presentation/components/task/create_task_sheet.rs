@@ -1,4 +1,4 @@
-use chrono::{Local, NaiveDate, NaiveTime, TimeZone, Timelike};
+use chrono::{Datelike, Local, NaiveDate, NaiveTime, TimeZone, Timelike};
 use dioxus::{logger::tracing::debug, prelude::*};
 use shared::task::{TaskPriority, TaskScheduleDto};
 use time::Date as TimeDate;
@@ -6,7 +6,10 @@ use time::Date as TimeDate;
 use crate::{
     components::{
         button::{Button, ButtonVariant},
-        date_picker::{DatePicker, DatePickerInput},
+        calendar::{
+            Calendar, CalendarGrid, CalendarHeader, CalendarMonthTitle, CalendarNavigation,
+            CalendarNextMonthButton, CalendarPreviousMonthButton, CalendarView,
+        },
         input::Input,
         select::{Select, SelectList, SelectOption, SelectTrigger, SelectValue},
     },
@@ -87,6 +90,16 @@ pub fn CreateTaskSheet(props: CreateTaskSheetProps) -> Element {
     let mut description = use_signal(String::new);
     let mut selected_cat_id = use_signal(String::new);
     let mut selected_date: Signal<Option<TimeDate>> = use_signal(|| None);
+    let mut show_calendar = use_signal(|| false);
+    let mut cal_view: Signal<TimeDate> = use_signal(|| {
+        let now = Local::now().date_naive();
+        TimeDate::from_calendar_date(
+            now.year(),
+            time::Month::try_from(now.month() as u8).unwrap_or(time::Month::January),
+            now.day() as u8,
+        )
+        .unwrap_or(time::macros::date!(2026-01-01))
+    });
     let mut due_time_str = use_signal(String::new);
     let mut due_end_time_str = use_signal(String::new);
     let mut is_all_day = use_signal(|| true);
@@ -108,6 +121,7 @@ pub fn CreateTaskSheet(props: CreateTaskSheetProps) -> Element {
         description.set(String::new());
         selected_cat_id.set(String::new());
         selected_date.set(None);
+        show_calendar.set(false);
         due_time_str.set(String::new());
         due_end_time_str.set(String::new());
         is_all_day.set(true);
@@ -158,6 +172,7 @@ pub fn CreateTaskSheet(props: CreateTaskSheetProps) -> Element {
                     description.set(String::new());
                     selected_cat_id.set(String::new());
                     selected_date.set(None);
+                    show_calendar.set(false);
                     due_time_str.set(String::new());
                     due_end_time_str.set(String::new());
                     is_all_day.set(true);
@@ -187,12 +202,29 @@ pub fn CreateTaskSheet(props: CreateTaskSheetProps) -> Element {
                 div { class: "flex flex-col gap-1.5",
                     label { class: FIELD_LABEL, "Schedule" }
                     div { class: "flex gap-2 items-center flex-wrap",
-                        DatePicker {
-                            selected_date: ReadSignal::new(selected_date),
-                            on_value_change: move |d: Option<TimeDate>| selected_date.set(d),
-                            DatePickerInput {}
+                        button {
+                            r#type: "button",
+                            class: "h-9 px-3 bg-surface-card border border-border rounded-md text-sm font-sans cursor-pointer text-foreground transition-[border-color] duration-fast ease-tech hover:border-accent",
+                            onclick: move |_| {
+                                let cur = *show_calendar.read();
+                                show_calendar.set(!cur);
+                            },
+                            if let Some(d) = *selected_date.read() {
+                                "{d.day()} {d.month()} {d.year()}"
+                            } else {
+                                "Pick a date"
+                            }
                         }
                         if selected_date.read().is_some() {
+                            button {
+                                r#type: "button",
+                                class: "size-9 grid place-items-center bg-surface-card border border-border rounded-md text-subtle cursor-pointer text-base hover:text-foreground transition-colors duration-fast",
+                                onclick: move |_| {
+                                    selected_date.set(None);
+                                    show_calendar.set(false);
+                                },
+                                "×"
+                            }
                             label { class: "flex items-center gap-1.5 shrink-0 cursor-pointer",
                                 input {
                                     r#type: "checkbox",
@@ -207,6 +239,27 @@ pub fn CreateTaskSheet(props: CreateTaskSheetProps) -> Element {
                                     },
                                 }
                                 span { class: "font-mono text-[11px] text-subtle uppercase tracking-[0.04em]", "All day" }
+                            }
+                        }
+                    }
+                    if *show_calendar.read() {
+                        Calendar {
+                            selected_date: ReadSignal::new(selected_date),
+                            on_date_change: move |d: Option<TimeDate>| {
+                                selected_date.set(d);
+                                show_calendar.set(false);
+                            },
+                            view_date: ReadSignal::new(cal_view),
+                            on_view_change: move |d: TimeDate| cal_view.set(d),
+                            CalendarView {
+                                CalendarHeader {
+                                    CalendarNavigation {
+                                        CalendarPreviousMonthButton {}
+                                        CalendarMonthTitle { class: "dx-calendar-month-title" }
+                                        CalendarNextMonthButton {}
+                                    }
+                                }
+                                CalendarGrid {}
                             }
                         }
                     }
@@ -242,6 +295,7 @@ pub fn CreateTaskSheet(props: CreateTaskSheetProps) -> Element {
                         Select::<String> {
                             default_value: None,
                             on_value_change: move |v: Option<String>| {
+                                debug!("selected_cat_id: {:?}", v);
                                 selected_cat_id.set(v.unwrap_or_default());
                             },
                             SelectTrigger {

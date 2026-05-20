@@ -20,6 +20,7 @@ pub fn BottomSheet(props: BottomSheetProps) -> Element {
             onclick: move |_| props.on_close.call(()),
         }
         div { class: "fixed bottom-0 left-0 right-0 z-[41] bg-surface-raised border border-border border-b-0 rounded-t-xl pb-11 animate-sheet-in",
+            onclick: move |e| e.stop_propagation(),
             div { class: "w-9 h-1 bg-border-strong rounded-full mx-auto mt-[14px]" }
             div { class: "flex items-center justify-between px-5 py-4 border-b border-border",
                 span { class: "text-xl font-bold text-foreground tracking-[-0.025em]", "{props.title}" }

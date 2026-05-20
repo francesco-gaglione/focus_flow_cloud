@@ -1,274 +1,237 @@
-/* Calendar Container */
+/* ── Calendar container ─────────────────────────────────────────────── */
 .dx-calendar {
     display: flex;
-    flex-direction: row;
-    border: 1px solid var(--primary-color-6);
-    border-radius: 8px;
-    background-color: var(--primary-color-2);
-    box-shadow: 0 2px 10px rgb(0 0 0 / 10%);
-    font-family: inherit;
+    flex-direction: column;
+    background-color: var(--color-surface-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    font-family: var(--font-sans);
+    overflow: hidden;
+    min-width: 280px;
 }
 
-/* Calendar Navigation */
+/* ── Navigation bar ─────────────────────────────────────────────────── */
 .dx-calendar-navigation {
-    position: relative;
     display: flex;
     align-items: center;
-    justify-content: center;
-    padding: 0.75rem;
-    padding: 0.75rem calc(0.75rem + 1.75rem + 0.5rem) 0.25rem;
-    gap: 0.5rem;
+    justify-content: space-between;
+    padding: 12px 12px 8px;
+    gap: 4px;
 }
 
-.dx-calendar-nav-title {
-    color: var(--secondary-color-4);
-    font-size: 16px;
-    font-weight: 600;
+.dx-calendar-previous-month-icon,
+.dx-calendar-next-month-icon {
+    display: block;
 }
 
 .dx-calendar-nav-prev,
 .dx-calendar-nav-next {
-    position: absolute;
     display: flex;
-    width: 1.75rem;
-    height: 1.75rem;
+    width: 32px;
+    height: 32px;
     align-items: center;
     justify-content: center;
-    border: 1px solid var(--primary-color-6);
-    border-radius: 0.5rem;
-    background-color: var(--light, transparent)
-        var(--dark, var(--primary-color-3));
-    color: var(--secondary-color-5);
+    flex-shrink: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--color-muted);
     cursor: pointer;
-    font-size: 1rem;
-}
-
-.dx-calendar-nav-prev {
-    left: 0.75rem;
-}
-
-.dx-calendar-nav-next {
-    right: 0.75rem;
+    transition: background 150ms, border-color 150ms, color 150ms;
 }
 
 .dx-calendar-nav-prev:hover,
 .dx-calendar-nav-next:hover {
-    border-color: var(--primary-color-7);
-    background-color: var(--primary-color-4);
-    color: var(--secondary-color-4);
-}
-
-.dx-calendar-nav-prev:focus-visible,
-.dx-calendar-nav-next:focus-visible {
-    box-shadow: 0 0 0 2px var(--focused-border-color);
+    background: var(--color-gray-200);
+    border-color: var(--color-border-strong);
+    color: var(--color-foreground);
 }
 
 .dx-calendar-nav-prev:disabled,
 .dx-calendar-nav-next:disabled {
-    border-color: var(--primary-color-5);
-    background-color: var(--primary-color-2);
-    color: var(--secondary-color-3);
+    opacity: 0.35;
     cursor: not-allowed;
 }
 
-.dx-calendar-month-title {
-    display: flex;
-    width: 100%;
-    height: 1.75rem;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Calendar Grid */
-.dx-calendar-view {
-    display: flex;
-    flex-direction: column;
-}
-
-.dx-calendar-grid {
-    width: 100%;
-    padding: 0.5rem;
-}
-
-.dx-calendar-grid-header {
-    display: flex;
-    flex-direction: row;
-    margin-bottom: 8px;
-}
-
-.dx-calendar-grid-day-header {
-    flex: 1;
-    color: var(--secondary-color-5);
-    font-size: 12px;
-    font-weight: 300;
-    text-align: center;
-}
-
-.dx-calendar-grid-body {
-    display: flex;
-    width: 100%;
-    flex-direction: column;
-    gap: 0.25rem;
-}
-
-.dx-calendar-grid-cell {
-    width: 2rem;
-    border: none;
-    border-radius: 0.5rem;
-    aspect-ratio: 1;
-    background: none;
-    color: var(--secondary-color-4);
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.dx-calendar-grid-cell[data-month="current"]:not([data-disabled="true"]):hover {
-    background-color: var(--primary-color-4);
-}
-
-.dx-calendar-grid-cell[data-month="current"]:focus-visible {
-    outline: 2px solid var(--focused-border-color);
-    outline-offset: 2px;
-}
-
-.dx-calendar-grid-cell[data-month="last"],
-.dx-calendar-grid-cell[data-month="next"],
-.dx-calendar-grid-cell[data-disabled="true"] {
-    color: var(--secondary-color-5);
-    cursor: not-allowed;
-}
-
-.dx-calendar-grid-cell[data-month="last"][data-selected="true"],
-.dx-calendar-grid-cell[data-month="next"][data-selected="true"] {
-    background-color: var(--secondary-color-6);
-}
-
-.dx-calendar-grid-cell[data-month="current"][data-selected="true"] {
-    background-color: var(--secondary-color-2);
-    color: var(--primary-color);
-}
-
-.dx-calendar-grid-cell[data-month="current"][data-unavailable="true"] {
-    color: var(--secondary-color-6);
-    cursor: not-allowed;
-    text-decoration: line-through;
-}
-
-.dx-calendar-grid-week td {
-    padding-right: 0;
-    padding-left: 0;
-}
-
-.dx-calendar-grid-week td:first-child .dx-calendar-grid-cell {
-    border-bottom-left-radius: 0.5rem;
-    border-top-left-radius: 0.5rem;
-}
-
-.dx-calendar-grid-week td:last-child .dx-calendar-grid-cell {
-    border-bottom-right-radius: 0.5rem;
-    border-top-right-radius: 0.5rem;
-}
-
-.dx-calendar-grid-cell[data-month="last"][data-selection-between="true"],
-.dx-calendar-grid-cell[data-month="next"][data-selection-between="true"] {
-    border-radius: 0;
-    background-color: var(--primary-color-5);
-    color: var(--secondary-color-5);
-}
-
-.dx-calendar-grid-cell[data-month="current"][data-selection-between="true"] {
-    border-radius: 0;
-    background-color: var(--primary-color-5);
-    color: var(--secondary-color-4);
-}
-
-td:has(.dx-calendar-grid-cell[data-selection-start="true"]) {
-    padding: 0;
-    margin-top: 1px;
-    margin-bottom: 1px;
-    background-color: var(--primary-color-5);
-    border-bottom-left-radius: 0.5rem;
-    border-top-left-radius: 0.5rem;
-}
-
-td:has(.dx-calendar-grid-cell[data-selection-end="true"]) {
-    padding: 0;
-    margin-top: 1px;
-    margin-bottom: 1px;
-    background-color: var(--primary-color-5);
-    border-bottom-right-radius: 0.5rem;
-    border-top-right-radius: 0.5rem;
-}
-
-.dx-calendar-grid-cell[data-month="current"][data-selected="true"]:hover {
-    background-color: var(--light, var(--secondary-color-2))
-        var(--dark, var(--primary-color-5));
-    color: var(--light, var(--primary-color))
-        var(--dark, var(--secondary-color-1));
-    font-weight: var(--light, 550) var(--dark, inherit);
-}
-
-.dx-calendar-grid-cell[data-month="current"][data-today="true"]:not(
-        [data-selected="true"]
-    ) {
-    background-color: var(--primary-color-5);
-}
-
-.dx-calendar-grid-weeknum {
-    border-radius: 0.5rem;
-    background-color: var(--primary-color);
-    color: var(--secondary-color-5);
-    font-size: 12px;
-}
-
-/* Calendar with week numbers */
-.dx-calendar-grid-week {
-    display: flex;
-    width: 100%;
-    flex-direction: row;
-    justify-content: space-between;
-}
-
-/* Calendar states */
-.dx-calendar[data-disabled="true"] {
-    opacity: 0.6;
-    pointer-events: none;
-}
-
+/* ── Month / Year selectors ─────────────────────────────────────────── */
 .dx-calendar-month-select-container,
 .dx-calendar-year-select-container {
     position: relative;
-}
-
-.dx-calendar-month-select-container:has(:focus-visible),
-.dx-calendar-year-select-container:has(:focus-visible) {
-    border-radius: 0.5rem;
-    outline: 2px solid var(--focused-border-color);
-}
-
-.dx-calendar-month-select,
-.dx-calendar-year-select {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    padding: 0.25rem;
-    margin: 0;
-    inset: 0;
-    opacity: 0;
+    display: inline-flex;
+    align-items: center;
 }
 
 .dx-calendar-month-select-value,
 .dx-calendar-year-select-value {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    padding: 0.25rem;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    background: transparent;
     border: none;
-    background-color: transparent;
-    color: var(--secondary-color-4);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 600;
     cursor: pointer;
-    font-size: 1rem;
-    transition:
-        background-color 0.2s ease,
-        color 0.2s ease;
+    transition: background 150ms;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.dx-calendar-month-select,
+.dx-calendar-year-select {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    margin: 0;
+    padding: 0;
+}
+
+.dx-calendar-month-select-container:hover .dx-calendar-month-select-value,
+.dx-calendar-year-select-container:hover .dx-calendar-year-select-value {
+    background: var(--color-gray-200);
+}
+
+/* ── Month title (simple alternative to selects) ────────────────────── */
+.dx-calendar-month-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    flex: 1;
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* ── Calendar grid (table) ──────────────────────────────────────────── */
+.dx-calendar-grid {
+    width: 100%;
+    padding: 4px 12px 12px;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+/* Day-of-week header cells */
+.dx-calendar-grid th {
+    padding: 4px 0;
+    color: var(--color-subtle);
+    font-size: 11px;
+    font-weight: 500;
+    font-family: var(--font-mono);
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+/* Week rows */
+.dx-calendar-grid tbody tr {
+    /* no extra styling needed — browser handles table layout */
+}
+
+/* Day cells */
+.dx-calendar-grid td {
+    padding: 2px 0;
+    text-align: center;
+}
+
+/* ── Day buttons ────────────────────────────────────────────────────── */
+.dx-calendar-grid td button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--color-muted);
+    cursor: pointer;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 400;
+    transition: background 100ms, color 100ms;
+    -webkit-appearance: none;
+    appearance: none;
+    padding: 0;
+}
+
+.dx-calendar-grid td button[data-month="current"]:not([data-disabled="true"]):hover {
+    background: var(--color-gray-200);
+    color: var(--color-foreground);
+}
+
+.dx-calendar-grid td button[data-month="last"],
+.dx-calendar-grid td button[data-month="next"] {
+    color: var(--color-border-strong);
+}
+
+.dx-calendar-grid td button[data-disabled="true"] {
+    color: var(--color-border-strong);
+    cursor: not-allowed;
+}
+
+.dx-calendar-grid td button[data-month="current"][data-today="true"]:not([data-selected="true"]) {
+    background: var(--color-gray-300);
+    color: var(--color-foreground);
+    font-weight: 600;
+}
+
+.dx-calendar-grid td button[data-month="current"][data-selected="true"] {
+    background: var(--color-accent);
+    color: var(--color-foreground);
+    font-weight: 600;
+}
+
+.dx-calendar-grid td button[data-month="current"][data-selected="true"]:hover {
+    background: var(--color-accent-hover);
+}
+
+.dx-calendar-grid td button[data-month="current"][data-unavailable="true"] {
+    color: var(--color-border-strong);
+    cursor: not-allowed;
+    text-decoration: line-through;
+}
+
+/* ── Range selection ─────────────────────────────────────────────────── */
+.dx-calendar-grid td button[data-selection-between="true"] {
+    border-radius: 0;
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
+}
+
+.dx-calendar-grid td:has(button[data-selection-start="true"]) {
+    background: var(--color-accent-soft);
+    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+}
+
+.dx-calendar-grid td:has(button[data-selection-end="true"]) {
+    background: var(--color-accent-soft);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+/* ── Focus ───────────────────────────────────────────────────────────── */
+.dx-calendar-grid td button:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 1px;
+}
+
+.dx-calendar-nav-prev:focus-visible,
+.dx-calendar-nav-next:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 1px;
+}
+
+/* ── Disabled calendar ───────────────────────────────────────────────── */
+.dx-calendar[data-disabled="true"] {
+    opacity: 0.5;
+    pointer-events: none;
 }
