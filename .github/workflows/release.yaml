@@ -213,9 +213,6 @@ jobs:
           - os: ubuntu-latest
             target: android
             platform: android
-          - os: macos-latest
-            target: ios
-            platform: ios
     defaults:
       run:
         working-directory: focus_flow_app
@@ -254,10 +251,6 @@ jobs:
       - name: Add Android Rust targets
         if: matrix.target == 'android'
         run: rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android
-
-      - name: Add iOS Rust targets
-        if: matrix.target == 'ios'
-        run: rustup target add aarch64-apple-ios
 
       - name: Install Dioxus CLI
         run: cargo install dioxus-cli --locked
