@@ -98,7 +98,7 @@ pub fn CreateTaskSheet(props: CreateTaskSheetProps) -> Element {
             time::Month::try_from(now.month() as u8).unwrap_or(time::Month::January),
             now.day() as u8,
         )
-        .unwrap_or(time::macros::date!(2026-01-01))
+        .unwrap_or(time::macros::date!(2026 - 01 - 01))
     });
     let mut due_time_str = use_signal(String::new);
     let mut due_end_time_str = use_signal(String::new);

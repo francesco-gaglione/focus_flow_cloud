@@ -265,7 +265,7 @@ jobs:
       - name: Create DMG (macOS)
         if: matrix.target == 'macos'
         run: |
-          APP_PATH=$(find ../target/dx/focus_flow_app/release/macos -name "*.app" -maxdepth 4 | head -1)
+          APP_PATH=$(find target/dx/focus_flow_app/release/macos -name "*.app" -maxdepth 4 | head -1)
           create-dmg \
             --volname "Focus Flow" \
             --window-pos 200 120 \
@@ -278,14 +278,14 @@ jobs:
       - name: Package Linux bundle
         if: matrix.target == 'linux'
         run: |
-          BUNDLE_DIR=$(find ../target/dx/focus_flow_app/release/linux -maxdepth 2 -type d | head -1)
+          BUNDLE_DIR=$(find target/dx/focus_flow_app/release/linux -maxdepth 2 -type d | head -1)
           tar -czf focus_flow_app-linux.tar.gz -C "$BUNDLE_DIR" .
 
       - name: Package Windows bundle
         if: matrix.target == 'windows'
         shell: pwsh
         run: |
-          $bundleDir = Get-ChildItem -Path "../target/dx/focus_flow_app/release/windows" -Directory | Select-Object -First 1
+          $bundleDir = Get-ChildItem -Path "target/dx/focus_flow_app/release/windows" -Directory | Select-Object -First 1
           Compress-Archive -Path "$($bundleDir.FullName)/*" -DestinationPath "focus_flow_app-windows.zip"
 
       - name: Upload Artifact
