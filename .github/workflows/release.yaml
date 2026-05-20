@@ -198,15 +198,24 @@ jobs:
     name: Build App (${{ matrix.target }})
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         include:
-          - os: ubuntu-latest
-            target: web
-            platform: web
           - os: macos-latest
             target: macos
             platform: macos
+          - os: ubuntu-latest
+            target: linux
+            platform: linux
+          - os: windows-latest
+            target: windows
+            platform: windows
+          - os: ubuntu-latest
+            target: android
+            platform: android
+          - os: macos-latest
+            target: ios
+            platform: ios
     defaults:
       run:
         working-directory: focus_flow_app
@@ -223,19 +232,38 @@ jobs:
         with:
           workspaces: "focus_flow_app"
 
-      - name: Add wasm32 target (web)
-        if: matrix.target == 'web'
-        run: rustup target add wasm32-unknown-unknown
+      - name: Install Linux dependencies
+        if: matrix.target == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libxdo-dev libayatana-appindicator3-dev
+
+      - name: Setup Java (android)
+        if: matrix.target == 'android'
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install Android NDK (android)
+        if: matrix.target == 'android'
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r27c
+
+      - name: Add Android Rust targets
+        if: matrix.target == 'android'
+        run: rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android
+
+      - name: Add iOS Rust targets
+        if: matrix.target == 'ios'
+        run: rustup target add aarch64-apple-ios
 
       - name: Install Dioxus CLI
         run: cargo install dioxus-cli --locked
 
       - name: Bundle (${{ matrix.target }})
         run: dx bundle --release --platform ${{ matrix.platform }}
-
-      - name: Package web bundle
-        if: matrix.target == 'web'
-        run: zip -r focus_flow_app-web.zip dist/
 
       - name: Install create-dmg (macOS)
         if: matrix.target == 'macos'
@@ -254,13 +282,27 @@ jobs:
             "focus_flow_app-macos.dmg" \
             "$APP_PATH"
 
+      - name: Package Linux bundle
+        if: matrix.target == 'linux'
+        run: |
+          BUNDLE_DIR=$(find ../target/dx/focus_flow_app/release/linux -maxdepth 2 -type d | head -1)
+          tar -czf focus_flow_app-linux.tar.gz -C "$BUNDLE_DIR" .
+
+      - name: Package Windows bundle
+        if: matrix.target == 'windows'
+        shell: pwsh
+        run: |
+          $bundleDir = Get-ChildItem -Path "../target/dx/focus_flow_app/release/windows" -Directory | Select-Object -First 1
+          Compress-Archive -Path "$($bundleDir.FullName)/*" -DestinationPath "focus_flow_app-windows.zip"
+
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-${{ matrix.target }}
           path: |
-            focus_flow_app/focus_flow_app-web.zip
             focus_flow_app/focus_flow_app-macos.dmg
+            focus_flow_app/focus_flow_app-linux.tar.gz
+            focus_flow_app/focus_flow_app-windows.zip
           if-no-files-found: ignore
 
       - name: Cancel Workflow on Failure
@@ -296,8 +338,9 @@ jobs:
           files: |
             release_assets/**/focus_flow_cloud-amd64
             release_assets/**/focus_flow_cloud-arm64
-            release_assets/**/*.zip
             release_assets/**/*.dmg
+            release_assets/**/*.tar.gz
+            release_assets/**/*.zip
           generate_release_notes: true
           fail_on_unmatched_files: false
 
