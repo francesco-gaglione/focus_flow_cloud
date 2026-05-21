@@ -5,6 +5,7 @@
   :root, :host {
     --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
         "Segoe UI", sans-serif;
+    --font-serif: ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
     --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     --color-red-50: oklch(97.1% 0.013 17.38);
     --color-red-100: oklch(93.6% 0.032 17.717);
@@ -40,6 +41,7 @@
     --font-weight-semibold: 600;
     --font-weight-bold: 700;
     --tracking-tight: -0.025em;
+    --tracking-normal: 0em;
     --radius-xs: 4px;
     --radius-sm: 6px;
     --radius-md: 8px;
@@ -311,6 +313,9 @@
   .mx-auto {
     margin-inline: auto;
   }
+  .mt-0 {
+    margin-top: calc(var(--spacing) * 0);
+  }
   .mt-0\.5 {
     margin-top: calc(var(--spacing) * 0.5);
   }
@@ -474,11 +479,17 @@
   .flex-1 {
     flex: 1;
   }
+  .flex-shrink {
+    flex-shrink: 1;
+  }
   .flex-shrink-0 {
     flex-shrink: 0;
   }
   .shrink-0 {
     flex-shrink: 0;
+  }
+  .border-collapse {
+    border-collapse: collapse;
   }
   .-translate-x-full {
     --tw-translate-x: -100%;
@@ -566,6 +577,9 @@
   .justify-end {
     justify-content: flex-end;
   }
+  .gap-0 {
+    gap: calc(var(--spacing) * 0);
+  }
   .gap-0\.5 {
     gap: calc(var(--spacing) * 0.5);
   }
@@ -640,9 +654,17 @@
   .rounded-xl {
     border-radius: var(--radius-xl);
   }
+  .rounded-t-md {
+    border-top-left-radius: var(--radius-md);
+    border-top-right-radius: var(--radius-md);
+  }
   .rounded-t-xl {
     border-top-left-radius: var(--radius-xl);
     border-top-right-radius: var(--radius-xl);
+  }
+  .rounded-b-md {
+    border-bottom-right-radius: var(--radius-md);
+    border-bottom-left-radius: var(--radius-md);
   }
   .border {
     border-style: var(--tw-border-style);
@@ -705,6 +727,9 @@
   }
   .bg-accent-soft {
     background-color: var(--color-accent-soft);
+  }
+  .bg-black {
+    background-color: var(--color-black);
   }
   .bg-black\/55 {
     background-color: color-mix(in srgb, #000 55%, transparent);
@@ -1028,6 +1053,9 @@
   }
   .no-underline {
     text-decoration-line: none;
+  }
+  .underline {
+    text-decoration-line: underline;
   }
   .accent-accent {
     accent-color: var(--color-accent);
