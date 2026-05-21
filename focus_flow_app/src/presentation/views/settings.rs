@@ -1,6 +1,9 @@
 use crate::{
-    i18n::use_i18n, presentation::components::common_components::bottom_sheet::BottomSheet,
-    services::storage::set_item, state::app_state::AppState,
+    components::select::{Select, SelectList, SelectOption, SelectTrigger, SelectValue},
+    i18n::{save_locale, use_i18n, I18n, Locale},
+    presentation::components::common_components::bottom_sheet::BottomSheet,
+    services::storage::set_item,
+    state::app_state::AppState,
     use_cases::auth::update_base_url_uc::update_base_url_uc,
 };
 use dioxus::prelude::*;
@@ -9,12 +12,13 @@ use dioxus::prelude::*;
 pub fn Settings() -> Element {
     let mut drawer_open = use_context::<Signal<bool>>();
     let mut app_state = use_context::<Signal<AppState>>();
-    let i18n = use_i18n();
+    let mut i18n = use_i18n();
 
     let mut sheet_open = use_signal(|| false);
     let mut edit_url = use_signal(|| app_state.read().server_url().unwrap_or("").to_string());
 
     let version = env!("CARGO_PKG_VERSION");
+    let current_locale = i18n.read().locale.code().to_string();
 
     rsx! {
         div { class: "flex-1 min-h-0 flex flex-col overflow-hidden",
@@ -42,22 +46,19 @@ pub fn Settings() -> Element {
                 }
             }
 
-            // Content
             div { class: "flex-1 overflow-y-auto px-4 pb-8",
                 div { class: "pt-5 pb-2 font-mono text-[10px] text-subtle tracking-[0.02em] uppercase",
                     "{i18n.read().t(\"layout.comment_app_info\")}"
                 }
                 div { class: "flex flex-col rounded-md border border-border overflow-hidden",
-                    // Version row
                     div { class: "flex items-center justify-between px-4 py-3 bg-surface-card border-b border-border",
                         span { class: "font-mono text-xs text-subtle",
                             "{i18n.read().t(\"layout.version_label\")}"
                         }
                         span { class: "font-mono text-xs text-foreground", "v{version}" }
                     }
-                    // Server URL row (tappable)
                     button {
-                        class: "appearance-none flex items-center justify-between px-4 py-3 bg-surface-card text-left w-full cursor-pointer border-0 transition-[background] duration-fast ease-tech hover:bg-gray-100 active:bg-gray-200",
+                        class: "appearance-none flex items-center justify-between px-4 py-3 bg-surface-card text-left w-full cursor-pointer border-0 border-b border-border transition-[background] duration-fast ease-tech hover:bg-gray-100 active:bg-gray-200",
                         onclick: move |_| {
                             edit_url.set(app_state.read().server_url().unwrap_or("").to_string());
                             sheet_open.set(true);
@@ -79,6 +80,43 @@ pub fn Settings() -> Element {
                                 stroke_linecap: "round",
                                 stroke_linejoin: "round",
                                 path { d: "M6 3l5 5-5 5" }
+                            }
+                        }
+                    }
+                    div { class: "flex items-center justify-between px-4 py-3 bg-surface-card",
+                        span { class: "font-mono text-xs text-subtle",
+                            "{i18n.read().t(\"layout.language_label\")}"
+                        }
+                        div { class: "min-w-[140px]",
+                            Select::<String> {
+                                default_value: Some(current_locale),
+                                on_value_change: move |v: Option<String>| {
+                                    if let Some(code) = v {
+                                        let locale = match code.as_str() {
+                                            "it" => Locale::It,
+                                            _ => Locale::En,
+                                        };
+                                        save_locale(&locale);
+                                        *i18n.write() = I18n::new(locale);
+                                    }
+                                },
+                                SelectTrigger {
+                                    SelectValue { placeholder: "{i18n.read().t(\"layout.language_label\")}" }
+                                }
+                                SelectList {
+                                    SelectOption::<String> {
+                                        index: 0_usize,
+                                        value: "en".to_string(),
+                                        text_value: "English",
+                                        "{i18n.read().t(\"layout.language_en\")}"
+                                    }
+                                    SelectOption::<String> {
+                                        index: 1_usize,
+                                        value: "it".to_string(),
+                                        text_value: "Italiano",
+                                        "{i18n.read().t(\"layout.language_it\")}"
+                                    }
+                                }
                             }
                         }
                     }
