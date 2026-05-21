@@ -24,6 +24,13 @@
   "layout.user_status": "local · synced",
   "layout.focus": "Focus",
   "layout.flow": "Flow",
+  "layout.comment_app_info": "// app info",
+  "layout.version_label": "Version",
+  "layout.server_label": "Server",
+  "layout.edit_server_title": "Edit Server URL",
+  "layout.save": "Save",
+  "layout.cancel": "Cancel",
+  "layout.settings": "Settings",
 
   "tasks_layout.title_todo": "Tasks, <em>focus please.</em>",
   "tasks_layout.title_calendar": "A month, <em>at a glance</em>.",
