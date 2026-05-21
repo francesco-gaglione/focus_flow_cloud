@@ -1,4 +1,5 @@
 use crate::{
+    clients::user_client::get_user_info,
     components::select::{Select, SelectList, SelectOption, SelectTrigger, SelectValue},
     i18n::{save_locale, use_i18n, I18n, Locale},
     presentation::components::common_components::bottom_sheet::BottomSheet,
@@ -6,7 +7,8 @@ use crate::{
     state::app_state::AppState,
     use_cases::auth::{logout_uc::logout_uc, update_base_url_uc::update_base_url_uc},
     use_cases::user::{
-        update_password_uc::update_password_uc, update_username_uc::update_username_uc,
+        create_user_uc::create_user_uc, update_password_uc::update_password_uc,
+        update_username_uc::update_username_uc,
     },
 };
 use dioxus::prelude::*;
@@ -19,6 +21,22 @@ pub fn Settings() -> Element {
 
     let mut sheet_open = use_signal(|| false);
     let mut edit_url = use_signal(|| app_state.read().server_url().unwrap_or("").to_string());
+
+    let mut is_admin = use_signal(|| false);
+    let mut create_user_sheet_open = use_signal(|| false);
+    let mut new_user_username = use_signal(String::new);
+    let mut new_user_password = use_signal(String::new);
+    let mut create_user_error: Signal<Option<String>> = use_signal(|| None);
+    let mut create_user_loading = use_signal(|| false);
+
+    use_effect(move || {
+        spawn(async move {
+            if let Ok(info) = get_user_info().await {
+                dbg!(&info);
+                is_admin.set(info.role == "Admin");
+            }
+        });
+    });
 
     let mut username_sheet_open = use_signal(|| false);
     let mut new_username = use_signal(String::new);
@@ -184,6 +202,37 @@ pub fn Settings() -> Element {
                                         "{i18n.read().t(\"layout.language_it\")}"
                                     }
                                 }
+                            }
+                        }
+                    }
+                }
+
+                if *is_admin.read() {
+                    div { class: "pt-5 pb-2 font-mono text-[10px] text-subtle tracking-[0.02em] uppercase",
+                        "{i18n.read().t(\"layout.comment_admin\")}"
+                    }
+                    div { class: "flex flex-col rounded-md border border-border",
+                        button {
+                            class: "appearance-none flex items-center justify-between px-4 py-3 bg-surface-card rounded-md text-left w-full cursor-pointer border-0 transition-[background] duration-fast ease-tech hover:bg-gray-100 active:bg-gray-200",
+                            onclick: move |_| {
+                                new_user_username.set(String::new());
+                                new_user_password.set(String::new());
+                                create_user_error.set(None);
+                                create_user_sheet_open.set(true);
+                            },
+                            span { class: "font-mono text-xs text-subtle",
+                                "{i18n.read().t(\"layout.create_user\")}"
+                            }
+                            svg {
+                                view_box: "0 0 16 16",
+                                width: "12",
+                                height: "12",
+                                stroke: "currentColor",
+                                fill: "none",
+                                stroke_width: "1.5",
+                                stroke_linecap: "round",
+                                stroke_linejoin: "round",
+                                path { d: "M6 3l5 5-5 5" }
                             }
                         }
                     }
@@ -358,6 +407,75 @@ pub fn Settings() -> Element {
                                 });
                             },
                             "{i18n.read().t(\"layout.save\")}"
+                        }
+                    }
+                }
+            }
+
+            BottomSheet {
+                show: *create_user_sheet_open.read(),
+                title: i18n.read().t("layout.create_user_title"),
+                on_close: move |_| {
+                    create_user_sheet_open.set(false);
+                    new_user_username.set(String::new());
+                    new_user_password.set(String::new());
+                    create_user_error.set(None);
+                },
+                div { class: "px-5 pt-4 pb-2 flex flex-col gap-3",
+                    input {
+                        class: "w-full px-3 py-2 text-sm font-mono bg-surface-card border border-border rounded-md text-foreground placeholder:text-subtle focus:outline-none focus:border-accent",
+                        r#type: "text",
+                        value: "{new_user_username.read()}",
+                        oninput: move |e| new_user_username.set(e.value().clone()),
+                        placeholder: "{i18n.read().t(\"layout.new_user_username_placeholder\")}",
+                    }
+                    input {
+                        class: "w-full px-3 py-2 text-sm font-mono bg-surface-card border border-border rounded-md text-foreground placeholder:text-subtle focus:outline-none focus:border-accent",
+                        r#type: "password",
+                        value: "{new_user_password.read()}",
+                        oninput: move |e| new_user_password.set(e.value().clone()),
+                        placeholder: "{i18n.read().t(\"layout.new_user_password_placeholder\")}",
+                    }
+                    if let Some(err) = create_user_error.read().as_deref() {
+                        div { class: "text-xs text-red-500 font-mono", "{err}" }
+                    }
+                    div { class: "flex gap-2 pb-2",
+                        button {
+                            class: "flex-1 px-4 py-2 text-sm font-medium rounded-md border border-border text-subtle bg-surface-card cursor-pointer transition-[background] duration-fast ease-tech hover:bg-gray-100 active:bg-gray-200",
+                            onclick: move |_| {
+                                create_user_sheet_open.set(false);
+                                new_user_username.set(String::new());
+                                new_user_password.set(String::new());
+                                create_user_error.set(None);
+                            },
+                            "{i18n.read().t(\"layout.cancel\")}"
+                        }
+                        button {
+                            class: "flex-1 px-4 py-2 text-sm font-medium rounded-md bg-accent text-white cursor-pointer border-0 transition-[background] duration-fast ease-tech hover:opacity-90 active:opacity-80 disabled:opacity-50",
+                            disabled: *create_user_loading.read(),
+                            onclick: move |_| {
+                                let uname = new_user_username.read().clone();
+                                let pwd = new_user_password.read().clone();
+                                if uname.trim().is_empty() || pwd.is_empty() {
+                                    return;
+                                }
+                                create_user_loading.set(true);
+                                create_user_error.set(None);
+                                spawn(async move {
+                                    match create_user_uc(&uname, &pwd).await {
+                                        Ok(()) => {
+                                            create_user_sheet_open.set(false);
+                                            new_user_username.set(String::new());
+                                            new_user_password.set(String::new());
+                                        }
+                                        Err(e) => {
+                                            create_user_error.set(Some(e));
+                                        }
+                                    }
+                                    create_user_loading.set(false);
+                                });
+                            },
+                            "{i18n.read().t(\"layout.create_user\")}"
                         }
                     }
                 }

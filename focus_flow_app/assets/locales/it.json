@@ -46,6 +46,11 @@
   "layout.new_password_label": "Nuova password",
   "layout.confirm_password_label": "Conferma password",
   "layout.passwords_mismatch": "Le password non corrispondono",
+  "layout.comment_admin": "// admin",
+  "layout.create_user": "Crea utente",
+  "layout.create_user_title": "Crea utente",
+  "layout.new_user_username_placeholder": "Nome utente",
+  "layout.new_user_password_placeholder": "Password",
 
   "tasks_layout.title_todo": "Attività, <em>concentrati.</em>",
   "tasks_layout.title_calendar": "Un mese, <em>a colpo d'occhio</em>.",
