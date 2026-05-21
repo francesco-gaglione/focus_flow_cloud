@@ -28,6 +28,7 @@
   "layout.version_label": "Versione",
   "layout.server_label": "Server",
   "layout.edit_server_title": "Modifica URL server",
+  "layout.logout": "Esci",
   "layout.language_label": "Lingua",
   "layout.language_en": "English",
   "layout.language_it": "Italiano",

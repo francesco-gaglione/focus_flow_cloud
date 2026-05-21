@@ -4,7 +4,7 @@ use crate::{
     presentation::components::common_components::bottom_sheet::BottomSheet,
     services::storage::set_item,
     state::app_state::AppState,
-    use_cases::auth::update_base_url_uc::update_base_url_uc,
+    use_cases::auth::{logout_uc::logout_uc, update_base_url_uc::update_base_url_uc},
 };
 use dioxus::prelude::*;
 
@@ -119,6 +119,16 @@ pub fn Settings() -> Element {
                                 }
                             }
                         }
+                    }
+                }
+
+                div { class: "pt-6",
+                    button {
+                        class: "w-full px-4 py-3 font-mono text-sm font-medium rounded-md bg-surface-card border border-border text-red-500 cursor-pointer transition-[background,border-color] duration-fast ease-tech hover:bg-red-50 hover:border-red-300 active:bg-red-100",
+                        onclick: move |_| {
+                            spawn(async move { logout_uc().await; });
+                        },
+                        "{i18n.read().t(\"layout.logout\")}"
                     }
                 }
             }
