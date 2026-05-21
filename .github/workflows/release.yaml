@@ -288,6 +288,19 @@ jobs:
           $bundleDir = Get-ChildItem -Path "target/dx/focus_flow_app/release/windows" -Directory | Select-Object -First 1
           Compress-Archive -Path "$($bundleDir.FullName)/*" -DestinationPath "focus_flow_app-windows.zip"
 
+      - name: Sign APK (android)
+        if: matrix.target == 'android'
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > release.jks
+          APK_PATH=$(find target/dx/focus_flow_app/release/android -name "*.apk" | head -1)
+          BUILD_TOOLS=$ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | sort | tail -1)
+          $BUILD_TOOLS/apksigner sign \
+            --ks release.jks \
+            --ks-key-alias "${{ secrets.KEY_ALIAS }}" \
+            --ks-pass pass:"${{ secrets.KEYSTORE_PASSWORD }}" \
+            --key-pass pass:"${{ secrets.KEY_PASSWORD }}" \
+            "$APK_PATH"
+
       - name: Package Android bundle
         if: matrix.target == 'android'
         run: |
