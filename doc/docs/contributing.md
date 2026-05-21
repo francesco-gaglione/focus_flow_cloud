@@ -1,7 +1,7 @@
 ---
 sidebar_position: 4
 description: "Contribute to FocusFlow: development workflow, code style, commit guidelines, and pull request process."
-keywords: [focusflow, contributing, open source, rust, flutter, conventional commits]
+keywords: [focusflow, contributing, open source, rust, dioxus, conventional commits]
 ---
 
 # Contributing
@@ -30,11 +30,10 @@ We welcome contributions to FocusFlow! Whether you're fixing a bug, improving do
 - **Testing**: Ensure all tests pass with `just backend-test`.
 - **All-in-one**: Run `just backend-check` to run all verification steps.
 
-### Flutter (App)
+### Dioxus (App)
 
-- **Formatting**: Run `dart format .` (manual).
-- **Linting**: Analyze code with `just app-analyze`.
-- **Testing**: Run `just app-test`.
+- **Formatting**: Run `cargo fmt` (manual).
+- **Linting**: Run `cargo clippy` to catch common mistakes.
 - **All-in-one**: Run `just app-check` to run all verification steps.
 
 ## � Commit Guidelines

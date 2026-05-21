@@ -1,8 +1,8 @@
 ---
 sidebar_position: 2
-description: "Learn how to deploy FocusFlow with Docker Compose, configure the backend, and run the Flutter app locally."
+description: "Learn how to deploy FocusFlow with Docker Compose, configure the backend, and run the Dioxus app locally."
 keywords:
-  [focusflow, getting started, docker, deployment, self-hosting, flutter setup]
+  [focusflow, getting started, docker, deployment, self-hosting, dioxus setup]
 ---
 
 # Getting Started
@@ -220,16 +220,19 @@ Pre-built executables for various platforms are available on the [GitHub Release
 
 ### Running locally
 
-To run the mobile application, you will need the Flutter SDK installed.
+To run the application locally, you will need Rust and the Dioxus CLI installed.
 
-1.  **Install Flutter**: [Official Guide](https://docs.flutter.dev/get-started/install)
-2.  **Clone the repository**:
+1.  **Install Rust**: [Official Guide](https://www.rust-lang.org/tools/install)
+2.  **Install Dioxus CLI**:
+    ```bash
+    cargo install dioxus-cli --locked
+    ```
+3.  **Clone the repository**:
     ```bash
     git clone https://github.com/francesco-gaglione/focus_flow_cloud.git
-    cd focus_flow_cloud/app
+    cd focus_flow_cloud/focus_flow_app
     ```
-3.  **Run**:
+4.  **Run**:
     ```bash
-    flutter pub get
-    flutter run
+    dx serve
     ```

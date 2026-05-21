@@ -34,7 +34,7 @@ export default function Home(): ReactNode {
   return (
     <Layout
       title="FocusFlow – Open Source Pomodoro & Productivity Tracker"
-      description="FocusFlow is a free, open-source Pomodoro technique tracker with real-time sync, task management, and productivity analytics. Built with Rust and Flutter.">
+      description="FocusFlow is a free, open-source Pomodoro technique tracker with real-time sync, task management, and productivity analytics. Built with Rust and Dioxus.">
       <HomepageHeader />
       <main>
         <HomepageFeatures />

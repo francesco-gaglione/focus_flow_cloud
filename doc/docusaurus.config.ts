@@ -7,7 +7,7 @@ import type * as Preset from "@docusaurus/preset-classic";
 const config: Config = {
     title: "FocusFlow – Open Source Pomodoro Tracker",
     tagline:
-        "A comprehensive Pomodoro technique tracking solution featuring a Rust backend and a Flutter mobile application.",
+        "A comprehensive Pomodoro technique tracking solution featuring a Rust backend and a Dioxus (Rust) cross-platform application.",
     favicon: "img/app_icon.png",
 
     // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
@@ -97,7 +97,7 @@ const config: Config = {
     themeConfig: {
         image: "img/app_icon.png",
         metadata: [
-            { name: "keywords", content: "pomodoro, focus timer, productivity, task management, rust, flutter, open source, time tracking" },
+            { name: "keywords", content: "pomodoro, focus timer, productivity, task management, rust, dioxus, open source, time tracking" },
             { name: "author", content: "Francesco Gaglione" },
             { name: "robots", content: "index, follow" },
             { property: "og:type", content: "website" },

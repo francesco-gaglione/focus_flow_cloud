@@ -1,8 +1,8 @@
 ---
 sidebar_position: 1
-description: "FocusFlow is an open-source Pomodoro tracker with real-time sync, task management, and productivity analytics. Built with Rust and Flutter."
+description: "FocusFlow is an open-source Pomodoro tracker with real-time sync, task management, and productivity analytics. Built with Rust and Dioxus."
 keywords:
-  [focusflow, pomodoro, productivity, open source, rust, flutter, time tracking]
+  [focusflow, pomodoro, productivity, open source, rust, dioxus, time tracking]
 ---
 
 # Introduction
@@ -40,7 +40,7 @@ FocusFlow provides a synchronized experience across all your devices:
 
 FocusFlow is a cross-platform solution:
 
-- **Mobile App**: Built with [Flutter](https://flutter.dev), available for iOS, Android, MacOS, Windows, Linux.
+- **App**: Built with [Dioxus](https://dioxuslabs.com/) (Rust), available for Android, macOS, Windows, Linux.
 - **Cloud Backend**: Powered by [Rust](https://www.rust-lang.org/) (Axum, Tokio), ensuring high performance and reliability.
 
 ## Open Source
