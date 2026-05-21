@@ -1,8 +1,6 @@
 use crate::{
-    i18n::use_i18n,
-    presentation::components::common_components::bottom_sheet::BottomSheet,
-    services::storage::set_item,
-    state::app_state::AppState,
+    i18n::use_i18n, presentation::components::common_components::bottom_sheet::BottomSheet,
+    services::storage::set_item, state::app_state::AppState,
     use_cases::auth::update_base_url_uc::update_base_url_uc,
 };
 use dioxus::prelude::*;
