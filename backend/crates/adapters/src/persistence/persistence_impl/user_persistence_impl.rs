@@ -10,7 +10,7 @@ use application::repository_traits::user_persistence::UserPersistence;
 use async_trait::async_trait;
 use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper};
 use domain::entities::user::User;
-use tracing::{info, instrument, warn};
+use tracing::{error, info, instrument, warn};
 use uuid::Uuid;
 
 #[async_trait]
@@ -59,6 +59,7 @@ impl UserPersistence for PostgresPersistence {
             .map_err(|e| PersistenceError::Unexpected(e.to_string()))?
             .map_err(|e| match e {
                 diesel::result::Error::NotFound => {
+                    error!("User not found: user_id={user_id}");
                     PersistenceError::NotFound("User not found".to_string())
                 }
                 _ => PersistenceError::Unexpected(e.to_string()),
@@ -99,6 +100,7 @@ impl UserPersistence for PostgresPersistence {
         Ok(result.into())
     }
 
+    #[instrument(skip(self))]
     async fn update_user(&self, user: User) -> PersistenceResult<()> {
         let conn = self
             .pool
@@ -126,6 +128,7 @@ impl UserPersistence for PostgresPersistence {
         Ok(())
     }
 
+    #[instrument(skip(self))]
     async fn delete_user(&self, user_id: Uuid) -> PersistenceResult<()> {
         let conn = self
             .pool
@@ -152,6 +155,7 @@ impl UserPersistence for PostgresPersistence {
         Ok(())
     }
 
+    #[instrument(skip(self))]
     async fn is_user_admin(&self, user_id: Uuid) -> PersistenceResult<bool> {
         let conn = self
             .pool
