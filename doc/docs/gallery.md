@@ -1,79 +1,51 @@
 ---
 sidebar_position: 10
-description: "Browse all FocusFlow screenshots: focus sessions, task management, statistics, notes, and settings in light and dark mode."
-keywords: [focusflow, screenshots, gallery, UI, light mode, dark mode]
+description: "Browse all FocusFlow screenshots: tasks, calendar, statistics, pomodoro timer, and flashcards."
+keywords: [focusflow, screenshots, gallery, UI, dark mode]
 ---
 
 # 📸 Gallery
 
 Here you can browse all the screens of FocusFlow.
 
-## Focus Session
+## Tasks
 
-**Light Mode**
+![Tasks - Upcoming & Done](/img/screenshots/tasks_dark.png)
 
-![Focus Session Light](/img/screenshots/focus_light.png)
-
-![Focus Editor Light](/img/screenshots/focus_editor_light.png)
-
-**Dark Mode**
-
-![Focus Session Dark](/img/screenshots/focus_dark.png)
-
-![Focus Session Dark Alt](/img/screenshots/focus_dark_alt.png)
-
-![Focus Editor Dark](/img/screenshots/focus_editor_dark.png)
+![Tasks - Today & Upcoming](/img/screenshots/tasks_today_dark.png)
 
 ---
 
-## Tasks & Categories
+## Calendar
 
-**Light Mode**
+![Calendar - Month View](/img/screenshots/calendar_month_dark.png)
 
-![Tasks Light](/img/screenshots/tasks_light.png)
+![Calendar - Month with Tasks](/img/screenshots/calendar_month_tasks_dark.png)
 
-![Tasks Light Alt](/img/screenshots/tasks_light_alt.png)
-
-**Dark Mode**
-
-![Tasks Dark](/img/screenshots/tasks_dark.png)
+![Calendar - Week View](/img/screenshots/calendar_week_dark.png)
 
 ---
 
-## Scheduled tasks & calendar
+## Statistics
 
-![Month view](/img/screenshots/calendar_month_view.png)
-
-![Week view](/img/screenshots/calendar_week_view.png)
-
-![Day view](/img/screenshots/calendar_day_view.png)
+![Statistics](/img/screenshots/stats_dark.png)
 
 ---
 
-## Statistics & Notes
+## Pomodoro Timer
 
-**Light Mode**
+![Pomodoro Timer](/img/screenshots/timer_dark.png)
 
-![Notes Light](/img/screenshots/notes_light.png)
-
-**Dark Mode**
-
-![Stats Day Dark](/img/screenshots/stats_day_dark.png)
-
-![Stats Week Dark](/img/screenshots/stats_week_dark.png)
-
-![Archive Dark](/img/screenshots/archive_dark.png)
+![Pomodoro Timer - Task Selected](/img/screenshots/timer_task_dark.png)
 
 ---
 
-## Settings
+## Flashcards
 
-**Light Mode**
+![Flashcards](/img/screenshots/flashcards_dark.png)
 
-![Settings Light](/img/screenshots/settings_light.png)
+---
 
-**Dark Mode**
+## Navigation
 
-![Settings Dark](/img/screenshots/settings_dark.png)
-
-![Settings Dark Alt](/img/screenshots/settings_dark_alt.png)
+![Sidebar](/img/screenshots/sidebar_dark.png)

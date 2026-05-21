@@ -2,15 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
-## [6.0.0] - 2026-05-19
+## [5.0.0] - 2026-05-19
 
 ### Features
 
 - First alpha [alpha.1]
-
-### Miscellaneous Tasks
-
-- Pre-release v5.0.0-alpha.1
 
 ### Other
 
@@ -36,7 +32,7 @@ All notable changes to this project will be documented in this file.
 * new pomodoro page and ws handlers
 
 * Feat: Complete/uncomplete tasks and subtasks. Priority form and view
-update.
+  update.
 
 * task soft delete
 
@@ -75,9 +71,11 @@ update.
 * fix tests
 
 * fmt fix
+
 - Revise README for app directory and features
 
 Updated app directory and features in README.
+
 - Rename command from 'app-run' to 'app-serve'
 - Alpha version
 - Undo prerelease bump changes
@@ -165,7 +163,7 @@ and screenshots:
 
 ### Features
 
-- Backend configuration page accessible via a new route 
+- Backend configuration page accessible via a new route
 
 ## [2.0.0] - 2026-01-19
 
@@ -504,7 +502,6 @@ and screenshots:
 
 - Merge branch 'master' of https://github.com/francesco-gaglione/focus_flow_cloud
 
-
 ## [1.2.0] - 2026-01-02
 
 ### Bug Fixes
@@ -580,5 +577,3 @@ and screenshots:
 ### Features
 
 - Add tests for category use cases
-
-

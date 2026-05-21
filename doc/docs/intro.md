@@ -17,27 +17,24 @@ FocusFlow provides a synchronized experience across all your devices:
 
 - **Focus Sessions**: Manage work and break intervals efficiently. The core timer logic ensures you stay on track.
 
-  ![Focus Session Light](/img/screenshots/focus_light.png)
-  ![Focus Session Dark](/img/screenshots/focus_dark.png)
+  ![Pomodoro Timer](/img/screenshots/timer_dark.png)
+  ![Pomodoro Timer - Task Selected](/img/screenshots/timer_task_dark.png)
 
 - **Real-time Synchronization**: Synchronize your state across multiple devices using WebSockets. Start a timer on your phone and see it update instantly on your desktop.
 - **Task Management**: Create, organize, and color-code your to-dos. Keep your tasks aligned with your focus sessions.
 
-  ![Tasks Light](/img/screenshots/tasks_light.png)
-  ![Tasks Dark](/img/screenshots/tasks_dark.png)
+  ![Tasks](/img/screenshots/tasks_dark.png)
+  ![Tasks - Today](/img/screenshots/tasks_today_dark.png)
 
 - **Scheduled Task & Calendar**: Schedule a task and see it on different calendar views.
 
-  ![Month view](/img/screenshots/calendar_month_view.png)
+  ![Calendar - Month View](/img/screenshots/calendar_month_dark.png)
 
-  ![Week view](/img/screenshots/calendar_week_view.png)
-
-  ![Day view](/img/screenshots/calendar_day_view.png)
+  ![Calendar - Week View](/img/screenshots/calendar_week_dark.png)
 
 - **Productivity Analytics**: View detailed statistics to understand your work habits and improve over time.
 
-  ![Notes Light](/img/screenshots/notes_light.png)
-  ![Statistics Dark](/img/screenshots/stats_week_dark.png)
+  ![Statistics](/img/screenshots/stats_dark.png)
 
 ## Platforms
 

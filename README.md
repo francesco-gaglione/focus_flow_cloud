@@ -17,25 +17,25 @@ A comprehensive Pomodoro technique tracking solution featuring a Rust backend an
 
 <table>
   <tr>
-    <td align="center" width="25%"><b>Focus Session</b></td>
-    <td align="center" width="25%"><b>Task Management</b></td>
-    <td align="center" width="25%"><b>Task scheduling</b></td>
-    <td align="center" width="25%"><b>Notes & Statistics</b></td>
-    <td align="center" width="25%"><b>Settings</b></td>
+    <td align="center" width="20%"><b>Tasks</b></td>
+    <td align="center" width="20%"><b>Calendar</b></td>
+    <td align="center" width="20%"><b>Statistics</b></td>
+    <td align="center" width="20%"><b>Pomodoro</b></td>
+    <td align="center" width="20%"><b>More</b></td>
   </tr>
   <tr>
-    <td><img src="doc/static/img/screenshots/focus_light.png" alt="Focus Session Light" width="100%" /></td>
-    <td><img src="doc/static/img/screenshots/tasks_light.png" alt="Tasks Light" width="100%" /></td>
-    <td><img src="doc/static/img/screenshots/calendar_month_view.png" alt="Notes Light" width="100%" /></td>
-    <td><img src="doc/static/img/screenshots/notes_light.png" alt="Notes Light" width="100%" /></td>
-    <td><img src="doc/static/img/screenshots/settings_light.png" alt="Settings Light" width="100%" /></td>
+    <td><img src="doc/static/img/screenshots/tasks_dark.png" alt="Tasks" width="100%" /></td>
+    <td><img src="doc/static/img/screenshots/calendar_month_dark.png" alt="Calendar Month" width="100%" /></td>
+    <td><img src="doc/static/img/screenshots/stats_dark.png" alt="Statistics" width="100%" /></td>
+    <td><img src="doc/static/img/screenshots/timer_dark.png" alt="Pomodoro Timer" width="100%" /></td>
+    <td><img src="doc/static/img/screenshots/flashcards_dark.png" alt="Flashcards" width="100%" /></td>
   </tr>
   <tr>
-    <td><img src="doc/static/img/screenshots/focus_dark.png" alt="Focus Session Dark" width="100%" /></td>
-    <td><img src="doc/static/img/screenshots/tasks_dark.png" alt="Tasks Dark" width="100%" /></td>
-    <td><img src="doc/static/img/screenshots/calendar_day_view.png" alt="Notes Light" width="100%" /></td>
-    <td><img src="doc/static/img/screenshots/stats_week_dark.png" alt="Statistics Dark" width="100%" /></td>
-    <td><img src="doc/static/img/screenshots/settings_dark.png" alt="Settings Dark" width="100%" /></td>
+    <td><img src="doc/static/img/screenshots/tasks_today_dark.png" alt="Tasks Today" width="100%" /></td>
+    <td><img src="doc/static/img/screenshots/calendar_week_dark.png" alt="Calendar Week" width="100%" /></td>
+    <td><img src="doc/static/img/screenshots/calendar_month_tasks_dark.png" alt="Calendar with Tasks" width="100%" /></td>
+    <td><img src="doc/static/img/screenshots/timer_task_dark.png" alt="Pomodoro with Task" width="100%" /></td>
+    <td><img src="doc/static/img/screenshots/sidebar_dark.png" alt="Sidebar" width="100%" /></td>
   </tr>
 </table>
 
