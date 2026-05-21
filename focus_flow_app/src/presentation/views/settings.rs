@@ -7,8 +7,7 @@ use crate::{
     state::app_state::AppState,
     use_cases::auth::{logout_uc::logout_uc, update_base_url_uc::update_base_url_uc},
     use_cases::user::{
-        create_user_uc::create_user_uc,
-        update_password_uc::update_password_uc,
+        create_user_uc::create_user_uc, update_password_uc::update_password_uc,
         update_username_uc::update_username_uc,
     },
 };
