@@ -3,7 +3,7 @@ use std::sync::Arc;
 use crate::repository_traits::persistence_error::PersistenceError;
 use crate::repository_traits::user_persistence::UserPersistence;
 use thiserror::Error;
-use tracing::instrument;
+use tracing::{error, info, instrument};
 use uuid::Uuid;
 
 #[derive(Debug, Error, PartialEq)]
@@ -39,11 +39,14 @@ impl UpdateUserUsernameUseCase {
     pub async fn execute(&self, cmd: UpdateUserUsernameCommand) -> UpdateUserUsernameResult<()> {
         // Validate input
         if cmd.new_username.is_empty() {
+            error!("Invalid credentials: new_username is empty");
             return Err(UpdateUserUsernameError::InvalidCredentials);
         }
 
         // Retrieve user
+        info!("Retrieving user: user_id={}", cmd.user_id);
         let mut user = self.user_persistence.find_user_by_id(cmd.user_id).await?;
+        info!("User retrieved: {:?}", user);
 
         // Check if username is changing
         if user.username() != cmd.new_username {
@@ -54,10 +57,17 @@ impl UpdateUserUsernameUseCase {
                 .await
                 .is_ok()
             {
+                error!("Username already exists: new_username={}", cmd.new_username);
                 return Err(UpdateUserUsernameError::UsernameAlreadyExists);
             }
 
+            info!(
+                "Updating username: old_username={} new_username={}",
+                user.username(),
+                cmd.new_username
+            );
             user.update_username(cmd.new_username);
+            info!("Username updated: new_username={}", user.username());
             self.user_persistence.update_user(user).await?;
         }
 
