@@ -94,8 +94,16 @@ app-serve-android:
 app-test:
     cd focus_flow_app && cargo test
 
+# Check app formatting
+app-fmt-check:
+    cd focus_flow_app && cargo fmt --all -- --check
+
+# Lint app
+app-lint:
+    cd focus_flow_app && cargo clippy -- -D warnings
+
 # Run all app checks
-app-check: app-test
+app-check: app-fmt-check app-lint app-test
     @echo "App checks passed!"
 
 # ============================================================================
