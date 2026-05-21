@@ -24,6 +24,13 @@
   "layout.user_status": "locale · sincronizzato",
   "layout.focus": "Focus",
   "layout.flow": "Flow",
+  "layout.comment_app_info": "// info app",
+  "layout.version_label": "Versione",
+  "layout.server_label": "Server",
+  "layout.edit_server_title": "Modifica URL server",
+  "layout.save": "Salva",
+  "layout.cancel": "Annulla",
+  "layout.settings": "Impostazioni",
 
   "tasks_layout.title_todo": "Attività, <em>concentrati.</em>",
   "tasks_layout.title_calendar": "Un mese, <em>a colpo d'occhio</em>.",

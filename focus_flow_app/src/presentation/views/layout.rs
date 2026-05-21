@@ -46,6 +46,7 @@ pub fn Layout() -> Element {
         | Route::Pomodoro {}
         | Route::Categories {} => "tasks",
         Route::Flashcards {} => "flashcards",
+        Route::Settings {} => "settings",
     };
 
     let is_en = i18n.read().locale == Locale::En;
@@ -128,6 +129,18 @@ pub fn Layout() -> Element {
                         }
                         span { class: "flex-1", "{i18n.read().t(\"layout.flashcards\")}" }
                         span { class: "font-mono text-[10px] text-subtle tracking-[0.02em] uppercase", "{i18n.read().t(\"layout.soon\")}" }
+                    }
+                    Link {
+                        to: Route::Settings {},
+                        class: sd_item_cls(active_section == "settings"),
+                        onclick: move |_| drawer_open.set(false),
+                        span { class: sd_icon_cls(active_section == "settings"),
+                            svg { view_box: "0 0 16 16", width: "14", height: "14", stroke: "currentColor", fill: "none", stroke_width: "1.5", stroke_linecap: "round", stroke_linejoin: "round",
+                                circle { cx: "8", cy: "8", r: "2.5" }
+                                path { d: "M8 1v1.5M8 13.5V15M1 8h1.5M13.5 8H15M3.05 3.05l1.06 1.06M11.89 11.89l1.06 1.06M3.05 12.95l1.06-1.06M11.89 4.11l1.06-1.06" }
+                            }
+                        }
+                        span { class: "flex-1", "{i18n.read().t(\"layout.settings\")}" }
                     }
                 }
 

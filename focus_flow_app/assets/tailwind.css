@@ -455,6 +455,9 @@
   .w-full {
     width: 100%;
   }
+  .max-w-\[180px\] {
+    max-width: 180px;
+  }
   .max-w-\[340px\] {
     max-width: 340px;
   }
@@ -1230,6 +1233,13 @@
       }
     }
   }
+  .hover\:bg-gray-100 {
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--color-gray-100);
+      }
+    }
+  }
   .hover\:bg-gray-200 {
     &:hover {
       @media (hover: hover) {
@@ -1272,6 +1282,13 @@
       }
     }
   }
+  .hover\:opacity-90 {
+    &:hover {
+      @media (hover: hover) {
+        opacity: 90%;
+      }
+    }
+  }
   .focus\:border-accent {
     &:focus {
       border-color: var(--color-accent);
@@ -1280,6 +1297,12 @@
   .focus\:\[box-shadow\:var\(--shadow-focus\)\] {
     &:focus {
       box-shadow: var(--shadow-focus);
+    }
+  }
+  .focus\:outline-none {
+    &:focus {
+      --tw-outline-style: none;
+      outline-style: none;
     }
   }
   .active\:scale-95 {
@@ -1308,6 +1331,11 @@
   .active\:opacity-70 {
     &:active {
       opacity: 70%;
+    }
+  }
+  .active\:opacity-80 {
+    &:active {
+      opacity: 80%;
     }
   }
   .disabled\:cursor-not-allowed {

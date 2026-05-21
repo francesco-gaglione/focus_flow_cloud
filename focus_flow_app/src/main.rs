@@ -10,7 +10,8 @@ mod state;
 mod use_cases;
 
 use presentation::views::{
-    Calendar, Categories, Flashcards, FlashcardsLayout, Layout, Pomodoro, Stats, TasksLayout, Todo,
+    Calendar, Categories, Flashcards, FlashcardsLayout, Layout, Pomodoro, Settings, Stats,
+    TasksLayout, Todo,
 };
 
 use crate::{
@@ -34,6 +35,8 @@ enum Route {
         #[end_layout]
         #[layout(FlashcardsLayout)]
             #[route("/cards")]   Flashcards {},
+        #[end_layout]
+        #[route("/settings")]    Settings {},
 }
 
 const CSS_TAILWIND: Asset = asset!("/assets/tailwind.css");
