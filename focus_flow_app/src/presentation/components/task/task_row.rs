@@ -41,35 +41,43 @@ pub fn TaskRow(props: TaskRowProps) -> Element {
 
     let (due_mod, is_overdue, is_today) = match &task.due {
         TaskDue::Overdue(_) => ("overdue", true, false),
-        TaskDue::Today(_)   => ("today", false, true),
-        _                   => ("", false, false),
+        TaskDue::Today(_) => ("today", false, true),
+        _ => ("", false, false),
     };
     let due_class = format!("todo-due {}", due_mod);
 
     let cat_color = task.cat_color.as_deref().unwrap_or("#888").to_string();
     let stripe_color = match task.priority {
-        Some(TaskPriority::Low)    => "#6b7280".to_string(),
+        Some(TaskPriority::Low) => "#6b7280".to_string(),
         Some(TaskPriority::Medium) => "#d97706".to_string(),
-        Some(TaskPriority::High)   => "#ef4444".to_string(),
+        Some(TaskPriority::High) => "#ef4444".to_string(),
         Some(TaskPriority::Urgent) => "#7c3aed".to_string(),
         None => cat_color.clone(),
     };
 
     let row_class = {
-        let mut c = if task.done { "todo-row done" } else { "todo-row" }.to_string();
+        let mut c = if task.done {
+            "todo-row done"
+        } else {
+            "todo-row"
+        }
+        .to_string();
         if !task.done {
-            if is_overdue      { c.push_str(" overdue-row"); }
-            else if is_today   { c.push_str(" today-row"); }
+            if is_overdue {
+                c.push_str(" overdue-row");
+            } else if is_today {
+                c.push_str(" today-row");
+            }
         }
         c
     };
 
     let (p_lvl, p_lbl_key) = match task.priority {
-        Some(TaskPriority::Low)    => ("low",    "task_row.priority_low"),
+        Some(TaskPriority::Low) => ("low", "task_row.priority_low"),
         Some(TaskPriority::Medium) => ("medium", "task_row.priority_med"),
-        Some(TaskPriority::High)   => ("high",   "task_row.priority_high"),
+        Some(TaskPriority::High) => ("high", "task_row.priority_high"),
         Some(TaskPriority::Urgent) => ("urgent", "task_row.priority_urgent"),
-        None                       => ("none",   "task_row.priority_none"),
+        None => ("none", "task_row.priority_none"),
     };
     let p_lbl = i18n.read().t(p_lbl_key);
 
@@ -113,8 +121,16 @@ pub fn TaskRow(props: TaskRowProps) -> Element {
         .collect();
 
     let can_expand = has_subtasks || has_add_subtask;
-    let wrap_class = if can_expand && *expanded.read() { "todo-row-wrap expanded" } else { "todo-row-wrap" };
-    let expand_btn_class = if *expanded.read() { "todo-expand-btn open" } else { "todo-expand-btn" };
+    let wrap_class = if can_expand && *expanded.read() {
+        "todo-row-wrap expanded"
+    } else {
+        "todo-row-wrap"
+    };
+    let expand_btn_class = if *expanded.read() {
+        "todo-expand-btn open"
+    } else {
+        "todo-expand-btn"
+    };
 
     rsx! {
         div {

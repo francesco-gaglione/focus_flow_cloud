@@ -24,12 +24,12 @@ pub fn TasksLayout() -> Element {
     let route = use_route::<Route>();
 
     let (title_key, active_tab) = match route {
-        Route::Todo {}       => ("tasks_layout.title_todo",       "todo"),
-        Route::Calendar {}   => ("tasks_layout.title_calendar",   "calendar"),
-        Route::Stats {}      => ("tasks_layout.title_stats",      "stats"),
-        Route::Pomodoro {}   => ("tasks_layout.title_timer",      "timer"),
+        Route::Todo {} => ("tasks_layout.title_todo", "todo"),
+        Route::Calendar {} => ("tasks_layout.title_calendar", "calendar"),
+        Route::Stats {} => ("tasks_layout.title_stats", "stats"),
+        Route::Pomodoro {} => ("tasks_layout.title_timer", "timer"),
         Route::Categories {} => ("tasks_layout.title_categories", "categories"),
-        _                    => ("tasks_layout.title_todo",       "todo"),
+        _ => ("tasks_layout.title_todo", "todo"),
     };
     let title_html = i18n.read().t(title_key);
     let on_categories = active_tab == "categories";

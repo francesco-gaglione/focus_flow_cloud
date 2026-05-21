@@ -27,7 +27,10 @@ pub struct I18n {
 impl I18n {
     pub fn new(locale: Locale) -> Self {
         let translations = load_translations(&locale);
-        Self { locale, translations }
+        Self {
+            locale,
+            translations,
+        }
     }
 
     /// Returns the translated string for `key`, or `key` itself as fallback.
@@ -41,7 +44,8 @@ impl I18n {
     /// Returns translated string with positional placeholder substitution.
     /// `{0}`, `{1}`, … in the translation are replaced with the corresponding `args`.
     pub fn tf(&self, key: &str, args: &[&str]) -> String {
-        let mut s = self.translations
+        let mut s = self
+            .translations
             .get(key)
             .cloned()
             .unwrap_or_else(|| key.to_string());

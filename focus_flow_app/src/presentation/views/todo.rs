@@ -46,7 +46,11 @@ fn compute_duration_mins(start_str: &str, end_str: &str) -> i64 {
         use chrono::Timelike;
         let s = start.hour() as i64 * 60 + start.minute() as i64;
         let e = end.hour() as i64 * 60 + end.minute() as i64;
-        if e > s { e - s } else { 0 }
+        if e > s {
+            e - s
+        } else {
+            0
+        }
     } else {
         0
     }
@@ -119,7 +123,7 @@ pub fn Todo() -> Element {
             time::Month::try_from(now.month() as u8).unwrap_or(time::Month::January),
             now.day() as u8,
         )
-        .unwrap_or(time::macros::date!(2026-01-01))
+        .unwrap_or(time::macros::date!(2026 - 01 - 01))
     });
 
     use_effect(move || {
@@ -155,10 +159,12 @@ pub fn Todo() -> Element {
         .iter()
         .filter(|t| {
             let period_ok = match period_filter.read().as_str() {
-                "today"    => !t.done && matches!(t.due, TaskDue::Today(_)),
-                "upcoming" => !t.done && matches!(t.due, TaskDue::Upcoming(_) | TaskDue::Tomorrow(_)),
-                "done"     => t.done,
-                _          => true,
+                "today" => !t.done && matches!(t.due, TaskDue::Today(_)),
+                "upcoming" => {
+                    !t.done && matches!(t.due, TaskDue::Upcoming(_) | TaskDue::Tomorrow(_))
+                }
+                "done" => t.done,
+                _ => true,
             };
             let cat_ok = {
                 let filter = cat_filter.read();
@@ -169,9 +175,21 @@ pub fn Todo() -> Element {
         .cloned()
         .collect();
 
-    let overdue: Vec<TodoTask> = filtered.iter().filter(|t| !t.done && matches!(t.due, TaskDue::Overdue(_))).cloned().collect();
-    let today_tasks: Vec<TodoTask> = filtered.iter().filter(|t| !t.done && matches!(t.due, TaskDue::Today(_))).cloned().collect();
-    let upcoming_tasks: Vec<TodoTask> = filtered.iter().filter(|t| !t.done && matches!(t.due, TaskDue::Upcoming(_) | TaskDue::Tomorrow(_))).cloned().collect();
+    let overdue: Vec<TodoTask> = filtered
+        .iter()
+        .filter(|t| !t.done && matches!(t.due, TaskDue::Overdue(_)))
+        .cloned()
+        .collect();
+    let today_tasks: Vec<TodoTask> = filtered
+        .iter()
+        .filter(|t| !t.done && matches!(t.due, TaskDue::Today(_)))
+        .cloned()
+        .collect();
+    let upcoming_tasks: Vec<TodoTask> = filtered
+        .iter()
+        .filter(|t| !t.done && matches!(t.due, TaskDue::Upcoming(_) | TaskDue::Tomorrow(_)))
+        .cloned()
+        .collect();
     let done_tasks: Vec<TodoTask> = filtered.iter().filter(|t| t.done).cloned().collect();
 
     let complete_task_toggle = move |(id, completed): (String, bool)| {
@@ -188,7 +206,9 @@ pub fn Todo() -> Element {
                             toast_api.info(
                                 i18n.read().t("todo.toast_uncompleted_subtasks"),
                                 ToastOptions::new()
-                                    .description(i18n.read().t("todo.toast_complete_subtasks_first"))
+                                    .description(
+                                        i18n.read().t("todo.toast_complete_subtasks_first"),
+                                    )
                                     .duration(Duration::from_secs(15))
                                     .permanent(false),
                             );
@@ -200,20 +220,31 @@ pub fn Todo() -> Element {
         });
     };
 
-    let complete_subtask_handler = move |(task_id, subtask_id, completed): (String, String, bool)| {
-        spawn(async move {
-            match update_subtask_completition_uc(task_id, subtask_id, Some(completed)).await {
-                Ok(_) => { info!("Subtask completed"); fetch_task_list.restart(); }
-                Err(e) => { error!("Error completing subtask: {}", e.to_string()); }
-            }
-        });
-    };
+    let complete_subtask_handler =
+        move |(task_id, subtask_id, completed): (String, String, bool)| {
+            spawn(async move {
+                match update_subtask_completition_uc(task_id, subtask_id, Some(completed)).await {
+                    Ok(_) => {
+                        info!("Subtask completed");
+                        fetch_task_list.restart();
+                    }
+                    Err(e) => {
+                        error!("Error completing subtask: {}", e.to_string());
+                    }
+                }
+            });
+        };
 
     let delete_task_handler = move |id: String| {
         spawn(async move {
             match delete_task_uc(id).await {
-                Ok(_) => { info!("Task deleted"); fetch_task_list.restart(); }
-                Err(e) => { error!("Error deleting a task: {}", e.to_string()); }
+                Ok(_) => {
+                    info!("Task deleted");
+                    fetch_task_list.restart();
+                }
+                Err(e) => {
+                    error!("Error deleting a task: {}", e.to_string());
+                }
             }
         });
     };
@@ -228,8 +259,13 @@ pub fn Todo() -> Element {
     let add_subtask_handler = move |(task_id, title): (String, String)| {
         spawn(async move {
             match create_subtask_uc(task_id, title, None).await {
-                Ok(_) => { info!("Subtask created"); fetch_task_list.restart(); }
-                Err(e) => { error!("Error creating subtask: {}", e); }
+                Ok(_) => {
+                    info!("Subtask created");
+                    fetch_task_list.restart();
+                }
+                Err(e) => {
+                    error!("Error creating subtask: {}", e);
+                }
             }
         });
     };

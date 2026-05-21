@@ -116,9 +116,11 @@ pub fn Stats() -> Element {
 
     let week_delta = counts.week_delta;
     let week_delta_str = if week_delta >= 0 {
-        i18n.read().tf("stats.week_more", &[&week_delta.to_string()])
+        i18n.read()
+            .tf("stats.week_more", &[&week_delta.to_string()])
     } else {
-        i18n.read().tf("stats.week_fewer", &[&week_delta.abs().to_string()])
+        i18n.read()
+            .tf("stats.week_fewer", &[&week_delta.abs().to_string()])
     };
     let week_badge_cls = if week_delta >= 0 {
         "font-mono text-[10px] tracking-[var(--tracking-data)] uppercase mt-1 inline-block px-[7px] py-[2px] rounded-full text-success bg-[color-mix(in_srgb,#46a758_12%,transparent)]"
