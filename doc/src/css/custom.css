@@ -1,79 +1,284 @@
-/**
- * Any CSS included here will be global. The classic template
- * bundles Infima by default. Infima is a CSS framework designed to
- * work well for content-centric websites.
- */
+@font-face {
+  font-family: "Geist";
+  src: url("https://cdn.jsdelivr.net/npm/geist@1.5.1/dist/fonts/geist-sans/GeistVariableVF.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
 
-/* You can override the default Infima variables here. */
+@font-face {
+  font-family: "Geist Mono";
+  src: url("https://cdn.jsdelivr.net/npm/geist@1.5.1/dist/fonts/geist-mono/GeistMonoVariableVF.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ─── Light mode ─────────────────────────────────────────────── */
 :root {
-  /* Brand Color: #6750A4 (Material Deep Purple) */
-  --ifm-color-primary: #6750A4;
-  --ifm-color-primary-dark: #5c4893;
-  --ifm-color-primary-darker: #57448b;
-  --ifm-color-primary-darkest: #473873;
-  --ifm-color-primary-light: #7d65b6;
-  --ifm-color-primary-lighter: #8770bd;
-  --ifm-color-primary-lightest: #a795cf;
-  
-  --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --ifm-color-primary: #46a758;
+  --ifm-color-primary-dark: #3d9a4d;
+  --ifm-color-primary-darker: #3a9249;
+  --ifm-color-primary-darkest: #2e7339;
+  --ifm-color-primary-light: #57b567;
+  --ifm-color-primary-lighter: #65be74;
+  --ifm-color-primary-lightest: #8dd49a;
 
-  /* Material 3 Styling */
-  --ifm-button-border-radius: 20px;
-  --ifm-card-border-radius: 12px;
-  --ifm-navbar-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  
-  --feature-card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --feature-card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --ifm-font-family-base: "Geist", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --ifm-font-family-monospace: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --ifm-code-font-size: 90%;
+  --ifm-font-size-base: 15px;
+  --ifm-line-height-base: 1.6;
+
+  --ifm-heading-font-weight: 700;
+  --ifm-heading-letter-spacing: -0.02em;
+
+  --ifm-border-radius: 6px;
+  --ifm-button-border-radius: 6px;
+  --ifm-card-border-radius: 8px;
+  --ifm-global-border-width: 1px;
+
+  --ifm-navbar-shadow: none;
+  --ifm-navbar-height: 56px;
+
+  --docusaurus-highlighted-code-line-bg: rgba(70, 167, 88, 0.08);
+
+  --ff-accent: #46a758;
+  --ff-accent-hover: #3d9a4d;
+  --ff-surface: #ffffff;
+  --ff-surface-card: #f5f5f5;
+  --ff-border: #e0e0e0;
+  --ff-border-strong: #c0c0c0;
+  --ff-foreground: #111111;
+  --ff-subtle: #666666;
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
+/* ─── Dark mode — matches app exactly ───────────────────────── */
 [data-theme='dark'] {
-  /* Lighter purple for dark mode contrast */
-  --ifm-color-primary: #D0BCFF;
-  --ifm-color-primary-dark: #bb9eff;
-  --ifm-color-primary-darker: #b08fff;
-  --ifm-color-primary-darkest: #9063ff;
-  --ifm-color-primary-light: #e6dbff;
-  --ifm-color-primary-lighter: #f0ebff;
-  --ifm-color-primary-lightest: #ffffff;
-  
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  --ifm-color-primary: #46a758;
+  --ifm-color-primary-dark: #3d9a4d;
+  --ifm-color-primary-darker: #3a9249;
+  --ifm-color-primary-darkest: #2e7339;
+  --ifm-color-primary-light: #57b567;
+  --ifm-color-primary-lighter: #65be74;
+  --ifm-color-primary-lightest: #8dd49a;
+
+  --ifm-background-color: #080808;
+  --ifm-background-surface-color: #181818;
+  --ifm-navbar-background-color: #080808;
+  --ifm-footer-background-color: #111111;
+  --ifm-card-background-color: #181818;
+  --ifm-toc-border-color: #2a2a2a;
+  --ifm-hr-border-color: #2a2a2a;
+  --ifm-color-emphasis-200: #2a2a2a;
+  --ifm-color-emphasis-300: #313131;
+  --ifm-color-emphasis-600: #606060;
+  --ifm-color-emphasis-700: #7d7d7d;
+  --ifm-color-emphasis-900: #efefef;
+  --ifm-color-content: #ffffff;
+  --ifm-color-content-secondary: #7d7d7d;
+  --ifm-link-color: #46a758;
+  --ifm-link-hover-color: #57b567;
+  --ifm-menu-color: #a8a8a8;
+  --ifm-menu-color-active: #46a758;
+  --ifm-menu-color-background-active: rgba(70, 167, 88, 0.08);
+  --ifm-menu-color-background-hover: #202020;
+  --ifm-navbar-link-color: #a8a8a8;
+  --ifm-navbar-link-hover-color: #ffffff;
+
+  --docusaurus-highlighted-code-line-bg: rgba(70, 167, 88, 0.1);
+
+  --ff-accent: #46a758;
+  --ff-accent-hover: #3d9a4d;
+  --ff-surface: #080808;
+  --ff-surface-card: #181818;
+  --ff-border: #2a2a2a;
+  --ff-border-strong: #494949;
+  --ff-foreground: #ffffff;
+  --ff-subtle: #7d7d7d;
 }
 
-/* Custom Hero Styling */
+/* ─── Navbar ─────────────────────────────────────────────────── */
+.navbar {
+  border-bottom: 1px solid var(--ff-border);
+  backdrop-filter: blur(8px);
+}
+
+[data-theme='dark'] .navbar {
+  background-color: rgba(8, 8, 8, 0.85);
+}
+
+.navbar__brand {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.navbar__link {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* ─── Hero ───────────────────────────────────────────────────── */
 .hero--primary {
-  background: linear-gradient(135deg, var(--ifm-color-primary-darker) 0%, var(--ifm-color-primary) 100%);
+  background: #080808;
+  border-bottom: 1px solid #2a2a2a;
 }
 
 .hero__title {
   font-weight: 800;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.04em;
+  font-size: 3rem;
+  color: #ffffff;
 }
 
-/* Feature Cards */
+.hero__subtitle {
+  color: #7d7d7d;
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.hero .button--secondary {
+  background: #181818;
+  border-color: #2a2a2a;
+  color: #ffffff;
+}
+
+.hero .button--secondary:hover {
+  background: #202020;
+  border-color: #494949;
+}
+
+/* ─── Feature cards ──────────────────────────────────────────── */
 .feature-card {
   height: 100%;
-  padding: 2rem;
-  border-radius: var(--ifm-card-border-radius);
-  background: var(--ifm-background-surface-color);
-  box-shadow: var(--feature-card-shadow);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  border: 1px solid var(--ifm-color-emphasis-200);
+  padding: 1.5rem;
+  border-radius: 8px;
+  background: var(--ff-surface-card);
+  border: 1px solid var(--ff-border);
+  transition: border-color 150ms ease, background 150ms ease;
 }
 
 .feature-card:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--feature-card-shadow-hover);
-}
-
-[data-theme='dark'] .feature-card {
-  background: var(--ifm-card-background-color);
-  border-color: var(--ifm-color-emphasis-100);
+  border-color: var(--ff-border-strong);
+  background: var(--ff-surface-card);
+  transform: none;
+  box-shadow: none;
 }
 
 .feature-emoji {
-  font-size: 3rem;
-  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
   display: block;
+}
+
+/* ─── Sidebar ────────────────────────────────────────────────── */
+.menu__link {
+  font-size: 13px;
+  border-radius: 4px;
+}
+
+.menu__link--active {
+  font-weight: 600;
+}
+
+/* ─── Docs content ───────────────────────────────────────────── */
+.markdown h1,
+.markdown h2,
+.markdown h3,
+.markdown h4 {
+  letter-spacing: -0.02em;
+}
+
+.markdown h1 {
+  font-size: 1.875rem;
+  font-weight: 800;
+}
+
+.markdown h2 {
+  font-size: 1.375rem;
+  font-weight: 700;
+  border-bottom: 1px solid var(--ff-border);
+  padding-bottom: 0.5rem;
+}
+
+.markdown a {
+  color: var(--ff-accent);
+  text-decoration: none;
+}
+
+.markdown a:hover {
+  color: var(--ff-accent-hover);
+  text-decoration: underline;
+}
+
+/* ─── Code blocks ────────────────────────────────────────────── */
+[data-theme='dark'] code {
+  background: #181818;
+  border: 1px solid #2a2a2a;
+}
+
+[data-theme='dark'] .prism-code {
+  background: #111111 !important;
+}
+
+/* ─── Table ──────────────────────────────────────────────────── */
+[data-theme='dark'] table th {
+  background: #181818;
+}
+
+[data-theme='dark'] table tr:nth-child(even) {
+  background: #111111;
+}
+
+/* ─── Footer ─────────────────────────────────────────────────── */
+[data-theme='dark'] .footer {
+  border-top: 1px solid #2a2a2a;
+}
+
+.footer__title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-family: "Geist Mono", monospace;
+}
+
+/* ─── TOC ────────────────────────────────────────────────────── */
+.table-of-contents__link {
+  font-size: 12px;
+}
+
+.table-of-contents__link--active {
+  color: var(--ff-accent);
+  font-weight: 600;
+}
+
+/* ─── Admonitions ────────────────────────────────────────────── */
+[data-theme='dark'] .alert {
+  background: #111111;
+  border-color: #2a2a2a;
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────────── */
+[data-theme='dark'] ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+[data-theme='dark'] ::-webkit-scrollbar-track {
+  background: #111111;
+}
+
+[data-theme='dark'] ::-webkit-scrollbar-thumb {
+  background: #313131;
+  border-radius: 3px;
+}
+
+[data-theme='dark'] ::-webkit-scrollbar-thumb:hover {
+  background: #494949;
+}
+
+/* ─── Focus ring ─────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--ff-accent);
+  outline-offset: 2px;
 }
