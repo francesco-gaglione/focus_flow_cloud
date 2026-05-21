@@ -3,6 +3,7 @@ use dioxus::prelude::*;
 
 mod clients;
 mod components;
+mod i18n;
 mod presentation;
 mod services;
 mod state;
@@ -15,6 +16,7 @@ use presentation::views::{
 use crate::{
     clients::http_client::ApiClient,
     components::toast::ToastProvider,
+    i18n::{load_locale, I18n},
     services::storage::get_item,
     state::{app_state::AppState, auth_state::AuthState},
 };
@@ -77,6 +79,7 @@ fn App() -> Element {
     use_context_provider(|| Signal::new(app_state));
     use_context_provider(|| Signal::new(api_client));
     use_context_provider(|| Signal::new(Option::<(String, String)>::None)); // (task_id, task_title) for timer
+    use_context_provider(|| Signal::new(I18n::new(load_locale())));
 
     rsx! {
         document::Link { rel: "stylesheet", href: CSS_TAILWIND }

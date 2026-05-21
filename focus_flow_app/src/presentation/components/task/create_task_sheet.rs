@@ -13,6 +13,7 @@ use crate::{
         input::Input,
         select::{Select, SelectList, SelectOption, SelectTrigger, SelectValue},
     },
+    i18n::use_i18n,
     presentation::components::common_components::bottom_sheet::BottomSheet,
     use_cases::tasks::{
         create_task_uc::{CreateSubtask, CreateTaskCommand},
@@ -86,6 +87,7 @@ pub struct CreateTaskSheetProps {
 
 #[component]
 pub fn CreateTaskSheet(props: CreateTaskSheetProps) -> Element {
+    let i18n = use_i18n();
     let mut title = use_signal(String::new);
     let mut description = use_signal(String::new);
     let mut selected_cat_id = use_signal(String::new);
@@ -134,7 +136,7 @@ pub fn CreateTaskSheet(props: CreateTaskSheetProps) -> Element {
     rsx! {
         BottomSheet {
             show: props.show,
-            title: "New task".to_string(),
+            title: i18n.read().t("create_task.title"),
             on_close: move |_| close(),
 
             form {
@@ -182,25 +184,25 @@ pub fn CreateTaskSheet(props: CreateTaskSheetProps) -> Element {
                 },
 
                 div { class: "flex flex-col gap-1.5",
-                    label { class: FIELD_LABEL, "Task name" }
+                    label { class: FIELD_LABEL, "{i18n.read().t(\"create_task.task_name_label\")}" }
                     Input {
-                        placeholder: "What needs to be done?",
+                        placeholder: i18n.read().t("create_task.task_name_placeholder"),
                         value: "{title}",
                         oninput: move |e: FormEvent| title.set(e.value()),
                     }
                 }
 
                 div { class: "flex flex-col gap-1.5",
-                    label { class: FIELD_LABEL, "Notes" }
+                    label { class: FIELD_LABEL, "{i18n.read().t(\"create_task.notes_label\")}" }
                     Input {
-                        placeholder: "Add extra details or context…",
+                        placeholder: i18n.read().t("create_task.notes_placeholder"),
                         value: "{description}",
                         oninput: move |e: FormEvent| description.set(e.value()),
                     }
                 }
 
                 div { class: "flex flex-col gap-1.5",
-                    label { class: FIELD_LABEL, "Schedule" }
+                    label { class: FIELD_LABEL, "{i18n.read().t(\"create_task.schedule_label\")}" }
                     div { class: "flex gap-2 items-center flex-wrap",
                         button {
                             r#type: "button",
@@ -212,7 +214,7 @@ pub fn CreateTaskSheet(props: CreateTaskSheetProps) -> Element {
                             if let Some(d) = *selected_date.read() {
                                 "{d.day()} {d.month()} {d.year()}"
                             } else {
-                                "Pick a date"
+                                "{i18n.read().t(\"create_task.pick_date\")}"
                             }
                         }
                         if selected_date.read().is_some() {
@@ -238,7 +240,7 @@ pub fn CreateTaskSheet(props: CreateTaskSheetProps) -> Element {
                                         }
                                     },
                                 }
-                                span { class: "font-mono text-[11px] text-subtle uppercase tracking-[0.04em]", "All day" }
+                                span { class: "font-mono text-[11px] text-subtle uppercase tracking-[0.04em]", "{i18n.read().t(\"create_task.all_day\")}" }
                             }
                         }
                     }
@@ -266,7 +268,7 @@ pub fn CreateTaskSheet(props: CreateTaskSheetProps) -> Element {
                     if selected_date.read().is_some() && !*is_all_day.read() {
                         div { class: "flex gap-3 items-end mt-1",
                             div { class: "flex flex-col gap-1",
-                                span { class: "font-mono text-[10px] text-subtle uppercase tracking-[0.04em]", "From" }
+                                span { class: "font-mono text-[10px] text-subtle uppercase tracking-[0.04em]", "{i18n.read().t(\"create_task.from_label\")}" }
                                 input {
                                     class: "w-[110px] h-10 px-[14px] bg-surface-card border border-border rounded-md text-foreground font-mono text-sm outline-none transition-[border-color,box-shadow] duration-fast ease-tech focus:border-accent focus:[box-shadow:var(--shadow-focus)] [color-scheme:dark]",
                                     r#type: "time",
@@ -275,23 +277,23 @@ pub fn CreateTaskSheet(props: CreateTaskSheetProps) -> Element {
                                 }
                             }
                             div { class: "flex flex-col gap-1",
-                                span { class: "font-mono text-[10px] text-subtle uppercase tracking-[0.04em]", "To" }
+                                span { class: "font-mono text-[10px] text-subtle uppercase tracking-[0.04em]", "{i18n.read().t(\"create_task.to_label\")}" }
                                 input {
                                     class: "w-[110px] h-10 px-[14px] bg-surface-card border border-border rounded-md text-foreground font-mono text-sm outline-none transition-[border-color,box-shadow] duration-fast ease-tech focus:border-accent focus:[box-shadow:var(--shadow-focus)] [color-scheme:dark]",
                                     r#type: "time",
-                                    placeholder: "optional",
+                                    placeholder: i18n.read().t("create_task.to_optional"),
                                     value: "{due_end_time_str}",
                                     oninput: move |e| due_end_time_str.set(e.value()),
                                 }
                             }
                         }
-                        p { class: FIELD_HINT, "Leave \"To\" empty to mark a point in time with no duration." }
+                        p { class: FIELD_HINT, "{i18n.read().t(\"create_task.to_hint\")}" }
                     }
                 }
 
                 div { class: "flex gap-3",
                     div { class: "flex-1 min-w-0 flex flex-col gap-1.5",
-                        label { class: FIELD_LABEL, "Category" }
+                        label { class: FIELD_LABEL, "{i18n.read().t(\"create_task.category_label\")}" }
                         Select::<String> {
                             default_value: None,
                             on_value_change: move |v: Option<String>| {
@@ -299,7 +301,7 @@ pub fn CreateTaskSheet(props: CreateTaskSheetProps) -> Element {
                                 selected_cat_id.set(v.unwrap_or_default());
                             },
                             SelectTrigger {
-                                SelectValue { placeholder: "No category" }
+                                SelectValue { placeholder: i18n.read().t("create_task.no_category") }
                             }
                             SelectList {
                                 for (i, cat) in props.categories.iter().enumerate() {
@@ -315,7 +317,7 @@ pub fn CreateTaskSheet(props: CreateTaskSheetProps) -> Element {
                     }
 
                     div { class: "flex-1 min-w-0 flex flex-col gap-1.5",
-                        label { class: FIELD_LABEL, "Priority" }
+                        label { class: FIELD_LABEL, "{i18n.read().t(\"create_task.priority_label\")}" }
                         Select::<String> {
                             default_value: None,
                             on_value_change: move |v: Option<String>| {
@@ -329,20 +331,20 @@ pub fn CreateTaskSheet(props: CreateTaskSheetProps) -> Element {
                                 }));
                             },
                             SelectTrigger {
-                                SelectValue { placeholder: "None" }
+                                SelectValue { placeholder: i18n.read().t("create_task.priority_none") }
                             }
                             SelectList {
-                                SelectOption::<String> { index: 0_usize, value: "low".to_string(), text_value: "Low", "Low" }
-                                SelectOption::<String> { index: 1_usize, value: "medium".to_string(), text_value: "Medium", "Medium" }
-                                SelectOption::<String> { index: 2_usize, value: "high".to_string(), text_value: "High", "High" }
-                                SelectOption::<String> { index: 3_usize, value: "urgent".to_string(), text_value: "Urgent", "Urgent" }
+                                SelectOption::<String> { index: 0_usize, value: "low".to_string(), text_value: "Low", "{i18n.read().t(\"create_task.priority_low\")}" }
+                                SelectOption::<String> { index: 1_usize, value: "medium".to_string(), text_value: "Medium", "{i18n.read().t(\"create_task.priority_medium\")}" }
+                                SelectOption::<String> { index: 2_usize, value: "high".to_string(), text_value: "High", "{i18n.read().t(\"create_task.priority_high\")}" }
+                                SelectOption::<String> { index: 3_usize, value: "urgent".to_string(), text_value: "Urgent", "{i18n.read().t(\"create_task.priority_urgent\")}" }
                             }
                         }
                     }
                 }
 
                 div { class: "flex flex-col gap-1.5",
-                    label { class: FIELD_LABEL, "Subtasks" }
+                    label { class: FIELD_LABEL, "{i18n.read().t(\"create_task.subtasks_label\")}" }
                     for (i, sub) in subtasks.read().clone().into_iter().enumerate() {
                         div { class: "flex items-center gap-2 px-3 py-2 bg-surface-card border border-border rounded-md mb-1",
                             span { class: "flex-1 text-sm text-muted leading-[1.4]", "{sub}" }
@@ -357,7 +359,7 @@ pub fn CreateTaskSheet(props: CreateTaskSheetProps) -> Element {
                     div { class: "flex gap-2 items-center mt-1",
                         input {
                             class: "flex-1 h-[38px] px-[14px] bg-surface-card border border-border rounded-md text-foreground font-sans text-sm outline-none transition-[border-color,box-shadow] duration-fast ease-tech placeholder:text-subtle focus:border-accent focus:[box-shadow:var(--shadow-focus)]",
-                            placeholder: "Add a subtask…",
+                            placeholder: i18n.read().t("create_task.add_subtask_placeholder"),
                             value: "{subtask_input}",
                             oninput: move |e| subtask_input.set(e.value()),
                             onkeydown: move |e| {
@@ -385,13 +387,13 @@ pub fn CreateTaskSheet(props: CreateTaskSheetProps) -> Element {
                         r#type: "button",
                         style: "flex: 1;",
                         onclick: move |_| close(),
-                        "Cancel"
+                        "{i18n.read().t(\"create_task.cancel\")}"
                     }
                     Button {
                         variant: ButtonVariant::Primary,
                         r#type: "submit",
                         style: "flex: 2; justify-content: center;",
-                        "Add task"
+                        "{i18n.read().t(\"create_task.add_task\")}"
                     }
                 }
             }

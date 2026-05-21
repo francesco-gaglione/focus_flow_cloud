@@ -5,6 +5,7 @@ use crate::{
         button::{Button, ButtonVariant},
         input::Input,
     },
+    i18n::use_i18n,
     services::storage,
     state::app_state::AppState,
     use_cases::auth::{login_uc::login_uc, update_base_url_uc::update_base_url_uc},
@@ -16,6 +17,7 @@ const CARD_CLS: &str = "w-full max-w-[340px] flex flex-col gap-5 p-6 bg-surface-
 #[component]
 pub fn AuthPage() -> Element {
     let mut app_state = use_context::<Signal<AppState>>();
+    let i18n = use_i18n();
 
     let mut server_url_input = use_signal(String::new);
     let mut username_input = use_signal(String::new);
@@ -29,26 +31,26 @@ pub fn AuthPage() -> Element {
             style: "background-image: radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px); background-size: 20px 20px;",
 
             div { class: "flex flex-col items-center gap-2",
-                div { class: "font-mono text-xs tracking-[0.02em] uppercase text-subtle", "// auth" }
+                div { class: "font-mono text-xs tracking-[0.02em] uppercase text-subtle", "{i18n.read().t(\"auth.comment\")}" }
                 div { class: "text-[44px] font-bold text-foreground tracking-[-0.04em] leading-none",
-                    span { "Focus" }
-                    em { class: "text-accent not-italic", "Flow" }
+                    span { "{i18n.read().t(\"layout.focus\")}" }
+                    em { class: "text-accent not-italic", "{i18n.read().t(\"layout.flow\")}" }
                 }
             }
 
             if !app_state.read().is_server_url_set() {
                 div { class: CARD_CLS,
                     p { class: "text-lg font-semibold text-foreground tracking-[-0.02em] leading-[1.3]",
-                        "configure "
-                        em { class: "text-subtle font-normal not-italic", "server." }
+                        "{i18n.read().t(\"auth.configure_title_main\")}"
+                        em { class: "text-subtle font-normal not-italic", "{i18n.read().t(\"auth.configure_title_em\")}" }
                     }
 
                     div { class: "flex flex-col gap-1",
-                        label { class: LABEL_CLS, "Server URL" }
+                        label { class: LABEL_CLS, "{i18n.read().t(\"auth.server_url_label\")}" }
                         Input {
                             r#type: "url",
-                            placeholder: "http://192.168.1.x:8080",
-                            value: "http://192.168.1.x:8080",
+                            placeholder: i18n.read().t("auth.server_url_placeholder"),
+                            value: i18n.read().t("auth.server_url_placeholder"),
                             oninput: move |e: FormEvent| server_url_input.set(e.value()),
                         }
                     }
@@ -64,7 +66,7 @@ pub fn AuthPage() -> Element {
                                 let _ = update_base_url_uc(&url);
                             }
                         },
-                        "Continue"
+                        "{i18n.read().t(\"auth.continue\")}"
                         svg { view_box: "0 0 16 16", width: "14", height: "14",
                             path { d: "M6 4l4 4-4 4", stroke: "currentColor", fill: "none", stroke_width: "1.6" }
                         }
@@ -73,25 +75,25 @@ pub fn AuthPage() -> Element {
             } else {
                 div { class: CARD_CLS,
                     p { class: "text-lg font-semibold text-foreground tracking-[-0.02em] leading-[1.3]",
-                        "sign in to "
-                        em { class: "text-subtle font-normal not-italic", "continue." }
+                        "{i18n.read().t(\"auth.sign_in_title_main\")}"
+                        em { class: "text-subtle font-normal not-italic", "{i18n.read().t(\"auth.sign_in_title_em\")}" }
                     }
 
                     div { class: "flex flex-col gap-4",
                         div { class: "flex flex-col gap-1",
-                            label { class: LABEL_CLS, "Username" }
+                            label { class: LABEL_CLS, "{i18n.read().t(\"auth.username_label\")}" }
                             Input {
                                 r#type: "text",
-                                placeholder: "your username",
+                                placeholder: i18n.read().t("auth.username_placeholder"),
                                 value: "{username_input}",
                                 oninput: move |e: FormEvent| username_input.set(e.value()),
                             }
                         }
                         div { class: "flex flex-col gap-1",
-                            label { class: LABEL_CLS, "Password" }
+                            label { class: LABEL_CLS, "{i18n.read().t(\"auth.password_label\")}" }
                             Input {
                                 r#type: "password",
-                                placeholder: "••••••••",
+                                placeholder: i18n.read().t("auth.password_placeholder"),
                                 value: "{password_input}",
                                 oninput: move |e: FormEvent| password_input.set(e.value()),
                             }
@@ -116,7 +118,7 @@ pub fn AuthPage() -> Element {
                             let username = username_input.read().clone();
                             let password = password_input.read().clone();
                             if username.trim().is_empty() || password.is_empty() {
-                                error_msg.set(Some("Username and password required.".into()));
+                                error_msg.set(Some(i18n.read().t("auth.error_required")));
                                 return;
                             }
                             error_msg.set(None);
@@ -132,7 +134,7 @@ pub fn AuthPage() -> Element {
                                 }
                             });
                         },
-                        if *is_loading.read() { "Signing in…" } else { "Sign in" }
+                        if *is_loading.read() { "{i18n.read().t(\"auth.signing_in\")}" } else { "{i18n.read().t(\"auth.sign_in_btn\")}" }
                         if !*is_loading.read() {
                             svg { view_box: "0 0 16 16", width: "14", height: "14",
                                 path { d: "M6 4l4 4-4 4", stroke: "currentColor", fill: "none", stroke_width: "1.6" }
@@ -153,7 +155,7 @@ pub fn AuthPage() -> Element {
                             error_msg.set(None);
                             is_loading.set(false);
                         },
-                        "change"
+                        "{i18n.read().t(\"auth.change\")}"
                     }
                 }
             }

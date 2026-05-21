@@ -8,6 +8,7 @@ use tokio_tungstenite::{connect_async, tungstenite::protocol::Message};
 
 use crate::{
     components::button::{Button, ButtonVariant},
+    i18n::use_i18n,
     state::{app_state::AppState, auth_state::AuthState},
 };
 
@@ -19,11 +20,11 @@ enum WsSessionType {
 }
 
 impl WsSessionType {
-    fn label(&self) -> &'static str {
+    fn label_key(&self) -> &'static str {
         match self {
-            WsSessionType::Work => "Focus",
-            WsSessionType::ShortBreak => "Short Break",
-            WsSessionType::LongBreak => "Long Break",
+            WsSessionType::Work => "pomodoro.session_focus",
+            WsSessionType::ShortBreak => "pomodoro.session_short_break",
+            WsSessionType::LongBreak => "pomodoro.session_long_break",
         }
     }
     fn target_secs(&self) -> i64 {
@@ -92,6 +93,7 @@ fn ws_msg(val: serde_json::Value) -> Message {
 
 #[component]
 pub fn Pomodoro() -> Element {
+    let i18n = use_i18n();
     let auth_state = use_context::<Signal<AuthState>>();
     let app_state_ctx = use_context::<Signal<AppState>>();
     let mut selected_task = use_context::<Signal<Option<(String, String)>>>();
@@ -251,7 +253,7 @@ pub fn Pomodoro() -> Element {
             });
         } else {
             error!("[pomodoro] no auth token, cannot connect");
-            ws_error.set(Some("Not authenticated".into()));
+            ws_error.set(Some(i18n.read().t("pomodoro.not_authenticated")));
         }
     });
 
@@ -273,8 +275,8 @@ pub fn Pomodoro() -> Element {
         .unwrap_or(false);
     let session_label = session
         .as_ref()
-        .map(|s| s.session_type.label())
-        .unwrap_or("Focus");
+        .map(|s| i18n.read().t(s.session_type.label_key()))
+        .unwrap_or_else(|| i18n.read().t("pomodoro.session_focus"));
     let existing_score = session.as_ref().and_then(|s| s.concentration_score);
     let existing_note = session
         .as_ref()
@@ -305,12 +307,12 @@ pub fn Pomodoro() -> Element {
                     }
                 } else {
                     div { class: "pomo-task-chip pomo-task-chip-empty",
-                        span { "No task selected" }
+                        span { "{i18n.read().t(\"pomodoro.no_task\")}" }
                     }
                 }
                 div {
                     class: if connected { "pomo-conn-dot connected" } else { "pomo-conn-dot" },
-                    title: if connected { "Connected" } else { "Disconnected" }
+                    title: if connected { i18n.read().t("pomodoro.connected") } else { i18n.read().t("pomodoro.disconnected") }
                 }
             }
 
@@ -343,9 +345,9 @@ pub fn Pomodoro() -> Element {
                 div { class: "pomo-time-display",
                     span { class: "pomo-time", "{fmt_time(remaining)}" }
                     if has_session {
-                        span { class: "pomo-time-sub", "remaining" }
+                        span { class: "pomo-time-sub", "{i18n.read().t(\"pomodoro.remaining\")}" }
                     } else {
-                        span { class: "pomo-time-sub", "ready" }
+                        span { class: "pomo-time-sub", "{i18n.read().t(\"pomodoro.ready\")}" }
                     }
                 }
             }
@@ -363,7 +365,7 @@ pub fn Pomodoro() -> Element {
                         svg { view_box: "0 0 16 16", width: "18", height: "18",
                             polygon { points: "5 3 13 8 5 13", fill: "currentColor" }
                         }
-                        if has_session { "Resume" } else { "Start" }
+                        if has_session { "{i18n.read().t(\"pomodoro.resume\")}" } else { "{i18n.read().t(\"pomodoro.start\")}" }
                     }
                 }
                 if is_work {
@@ -378,7 +380,7 @@ pub fn Pomodoro() -> Element {
                             rect { x: "3", y: "4", width: "3", height: "8", fill: "currentColor" }
                             rect { x: "10", y: "4", width: "3", height: "8", fill: "currentColor" }
                         }
-                        "Break"
+                        "{i18n.read().t(\"pomodoro.break\")}"
                     }
                 }
                 if has_session {
@@ -392,7 +394,7 @@ pub fn Pomodoro() -> Element {
                         svg { view_box: "0 0 16 16", width: "18", height: "18",
                             rect { x: "3", y: "3", width: "10", height: "10", rx: "1", fill: "currentColor" }
                         }
-                        "Stop"
+                        "{i18n.read().t(\"pomodoro.stop\")}"
                     }
                 }
             }
@@ -402,7 +404,7 @@ pub fn Pomodoro() -> Element {
                 div { class: "pomo-extras",
                     // Concentration score
                     div { class: "pomo-score-row",
-                        span { class: "pomo-extras-label", "Focus score" }
+                        span { class: "pomo-extras-label", "{i18n.read().t(\"pomodoro.focus_score\")}" }
                         div { class: "pomo-stars",
                             for i in 1..=5 {
                                 button {
@@ -423,11 +425,11 @@ pub fn Pomodoro() -> Element {
                     }
                     // Note input
                     div { class: "pomo-note-row",
-                        span { class: "pomo-extras-label", "Note" }
+                        span { class: "pomo-extras-label", "{i18n.read().t(\"pomodoro.note_label\")}" }
                         div { class: "pomo-note-input-wrap",
                             input {
                                 class: "pomo-note-input",
-                                placeholder: if existing_note.is_empty() { "Add a note…" } else { existing_note.as_str() },
+                                placeholder: if existing_note.is_empty() { i18n.read().t("pomodoro.note_placeholder") } else { existing_note.clone() },
                                 value: "{note_input}",
                                 oninput: move |e| note_input.set(e.value()),
                                 onkeydown: move |e| {
@@ -465,7 +467,7 @@ pub fn Pomodoro() -> Element {
             }
 
             if let Some(ref err) = error {
-                div { class: "pomo-error", "Connection error: {err}" }
+                div { class: "pomo-error", "{i18n.read().tf(\"pomodoro.connection_error\", &[err])}" }
             }
         }
     }

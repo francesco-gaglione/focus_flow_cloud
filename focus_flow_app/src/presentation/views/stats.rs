@@ -2,7 +2,10 @@ use chrono::Datelike;
 use dioxus::prelude::*;
 use shared::stats::OverdueTrendTypeDto;
 
-use crate::use_cases::stats::get_stats_uc::{get_stats_uc, StatsData};
+use crate::{
+    i18n::use_i18n,
+    use_cases::stats::get_stats_uc::{get_stats_uc, StatsData},
+};
 
 const CAT_COLORS: [&str; 7] = [
     "#0070f3", "#12a594", "#ffb224", "#7c3aed", "#ef4444", "#d97706", "#6b7280",
@@ -10,6 +13,7 @@ const CAT_COLORS: [&str; 7] = [
 
 #[component]
 pub fn Stats() -> Element {
+    let i18n = use_i18n();
     let mut stats_data = use_signal(StatsData::default);
     let mut is_loading = use_signal(|| true);
     let mut load_error: Signal<Option<String>> = use_signal(|| None);
@@ -63,20 +67,21 @@ pub fn Stats() -> Element {
     };
 
     let trend_val = overdue_dto.trend_value.abs();
+    let trend_val_str = format!("{:.0}", trend_val);
     let (delta_cls, delta_txt, overdue_display) = match overdue_dto.trend_type {
         OverdueTrendTypeDto::Decreasing => (
             "overdue-delta good",
-            format!("{:.0}% fewer overdue vs last week", trend_val),
+            i18n.read().tf("stats.fewer_overdue", &[&trend_val_str]),
             format!("↓{:.0}%", trend_val),
         ),
         OverdueTrendTypeDto::Increasing => (
             "overdue-delta bad",
-            format!("{:.0}% more overdue vs last week", trend_val),
+            i18n.read().tf("stats.more_overdue", &[&trend_val_str]),
             format!("↑{:.0}%", trend_val),
         ),
         OverdueTrendTypeDto::Stable => (
             "overdue-delta",
-            "No change from last week".to_string(),
+            i18n.read().t("stats.no_change"),
             "→ 0%".to_string(),
         ),
     };
@@ -92,7 +97,7 @@ pub fn Stats() -> Element {
             let is_today = i == days14.len().saturating_sub(1);
             let is_muted = d.count == 0;
             let lbl = if is_today {
-                "TDY".to_string()
+                i18n.read().t("stats.today_abbrev")
             } else {
                 d.day.day().to_string()
             };
@@ -111,9 +116,9 @@ pub fn Stats() -> Element {
 
     let week_delta = counts.week_delta;
     let week_delta_str = if week_delta >= 0 {
-        format!("↑ +{} from last week", week_delta)
+        i18n.read().tf("stats.week_more", &[&week_delta.to_string()])
     } else {
-        format!("↓ {} from last week", week_delta.abs())
+        i18n.read().tf("stats.week_fewer", &[&week_delta.abs().to_string()])
     };
     let week_badge_cls = if week_delta >= 0 {
         "font-mono text-[10px] tracking-[var(--tracking-data)] uppercase mt-1 inline-block px-[7px] py-[2px] rounded-full text-success bg-[color-mix(in_srgb,#46a758_12%,transparent)]"
@@ -126,25 +131,25 @@ pub fn Stats() -> Element {
         div { class: "scroll",
 
             if *is_loading.read() {
-                div { class: "font-mono text-xs text-subtle text-center py-8 tracking-[var(--tracking-data)] uppercase", "Loading…" }
+                div { class: "font-mono text-xs text-subtle text-center py-8 tracking-[var(--tracking-data)] uppercase", "{i18n.read().t(\"stats.loading\")}" }
             } else if let Some(err) = load_error.read().as_ref() {
                 div { class: "font-mono text-xs text-[#ef4444] text-center py-8", "{err}" }
             } else {
 
                 div { class: "stats-hero grid grid-cols-2 gap-2 mb-3",
                     div { class: "stats-card",
-                        div { class: "stats-title", "Done today" }
+                        div { class: "stats-title", "{i18n.read().t(\"stats.done_today\")}" }
                         div { class: "stats-big",
                             em { style: "color:var(--color-success,#46a758);", "{counts.completed_today}" }
-                            span { class: "unit", " tasks" }
+                            span { class: "unit", "{i18n.read().t(\"stats.tasks_unit\")}" }
                         }
-                        div { class: "font-mono text-[10px] tracking-[var(--tracking-data)] uppercase mt-1 inline-block px-[7px] py-[2px] rounded-full text-success bg-[color-mix(in_srgb,#46a758_12%,transparent)]", "keep going ✦" }
+                        div { class: "font-mono text-[10px] tracking-[var(--tracking-data)] uppercase mt-1 inline-block px-[7px] py-[2px] rounded-full text-success bg-[color-mix(in_srgb,#46a758_12%,transparent)]", "{i18n.read().t(\"stats.keep_going\")}" }
                     }
                     div { class: "stats-card",
-                        div { class: "stats-title", "This week" }
+                        div { class: "stats-title", "{i18n.read().t(\"stats.this_week\")}" }
                         div { class: "stats-big",
                             em { "{counts.completed_this_week}" }
-                            span { class: "unit", " tasks" }
+                            span { class: "unit", "{i18n.read().t(\"stats.tasks_unit\")}" }
                         }
                         div { class: "{week_badge_cls}", "{week_delta_str}" }
                     }
@@ -152,28 +157,28 @@ pub fn Stats() -> Element {
 
                 div { class: "stats-trio grid grid-cols-3 gap-2 mb-3",
                     HintCard {
-                        title: "Done · 30d",
-                        hint: "Total tasks completed in the last 30 days. Rolling window.",
+                        title: i18n.read().t("stats.done_30d"),
+                        hint: i18n.read().t("stats.done_30d_hint"),
                         div { class: "stats-big", em { "{counts.completed_this_month}" } }
                     }
                     HintCard {
-                        title: "Avg / day",
-                        hint: "Average tasks completed per day over 30 days. Use as a baseline, not a target.",
+                        title: i18n.read().t("stats.avg_per_day"),
+                        hint: i18n.read().t("stats.avg_per_day_hint"),
                         div { class: "stats-big", "{day_avg}" }
                     }
                     HintCard {
-                        title: "Focus · 7d",
-                        hint: "Pomodoro sessions completed this week.",
+                        title: i18n.read().t("stats.focus_7d"),
+                        hint: i18n.read().t("stats.focus_7d_hint"),
                         div { class: "stats-big", em { "{counts.focus_sessions}" } }
                     }
                 }
 
                 HintCard {
-                    title: "Peak window",
-                    subtitle: "// when you flow",
-                    hint: "Hours when you complete the most tasks. Schedule demanding work here.",
+                    title: i18n.read().t("stats.peak_window"),
+                    subtitle: i18n.read().t("stats.peak_window_sub"),
+                    hint: i18n.read().t("stats.peak_window_hint"),
                     if peak_data.is_empty() {
-                        div { class: "font-mono text-xs text-subtle py-2", "No data yet" }
+                        div { class: "font-mono text-xs text-subtle py-2", "{i18n.read().t(\"stats.no_data\")}" }
                     } else {
                         div { class: "peak-chart",
                             for (lbl, cnt, pct, is_peak) in peak_data {
@@ -194,35 +199,35 @@ pub fn Stats() -> Element {
 
                 div { class: "stats-pair grid grid-cols-2 gap-2 mb-3",
                     HintCard {
-                        title: "Priority mix",
-                        hint: "Breakdown of completed tasks by priority. Useful to spot if you tend to complete easier tasks over more important ones.",
+                        title: i18n.read().t("stats.priority_mix"),
+                        hint: i18n.read().t("stats.priority_mix_hint"),
                         div { class: "breakdown",
-                            PriorityRow { label: "Urgent", color: "#7c3aed", count: priority.urgent, pct: p_urgent_pct }
-                            PriorityRow { label: "High",   color: "#ef4444", count: priority.high,   pct: p_high_pct   }
-                            PriorityRow { label: "Medium", color: "#d97706", count: priority.medium,  pct: p_medium_pct }
-                            PriorityRow { label: "Low / —",color: "#6b7280", count: priority.low,    pct: p_low_pct    }
+                            PriorityRow { label: i18n.read().t("stats.priority_urgent"), color: "#7c3aed", count: priority.urgent, pct: p_urgent_pct }
+                            PriorityRow { label: i18n.read().t("stats.priority_high"),   color: "#ef4444", count: priority.high,   pct: p_high_pct   }
+                            PriorityRow { label: i18n.read().t("stats.priority_medium"), color: "#d97706", count: priority.medium,  pct: p_medium_pct }
+                            PriorityRow { label: i18n.read().t("stats.priority_low_none"), color: "#6b7280", count: priority.low, pct: p_low_pct    }
                         }
                     }
                     HintCard {
-                        title: "Focus sessions",
-                        hint: "Pomodoro session stats. Average duration reflects your actual focus window.",
+                        title: i18n.read().t("stats.focus_sessions"),
+                        hint: i18n.read().t("stats.focus_sessions_hint"),
                         div { class: "stats-big",
                             em { "{focus_count}" }
-                            span { class: "unit", " this wk" }
+                            span { class: "unit", "{i18n.read().t(\"stats.this_week_unit\")}" }
                         }
                         div { class: "focus-details",
                             div { class: "focus-detail-row",
-                                span { class: "focus-detail-label", "Avg" }
-                                span { class: "focus-detail-val", "{focus_avg_mins} min" }
+                                span { class: "focus-detail-label", "{i18n.read().t(\"stats.avg\")}" }
+                                span { class: "focus-detail-val", "{focus_avg_mins}{i18n.read().t(\"stats.min_unit\")}" }
                             }
                         }
                     }
                 }
 
                 HintCard {
-                    title: "Overdue trend",
-                    subtitle: "// direction matters",
-                    hint: "Overdue task count week over week. Direction matters more than the absolute number.",
+                    title: i18n.read().t("stats.overdue_trend"),
+                    subtitle: i18n.read().t("stats.overdue_trend_sub"),
+                    hint: i18n.read().t("stats.overdue_trend_hint"),
                     div { class: "overdue-trend",
                         span { class: "{delta_cls}", "{overdue_display}" }
                         div { class: "overdue-info",
@@ -232,11 +237,11 @@ pub fn Stats() -> Element {
                 }
 
                 HintCard {
-                    title: "Category balance",
-                    subtitle: "// neglected?",
-                    hint: "Tasks completed per category. Low numbers in a category may signal it is getting less attention.",
+                    title: i18n.read().t("stats.category_balance"),
+                    subtitle: i18n.read().t("stats.category_balance_sub"),
+                    hint: i18n.read().t("stats.category_balance_hint"),
                     if cats.is_empty() {
-                        div { class: "font-mono text-xs text-subtle py-2", "No data yet" }
+                        div { class: "font-mono text-xs text-subtle py-2", "{i18n.read().t(\"stats.no_data\")}" }
                     } else {
                         div { class: "breakdown",
                             for (i, cat) in cats.iter().enumerate() {
@@ -261,11 +266,11 @@ pub fn Stats() -> Element {
                 }
 
                 HintCard {
-                    title: "Last 14 days",
-                    subtitle: "// rhythm",
-                    hint: "Task completions over the last 14 days. Look at the pattern, not individual days.",
+                    title: i18n.read().t("stats.last_14_days"),
+                    subtitle: i18n.read().t("stats.last_14_days_sub"),
+                    hint: i18n.read().t("stats.last_14_days_hint"),
                     if bar14.is_empty() {
-                        div { class: "font-mono text-xs text-subtle py-2", "No data yet" }
+                        div { class: "font-mono text-xs text-subtle py-2", "{i18n.read().t(\"stats.no_data\")}" }
                     } else {
                         div { class: "barchart",
                             for (h, is_today, is_muted, _lbl) in bar14.iter() {
@@ -292,11 +297,11 @@ pub fn Stats() -> Element {
                 }
 
                 HintCard {
-                    title: "Last 8 weeks",
-                    subtitle: "// no shame",
-                    hint: "8 weeks of activity at a glance. A reference for patterns, not a streak tracker.",
+                    title: i18n.read().t("stats.last_8_weeks"),
+                    subtitle: i18n.read().t("stats.last_8_weeks_sub"),
+                    hint: i18n.read().t("stats.last_8_weeks_hint"),
                     if heatmap_levels.is_empty() {
-                        div { class: "font-mono text-xs text-subtle py-2", "No data yet" }
+                        div { class: "font-mono text-xs text-subtle py-2", "{i18n.read().t(\"stats.no_data\")}" }
                     } else {
                         div { class: "heatmap",
                             for level in heatmap_levels.iter() {
@@ -313,7 +318,7 @@ pub fn Stats() -> Element {
                             }
                         }
                         div { class: "heatmap-legend",
-                            span { "less" }
+                            span { "{i18n.read().t(\"stats.heatmap_less\")}" }
                             div { class: "scale",
                                 span {}
                                 span { class: "hl-1" }
@@ -321,7 +326,7 @@ pub fn Stats() -> Element {
                                 span { class: "hl-3" }
                                 span { class: "hl-4" }
                             }
-                            span { "more" }
+                            span { "{i18n.read().t(\"stats.heatmap_more\")}" }
                         }
                     }
                 }
@@ -332,15 +337,16 @@ pub fn Stats() -> Element {
 
 #[derive(Props, Clone, PartialEq)]
 struct HintCardProps {
-    title: &'static str,
-    hint: &'static str,
+    title: String,
+    hint: String,
     #[props(optional)]
-    subtitle: Option<&'static str>,
+    subtitle: Option<String>,
     children: Element,
 }
 
 #[component]
 fn HintCard(props: HintCardProps) -> Element {
+    let i18n = use_i18n();
     let mut open = use_signal(|| false);
     let is_open = *open.read();
     rsx! {
@@ -348,14 +354,14 @@ fn HintCard(props: HintCardProps) -> Element {
             div { class: "stats-title",
                 span { class: "stats-title-left",
                     "{props.title}"
-                    if let Some(sub) = props.subtitle {
+                    if let Some(ref sub) = props.subtitle {
                         span { class: "delta", " {sub}" }
                     }
                 }
                 button {
                     class: if is_open { "stats-hint-btn active" } else { "stats-hint-btn" },
                     r#type: "button",
-                    title: "What does this mean?",
+                    title: i18n.read().t("stats.what_does_this_mean"),
                     onclick: move |e| {
                         e.stop_propagation();
                         let cur = *open.read();
@@ -374,7 +380,7 @@ fn HintCard(props: HintCardProps) -> Element {
 
 #[derive(Props, Clone, PartialEq)]
 struct PriorityRowProps {
-    label: &'static str,
+    label: String,
     color: &'static str,
     count: usize,
     pct: u32,

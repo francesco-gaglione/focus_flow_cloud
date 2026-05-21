@@ -1,9 +1,10 @@
-use crate::Route;
+use crate::{i18n::use_i18n, Route};
 use dioxus::prelude::*;
 
 #[component]
 pub fn FlashcardsLayout() -> Element {
     let mut drawer_open = use_context::<Signal<bool>>();
+    let i18n = use_i18n();
 
     rsx! {
         div { class: "app-bar",
@@ -18,11 +19,11 @@ pub fn FlashcardsLayout() -> Element {
             }
             div { class: "title-block",
                 div { class: "app-crumb",
-                    span { "Flashcards" }
+                    span { "{i18n.read().t(\"flashcards_layout.breadcrumb_flashcards\")}" }
                     span { class: "sep", "/" }
-                    span { "Decks" }
+                    span { "{i18n.read().t(\"flashcards_layout.breadcrumb_decks\")}" }
                 }
-                div { class: "app-title", dangerous_inner_html: "Memory, <em>tomorrow</em>." }
+                div { class: "app-title", dangerous_inner_html: i18n.read().t("flashcards_layout.title") }
             }
             button { class: "icon-btn",
                 svg { view_box: "0 0 16 16",
@@ -42,7 +43,7 @@ pub fn FlashcardsLayout() -> Element {
                         rect { x: "7", y: "9", width: "14", height: "13", rx: "1", stroke: "currentColor", stroke_width: "1.6", fill: "none" }
                     }
                 }
-                span { "Decks" }
+                span { "{i18n.read().t(\"flashcards_layout.tab_decks\")}" }
             }
             button { class: "nav-tab",
                 span { class: "ico",
@@ -52,7 +53,7 @@ pub fn FlashcardsLayout() -> Element {
                         path { d: "M2 12l10 5 10-5", stroke: "currentColor", stroke_width: "1.6", fill: "none" }
                     }
                 }
-                span { "Practice" }
+                span { "{i18n.read().t(\"flashcards_layout.tab_practice\")}" }
             }
             button { class: "nav-tab",
                 span { class: "ico",
@@ -61,7 +62,7 @@ pub fn FlashcardsLayout() -> Element {
                         path { d: "M12 8v4l3 3", stroke: "currentColor", stroke_width: "1.6" }
                     }
                 }
-                span { "Review" }
+                span { "{i18n.read().t(\"flashcards_layout.tab_review\")}" }
             }
         }
     }

@@ -1,4 +1,4 @@
-use crate::Route;
+use crate::{i18n::use_i18n, Route};
 use dioxus::prelude::*;
 
 fn tab_cls(active: bool) -> &'static str {
@@ -20,16 +20,18 @@ fn ico_cls(active: bool) -> &'static str {
 #[component]
 pub fn TasksLayout() -> Element {
     let mut drawer_open = use_context::<Signal<bool>>();
+    let i18n = use_i18n();
     let route = use_route::<Route>();
 
-    let (title_html, active_tab) = match route {
-        Route::Todo {} => ("Tasks, <em>focus please.</em>", "todo"),
-        Route::Calendar {} => ("A month, <em>at a glance</em>.", "calendar"),
-        Route::Stats {} => ("Your <em>quiet</em> wins.", "stats"),
-        Route::Pomodoro {} => ("Pomodoro, <em>deep work.</em>", "timer"),
-        Route::Categories {} => ("Categories.", "categories"),
-        _ => ("Today.", "todo"),
+    let (title_key, active_tab) = match route {
+        Route::Todo {}       => ("tasks_layout.title_todo",       "todo"),
+        Route::Calendar {}   => ("tasks_layout.title_calendar",   "calendar"),
+        Route::Stats {}      => ("tasks_layout.title_stats",      "stats"),
+        Route::Pomodoro {}   => ("tasks_layout.title_timer",      "timer"),
+        Route::Categories {} => ("tasks_layout.title_categories", "categories"),
+        _                    => ("tasks_layout.title_todo",       "todo"),
     };
+    let title_html = i18n.read().t(title_key);
     let on_categories = active_tab == "categories";
 
     rsx! {
@@ -56,7 +58,7 @@ pub fn TasksLayout() -> Element {
                 } else {
                     "size-9 bg-surface-card border border-border rounded-sm text-subtle grid place-items-center cursor-pointer shrink-0 transition-[background,border-color,color] duration-fast ease-tech hover:bg-gray-200 hover:border-border-strong hover:text-foreground active:bg-gray-300"
                 },
-                title: "Manage categories",
+                title: i18n.read().t("tasks_layout.manage_categories"),
                 svg { view_box: "0 0 16 16", width: "16", height: "16", stroke: "currentColor", fill: "none", stroke_width: "1.6", stroke_linecap: "round", stroke_linejoin: "round",
                     path { d: "M9 3H3a1 1 0 00-1 1v2a1 1 0 001 1h6l3 3 3-3V4a1 1 0 00-1-1h-2" }
                     path { d: "M9 9H3a1 1 0 00-1 1v2a1 1 0 001 1h6" }
@@ -75,7 +77,7 @@ pub fn TasksLayout() -> Element {
                         path { d: "M5 7h14M5 12h14M5 17h8" }
                     }
                 }
-                span { "Tasks" }
+                span { "{i18n.read().t(\"tasks_layout.tab_tasks\")}" }
             }
             Link {
                 to: Route::Calendar {},
@@ -88,7 +90,7 @@ pub fn TasksLayout() -> Element {
                         line { x1: "16", y1: "3", x2: "16", y2: "7" }
                     }
                 }
-                span { "Calendar" }
+                span { "{i18n.read().t(\"tasks_layout.tab_calendar\")}" }
             }
             Link {
                 to: Route::Stats {},
@@ -100,7 +102,7 @@ pub fn TasksLayout() -> Element {
                         line { x1: "19", y1: "20", x2: "19", y2: "11" }
                     }
                 }
-                span { "Stats" }
+                span { "{i18n.read().t(\"tasks_layout.tab_stats\")}" }
             }
             Link {
                 to: Route::Pomodoro {},
@@ -113,7 +115,7 @@ pub fn TasksLayout() -> Element {
                         line { x1: "9", y1: "3", x2: "15", y2: "3" }
                     }
                 }
-                span { "Timer" }
+                span { "{i18n.read().t(\"tasks_layout.tab_timer\")}" }
             }
         }
     }

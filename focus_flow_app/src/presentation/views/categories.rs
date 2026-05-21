@@ -2,6 +2,7 @@ use dioxus::prelude::*;
 
 use crate::{
     clients::category_http_client::get_all_categories,
+    i18n::use_i18n,
     use_cases::tasks::{
         create_category_uc::create_category_uc, delete_category_uc::delete_category_uc,
         update_category_uc::update_category_uc,
@@ -16,20 +17,21 @@ struct CatItem {
 }
 
 const PRESET_COLORS: &[(&str, &str)] = &[
-    ("#46a758", "Green"),
-    ("#12a594", "Cyan"),
-    ("#e5484d", "Red"),
-    ("#ffb224", "Amber"),
-    ("#0070f3", "Blue"),
-    ("#7c3aed", "Purple"),
-    ("#d97706", "Orange"),
-    ("#6b7280", "Gray"),
+    ("#46a758", "categories.color_green"),
+    ("#12a594", "categories.color_cyan"),
+    ("#e5484d", "categories.color_red"),
+    ("#ffb224", "categories.color_amber"),
+    ("#0070f3", "categories.color_blue"),
+    ("#7c3aed", "categories.color_purple"),
+    ("#d97706", "categories.color_orange"),
+    ("#6b7280", "categories.color_gray"),
 ];
 
 const INPUT_CLS: &str = "flex-1 h-10 px-3 bg-surface-raised border border-border rounded-md text-foreground font-sans text-sm outline-none transition-[border-color,box-shadow] duration-fast ease-tech placeholder:text-subtle focus:border-accent focus:[box-shadow:var(--shadow-focus)]";
 
 #[component]
 pub fn Categories() -> Element {
+    let i18n = use_i18n();
     let mut cats: Signal<Vec<CatItem>> = use_signal(Vec::new);
     let mut loading = use_signal(|| true);
 
@@ -62,12 +64,12 @@ pub fn Categories() -> Element {
         div { class: "scroll px-4 pt-4 pb-8 flex flex-col gap-6",
 
             div { class: "flex flex-col gap-3 p-4 bg-surface-card border border-border rounded-lg",
-                p { class: "font-mono text-xs font-medium tracking-[0.02em] uppercase text-subtle mb-1", "New category" }
+                p { class: "font-mono text-xs font-medium tracking-[0.02em] uppercase text-subtle mb-1", "{i18n.read().t(\"categories.new_category\")}" }
                 ColorPicker { selected: new_color.read().clone(), on_pick: move |c: String| new_color.set(c) }
                 div { class: "flex gap-2",
                     input {
                         class: INPUT_CLS,
-                        placeholder: "Category name…",
+                        placeholder: i18n.read().t("categories.name_placeholder"),
                         value: "{new_name}",
                         oninput: move |e| new_name.set(e.value()),
                         onkeydown: move |e| {
@@ -101,15 +103,15 @@ pub fn Categories() -> Element {
                                 }
                             });
                         },
-                        "Add"
+                        "{i18n.read().t(\"categories.add\")}"
                     }
                 }
             }
 
             if *loading.read() {
-                div { class: "empty-state", p { "Loading…" } }
+                div { class: "empty-state", p { "{i18n.read().t(\"categories.loading\")}" } }
             } else if cat_list.is_empty() {
-                div { class: "empty-state", p { "No categories yet. Add one above." } }
+                div { class: "empty-state", p { "{i18n.read().t(\"categories.empty\")}" } }
             } else {
                 div { class: "flex flex-col gap-2",
                     for cat in cat_list {
@@ -145,13 +147,13 @@ pub fn Categories() -> Element {
                                                         fetch.restart();
                                                     });
                                                 },
-                                                "Save"
+                                                "{i18n.read().t(\"categories.save\")}"
                                             }
                                             button {
                                                 r#type: "button",
                                                 class: "h-10 px-3 bg-surface-raised border border-border text-subtle font-mono text-xs rounded-md cursor-pointer shrink-0 transition-colors duration-fast ease-tech hover:text-foreground",
                                                 onclick: move |_| editing_id.set(None),
-                                                "Cancel"
+                                                "{i18n.read().t(\"categories.cancel\")}"
                                             }
                                         }
                                     }
@@ -165,7 +167,7 @@ pub fn Categories() -> Element {
                                         button {
                                             r#type: "button",
                                             class: "size-8 grid place-items-center bg-transparent border-0 text-subtle cursor-pointer rounded-sm transition-colors duration-fast ease-tech hover:text-foreground hover:bg-surface-raised shrink-0",
-                                            title: "Edit",
+                                            title: i18n.read().t("categories.edit"),
                                             onclick: move |_| {
                                                 editing_id.set(Some(id_for_edit.clone()));
                                                 editing_name.set(name_for_edit.clone());
@@ -178,7 +180,7 @@ pub fn Categories() -> Element {
                                         button {
                                             r#type: "button",
                                             class: "size-8 grid place-items-center bg-transparent border-0 text-subtle cursor-pointer rounded-sm transition-colors duration-fast ease-tech hover:text-danger hover:bg-surface-raised shrink-0",
-                                            title: "Delete",
+                                            title: i18n.read().t("categories.delete"),
                                             onclick: move |_| {
                                                 let id = cat.id.clone();
                                                 spawn(async move {
@@ -212,12 +214,14 @@ struct ColorPickerProps {
 
 #[component]
 fn ColorPicker(props: ColorPickerProps) -> Element {
+    let i18n = use_i18n();
     rsx! {
         div { class: "flex gap-2 flex-wrap",
-            for &(color, label) in PRESET_COLORS.iter() {
+            for &(color, key) in PRESET_COLORS.iter() {
                 {
                     let c = color.to_string();
                     let selected = props.selected == c;
+                    let label = i18n.read().t(key);
                     rsx! {
                         button {
                             r#type: "button",

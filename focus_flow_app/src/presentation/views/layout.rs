@@ -1,6 +1,9 @@
 use crate::{
-    clients::auth_client::logout, presentation::views::auth_page::AuthPage,
-    state::auth_state::AuthState, Route,
+    clients::auth_client::logout,
+    i18n::{save_locale, use_i18n, I18n, Locale},
+    presentation::views::auth_page::AuthPage,
+    state::auth_state::AuthState,
+    Route,
 };
 use dioxus::prelude::*;
 
@@ -24,6 +27,7 @@ fn sd_icon_cls(active: bool) -> &'static str {
 pub fn Layout() -> Element {
     let mut drawer_open: Signal<bool> = use_context_provider(|| Signal::new(false));
     let mut auth_state = use_context::<Signal<AuthState>>();
+    let mut i18n = use_i18n();
 
     let logout_handler = move |_| {
         auth_state.write().delete_auth_token();
@@ -43,6 +47,9 @@ pub fn Layout() -> Element {
         | Route::Categories {} => "tasks",
         Route::Flashcards {} => "flashcards",
     };
+
+    let is_en = i18n.read().locale == Locale::En;
+    let is_it = i18n.read().locale == Locale::It;
 
     rsx! {
         div { class: "h-screen flex flex-col relative overflow-hidden",
@@ -78,8 +85,8 @@ pub fn Layout() -> Element {
                 div { class: "pt-[52px] px-5 pb-[18px] flex items-center gap-3 border-b border-border",
                     div { class: "size-[34px] bg-accent-soft border border-accent rounded-sm grid place-items-center shrink-0 relative after:content-[''] after:absolute after:size-3 after:bg-accent after:rounded-[3px]" }
                     div { class: "text-[20px] font-bold text-foreground tracking-[-0.025em]",
-                        "Focus"
-                        em { class: "text-accent not-italic", "Flow" }
+                        "{i18n.read().t(\"layout.focus\")}"
+                        em { class: "text-accent not-italic", "{i18n.read().t(\"layout.flow\")}" }
                     }
                     button {
                         class: "ml-auto size-[30px] bg-surface-card border border-border rounded-sm text-subtle grid place-items-center cursor-pointer transition-[background,color] duration-fast ease-tech hover:bg-gray-200 hover:text-foreground",
@@ -93,7 +100,7 @@ pub fn Layout() -> Element {
 
                 // Eyebrow
                 div { class: "px-5 pt-4 pb-1.5 font-mono text-[10px] text-subtle tracking-[0.02em] uppercase",
-                    "// workspace"
+                    "{i18n.read().t(\"layout.comment_workspace\")}"
                 }
 
                 // Nav
@@ -107,7 +114,7 @@ pub fn Layout() -> Element {
                                 path { d: "M3 4h10M3 8h10M3 12h6" }
                             }
                         }
-                        span { class: "flex-1", "Tasks" }
+                        span { class: "flex-1", "{i18n.read().t(\"layout.tasks\")}" }
                     }
                     Link {
                         to: Route::Flashcards {},
@@ -119,8 +126,8 @@ pub fn Layout() -> Element {
                                 rect { x: "4", y: "5", width: "10", height: "9" }
                             }
                         }
-                        span { class: "flex-1", "Flashcards" }
-                        span { class: "font-mono text-[10px] text-subtle tracking-[0.02em] uppercase", "soon" }
+                        span { class: "flex-1", "{i18n.read().t(\"layout.flashcards\")}" }
+                        span { class: "font-mono text-[10px] text-subtle tracking-[0.02em] uppercase", "{i18n.read().t(\"layout.soon\")}" }
                     }
                 }
 
@@ -130,11 +137,42 @@ pub fn Layout() -> Element {
                         "FF"
                     }
                     div { class: "flex flex-col flex-1 min-w-0",
-                        span { class: "text-sm font-medium text-foreground", "You" }
-                        span { class: "font-mono text-xs text-subtle whitespace-nowrap overflow-hidden text-ellipsis", "local · synced" }
+                        span { class: "text-sm font-medium text-foreground", "{i18n.read().t(\"layout.user_label\")}" }
+                        span { class: "font-mono text-xs text-subtle whitespace-nowrap overflow-hidden text-ellipsis", "{i18n.read().t(\"layout.user_status\")}" }
                     }
+
+                    // Language switcher
+                    div { class: "flex items-center gap-1 shrink-0",
+                        button {
+                            class: if is_en {
+                                "px-2 py-1 font-mono text-[10px] rounded-sm cursor-pointer border border-accent bg-accent-soft text-accent tracking-[0.04em] uppercase"
+                            } else {
+                                "px-2 py-1 font-mono text-[10px] rounded-sm cursor-pointer border border-border text-subtle tracking-[0.04em] uppercase hover:border-border-strong hover:text-muted"
+                            },
+                            onclick: move |_| {
+                                let locale = Locale::En;
+                                save_locale(&locale);
+                                *i18n.write() = I18n::new(locale);
+                            },
+                            "EN"
+                        }
+                        button {
+                            class: if is_it {
+                                "px-2 py-1 font-mono text-[10px] rounded-sm cursor-pointer border border-accent bg-accent-soft text-accent tracking-[0.04em] uppercase"
+                            } else {
+                                "px-2 py-1 font-mono text-[10px] rounded-sm cursor-pointer border border-border text-subtle tracking-[0.04em] uppercase hover:border-border-strong hover:text-muted"
+                            },
+                            onclick: move |_| {
+                                let locale = Locale::It;
+                                save_locale(&locale);
+                                *i18n.write() = I18n::new(locale);
+                            },
+                            "IT"
+                        }
+                    }
+
                     button {
-                        class: "size-8 bg-transparent border border-border rounded-sm text-subtle grid place-items-center cursor-pointer shrink-0 ml-auto transition-[background,border-color,color] duration-fast ease-tech hover:bg-danger/10 hover:border-danger hover:text-danger",
+                        class: "size-8 bg-transparent border border-border rounded-sm text-subtle grid place-items-center cursor-pointer shrink-0 ml-1 transition-[background,border-color,color] duration-fast ease-tech hover:bg-danger/10 hover:border-danger hover:text-danger",
                         r#type: "button",
                         onclick: logout_handler,
                         svg { view_box: "0 0 16 16", width: "14", height: "14", stroke: "currentColor", fill: "none", stroke_width: "1.5", stroke_linecap: "round",

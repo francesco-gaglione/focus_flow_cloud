@@ -2,7 +2,10 @@ use chrono::{Datelike, Duration, Local, Months, NaiveDate, Timelike, Weekday};
 use dioxus::prelude::*;
 use shared::task::TaskPriority;
 
-use crate::use_cases::tasks::task_list_uc::{task_list_uc, TaskSchedule, TodoTask};
+use crate::{
+    i18n::use_i18n,
+    use_cases::tasks::task_list_uc::{task_list_uc, TaskSchedule, TodoTask},
+};
 
 // ── constants ─────────────────────────────────────────────────────────────────
 
@@ -39,44 +42,27 @@ fn days_in_month(year: i32, month: u32) -> u32 {
     next.map(|d| (d - Duration::days(1)).day()).unwrap_or(30)
 }
 
-fn month_name(m: u32) -> &'static str {
-    match m {
-        1 => "January",
-        2 => "February",
-        3 => "March",
-        4 => "April",
-        5 => "May",
-        6 => "June",
-        7 => "July",
-        8 => "August",
-        9 => "September",
-        10 => "October",
-        11 => "November",
-        _ => "December",
+fn weekday_key_full(w: Weekday) -> &'static str {
+    match w {
+        Weekday::Mon => "calendar.weekday_monday",
+        Weekday::Tue => "calendar.weekday_tuesday",
+        Weekday::Wed => "calendar.weekday_wednesday",
+        Weekday::Thu => "calendar.weekday_thursday",
+        Weekday::Fri => "calendar.weekday_friday",
+        Weekday::Sat => "calendar.weekday_saturday",
+        Weekday::Sun => "calendar.weekday_sunday",
     }
 }
 
-fn weekday_name(w: Weekday) -> &'static str {
+fn weekday_key_short(w: Weekday) -> &'static str {
     match w {
-        Weekday::Mon => "Monday",
-        Weekday::Tue => "Tuesday",
-        Weekday::Wed => "Wednesday",
-        Weekday::Thu => "Thursday",
-        Weekday::Fri => "Friday",
-        Weekday::Sat => "Saturday",
-        Weekday::Sun => "Sunday",
-    }
-}
-
-fn weekday_short(w: Weekday) -> &'static str {
-    match w {
-        Weekday::Mon => "Mon",
-        Weekday::Tue => "Tue",
-        Weekday::Wed => "Wed",
-        Weekday::Thu => "Thu",
-        Weekday::Fri => "Fri",
-        Weekday::Sat => "Sat",
-        Weekday::Sun => "Sun",
+        Weekday::Mon => "calendar.weekday_short_mon",
+        Weekday::Tue => "calendar.weekday_short_tue",
+        Weekday::Wed => "calendar.weekday_short_wed",
+        Weekday::Thu => "calendar.weekday_short_thu",
+        Weekday::Fri => "calendar.weekday_short_fri",
+        Weekday::Sat => "calendar.weekday_short_sat",
+        Weekday::Sun => "calendar.weekday_short_sun",
     }
 }
 
@@ -99,6 +85,7 @@ struct TimedItem {
 
 #[component]
 pub fn Calendar() -> Element {
+    let i18n = use_i18n();
     let mut cal_mode: Signal<&'static str> = use_signal(|| "month");
     let mut current_date: Signal<NaiveDate> = use_signal(|| Local::now().date_naive());
 
@@ -116,15 +103,21 @@ pub fn Calendar() -> Element {
     let month_label = if mode == "week" {
         let mon = week_monday(cur);
         let sun = mon + Duration::days(6);
-        let m1 = &month_name(mon.month())[..3];
-        let m2 = &month_name(sun.month())[..3];
+        let m1_full = i18n.read().t(&format!("calendar.month_{}", mon.month()));
+        let m2_full = i18n.read().t(&format!("calendar.month_{}", sun.month()));
+        let m1: String = m1_full.chars().take(3).collect();
+        let m2: String = m2_full.chars().take(3).collect();
         if mon.month() == sun.month() {
             format!("{} {}–{}", m1, mon.day(), sun.day())
         } else {
             format!("{} {}–{} {}", m1, mon.day(), m2, sun.day())
         }
     } else {
-        format!("{} {}", month_name(cur.month()), cur.year())
+        format!(
+            "{} {}",
+            i18n.read().t(&format!("calendar.month_{}", cur.month())),
+            cur.year()
+        )
     };
 
     rsx! {
@@ -135,12 +128,12 @@ pub fn Calendar() -> Element {
                     button {
                         class: if mode == "month" { "active" } else { "" },
                         onclick: move |_| cal_mode.set("month"),
-                        "Month"
+                        "{i18n.read().t(\"calendar.month\")}"
                     }
                     button {
                         class: if mode == "week" { "active" } else { "" },
                         onclick: move |_| cal_mode.set("week"),
-                        "Week"
+                        "{i18n.read().t(\"calendar.week\")}"
                     }
                 }
 
@@ -204,7 +197,7 @@ pub fn Calendar() -> Element {
                     button {
                         class: "today-btn",
                         onclick: move |_| current_date.set(Local::now().date_naive()),
-                        "Today"
+                        "{i18n.read().t(\"calendar.today\")}"
                     }
                 }
             }
@@ -228,6 +221,7 @@ struct MonthViewProps {
 
 #[component]
 fn MonthView(props: MonthViewProps) -> Element {
+    let i18n = use_i18n();
     let today = Local::now().date_naive();
     let mut selected: Signal<NaiveDate> = use_signal(|| today);
 
@@ -258,20 +252,34 @@ fn MonthView(props: MonthViewProps) -> Element {
         .map(|t| (t.title.clone(), task_color(t), t.cat.clone()))
         .collect();
     let sel_count = sel_tasks.len();
-    let sel_count_str = format!(
-        "{} task{}",
-        sel_count,
-        if sel_count == 1 { "" } else { "s" }
-    );
+    let task_word = if sel_count == 1 {
+        i18n.read().t("calendar.task_singular")
+    } else {
+        i18n.read().t("calendar.task_plural")
+    };
+    let sel_count_str = format!("{} {}", sel_count, task_word);
+    let today_suffix = if sel == today {
+        i18n.read().t("calendar.today_suffix")
+    } else {
+        String::new()
+    };
     let sel_head = format!(
         "{}, {} {}{}",
-        weekday_name(sel.weekday()),
-        month_name(sel.month()),
+        i18n.read().t(weekday_key_full(sel.weekday())),
+        i18n.read().t(&format!("calendar.month_{}", sel.month())),
         sel.day(),
-        if sel == today { " · today" } else { "" }
+        today_suffix
     );
 
-    let dows = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    let dows = [
+        i18n.read().t("calendar.weekday_short_mon"),
+        i18n.read().t("calendar.weekday_short_tue"),
+        i18n.read().t("calendar.weekday_short_wed"),
+        i18n.read().t("calendar.weekday_short_thu"),
+        i18n.read().t("calendar.weekday_short_fri"),
+        i18n.read().t("calendar.weekday_short_sat"),
+        i18n.read().t("calendar.weekday_short_sun"),
+    ];
 
     rsx! {
         div { class: "cal-grid",
@@ -316,7 +324,7 @@ fn MonthView(props: MonthViewProps) -> Element {
                 span { class: "font-mono text-xs text-subtle tracking-[var(--tracking-data)] uppercase", "{sel_count_str}" }
             }
             if sel_tasks.is_empty() {
-                div { class: "text-center py-6 px-3 font-mono text-xs text-subtle tracking-[var(--tracking-data)] uppercase", "// quiet day · breathe" }
+                div { class: "text-center py-6 px-3 font-mono text-xs text-subtle tracking-[var(--tracking-data)] uppercase", "{i18n.read().t(\"calendar.quiet_day\")}" }
             } else {
                 div { class: "flex flex-col",
                     for (title, color, cat) in sel_tasks {
@@ -350,6 +358,7 @@ struct WeekViewProps {
 
 #[component]
 fn WeekView(props: WeekViewProps) -> Element {
+    let i18n = use_i18n();
     let today = Local::now().date_naive();
     let now = Local::now();
     let monday = week_monday(props.current_date);
@@ -478,7 +487,7 @@ fn WeekView(props: WeekViewProps) -> Element {
                 for (date, is_today) in header_data {
                     div {
                         class: if is_today { "flex-1 flex flex-col items-center py-2 px-1 gap-[2px] border-l border-border bg-accent-soft" } else { "flex-1 flex flex-col items-center py-2 px-1 gap-[2px] border-l border-border" },
-                        span { class: "font-mono text-[9px] text-subtle uppercase tracking-[var(--tracking-data)]", "{weekday_short(date.weekday())}" }
+                        span { class: "font-mono text-[9px] text-subtle uppercase tracking-[var(--tracking-data)]", "{i18n.read().t(weekday_key_short(date.weekday()))}" }
                         span { class: if is_today { "text-lg font-bold tracking-tight text-accent leading-none" } else { "text-lg font-bold tracking-tight text-foreground leading-none" }, "{date.day()}" }
                     }
                 }
@@ -487,7 +496,7 @@ fn WeekView(props: WeekViewProps) -> Element {
             if has_allday {
                 div { class: "flex border-b border-border min-h-[28px]",
                     div { class: "w-[52px] flex-shrink-0 flex items-center justify-end pr-2",
-                        span { class: "font-mono text-[9px] text-subtle uppercase tracking-[var(--tracking-data)] leading-none text-right", "all day" }
+                        span { class: "font-mono text-[9px] text-subtle uppercase tracking-[var(--tracking-data)] leading-none text-right", "{i18n.read().t(\"calendar.all_day\")}" }
                     }
                     for chips in allday_data {
                         div { class: "flex-1 py-1 px-[2px] flex flex-col gap-[2px] border-l border-border",
