@@ -101,7 +101,13 @@ impl ApiClient {
         let status = response.status();
 
         if status.is_success() {
-            return response.json::<R>().await.map_err(ApiError::from);
+            let bytes = response.bytes().await.map_err(ApiError::from)?;
+            return if bytes.is_empty() {
+                serde_json::from_str("null")
+            } else {
+                serde_json::from_slice(&bytes)
+            }
+            .map_err(|e| ApiError::Deserialization(e.to_string()));
         }
 
         match status {

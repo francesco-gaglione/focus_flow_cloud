@@ -35,6 +35,11 @@
   "layout.save": "Save",
   "layout.cancel": "Cancel",
   "layout.settings": "Settings",
+  "layout.comment_admin": "// admin",
+  "layout.create_user": "Create user",
+  "layout.create_user_title": "Create user",
+  "layout.new_user_username_placeholder": "Username",
+  "layout.new_user_password_placeholder": "Password",
 
   "tasks_layout.title_todo": "Tasks, <em>focus please.</em>",
   "tasks_layout.title_calendar": "A month, <em>at a glance</em>.",

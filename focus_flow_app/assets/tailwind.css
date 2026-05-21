@@ -1380,6 +1380,11 @@
       opacity: 40%;
     }
   }
+  .disabled\:opacity-50 {
+    &:disabled {
+      opacity: 50%;
+    }
+  }
   .\[\&_em\]\:text-accent {
     & em {
       color: var(--color-accent);
