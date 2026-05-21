@@ -256,7 +256,12 @@ jobs:
         run: cargo install dioxus-cli --locked
 
       - name: Bundle (${{ matrix.target }})
-        run: dx bundle --release --platform ${{ matrix.platform }}
+        run: |
+          if [ "${{ matrix.target }}" = "android" ]; then
+            dx bundle --release --platform android --target aarch64-linux-android
+          else
+            dx bundle --release --platform ${{ matrix.platform }}
+          fi
 
       - name: Install create-dmg (macOS)
         if: matrix.target == 'macos'
