@@ -28,6 +28,7 @@
   "layout.version_label": "Version",
   "layout.server_label": "Server",
   "layout.edit_server_title": "Edit Server URL",
+  "layout.logout": "Logout",
   "layout.language_label": "Language",
   "layout.language_en": "English",
   "layout.language_it": "Italiano",

@@ -6,6 +6,10 @@
     --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
         "Segoe UI", sans-serif;
     --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --color-red-50: oklch(97.1% 0.013 17.38);
+    --color-red-100: oklch(93.6% 0.032 17.717);
+    --color-red-300: oklch(80.8% 0.114 19.571);
+    --color-red-500: oklch(63.7% 0.237 25.331);
     --color-gray-100: #181818;
     --color-gray-200: #202020;
     --color-gray-300: #2a2a2a;
@@ -825,6 +829,9 @@
   .pt-5 {
     padding-top: calc(var(--spacing) * 5);
   }
+  .pt-6 {
+    padding-top: calc(var(--spacing) * 6);
+  }
   .pt-\[52px\] {
     padding-top: 52px;
   }
@@ -1000,6 +1007,9 @@
   }
   .text-muted {
     color: var(--color-muted);
+  }
+  .text-red-500 {
+    color: var(--color-red-500);
   }
   .text-subtle {
     color: var(--color-subtle);
@@ -1212,6 +1222,13 @@
       }
     }
   }
+  .hover\:border-red-300 {
+    &:hover {
+      @media (hover: hover) {
+        border-color: var(--color-red-300);
+      }
+    }
+  }
   .hover\:bg-accent-hover {
     &:hover {
       @media (hover: hover) {
@@ -1247,6 +1264,13 @@
     &:hover {
       @media (hover: hover) {
         background-color: var(--color-gray-200);
+      }
+    }
+  }
+  .hover\:bg-red-50 {
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--color-red-50);
       }
     }
   }
@@ -1324,6 +1348,11 @@
   .active\:bg-gray-300 {
     &:active {
       background-color: var(--color-gray-300);
+    }
+  }
+  .active\:bg-red-100 {
+    &:active {
+      background-color: var(--color-red-100);
     }
   }
   .active\:opacity-60 {
