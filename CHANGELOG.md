@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.0.1] - 2026-05-21
+
+### Bug Fixes
+
+- Android sign
+
+### Features
+
+- Logout button in setting page (#104)
+- Update username and password in setting page (#105)
+
+### Other
+
+- Create user (#106)
+
+* feat: create user
+
 ## [5.0.0] - 2026-05-19
 
 ### Features
