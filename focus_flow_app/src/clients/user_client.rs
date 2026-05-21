@@ -21,7 +21,8 @@ pub async fn update_username(new_username: &str) -> ApiResult<()> {
     let dto = UpdateUsernameDto {
         new_username: new_username.to_string(),
     };
-    api.put::<_, ()>("/api/users/username", None, None, &dto).await
+    api.put::<_, ()>("/api/users/username", None, None, &dto)
+        .await
 }
 
 pub async fn update_password(old_password: &str, new_password: &str) -> ApiResult<()> {
@@ -32,5 +33,6 @@ pub async fn update_password(old_password: &str, new_password: &str) -> ApiResul
         old_password: old_password.to_string(),
         new_password: new_password.to_string(),
     };
-    api.put::<_, ()>("/api/users/password", None, None, &dto).await
+    api.put::<_, ()>("/api/users/password", None, None, &dto)
+        .await
 }
