@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.0.3] - 2026-05-21
+
+### Other
+
+- Update doc
+- Merge branch 'master' of https://github.com/francesco-gaglione/focus_flow_cloud
+- Update Cargo.lock
+- Update doc style
+- Merge branch 'master' of https://github.com/francesco-gaglione/focus_flow_cloud
+
 ## [5.0.2] - 2026-05-21
 
 ### Other
