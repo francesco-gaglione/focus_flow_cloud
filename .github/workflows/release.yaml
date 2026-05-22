@@ -255,6 +255,20 @@ jobs:
       - name: Install Dioxus CLI
         run: cargo install dioxus-cli --locked
 
+      - name: Disable R8 minification (android)
+        if: matrix.target == 'android'
+        run: |
+          mkdir -p ~/.gradle/init.d
+          cat > ~/.gradle/init.d/disable-minify.gradle << 'EOF'
+          allprojects {
+            afterEvaluate {
+              extensions.findByName('android')?.with {
+                buildTypes.findByName('release')?.minifyEnabled = false
+              }
+            }
+          }
+          EOF
+
       - name: Bundle (${{ matrix.target }})
         if: matrix.target != 'android'
         run: dx bundle --release --platform ${{ matrix.platform }}
