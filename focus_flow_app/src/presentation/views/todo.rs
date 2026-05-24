@@ -13,7 +13,7 @@ use crate::{
             Calendar, CalendarGrid, CalendarHeader, CalendarMonthTitle, CalendarNavigation,
             CalendarNextMonthButton, CalendarPreviousMonthButton, CalendarView,
         },
-        select::{Select, SelectList, SelectOption, SelectTrigger, SelectValue},
+        select::{Select, SelectListUp, SelectOption, SelectTrigger, SelectValue},
     },
     i18n::use_i18n,
     presentation::components::{
@@ -283,7 +283,7 @@ pub fn Todo() -> Element {
                     SelectTrigger {
                         SelectValue { placeholder: i18n.read().t("todo.filter_all_periods") }
                     }
-                    SelectList {
+                    SelectListUp {
                         SelectOption::<String> { index: 0_usize, value: "all".to_string(),      text_value: i18n.read().t("todo.filter_all_periods"), "{i18n.read().t(\"todo.filter_all_periods\")}" }
                         SelectOption::<String> { index: 1_usize, value: "today".to_string(),    text_value: i18n.read().t("todo.filter_today"),       "{i18n.read().t(\"todo.filter_today\")}" }
                         SelectOption::<String> { index: 2_usize, value: "upcoming".to_string(), text_value: i18n.read().t("todo.filter_upcoming"),    "{i18n.read().t(\"todo.filter_upcoming\")}" }
@@ -300,7 +300,7 @@ pub fn Todo() -> Element {
                     SelectTrigger {
                         SelectValue { placeholder: i18n.read().t("todo.filter_all_categories") }
                     }
-                    SelectList {
+                    SelectListUp {
                         SelectOption::<String> { index: 0_usize, value: "all".to_string(), text_value: i18n.read().t("todo.filter_all_categories"), "{i18n.read().t(\"todo.filter_all_categories\")}" }
                         for (i, cat) in categories.read().iter().enumerate() {
                             SelectOption::<String> { index: i + 1, value: cat.name.clone(), text_value: cat.name.clone(), "@{cat.name}" }

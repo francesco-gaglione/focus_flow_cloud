@@ -11,7 +11,7 @@ use crate::{
             CalendarNextMonthButton, CalendarPreviousMonthButton, CalendarView,
         },
         input::Input,
-        select::{Select, SelectList, SelectOption, SelectTrigger, SelectValue},
+        select::{Select, SelectListUp, SelectOption, SelectTrigger, SelectValue},
     },
     i18n::use_i18n,
     presentation::components::common_components::bottom_sheet::BottomSheet,
@@ -303,7 +303,7 @@ pub fn CreateTaskSheet(props: CreateTaskSheetProps) -> Element {
                             SelectTrigger {
                                 SelectValue { placeholder: i18n.read().t("create_task.no_category") }
                             }
-                            SelectList {
+                            SelectListUp {
                                 for (i, cat) in props.categories.iter().enumerate() {
                                     SelectOption::<String> {
                                         index: i,
@@ -333,7 +333,7 @@ pub fn CreateTaskSheet(props: CreateTaskSheetProps) -> Element {
                             SelectTrigger {
                                 SelectValue { placeholder: i18n.read().t("create_task.priority_none") }
                             }
-                            SelectList {
+                            SelectListUp {
                                 SelectOption::<String> { index: 0_usize, value: "low".to_string(), text_value: "Low", "{i18n.read().t(\"create_task.priority_low\")}" }
                                 SelectOption::<String> { index: 1_usize, value: "medium".to_string(), text_value: "Medium", "{i18n.read().t(\"create_task.priority_medium\")}" }
                                 SelectOption::<String> { index: 2_usize, value: "high".to_string(), text_value: "High", "{i18n.read().t(\"create_task.priority_high\")}" }
