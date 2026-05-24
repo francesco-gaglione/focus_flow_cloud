@@ -29,7 +29,7 @@ impl Last14dCountsService {
 
 #[cfg(test)]
 mod tests {
-    use chrono::{Days, Duration, NaiveDate, Utc};
+    use chrono::{Days, NaiveDate, Utc};
     use uuid::Uuid;
 
     use crate::entities::tasks::{task::Task, task_schedule::TaskSchedule};

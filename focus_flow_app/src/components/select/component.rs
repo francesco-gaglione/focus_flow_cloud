@@ -81,8 +81,29 @@ pub fn SelectValue(props: SelectValueProps) -> Element {
 
 #[component]
 pub fn SelectList(props: SelectListProps) -> Element {
+    use_effect(|| {
+        // Inject a synchronous (non-passive) touchend listener that prevents
+        // mouse-compat events (ghost click) after a touch on the select list.
+        // Dioxus event handlers go through WRY's async IPC and cannot
+        // synchronously cancel browser events, so we must use raw JS here.
+        document::eval(
+            r#"
+            (function() {
+                if (window.__dxSelectTouchGuard) return;
+                window.__dxSelectTouchGuard = true;
+                document.addEventListener('touchend', function(e) {
+                    if (e.target.closest('.dx-select-list')) {
+                        e.preventDefault();
+                    }
+                }, { passive: false, capture: true });
+            })();
+        "#,
+        );
+    });
+
     let base = attributes!(div {
-        class: "dx-select-list"
+        class: "dx-select-list",
+        style: "touch-action: none;"
     });
     let merged = merge_attributes(vec![base, props.attributes]);
 
