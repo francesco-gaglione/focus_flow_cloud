@@ -133,6 +133,22 @@ pub fn SelectListUp(props: SelectListProps) -> Element {
 }
 
 #[component]
+pub fn SelectListUp(props: SelectListProps) -> Element {
+    let base = attributes!(div {
+        class: "dx-select-list dx-select-list--up"
+    });
+    let merged = merge_attributes(vec![base, props.attributes]);
+
+    rsx! {
+        select::SelectList {
+            id: props.id,
+            attributes: merged,
+            {props.children}
+        }
+    }
+}
+
+#[component]
 pub fn SelectGroup(props: SelectGroupProps) -> Element {
     let base = attributes!(div {
         class: "dx-select-group"
