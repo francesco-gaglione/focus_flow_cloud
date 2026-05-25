@@ -255,19 +255,31 @@ jobs:
       - name: Install Dioxus CLI
         run: cargo install dioxus-cli --locked
 
-      - name: Disable R8 minification (android)
+      - name: Keep WRY JNI bridge from R8 stripping (android)
         if: matrix.target == 'android'
         run: |
           mkdir -p ~/.gradle/init.d
-          cat > ~/.gradle/init.d/disable-minify.gradle << 'EOF'
-          allprojects {
-            afterEvaluate {
-              extensions.findByName('android')?.with {
-                buildTypes.findByName('release')?.minifyEnabled = false
-              }
+          cat > ~/.gradle/init.d/wry-proguard.gradle << 'EOF'
+allprojects {
+    afterEvaluate { project ->
+        if (project.plugins.hasPlugin('com.android.application')) {
+            def rulesFile = new File(project.buildDir, 'generated/wry-keep.pro')
+            rulesFile.parentFile.mkdirs()
+            rulesFile.text = '''\
+-keep class dev.dioxus.main.** { *; }
+-keepclassmembers class dev.dioxus.main.WryActivity {
+    public void setWebView(...);
+}
+'''
+            project.android.buildTypes.each { buildType ->
+                if (buildType.name == 'release') {
+                    buildType.proguardFile(rulesFile)
+                }
             }
-          }
-          EOF
+        }
+    }
+}
+EOF
 
       - name: Bundle (${{ matrix.target }})
         if: matrix.target != 'android'
