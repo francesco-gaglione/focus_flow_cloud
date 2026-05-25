@@ -2,7 +2,7 @@
 
 [package]
 name = "focus_flow_app"
-version = "5.0.5"
+version = "5.0.6"
 authors = ["Francesco Pio Gaglione <francesco.gaglione.p@gmail.com>"]
 edition = "2021"
 
