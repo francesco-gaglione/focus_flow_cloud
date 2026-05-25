@@ -1,3 +1,6 @@
+# App (Dioxus)
+focus_flow_app/assets/tailwind.css
+
 # Backend (Rust)
 backend/target
 backend/.env

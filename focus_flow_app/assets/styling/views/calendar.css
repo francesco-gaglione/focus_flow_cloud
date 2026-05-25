@@ -7,7 +7,6 @@
     border: 1px solid var(--border);
     border-radius: var(--r-md);
     padding: 3px;
-    margin-bottom: 14px;
 }
 .cal-toggle button {
     flex: 1;
