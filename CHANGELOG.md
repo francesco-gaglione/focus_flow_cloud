@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.0.4] - 2026-05-25
+
+### Bug Fixes
+
+- Android release fix
+- Dropdown ghost events (#113)
+- Prevent dropdown list from clipping below bottom sheets (#114)
+- Filter row misalignment on calendar page (#115)
+- Prevent dropdown list from clipping below bottom sheets
+- Calendar menu alignment
+- Fix build
+
+### Miscellaneous Tasks
+
+- Add empty tailwind.css placeholder for clippy
+
+### Other
+
+- Merge branch 'master' of https://github.com/francesco-gaglione/focus_flow_cloud
+- Merge branch '108-dropdown-menus-cut-off-at-the-bottom-of-bottom-sheets' into 109-filter-row-misalignment-on-calendar-page
+- Android fix
+- Merge branch '109-filter-row-misalignment-on-calendar-page'
+
 ## [5.0.3] - 2026-05-21
 
 ### Other
