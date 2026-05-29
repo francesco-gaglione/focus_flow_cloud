@@ -5,7 +5,7 @@ on:
     tags:
       - "v*"
       - "backend-v*"
-      - "app-v*"
+      - "pwa-v*"
 
 env:
   CARGO_TERM_COLOR: always
@@ -184,11 +184,57 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh run cancel ${{ github.run_id }}
 
+  # PWA
+  pwa-build:
+    if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/pwa-v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write
+    defaults:
+      run:
+        working-directory: pwa
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Type check
+        run: bun run check
+
+      - name: Build
+        run: bun run build
+
+      - name: Package build output
+        working-directory: .
+        run: tar -czf pwa-build.tar.gz pwa/build/
+
+      - name: Upload PWA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pwa-build
+          path: pwa-build.tar.gz
+          if-no-files-found: error
+
+      - name: Cancel Workflow on Failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh run cancel ${{ github.run_id }}
+
   # RELEASE
   publish-release:
     name: Publish Release
-    needs: [backend-build, app-build]
-    if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/backend-v') || startsWith(github.ref, 'refs/tags/app-v')
+    needs: [backend-build, pwa-build]
+    if: |
+      always() &&
+      (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/backend-v') || startsWith(github.ref, 'refs/tags/pwa-v')) &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -209,9 +255,6 @@ jobs:
           files: |
             release_assets/**/focus_flow_cloud-amd64
             release_assets/**/focus_flow_cloud-arm64
-            release_assets/**/*.dmg
-            release_assets/**/*.tar.gz
-            release_assets/**/*.zip
-            release_assets/**/*.apk
+            release_assets/**/pwa-build.tar.gz
           generate_release_notes: true
           fail_on_unmatched_files: false
