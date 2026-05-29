@@ -16,6 +16,7 @@
     import { Menu, Portal } from "@skeletonlabs/skeleton-svelte";
     import { timerStore } from "@/lib/stores/timer";
     import { goto } from "$app/navigation";
+    import EditTaskSheet from "./EditTaskSheet.svelte";
 
     const {
         task,
@@ -79,6 +80,7 @@
 
     const qc = useQueryClient();
     let expanded = $state(false);
+    let editOpen = $state(false);
 
     let cat = $derived(cats.find((c) => c.id === task.categoryId));
     let startTs = $derived(scheduleStartTs(task.schedule));
@@ -126,12 +128,13 @@
     });
 
     const menuSelection = (value: string) => {
-        console.debug(value);
         if (value === "delete") {
             $deleteTask.mutate(task.id);
         } else if (value === "startTimer") {
             timerStore.setSelectedTask({ id: task.id, title: task.title });
             goto("/timer");
+        } else if (value === "edit") {
+            editOpen = true;
         }
     };
 </script>
@@ -255,3 +258,5 @@
         </div>
     {/if}
 </div>
+
+<EditTaskSheet {task} open={editOpen} onClose={() => (editOpen = false)} />

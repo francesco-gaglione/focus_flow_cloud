@@ -87,7 +87,15 @@ impl GetTasksUseCase {
         tracing::info!("Fetching tasks with completed: {:?}", command.completed);
         let res = self.task_persistence.find_all(command.completed).await?;
         tracing::info!("Fetched {} tasks", res.len());
-        Ok(res.iter().map(|t| t.into()).collect())
+        let mut tasks: Vec<TaskOutput> = res.iter().map(|t| t.into()).collect();
+        tasks.sort_by_key(|t| match t.priority {
+            Some(TaskPriority::Urgent) => 0,
+            Some(TaskPriority::High) => 1,
+            Some(TaskPriority::Medium) => 2,
+            Some(TaskPriority::Low) => 3,
+            None => 4,
+        });
+        Ok(tasks)
     }
 }
 
