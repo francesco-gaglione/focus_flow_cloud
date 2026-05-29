@@ -136,6 +136,19 @@ jobs:
             backend/focus_flow_cloud-arm64
           if-no-files-found: error
 
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Build PWA for Docker image
+        working-directory: pwa
+        run: |
+          bun install --frozen-lockfile
+          bun run build
+
+      - name: Copy PWA build into Docker context
+        working-directory: .
+        run: cp -r pwa/build backend/pwa-dist
+
       - name: Extract version from Cargo.toml
         id: crate-version
         uses: colathro/crate-version@2.0.0

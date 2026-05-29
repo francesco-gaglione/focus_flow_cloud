@@ -79,6 +79,11 @@ spec:
                 configMapKeyRef:
                   name: focus-flow-cloud-config
                   key: OTLP_ENDPOINT
+            - name: PWA_DIST_DIR
+              valueFrom:
+                configMapKeyRef:
+                  name: focus-flow-cloud-config
+                  key: PWA_DIST_DIR
 
 ---
 apiVersion: v1

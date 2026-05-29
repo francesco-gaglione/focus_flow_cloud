@@ -1,52 +1,31 @@
-# App (Dioxus)
-focus_flow_app/assets/tailwind.css
-
-# PWA (React + Vite)
-pwa/node_modules/
-pwa/dist/
-pwa/.env
-
 # Backend (Rust)
-backend/target
+backend/target/
 backend/.env
+target/
 
-# App (Flutter)
-app/build/
-app/.dart_tool/
-app/.flutter-plugins
-app/.flutter-plugins-dependencies
-app/.pub-cache/
-app/.pub/
-app/ios/Flutter/.last_build_id
-app/android/app/debug
-app/android/app/profile
-app/android/app/release
+# PWA (SvelteKit)
+pwa/node_modules/
+pwa/build/
+pwa/.svelte-kit/
+pwa/.env
+pwa/pwa-dist/
 
-target
+# Docs
+doc/node_modules/
+doc/build/
+doc/.docusaurus/
 
 # Generic
-.idea
-.zed
+.idea/
+.zed/
 .env
-.k8s
-*.class
-*.log
-*.pyc
-*.swp
 .DS_Store
-.atom/
-.build/
-.buildlog/
+*.log
+*.swp
 .history
 .svn/
-.swiftpm/
-migrate_working_dir/
 
-# IntelliJ related
+# IntelliJ
 *.iml
 *.ipr
 *.iws
-.idea/
-
-# Flutter/Dart/Pub related (general)
-**/doc/api/

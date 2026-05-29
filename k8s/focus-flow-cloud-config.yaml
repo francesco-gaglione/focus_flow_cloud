@@ -14,3 +14,4 @@ data:
   ADMIN_USERNAME: "admin"
   ADMIN_PASSWORD: "admin"
   OTLP_ENDPOINT: "http://localhost:4317"
+  PWA_DIST_DIR: "/app/pwa"

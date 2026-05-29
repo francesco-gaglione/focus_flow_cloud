@@ -15,6 +15,9 @@ WORKDIR /app
 # Copy the pre-compiled binary matching the target architecture
 COPY focus_flow_cloud-${TARGETARCH} /app/focus_flow_cloud
 
+# Copy PWA static files (if present in build context)
+COPY pwa-dist /app/pwa
+
 EXPOSE 8080
 
 # Install wget for healthcheck
