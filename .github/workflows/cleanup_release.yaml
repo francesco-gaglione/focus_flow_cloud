@@ -23,7 +23,7 @@ jobs:
            echo "Head branch/tag: $TAG_NAME"
            
            # Check if it looks like one of our tags
-           if [[ "$TAG_NAME" == v* ]] || [[ "$TAG_NAME" == backend-v* ]] || [[ "$TAG_NAME" == app-v* ]]; then
+           if [[ "$TAG_NAME" == v* ]] || [[ "$TAG_NAME" == backend-v* ]] || [[ "$TAG_NAME" == pwa-v* ]]; then
              echo "Deleting failed release tag: $TAG_NAME"
              # API call to delete the tag ref
              gh api -X DELETE "repos/${{ github.repository }}/git/refs/tags/$TAG_NAME" || echo "Failed to delete tag (it might be already deleted)"

@@ -1,0 +1,36 @@
+name: PWA CI
+
+on:
+  pull_request:
+    branches: ["*"]
+    paths:
+      - "pwa/**"
+      - ".github/workflows/ci-pwa.yaml"
+  push:
+    branches: ["master"]
+    paths:
+      - "pwa/**"
+      - ".github/workflows/ci-pwa.yaml"
+
+jobs:
+  build:
+    if: "!contains(github.event.head_commit.message, 'chore: bump')"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: pwa
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Type check
+        run: bun run check
+
+      - name: Build
+        run: bun run build

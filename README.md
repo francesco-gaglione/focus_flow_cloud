@@ -1,41 +1,32 @@
-# FocusFlow Cloud & App
+# FocusFlow Cloud & PWA
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Backend CI](https://github.com/francesco-gaglione/focus_flow_cloud/actions/workflows/ci-backend.yaml/badge.svg)](https://github.com/francesco-gaglione/focus_flow_cloud/actions)
-[![App CI](https://github.com/francesco-gaglione/focus_flow_cloud/actions/workflows/ci-app.yaml/badge.svg)](https://github.com/francesco-gaglione/focus_flow_cloud/actions)
+[![PWA CI](https://github.com/francesco-gaglione/focus_flow_cloud/actions/workflows/ci-pwa.yaml/badge.svg)](https://github.com/francesco-gaglione/focus_flow_cloud/actions)
 [![Documentation](https://img.shields.io/badge/docs-focusflow-brightgreen)](https://francesco-gaglione.github.io/focus_flow_cloud/)
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=flat&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/francescogaglione)
 [![codecov](https://codecov.io/gh/francesco-gaglione/focus_flow_cloud/branch/master/graph/badge.svg)](https://codecov.io/gh/francesco-gaglione/focus_flow_cloud)
 
-A comprehensive Pomodoro technique tracking solution featuring a Rust backend and a Flutter mobile application. This monorepo contains both the cloud infrastructure and the client application.
+A comprehensive Pomodoro technique tracking solution featuring a Rust backend and a Progressive Web App (PWA). This monorepo contains both the cloud infrastructure and the client application.
 
 > **Full Documentation**: [https://francesco-gaglione.github.io/focus_flow_cloud/](https://francesco-gaglione.github.io/focus_flow_cloud/)
-
-> **V5 is under development. Leave feedback here:** [V5](https://github.com/francesco-gaglione/focus_flow_cloud/discussions/73)
 
 ## Screenshots
 
 <table>
   <tr>
-    <td align="center" width="20%"><b>Tasks</b></td>
-    <td align="center" width="20%"><b>Calendar</b></td>
-    <td align="center" width="20%"><b>Statistics</b></td>
-    <td align="center" width="20%"><b>Pomodoro</b></td>
-    <td align="center" width="20%"><b>More</b></td>
+    <td align="center"><b>Tasks</b></td>
+    <td align="center"><b>Calendar (Month)</b></td>
+    <td align="center"><b>Calendar (Week)</b></td>
+    <td align="center"><b>Statistics</b></td>
+    <td align="center"><b>Timer</b></td>
   </tr>
   <tr>
-    <td><img src="doc/static/img/screenshots/tasks_dark.png" alt="Tasks" width="100%" /></td>
-    <td><img src="doc/static/img/screenshots/calendar_month_dark.png" alt="Calendar Month" width="100%" /></td>
-    <td><img src="doc/static/img/screenshots/stats_dark.png" alt="Statistics" width="100%" /></td>
-    <td><img src="doc/static/img/screenshots/timer_dark.png" alt="Pomodoro Timer" width="100%" /></td>
-    <td><img src="doc/static/img/screenshots/flashcards_dark.png" alt="Flashcards" width="100%" /></td>
-  </tr>
-  <tr>
-    <td><img src="doc/static/img/screenshots/tasks_today_dark.png" alt="Tasks Today" width="100%" /></td>
-    <td><img src="doc/static/img/screenshots/calendar_week_dark.png" alt="Calendar Week" width="100%" /></td>
-    <td><img src="doc/static/img/screenshots/calendar_month_tasks_dark.png" alt="Calendar with Tasks" width="100%" /></td>
-    <td><img src="doc/static/img/screenshots/timer_task_dark.png" alt="Pomodoro with Task" width="100%" /></td>
-    <td><img src="doc/static/img/screenshots/sidebar_dark.png" alt="Sidebar" width="100%" /></td>
+    <td><img src="doc/static/img/screenshots/tasks.png" alt="Tasks" width="100%" /></td>
+    <td><img src="doc/static/img/screenshots/calendar_month.png" alt="Calendar Month" width="100%" /></td>
+    <td><img src="doc/static/img/screenshots/calendar_week.png" alt="Calendar Week" width="100%" /></td>
+    <td><img src="doc/static/img/screenshots/stats.png" alt="Statistics" width="100%" /></td>
+    <td><img src="doc/static/img/screenshots/timer.png" alt="Timer" width="100%" /></td>
   </tr>
 </table>
 
@@ -45,8 +36,9 @@ FocusFlow is a complete ecosystem for time management using the Pomodoro techniq
 
 - **Track Sessions**: Manage work and break intervals.
 - **Sync in Real-time**: Synchronize state across multiple devices using WebSockets.
-- **Organize Tasks**: Categorize and color-code your to-dos.
+- **Organize Tasks**: Categorize, prioritize, and schedule your to-dos.
 - **Analyze Productivity**: View detailed statistics and patterns.
+- **Install as App**: Works as a PWA — install it on any device directly from the browser.
 
 I built this project for my personal use to optimize my daily workflow and decided to share it as an open-source project.
 
@@ -54,8 +46,8 @@ I built this project for my personal use to optimize my daily workflow and decid
 
 This is a monorepo containing:
 
-- **[`backend/`](backend/)**: The server-side application built with Rust (Axum, Diesel, Tokio).
-- **[`app/`](focus_flow_app/)**: The client-side mobile application built with Dioxus.
+- **[`backend/`](backend/)**: Server-side application built with Rust (Axum, Diesel, Tokio).
+- **[`pwa/`](pwa/)**: Progressive Web App built with SvelteKit + TypeScript.
 
 ## Features
 
@@ -66,12 +58,19 @@ This is a monorepo containing:
 - **RESTful API**: Documented via OpenAPI/Swagger.
 - **Clean Architecture**: Domain-driven design.
 
-### App
+### PWA
 
-- **Timer UI**: Clean, responsive interface for managing sessions.
-- **Task Management**: Create and organize tasks.
-- **Statistics**: Visual insights into your productivity.
-- **Multi-platform**: Runs on iOS, Android, and Desktop.
+- **Timer UI**: Clean, responsive interface for managing focus sessions.
+- **Task Management**: Create, edit, prioritize, and schedule tasks with category support.
+- **Calendar**: Month and week views with time-positioned task blocks colored by priority.
+- **Statistics**: Visual insights into your productivity (sessions, tasks by priority/category, overdue trend, peak hours).
+- **Installable**: Works offline and can be installed on any device (iOS, Android, Desktop) from the browser.
+
+## Using the PWA
+
+Once the backend is running, open the PWA URL in any modern browser. You will see an **"Install"** prompt (or use the browser menu → "Add to Home Screen") to install it as a native-like app.
+
+Supported browsers: Chrome, Edge, Safari (iOS 16.4+), Firefox (Android).
 
 ## Getting Started
 
@@ -104,6 +103,8 @@ services:
       - POSTGRES_DB=focusflow
 ```
 
+After starting the backend, serve the PWA build (from `pwa/build/`) via any static file server (nginx, Caddy, etc.) or run it locally with `bun run preview`.
+
 ### Self-Hosting with Kubernetes
 
 Kubernetes manifests are provided in the [`k8s/`](k8s/) directory. The namespace must be applied first, then the rest in dependency order:
@@ -126,35 +127,39 @@ Edit `postgres-secret.yaml`, `focus-flow-cloud-secret.yaml`, and `focus-flow-clo
 
 We use [`just`](https://github.com/casey/just) to manage commands for the entire repository.
 
-**Prerequisites**: Rust 1.70+, Flutter 3.7.0+, Docker.
+**Prerequisites**: Rust 1.70+, [Bun](https://bun.sh/), Docker.
 
 **Quick Commands**:
 
 | Command            | Description                  |
 | :----------------- | :--------------------------- |
 | `just backend-run` | Run the Rust backend locally |
-| `just app-serve`   | Run the app                  |
+| `just pwa-dev`     | Start the PWA dev server     |
 | `just test-all`    | Run all tests                |
 
 #### 1. Setup Backend (Local)
 
-1.  **Environment**: `backend/.env` is required. See `.env.example`.
-2.  **Database**:
-    ```bash
-    cd backend && docker-compose up -d db
-    diesel migration run
-    ```
-3.  **Run**: `just backend-run`
+1. **Environment**: `backend/.env` is required. See `.env.example`.
+2. **Database**:
+   ```bash
+   cd backend && docker-compose up -d db
+   diesel migration run
+   ```
+3. **Run**: `just backend-run`
 
-#### 2. Setup App (Local)
+#### 2. Setup PWA (Local)
 
-1.  **Run**: `just app-serve`
+1. Install dependencies: `cd pwa && bun install`
+2. Start dev server: `bun run dev`
+3. The PWA is available at `http://localhost:5173`
+
+> For PWA install to work locally, use `bun run preview` after `bun run build` (requires HTTPS or localhost).
 
 ## Contributing
 
 Contributions are welcome! This monorepo allows you to work on the full stack.
 
-- If you change the API, please ensure the Flutter client is updated accordingly.
+- If you change the API, please ensure the PWA client is updated accordingly.
 - Run `just test-all` before submitting a PR.
 
 ### Commit Guidelines
@@ -174,7 +179,7 @@ We strictly follow **[Conventional Commits](https://www.conventionalcommits.org/
 - `docs`, `chore`, `refactor`, `test`: Other changes (no version bump)
 
 > [!IMPORTANT]
-> **💥 Breaking Changes**
+> **Breaking Changes**
 > If your changes break backward compatibility, you **MUST** indicate it to trigger a **MAJOR** version bump.
 >
 > You can do this by adding a `!` after the type:

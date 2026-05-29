@@ -5,15 +5,13 @@ on:
     tags:
       - "v*"
       - "backend-v*"
-      - "app-v*"
+      - "pwa-v*"
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  # ============================================================================
   # DOCS
-  # ============================================================================
   docs:
     name: Build & Deploy Docs
     runs-on: ubuntu-latest
@@ -25,19 +23,15 @@ jobs:
         working-directory: doc
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-          cache-dependency-path: doc/package-lock.json
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
 
       - name: Install dependencies
-        run: npm ci
+        run: bun install --frozen-lockfile
 
       - name: Build website
-        run: npm run build
+        run: bun run build
 
       - name: Deploy to GitHub Pages
         if: startsWith(github.ref, 'refs/tags/')
@@ -52,9 +46,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh run cancel ${{ github.run_id }}
 
-  # ============================================================================
   # BACKEND
-  # ============================================================================
   backend-build:
     if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/backend-v')
     runs-on: ubuntu-latest
@@ -88,13 +80,13 @@ jobs:
           deb [arch=amd64] http://azure.archive.ubuntu.com/ubuntu/ $(lsb_release -cs)-updates main restricted universe multiverse
           deb [arch=amd64] http://azure.archive.ubuntu.com/ubuntu/ $(lsb_release -cs)-backports main restricted universe multiverse
           deb [arch=amd64] http://azure.archive.ubuntu.com/ubuntu/ $(lsb_release -cs)-security main restricted universe multiverse
-          
+
           deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release -cs) main restricted universe multiverse
           deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release -cs)-updates main restricted universe multiverse
           deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release -cs)-backports main restricted universe multiverse
           deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release -cs)-security main restricted universe multiverse
           EOF
-          
+
           sudo apt-get update
           # Explicitly remove conflicting libpq packages to ensure clean state
           sudo apt-get remove -y libpq-dev libpq5
@@ -129,8 +121,6 @@ jobs:
         run: |
           sudo apt-get install -y gcc-aarch64-linux-gnu libpq-dev:arm64
           cargo build --release --target aarch64-unknown-linux-gnu --package focus_flow_cloud
-
-
 
       - name: Prepare binaries
         run: |
@@ -190,164 +180,41 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh run cancel ${{ github.run_id }}
 
-  # ============================================================================
-  # APP (Dioxus)
-  # ============================================================================
-  app-build:
-    if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/app-v')
-    name: Build App (${{ matrix.target }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-latest
-            target: macos
-            platform: macos
-          - os: ubuntu-latest
-            target: linux
-            platform: linux
-          - os: windows-latest
-            target: windows
-            platform: windows
-          - os: ubuntu-latest
-            target: android
-            platform: android
+  # PWA
+  pwa-build:
+    if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/pwa-v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write
     defaults:
       run:
-        working-directory: focus_flow_app
-    permissions:
-      contents: read
-      actions: write
+        working-directory: pwa
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Rust
-        uses: dtolnay/rust-toolchain@stable
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
 
-      - uses: swatinem/rust-cache@v2
-        with:
-          workspaces: "focus_flow_app"
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
 
-      - name: Install Linux dependencies
-        if: matrix.target == 'linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libxdo-dev libayatana-appindicator3-dev
+      - name: Type check
+        run: bun run check
 
-      - name: Setup Java (android)
-        if: matrix.target == 'android'
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
+      - name: Build
+        run: bun run build
 
-      - name: Install Android NDK (android)
-        if: matrix.target == 'android'
-        uses: nttld/setup-ndk@v1
-        with:
-          ndk-version: r27c
+      - name: Package build output
+        working-directory: .
+        run: tar -czf pwa-build.tar.gz pwa/build/
 
-      - name: Add Android Rust targets
-        if: matrix.target == 'android'
-        run: rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android
-
-      - name: Install Dioxus CLI
-        run: cargo install dioxus-cli --locked
-
-      - name: Keep WRY JNI bridge from R8 stripping (android)
-        if: matrix.target == 'android'
-        run: |
-          mkdir -p ~/.gradle/init.d
-          printf '%s\n' \
-            'allprojects {' \
-            '    afterEvaluate { project ->' \
-            '        if (project.plugins.hasPlugin("com.android.application")) {' \
-            '            def rulesFile = new File(project.buildDir, "generated/wry-keep.pro")' \
-            '            rulesFile.parentFile.mkdirs()' \
-            '            rulesFile.text = """\' \
-            '-keep class dev.dioxus.main.** { *; }' \
-            '-keepclassmembers class dev.dioxus.main.WryActivity {' \
-            '    public void setWebView(...);' \
-            '}' \
-            '"""' \
-            '            project.android.buildTypes.each { buildType ->' \
-            '                if (buildType.name == "release") {' \
-            '                    buildType.proguardFile(rulesFile)' \
-            '                }' \
-            '            }' \
-            '        }' \
-            '    }' \
-            '}' \
-            > ~/.gradle/init.d/wry-proguard.gradle
-
-      - name: Bundle (${{ matrix.target }})
-        if: matrix.target != 'android'
-        run: dx bundle --release --platform ${{ matrix.platform }}
-
-      - name: Bundle Android (aarch64)
-        if: matrix.target == 'android'
-        run: dx bundle --release --platform android --target aarch64-linux-android
-
-      - name: Install create-dmg (macOS)
-        if: matrix.target == 'macos'
-        run: brew install create-dmg
-
-      - name: Create DMG (macOS)
-        if: matrix.target == 'macos'
-        run: |
-          APP_PATH=$(find target/dx/focus_flow_app/release/macos -name "*.app" -maxdepth 4 | head -1)
-          create-dmg \
-            --volname "Focus Flow" \
-            --window-pos 200 120 \
-            --window-size 800 400 \
-            --icon-size 100 \
-            --app-drop-link 600 185 \
-            "focus_flow_app-macos.dmg" \
-            "$APP_PATH"
-
-      - name: Package Linux bundle
-        if: matrix.target == 'linux'
-        run: |
-          BUNDLE_DIR=$(find target/dx/focus_flow_app/release/linux -maxdepth 2 -type d | head -1)
-          tar -czf focus_flow_app-linux.tar.gz -C "$BUNDLE_DIR" .
-
-      - name: Package Windows bundle
-        if: matrix.target == 'windows'
-        shell: pwsh
-        run: |
-          $bundleDir = Get-ChildItem -Path "target/dx/focus_flow_app/release/windows" -Directory | Select-Object -First 1
-          Compress-Archive -Path "$($bundleDir.FullName)/*" -DestinationPath "focus_flow_app-windows.zip"
-
-      - name: Sign APK (android)
-        if: matrix.target == 'android'
-        run: |
-          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > release.jks
-          APK_PATH=$(find target/dx/focus_flow_app/release/android -name "*.apk" | head -1)
-          BUILD_TOOLS=$ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | sort | tail -1)
-          $BUILD_TOOLS/apksigner sign \
-            --ks release.jks \
-            --ks-key-alias "${{ secrets.KEY_ALIAS }}" \
-            --ks-pass pass:"${{ secrets.KEYSTORE_PASSWORD }}" \
-            --key-pass pass:"${{ secrets.KEY_PASSWORD }}" \
-            "$APK_PATH"
-
-      - name: Package Android bundle
-        if: matrix.target == 'android'
-        run: |
-          APK_PATH=$(find target/dx/focus_flow_app/release/android -name "*.apk" | head -1)
-          cp "$APK_PATH" focus_flow_app-android.apk
-
-      - name: Upload Artifact
+      - name: Upload PWA artifact
         uses: actions/upload-artifact@v4
         with:
-          name: app-${{ matrix.target }}
-          path: |
-            focus_flow_app/focus_flow_app-macos.dmg
-            focus_flow_app/focus_flow_app-linux.tar.gz
-            focus_flow_app/focus_flow_app-windows.zip
-            focus_flow_app/focus_flow_app-android.apk
-          if-no-files-found: ignore
+          name: pwa-build
+          path: pwa-build.tar.gz
+          if-no-files-found: error
 
       - name: Cancel Workflow on Failure
         if: failure()
@@ -355,13 +222,15 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh run cancel ${{ github.run_id }}
 
-  # ============================================================================
   # RELEASE
-  # ============================================================================
   publish-release:
     name: Publish Release
-    needs: [backend-build, app-build]
-    if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/backend-v') || startsWith(github.ref, 'refs/tags/app-v')
+    needs: [backend-build, pwa-build]
+    if: |
+      always() &&
+      (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/backend-v') || startsWith(github.ref, 'refs/tags/pwa-v')) &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -382,11 +251,6 @@ jobs:
           files: |
             release_assets/**/focus_flow_cloud-amd64
             release_assets/**/focus_flow_cloud-arm64
-            release_assets/**/*.dmg
-            release_assets/**/*.tar.gz
-            release_assets/**/*.zip
-            release_assets/**/*.apk
+            release_assets/**/pwa-build.tar.gz
           generate_release_notes: true
           fail_on_unmatched_files: false
-
-

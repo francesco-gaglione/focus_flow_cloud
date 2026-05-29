@@ -9,6 +9,7 @@ use http::{header, Method};
 use time::Duration;
 use tower::ServiceBuilder;
 use tower_http::cors::{AllowOrigin, CorsLayer};
+use tower_http::services::{ServeDir, ServeFile};
 use tower_http::trace::TraceLayer;
 use tower_sessions::{MemoryStore, SessionManagerLayer};
 use utoipa::OpenApi;
@@ -23,12 +24,19 @@ pub fn create_app(app_state: AppState) -> Router {
         .with_secure(false)
         .with_expiry(tower_sessions::Expiry::OnInactivity(Duration::hours(24))); // 24 hours
 
-    Router::new()
+    let mut router = Router::new()
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
         .merge(Scalar::with_url("/scalar", ApiDoc::openapi()))
         .nest("/api", api_routes(app_state.clone()))
         .nest("/ws", ws_routes(app_state.clone()))
-        .with_state(app_state.clone())
+        .with_state(app_state.clone());
+
+    if let Ok(dist_dir) = std::env::var("PWA_DIST_DIR") {
+        let index = ServeFile::new(format!("{}/index.html", dist_dir));
+        router = router.fallback_service(ServeDir::new(dist_dir).fallback(index));
+    }
+
+    router
         .layer(session_layer)
         .layer(
             CorsLayer::new()

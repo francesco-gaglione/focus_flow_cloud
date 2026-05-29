@@ -54,6 +54,30 @@ backend-check: backend-fmt-check backend-lint backend-test
     @echo "Backend checks passed!"
 
 # ============================================================================
+# PWA (React + Vite)
+# ============================================================================
+
+# Generate PWA type definitions
+pwa-generate-types:
+    cd pwa && bun run generate:types
+
+# Run PWA dev server
+pwa-dev:
+    cd pwa && bun run generate:types && bunx --bun vite --host
+
+# Build PWA for production
+pwa-build:
+    cd pwa && bunx --bun vite build
+
+# Preview PWA production build
+pwa-preview:
+    cd pwa && bunx --bun vite preview
+
+# Install PWA dependencies
+pwa-install:
+    cd pwa && bun install
+
+# ============================================================================
 # APP (Dioxus)
 # ============================================================================
 
@@ -105,6 +129,34 @@ app-lint:
 # Run all app checks
 app-check: app-fmt-check app-lint app-test
     @echo "App checks passed!"
+
+# ============================================================================
+# FLUTTER APP
+# ============================================================================
+
+# Generate Freezed & JSON code files
+flutter-codegen:
+    cd focus_flow_flutter && dart run build_runner build --delete-conflicting-outputs
+
+# Watch and generate Freezed & JSON code files in background
+flutter-codegen-watch:
+    cd focus_flow_flutter && dart run build_runner watch --delete-conflicting-outputs
+
+# Analyze Flutter codebase
+flutter-analyze:
+    cd focus_flow_flutter && flutter analyze
+
+# Run Flutter tests
+flutter-test:
+    cd focus_flow_flutter && flutter test
+
+# Run Flutter app locally
+flutter-run:
+    cd focus_flow_flutter && flutter run
+
+# Clean and fetch Flutter dependencies
+flutter-clean:
+    cd focus_flow_flutter && flutter clean && flutter pub get
 
 # ============================================================================
 # Doc

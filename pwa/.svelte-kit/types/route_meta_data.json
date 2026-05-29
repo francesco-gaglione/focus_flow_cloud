@@ -1,0 +1,30 @@
+{
+	"/(app)": [
+		"src/routes/+layout.ts",
+		"src/routes/+layout.ts"
+	],
+	"/": [
+		"src/routes/+layout.ts"
+	],
+	"/(app)/calendar": [
+		"src/routes/+layout.ts"
+	],
+	"/(app)/cards": [
+		"src/routes/+layout.ts"
+	],
+	"/(app)/categories": [
+		"src/routes/+layout.ts"
+	],
+	"/login": [
+		"src/routes/+layout.ts"
+	],
+	"/(app)/settings": [
+		"src/routes/+layout.ts"
+	],
+	"/(app)/stats": [
+		"src/routes/+layout.ts"
+	],
+	"/(app)/timer": [
+		"src/routes/+layout.ts"
+	]
+}
