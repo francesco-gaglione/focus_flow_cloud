@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.2] - 2026-05-29
+
+### Bug Fixes
+
+- Mobile pwa layout
+
+### Other
+
+- Merge branch 'master' of https://github.com/francesco-gaglione/focus_flow_cloud
+
 ## [1.0.1] - 2026-05-29
 
 ### Bug Fixes
