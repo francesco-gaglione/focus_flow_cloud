@@ -1,0 +1,28 @@
+[package]
+name = "shared"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+default = []
+openapi = ["dep:utoipa"]
+ts = ["dep:ts-rs"]
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+validator = { version = "0.20", features = ["derive"] }
+uuid = { version = "1", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+tracing = { workspace = true }
+lazy_static.workspace = true
+regex.workspace = true
+
+[dependencies.utoipa]
+version = "5"
+features = ["uuid", "chrono"]
+optional = true
+
+[dependencies.ts-rs]
+version = "10"
+features = ["serde-compat", "uuid-impl", "chrono-impl", "no-serde-warnings"]
+optional = true

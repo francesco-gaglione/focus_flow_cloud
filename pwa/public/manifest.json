@@ -1,0 +1,16 @@
+{
+  "name": "FocusFlow",
+  "short_name": "FocusFlow",
+  "description": "Pomodoro timer and task management",
+  "theme_color": "#46a758",
+  "background_color": "#080808",
+  "display": "standalone",
+  "orientation": "portrait",
+  "start_url": "/",
+  "scope": "/",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "categories": ["productivity", "utilities"]
+}

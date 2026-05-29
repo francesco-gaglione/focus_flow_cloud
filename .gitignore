@@ -1,6 +1,11 @@
 # App (Dioxus)
 focus_flow_app/assets/tailwind.css
 
+# PWA (React + Vite)
+pwa/node_modules/
+pwa/dist/
+pwa/.env
+
 # Backend (Rust)
 backend/target
 backend/.env

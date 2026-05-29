@@ -4,7 +4,7 @@ version = "5.0.5"
 edition = "2021"
 
 [dependencies]
-shared = { path = "../shared" }
+shared = { workspace = true }
 opentelemetry = { version = "0.27", features = ["trace"] }
 opentelemetry_sdk = { version = "0.27", features = ["trace", "rt-tokio"] }
 opentelemetry-otlp = { version = "0.27", features = ["tonic"] }
@@ -28,7 +28,7 @@ diesel = { version = "2", features = ["postgres", "uuid", "chrono", "r2d2"] }
 diesel_migrations = "2"
 async-trait = "0.1.89"
 http = "1.3.1"
-tower-http = { version = "0.6.6", features = ["trace", "cors"] }
+tower-http = { version = "0.6.6", features = ["trace", "cors", "fs"] }
 tower = { version = "0.5", features = ["util"] }
 validator = { version = "0.20.0", features = ["derive"] }
 rand = "0.8"

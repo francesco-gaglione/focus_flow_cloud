@@ -1,0 +1,2 @@
+import "./dev.js";
+export {};

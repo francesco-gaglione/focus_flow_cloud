@@ -13,7 +13,7 @@ utoipa = { workspace = true, features = ["axum_extras", "chrono", "uuid"] }
 utoipa-axum.workspace = true
 utoipa-swagger-ui = { workspace = true, features = ["axum"] }
 utoipa-scalar.workspace = true
-tower-http = { workspace = true, features = ["trace", "cors"] }
+tower-http = { workspace = true, features = ["trace", "cors", "fs"] }
 tracing.workspace = true
 serde = { workspace = true, features = ["derive"] }
 matchit.workspace = true
