@@ -46,6 +46,6 @@ declare module "$app/types" {
 		};
 		Pathname(): "/" | "/calendar" | "/cards" | "/categories" | "/login" | "/settings" | "/stats" | "/timer";
 		ResolvedPathname(): `${"" | `/${string}`}${ReturnType<AppTypes['Pathname']>}`;
-		Asset(): "/favicon.svg" | "/icons.svg" | "/locales/en/common.json" | "/locales/en/login.json" | "/locales/en/todo.json" | "/locales/it/common.json" | "/locales/it/login.json" | "/locales/it/todo.json" | "/manifest.json" | "/sw.js" | string & {};
+		Asset(): "/locales/it/todo.json" | "/locales/it/common.json" | "/locales/it/login.json" | "/locales/en/todo.json" | "/locales/en/common.json" | "/locales/en/login.json" | "/icon-192.png" | "/manifest.json" | "/icons.svg" | "/favicon.svg" | "/sw.js" | "/icon-512.png" | string & {};
 	}
 }

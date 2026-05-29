@@ -1,14 +1,14 @@
 ---
 sidebar_position: 4
 description: "Contribute to FocusFlow: development workflow, code style, commit guidelines, and pull request process."
-keywords: [focusflow, contributing, open source, rust, dioxus, conventional commits]
+keywords: [focusflow, contributing, open source, rust, sveltekit, pwa, conventional commits]
 ---
 
 # Contributing
 
 We welcome contributions to FocusFlow! Whether you're fixing a bug, improving documentation, or adding a new feature, your help is appreciated.
 
-## 🛠️ Development Workflow
+## Development Workflow
 
 1.  **Fork the Repository**: Create a personalized copy of the project on GitHub.
 2.  **Clone Locally**:
@@ -21,7 +21,7 @@ We welcome contributions to FocusFlow! Whether you're fixing a bug, improving do
     git checkout -b feature/my-new-feature
     ```
 
-## ✅ Code Style & Standards
+## Code Style & Standards
 
 ### Rust (Backend)
 
@@ -30,13 +30,13 @@ We welcome contributions to FocusFlow! Whether you're fixing a bug, improving do
 - **Testing**: Ensure all tests pass with `just backend-test`.
 - **All-in-one**: Run `just backend-check` to run all verification steps.
 
-### Dioxus (App)
+### SvelteKit (PWA)
 
-- **Formatting**: Run `cargo fmt` (manual).
-- **Linting**: Run `cargo clippy` to catch common mistakes.
-- **All-in-one**: Run `just app-check` to run all verification steps.
+- **Type checking**: Run `bun run check` (uses `svelte-check`).
+- **Build**: Run `bun run build` to verify the production build compiles cleanly.
+- **All-in-one**: Run `just pwa-check` to run all verification steps.
 
-## � Commit Guidelines
+## Commit Guidelines
 
 We strictly follow **[Conventional Commits](https://www.conventionalcommits.org/)** to manage versioning and changelogs automatically.
 
@@ -52,7 +52,7 @@ We strictly follow **[Conventional Commits](https://www.conventionalcommits.org/
 - `fix`: A bug fix (**Patch** version bump)
 - `docs`, `chore`, `refactor`, `test`: Other changes (no version bump)
 
-### 💥 Breaking Changes
+### Breaking Changes
 
 If your changes break backward compatibility, you **MUST** indicate it to trigger a **MAJOR** version bump.
 
@@ -62,16 +62,16 @@ If your changes break backward compatibility, you **MUST** indicate it to trigge
 feat!: remove legacy API endpoints
 ```
 
-## 🔄 Pull Request Process
+## Pull Request Process
 
 1.  **Update Documentation**: If you changed APIs or features, update the relevant docs in `doc/`.
-2.  **Open PR**: Submit your pull request against the `main` branch.
-3.  **CI Checks**: Ensure all GitHub Action checks pass.
+2.  **Open PR**: Submit your pull request against the `master` branch.
+3.  **CI Checks**: Ensure all GitHub Action checks pass (backend CI + PWA CI).
 
-## 🐛 Reporting Issues
+## Reporting Issues
 
 If you find a bug, please open an issue on GitHub with:
 
 - Steps to reproduce.
 - Expected vs. actual behavior.
-- Environment details (OS, versions).
+- Environment details (OS, browser, versions).

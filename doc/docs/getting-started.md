@@ -1,8 +1,8 @@
 ---
 sidebar_position: 2
-description: "Learn how to deploy FocusFlow with Docker Compose, configure the backend, and run the Dioxus app locally."
+description: "Learn how to deploy FocusFlow with Docker Compose, configure the backend, and run or install the PWA."
 keywords:
-  [focusflow, getting started, docker, deployment, self-hosting, dioxus setup]
+  [focusflow, getting started, docker, deployment, self-hosting, pwa, sveltekit]
 ---
 
 # Getting Started
@@ -210,29 +210,52 @@ The backend will be available on the `NodePort` defined in `focus-flow-cloud.yam
 - **Secrets management**: Consider using [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets) or an external secrets operator instead of committing base64 secrets to the repo.
 - **Ingress**: The default Service type is `NodePort`. For production, add an Ingress resource with TLS termination.
 
-## App
+## PWA
 
-### Download
+The FocusFlow PWA is a [Progressive Web App](https://web.dev/progressive-web-apps/) built with SvelteKit. It connects to the backend and can be installed on any device directly from the browser — no app store required.
 
-Pre-built executables for various platforms are available on the [GitHub Releases](https://github.com/francesco-gaglione/focus_flow_cloud/releases) page.
+### Using the hosted PWA
 
-**NOTE**: In order to allow the mobile app to send push notifications, you will need to allow push notifications for the app on your device.
+Pre-built PWA releases are available on the [GitHub Releases](https://github.com/francesco-gaglione/focus_flow_cloud/releases) page as `pwa-build.tar.gz`. Extract and serve the `build/` folder with any static file server (nginx, Caddy, etc.).
+
+### Installing the PWA
+
+Once the PWA is served over HTTPS (or `localhost` for development):
+
+1. Open the URL in a supported browser.
+2. You will see an **"Install"** button in the address bar (Chrome/Edge), or use the browser menu → **"Add to Home Screen"** (Safari on iOS).
+3. After installing, the app launches like a native app with its own window.
+
+**Supported browsers**: Chrome 67+, Edge 79+, Safari 16.4+ (iOS/macOS), Firefox on Android.
+
+> **Note**: PWA install requires HTTPS in production. On `localhost` the browser allows installation without TLS.
 
 ### Running locally
 
-To run the application locally, you will need Rust and the Dioxus CLI installed.
+Prerequisites: [Bun](https://bun.sh/)
 
-1.  **Install Rust**: [Official Guide](https://www.rust-lang.org/tools/install)
-2.  **Install Dioxus CLI**:
-    ```bash
-    cargo install dioxus-cli --locked
-    ```
-3.  **Clone the repository**:
-    ```bash
-    git clone https://github.com/francesco-gaglione/focus_flow_cloud.git
-    cd focus_flow_cloud/focus_flow_app
-    ```
-4.  **Run**:
-    ```bash
-    dx serve
-    ```
+```bash
+git clone https://github.com/francesco-gaglione/focus_flow_cloud.git
+cd focus_flow_cloud/pwa
+bun install
+bun run dev
+```
+
+The dev server starts at `http://localhost:5173`.
+
+To preview the production build (and test PWA install):
+
+```bash
+bun run build
+bun run preview
+```
+
+### Environment
+
+The PWA reads the backend URL from `PUBLIC_API_BASE_URL`. Create a `.env` file in `pwa/`:
+
+```env
+PUBLIC_API_BASE_URL=http://localhost:8080
+```
+
+In production, set this to your backend's public URL before building.
