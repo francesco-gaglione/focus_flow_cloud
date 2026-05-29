@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.1] - 2026-05-29
+
+### Bug Fixes
+
+- Fix pipeline
+
+### Other
+
+- Clean old ref
+- Update justfile
+
 ## [5.0.6] - 2026-05-25
 
 ### Bug Fixes
