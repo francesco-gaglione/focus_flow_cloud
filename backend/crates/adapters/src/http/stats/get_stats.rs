@@ -1,8 +1,9 @@
 use application::use_cases::stats::get_stats::{
     GetStatsCommand, GetStatsError, OverdueTrendTypeOutput, StatsOutput,
 };
-use axum::extract::{Extension, State};
+use axum::extract::{Extension, Query, State};
 use axum::Json;
+use serde::Deserialize;
 use shared::stats::{
     CategoryCountDto, CompletedByPriorityDto, CompletedFocusSessionsDto, CompletedTasksCountsDto,
     DayCountDto, GetStatsResponseDto, OverdueTrendDto, OverdueTrendTypeDto, PeakWindowRangeDto,
@@ -88,6 +89,11 @@ fn to_response_dto(s: StatsOutput) -> GetStatsResponseDto {
     }
 }
 
+#[derive(Deserialize)]
+pub struct GetStatsQuery {
+    tz_offset: Option<i32>,
+}
+
 #[utoipa::path(
     get,
     path = "/api/stats",
@@ -102,14 +108,17 @@ fn to_response_dto(s: StatsOutput) -> GetStatsResponseDto {
         ("jwt" = [])
     )
 )]
+
 pub async fn get_stats_api(
     State(state): State<AppState>,
     Extension(session): Extension<UserSession>,
+    Query(query): Query<GetStatsQuery>,
 ) -> HttpResult<Json<GetStatsResponseDto>> {
     let result = state
         .get_stats_uc
         .execute(GetStatsCommand {
             user_id: session.user_id,
+            tz_offset_minutes: query.tz_offset.unwrap_or(0),
         })
         .await?;
 

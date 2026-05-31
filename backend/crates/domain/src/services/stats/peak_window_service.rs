@@ -1,4 +1,4 @@
-use chrono::NaiveTime;
+use chrono::{Duration, NaiveTime};
 use thiserror::Error;
 
 use crate::{
@@ -50,7 +50,7 @@ impl PeakWindowService {
         Self {}
     }
 
-    pub fn calculate(&self, tasks: &[Task]) -> Result<PeakWindow, PeakWindowServiceError> {
+    pub fn calculate(&self, tasks: &[Task], tz_offset_minutes: i32) -> Result<PeakWindow, PeakWindowServiceError> {
         let mut peak_window = PeakWindow::new();
 
         for (start, end) in [
@@ -91,12 +91,16 @@ impl PeakWindowService {
                 NaiveTime::from_hms_opt(23, 59, 59).unwrap(),
             ),
         ] {
+            let offset = Duration::minutes(-tz_offset_minutes as i64);
             let tasks_in_range = tasks
                 .iter()
                 .filter(|t| {
-                    t.completed_at().is_some()
-                        && t.completed_at().unwrap().time() >= start
-                        && t.completed_at().unwrap().time() <= end
+                    if let Some(completed_at) = t.completed_at() {
+                        let local_time = (completed_at + offset).time();
+                        local_time >= start && local_time <= end
+                    } else {
+                        false
+                    }
                 })
                 .collect::<Vec<_>>();
 
@@ -164,7 +168,7 @@ mod tests_calculate_peak_window {
 
     #[test]
     fn test_empty_tasks_produces_9_zero_ranges() {
-        let result = svc().calculate(&[]).unwrap();
+        let result = svc().calculate(&[], 0).unwrap();
         assert_eq!(result.time_ranges().len(), 9);
         assert!(result.time_ranges().iter().all(|r| r.count() == 0));
     }
@@ -172,14 +176,14 @@ mod tests_calculate_peak_window {
     #[test]
     fn test_uncompleted_tasks_not_counted() {
         let tasks = vec![not_completed(), not_completed()];
-        let result = svc().calculate(&tasks).unwrap();
+        let result = svc().calculate(&tasks, 0).unwrap();
         assert!(result.time_ranges().iter().all(|r| r.count() == 0));
     }
 
     #[test]
     fn test_task_in_first_window() {
         let tasks = vec![completed_at(t(7, 0))];
-        let ranges = svc().calculate(&tasks).unwrap();
+        let ranges = svc().calculate(&tasks, 0).unwrap();
         let ranges = ranges.time_ranges();
         assert_eq!(ranges[0].count(), 1);
         assert!(ranges[1..].iter().all(|r| r.count() == 0));
@@ -188,7 +192,7 @@ mod tests_calculate_peak_window {
     #[test]
     fn test_task_in_last_window() {
         let tasks = vec![completed_at(t(23, 0))];
-        let ranges = svc().calculate(&tasks).unwrap();
+        let ranges = svc().calculate(&tasks, 0).unwrap();
         let ranges = ranges.time_ranges();
         assert_eq!(ranges[8].count(), 1);
         assert!(ranges[..8].iter().all(|r| r.count() == 0));
@@ -201,7 +205,7 @@ mod tests_calculate_peak_window {
             completed_at(t(9, 30)),
             completed_at(t(9, 59)),
         ];
-        let ranges = svc().calculate(&tasks).unwrap();
+        let ranges = svc().calculate(&tasks, 0).unwrap();
         let ranges = ranges.time_ranges();
         assert_eq!(ranges[1].count(), 3); // 8:00-10:00
     }
@@ -219,7 +223,7 @@ mod tests_calculate_peak_window {
             completed_at(t(21, 0)), // 20-22
             completed_at(t(23, 0)), // 22-24
         ];
-        let result = svc().calculate(&tasks).unwrap();
+        let result = svc().calculate(&tasks, 0).unwrap();
         let ranges = result.time_ranges();
         for r in ranges {
             assert_eq!(r.count(), 1);
@@ -229,7 +233,7 @@ mod tests_calculate_peak_window {
     #[test]
     fn test_tasks_before_first_window_not_counted() {
         let tasks = vec![completed_at(t(5, 59))];
-        let result = svc().calculate(&tasks).unwrap();
+        let result = svc().calculate(&tasks, 0).unwrap();
         assert!(result.time_ranges().iter().all(|r| r.count() == 0));
     }
 
@@ -241,7 +245,7 @@ mod tests_calculate_peak_window {
             completed_at(t(10, 45)),
             not_completed(),
         ];
-        let ranges = svc().calculate(&tasks).unwrap();
+        let ranges = svc().calculate(&tasks, 0).unwrap();
         let ranges = ranges.time_ranges();
         assert_eq!(ranges[2].count(), 2); // 10:00-12:00
         assert!(ranges
