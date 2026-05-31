@@ -233,27 +233,23 @@
     {#if expanded && totalSubtasks > 0}
         <div class="pl-12 pr-4 pb-2 flex flex-col gap-1.5">
             {#each task.subtasks as sub (sub.id)}
-                <div class="flex items-center gap-2">
-                    <div class={`grid place-items-center shrink-0 `}>
-                        <label class="flex items-center space-x-2">
-                            <input
-                                class="checkbox"
-                                type="checkbox"
-                                checked={sub.isCompleted}
-                                onchange={() =>
-                                    $toggleSubtask.mutate({
-                                        subtaskId: sub.id,
-                                        isCompleted: !sub.isCompleted,
-                                    })}
-                            />
-                            <span
-                                class={`text-xs ${sub.isCompleted ? "line-through text-surface-500" : "text-surface-300"}`}
-                            >
-                                {sub.title}
-                            </span>
-                        </label>
-                    </div>
-                </div>
+                <label class="flex items-center gap-2 min-w-0">
+                    <input
+                        class="checkbox shrink-0"
+                        type="checkbox"
+                        checked={sub.isCompleted}
+                        onchange={() =>
+                            $toggleSubtask.mutate({
+                                subtaskId: sub.id,
+                                isCompleted: !sub.isCompleted,
+                            })}
+                    />
+                    <span
+                        class={`text-xs break-words min-w-0 ${sub.isCompleted ? "line-through text-surface-500" : "text-surface-300"}`}
+                    >
+                        {sub.title}
+                    </span>
+                </label>
             {/each}
         </div>
     {/if}
