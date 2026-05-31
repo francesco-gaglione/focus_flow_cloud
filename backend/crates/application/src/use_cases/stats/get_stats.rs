@@ -284,7 +284,12 @@ mod tests {
             Arc::new(mock_categories),
         );
 
-        let result = use_case.execute(GetStatsCommand { user_id, tz_offset_minutes: 0 }).await;
+        let result = use_case
+            .execute(GetStatsCommand {
+                user_id,
+                tz_offset_minutes: 0,
+            })
+            .await;
         assert!(result.is_ok());
 
         let stats = result.unwrap();

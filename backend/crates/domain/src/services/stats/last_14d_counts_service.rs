@@ -81,7 +81,7 @@ mod tests {
     fn test_empty() {
         let result = Last14dCountsService::calculate(&[]);
         assert_eq!(result.total(), 0);
-        assert_eq!(result.counts().len(), 0);
+        assert_eq!(result.counts().len(), 14);
     }
 
     #[test]
@@ -100,7 +100,7 @@ mod tests {
             completed_on(today()),
         ];
         let result = Last14dCountsService::calculate(&tasks);
-        assert_eq!(result.counts().len(), 1);
+        assert_eq!(result.counts().len(), 14);
         assert_eq!(result.find_by_day(today()).unwrap().count(), 3);
     }
 
@@ -114,7 +114,7 @@ mod tests {
         ];
         let result = Last14dCountsService::calculate(&tasks);
         assert_eq!(result.total(), 4);
-        assert_eq!(result.counts().len(), 4);
+        assert_eq!(result.counts().len(), 14);
     }
 
     #[test]

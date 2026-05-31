@@ -90,7 +90,7 @@ mod tests {
     fn test_empty() {
         let result = Last8wCountsService::calculate(&[]);
         assert_eq!(result.total(), 0);
-        assert_eq!(result.counts().len(), 0);
+        assert_eq!(result.counts().len(), 8);
     }
 
     #[test]
@@ -108,7 +108,7 @@ mod tests {
             completed_on(this_week_start()),
         ];
         let result = Last8wCountsService::calculate(&tasks);
-        assert_eq!(result.counts().len(), 1);
+        assert_eq!(result.counts().len(), 8);
         assert_eq!(result.find_by_week(this_week_start()).unwrap().count(), 2);
     }
 
@@ -122,7 +122,7 @@ mod tests {
         ];
         let result = Last8wCountsService::calculate(&tasks);
         assert_eq!(result.total(), 4);
-        assert_eq!(result.counts().len(), 4);
+        assert_eq!(result.counts().len(), 8);
     }
 
     #[test]

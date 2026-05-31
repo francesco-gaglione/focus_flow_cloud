@@ -50,7 +50,11 @@ impl PeakWindowService {
         Self {}
     }
 
-    pub fn calculate(&self, tasks: &[Task], tz_offset_minutes: i32) -> Result<PeakWindow, PeakWindowServiceError> {
+    pub fn calculate(
+        &self,
+        tasks: &[Task],
+        tz_offset_minutes: i32,
+    ) -> Result<PeakWindow, PeakWindowServiceError> {
         let mut peak_window = PeakWindow::new();
 
         for (start, end) in [
