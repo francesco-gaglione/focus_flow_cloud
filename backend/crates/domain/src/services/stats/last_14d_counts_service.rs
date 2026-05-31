@@ -1,3 +1,5 @@
+use chrono::{Days, Utc};
+
 use crate::{entities::tasks::task::Task, value_objects::stats::last_14d_counts::Last14dCounts};
 
 pub struct Last14dCountsService {}
@@ -15,6 +17,12 @@ impl Last14dCountsService {
 
     pub fn calculate(tasks: &[Task]) -> Last14dCounts {
         let mut counts = Last14dCounts::new();
+        let today = Utc::now().date_naive();
+
+        for i in 0..14u64 {
+            let day = today.checked_sub_days(Days::new(13 - i)).unwrap();
+            let _ = counts.push(day, 0);
+        }
 
         for task in tasks {
             if let Some(completed_at) = task.completed_at() {
@@ -73,7 +81,7 @@ mod tests {
     fn test_empty() {
         let result = Last14dCountsService::calculate(&[]);
         assert_eq!(result.total(), 0);
-        assert_eq!(result.counts().len(), 0);
+        assert_eq!(result.counts().len(), 14);
     }
 
     #[test]
@@ -92,7 +100,7 @@ mod tests {
             completed_on(today()),
         ];
         let result = Last14dCountsService::calculate(&tasks);
-        assert_eq!(result.counts().len(), 1);
+        assert_eq!(result.counts().len(), 14);
         assert_eq!(result.find_by_day(today()).unwrap().count(), 3);
     }
 
@@ -106,7 +114,7 @@ mod tests {
         ];
         let result = Last14dCountsService::calculate(&tasks);
         assert_eq!(result.total(), 4);
-        assert_eq!(result.counts().len(), 4);
+        assert_eq!(result.counts().len(), 14);
     }
 
     #[test]
