@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.3] - 2026-05-31
+
+### Bug Fixes
+
+- Bottom padding using too much space
+- Subrtask horizzontal overflow
+- Peak horus calculation and graph
+- Last 14 dayes and last 8 weeks now shows 0 completed tasks days
+
 ## [1.0.2] - 2026-05-29
 
 ### Bug Fixes
