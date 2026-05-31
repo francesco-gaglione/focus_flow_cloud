@@ -48,6 +48,7 @@ pub type GetStatsResult<T> = Result<T, GetStatsError>;
 #[derive(Debug)]
 pub struct GetStatsCommand {
     pub user_id: Uuid,
+    pub tz_offset_minutes: i32,
 }
 
 pub struct CompletedTasksCountsOutput {
@@ -204,7 +205,7 @@ impl GetStatsUseCase {
         let categories = self.category_persistence.find_all().await?;
 
         let completed_tasks_counts = CompletedTasksCountsService::calculate(&tasks, &sessions);
-        let peak_window = PeakWindowService::new().calculate(&tasks)?;
+        let peak_window = PeakWindowService::new().calculate(&tasks, command.tz_offset_minutes)?;
         let completed_by_priority = CompletedByPriorityService::calculate(&tasks);
         let completed_focus_sessions = CompletedFocusSessionsService::calculate(&sessions);
         let overdue_trend = OverdueTrendService::calculate(&tasks);
@@ -283,7 +284,7 @@ mod tests {
             Arc::new(mock_categories),
         );
 
-        let result = use_case.execute(GetStatsCommand { user_id }).await;
+        let result = use_case.execute(GetStatsCommand { user_id, tz_offset_minutes: 0 }).await;
         assert!(result.is_ok());
 
         let stats = result.unwrap();
@@ -313,6 +314,7 @@ mod tests {
         let result = use_case
             .execute(GetStatsCommand {
                 user_id: Uuid::new_v4(),
+                tz_offset_minutes: 0,
             })
             .await;
         assert!(matches!(result, Err(GetStatsError::PersistenceError(_))));

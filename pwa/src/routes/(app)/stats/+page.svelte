@@ -35,6 +35,7 @@
     {@const totalByPriority = (Object.values(completedByPriority) as number[]).reduce((a, b) => a + b, 0) || 1}
     {@const topCats = [...countByCategory].sort((a, b) => b.count - a.count).slice(0, 6)}
     {@const maxCatCount = Math.max(...topCats.map(c => c.count), 1)}
+    {@const maxPeakCount = Math.max(...peakWindow.map((x: { count: number }) => x.count), 1)}
 
     <div class="flex-1 min-h-0 flex flex-col overflow-hidden">
         <div class="flex-1 overflow-y-auto pb-24 px-4 pt-3 flex flex-col gap-3">
@@ -183,13 +184,12 @@
                 <div class="card bg-surface-900 border border-surface-700 p-4">
                     <p class="text-xs font-mono text-surface-500 uppercase tracking-widest mb-3">Peak hours</p>
                     <div class="flex flex-col gap-2">
-                        {#each peakWindow.slice(0, 5) as w, i (i)}
-                            {@const maxCount = Math.max(...peakWindow.map((x: { count: number }) => x.count), 1)}
-                            {@const pct = (w.count / maxCount) * 100}
+                        {#each peakWindow as w (w.start)}
+                            {@const pct = (w.count / maxPeakCount) * 100}
                             <div class="flex items-center gap-2">
                                 <span class="text-xs font-mono text-surface-400 w-12">{w.start.slice(0, 5)}</span>
                                 <div class="flex-1 h-1.5 bg-surface-800 rounded-full overflow-hidden">
-                                    <div class={`h-full rounded-full ${i === 0 ? "bg-primary-500" : "bg-primary-500/40"}`} style="width:{pct}%"></div>
+                                    <div class={`h-full rounded-full ${w.count === maxPeakCount && maxPeakCount > 0 ? "bg-primary-500" : "bg-primary-500/40"}`} style="width:{pct}%"></div>
                                 </div>
                                 <span class="text-xs font-mono text-surface-500 w-4 text-right">{w.count}</span>
                             </div>
