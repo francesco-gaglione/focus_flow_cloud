@@ -1,4 +1,4 @@
-use chrono::{Datelike, Days};
+use chrono::{Datelike, Days, Utc};
 
 use crate::{entities::tasks::task::Task, value_objects::stats::last_8w_counts::Last8wCounts};
 
@@ -17,6 +17,12 @@ impl Last8wCountsService {
 
     pub fn calculate(tasks: &[Task]) -> Last8wCounts {
         let mut counts = Last8wCounts::new();
+        let this_week = week_start_of(Utc::now().date_naive());
+
+        for i in 0..8u64 {
+            let week = this_week.checked_sub_days(Days::new(7 * (7 - i))).unwrap();
+            let _ = counts.push(week, 0);
+        }
 
         for task in tasks {
             if let Some(completed_at) = task.completed_at() {
