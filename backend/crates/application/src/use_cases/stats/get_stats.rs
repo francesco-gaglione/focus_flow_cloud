@@ -291,8 +291,8 @@ mod tests {
         assert_eq!(stats.completed_tasks_counts.completed_today, 0);
         assert_eq!(stats.peak_window.len(), 9);
         assert_eq!(stats.count_by_category.len(), 0);
-        assert_eq!(stats.last_14d.len(), 0);
-        assert_eq!(stats.last_8w.len(), 0);
+        assert_eq!(stats.last_14d.len(), 14);
+        assert_eq!(stats.last_8w.len(), 8);
     }
 
     #[tokio::test]
