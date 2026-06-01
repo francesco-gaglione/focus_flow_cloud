@@ -1,4 +1,5 @@
 use crate::http::auth::login::{LoginDto, LoginResponseDto};
+use crate::http::auth::oauth_token::{OAuthTokenForm, OAuthTokenResponse};
 use crate::http::auth::logout::LogoutResponseDto;
 use crate::http::auth::refresh::{RefreshDto, RefreshResponseDto};
 use crate::http::category::create_category::{CreateCategoryDto, CreateCategoryResponseDto};
@@ -23,7 +24,9 @@ use crate::http::users::create_user::CreateUserDto;
 use crate::http::users::get_info::UserInfoResponseDto;
 use crate::http::users::update_password::UpdatePasswordDto;
 use crate::http::users::update_username::UpdateUsernameDto;
-use utoipa::openapi::security::{HttpAuthScheme, HttpBuilder, SecurityScheme};
+use utoipa::openapi::security::{
+    Flow, HttpAuthScheme, HttpBuilder, OAuth2, Password, Scopes, SecurityScheme,
+};
 use utoipa::{Modify, OpenApi};
 
 pub const AUTH_TAG: &str = "Auth";
@@ -47,6 +50,13 @@ impl Modify for SecurityAddon {
                         .bearer_format("JWT")
                         .build(),
                 ),
+            );
+            components.add_security_scheme(
+                "oauth2",
+                SecurityScheme::OAuth2(OAuth2::new([Flow::Password(Password::new(
+                    "/api/auth/token",
+                    Scopes::new(),
+                ))])),
             );
         }
     }
@@ -78,6 +88,7 @@ impl Modify for SecurityAddon {
         crate::http::users::update_username::update_username_api,
         crate::http::users::get_info::get_user_info_api,
         crate::http::auth::login::login_api,
+        crate::http::auth::oauth_token::oauth_token_api,
         crate::http::auth::refresh::refresh_api,
         crate::http::auth::logout::logout_api,
         crate::http::task::get_tasks::get_tasks_api,
@@ -115,6 +126,7 @@ impl Modify for SecurityAddon {
         schemas(UpdateUsernameDto),
         schemas(UserInfoResponseDto),
         schemas(LoginDto, LoginResponseDto),
+        schemas(OAuthTokenForm, OAuthTokenResponse),
         schemas(RefreshDto, RefreshResponseDto),
         schemas(LogoutResponseDto),
     ),
