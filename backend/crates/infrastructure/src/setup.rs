@@ -54,6 +54,7 @@ use adapters::config::AppConfig;
 use adapters::http::app_state::AppState;
 use adapters::persistence::persistence_impl::persistence::postgres_persistence;
 use adapters::persistence::persistence_impl::pomodoro_state_in_memory_impl::PomodoroStateInMermoryImpl;
+use adapters::persistence::persistence_impl::reminder_worker_port_impl::ReminderWorkerPortImpl;
 use application::auth_traits::password_hasher::PasswordHasher;
 use application::repository_traits::user_persistence::UserPersistence;
 use application::use_cases::pomodoro_state::pause_session::PauseSessionUseCase;
@@ -67,6 +68,15 @@ pub async fn init_app_state(
     let persistence = postgres_persistence(&config.database_url).await;
     run_migrations(&persistence.pool).await;
     let postgres_arc = Arc::new(persistence);
+
+    let sqlx_pool = sqlx::PgPool::connect(&config.database_url)
+        .await
+        .expect("Failed to create sqlx pool for apalis");
+    let reminder_worker = Arc::new(ReminderWorkerPortImpl::new(sqlx_pool));
+    reminder_worker
+        .setup()
+        .await
+        .expect("Failed to setup apalis schema");
     let pomodoro_state_arc = Arc::new(PomodoroStateInMermoryImpl::new());
 
     // Password Hasher
@@ -105,8 +115,15 @@ pub async fn init_app_state(
     let update_category_uc = Arc::new(UpdateCategoryUseCases::new(postgres_arc.clone()));
 
     // Task Use Cases
-    let create_task_uc = Arc::new(CreateTaskUseCase::new(postgres_arc.clone()));
-    let get_tasks_uc = Arc::new(GetTasksUseCase::new(postgres_arc.clone()));
+    let create_task_uc = Arc::new(CreateTaskUseCase::new(
+        postgres_arc.clone(),
+        postgres_arc.clone(),
+        reminder_worker,
+    ));
+    let get_tasks_uc = Arc::new(GetTasksUseCase::new(
+        postgres_arc.clone(),
+        postgres_arc.clone(),
+    ));
     let delete_tasks_uc = Arc::new(DeleteTaskUseCase::new(postgres_arc.clone()));
     let update_task_uc = Arc::new(UpdateTaskUseCase::new(postgres_arc.clone()));
     let update_subtask_uc = Arc::new(UpdateSubTaskUseCase::new(postgres_arc.clone()));

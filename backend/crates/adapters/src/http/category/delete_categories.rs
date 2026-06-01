@@ -1,13 +1,26 @@
 use crate::http::app_state::AppState;
+use crate::http::validators::validate_uuid::validate_uuid;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::CATEGORY_TAG;
 use application::use_cases::category::delete_categories_usecase::DeleteCategoriesError;
 use axum::extract::{Path, State};
 use axum::Json;
-use shared::category::{DeleteCategoriesDto, DeleteCategoriesResponseDto};
+use serde::{Deserialize, Serialize};
 use tracing::{debug, error};
+use utoipa::ToSchema;
 use uuid::Uuid;
 use validator::Validate;
+
+#[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
+pub struct DeleteCategoriesDto {
+    #[validate(custom(function = "validate_uuid"))]
+    pub id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
+pub struct DeleteCategoriesResponseDto {
+    pub deleted_ids: Vec<String>,
+}
 
 impl From<DeleteCategoriesError> for HttpError {
     fn from(value: DeleteCategoriesError) -> Self {
@@ -51,9 +64,10 @@ pub async fn delete_categories_api(
         HttpError::BadRequest("Invalid id".to_string())
     })?;
 
-    let category_ids = vec![category_id];
-
-    let res = state.delete_categories_uc.execute(category_ids).await?;
+    let res = state
+        .delete_categories_uc
+        .execute(vec![category_id])
+        .await?;
 
     debug!("Deleted {} categories", res.len());
 

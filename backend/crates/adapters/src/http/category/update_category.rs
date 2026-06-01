@@ -1,11 +1,28 @@
 use crate::http::app_state::AppState;
+use crate::http::validators::validate_uuid::validate_uuid;
 use crate::http_error::{map_persistence_error, HttpError, HttpResult};
 use crate::openapi::CATEGORY_TAG;
 use application::use_cases::category::update_category_usecase::{
     UpdateCategoryCommand, UpdateCategoryError,
 };
-use shared::category::{UpdateCategoryDto, UpdateCategoryResponseDto};
-use shared::validators::validate_uuid::validate_uuid;
+
+#[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateCategoryDto {
+    #[validate(length(
+        min = 1,
+        max = 255,
+        message = "Name must be between 1 and 255 characters"
+    ))]
+    pub name: Option<String>,
+    pub color: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateCategoryResponseDto {
+    pub success: bool,
+}
 
 impl From<UpdateCategoryError> for HttpError {
     fn from(value: UpdateCategoryError) -> Self {

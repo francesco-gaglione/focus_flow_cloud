@@ -4,7 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-shared = { workspace = true, features = ["openapi"] }
 domain = { path = "../domain" }
 application = { path = "../application" }
 axum = { workspace = true, features=["ws"]}
@@ -37,6 +36,10 @@ regex.workspace = true
 dotenvy.workspace = true
 serde_urlencoded = "0.7.1"
 secrecy.workspace = true
+apalis = "0.7.4"
+apalis-postgres = { version = "1.0.0-rc.8", features = ["migrate"] }
+apalis-core = { version = "1.0.0-rc.9", features = ["sleep"] }
+sqlx = { version = "0.8.1", features = ["postgres", "runtime-tokio"] }
 
 [dev-dependencies]
 testcontainers.workspace = true

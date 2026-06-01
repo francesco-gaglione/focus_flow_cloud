@@ -31,6 +31,21 @@ diesel::table! {
 }
 
 diesel::table! {
+    reminders (id) {
+        id -> Uuid,
+        user_id -> Uuid,
+        task_id -> Nullable<Uuid>,
+        #[max_length = 255]
+        title -> Varchar,
+        description -> Text,
+        date -> Timestamptz,
+        reminder_sent -> Bool,
+        created_at -> Timestamptz,
+        updated_at -> Timestamptz,
+    }
+}
+
+diesel::table! {
     subtasks (id) {
         id -> Uuid,
         task_id -> Uuid,
@@ -96,6 +111,7 @@ diesel::table! {
 diesel::joinable!(categories -> users (user_id));
 diesel::joinable!(focus_session -> tasks (task_id));
 diesel::joinable!(focus_session -> users (user_id));
+diesel::joinable!(reminders -> users (user_id));
 diesel::joinable!(subtasks -> tasks (task_id));
 diesel::joinable!(subtasks -> users (user_id));
 diesel::joinable!(tasks -> categories (category_id));
@@ -105,6 +121,7 @@ diesel::joinable!(user_settings -> users (user_id));
 diesel::allow_tables_to_appear_in_same_query!(
     categories,
     focus_session,
+    reminders,
     subtasks,
     tasks,
     user_settings,

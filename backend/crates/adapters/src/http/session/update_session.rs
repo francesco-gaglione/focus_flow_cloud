@@ -1,10 +1,10 @@
 use crate::http::app_state::AppState;
+use crate::http::validators::validate_uuid::validate_uuid;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::SESSION_TAG;
 use application::use_cases::focus_session::update_focus_session::{
     UpdateFocusSessionCommand, UpdateFocusSessionError,
 };
-use shared::validators::validate_uuid::validate_uuid;
 
 impl From<UpdateFocusSessionError> for HttpError {
     fn from(value: UpdateFocusSessionError) -> Self {

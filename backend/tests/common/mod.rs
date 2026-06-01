@@ -1,5 +1,7 @@
 use adapters::app::create_app;
 use adapters::config::AppConfig;
+use adapters::http::category::create_category::CreateCategoryResponseDto;
+use adapters::http::task::create_task::{CreateTaskDto, CreateTaskResponseDto};
 use adapters::http::{
     category::create_category::CreateCategoryDto,
     session::create_manual_session::{CreateManualSessionDto, CreateManualSessionResponseDto},
@@ -8,8 +10,6 @@ use adapters::http::{
     },
 };
 use infrastructure::setup::{init_app_state, init_tracing};
-use shared::category::CreateCategoryResponseDto;
-use shared::task::{CreateTaskDto, CreateTaskResponseDto};
 use std::sync::Once;
 use testcontainers::runners::AsyncRunner;
 use testcontainers_modules::postgres::Postgres;

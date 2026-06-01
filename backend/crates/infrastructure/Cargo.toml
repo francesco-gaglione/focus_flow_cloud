@@ -21,6 +21,7 @@ opentelemetry_sdk.workspace = true
 opentelemetry-otlp.workspace = true
 tracing-opentelemetry.workspace = true
 tokio = { workspace = true, features = ["sync"] }
+sqlx = { version = "0.8.1", features = ["postgres", "runtime-tokio"] }
 config.workspace = true
 dotenvy.workspace = true
 serde = { workspace = true, features = ["derive"] }

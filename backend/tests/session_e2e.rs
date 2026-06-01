@@ -1,5 +1,8 @@
 mod common;
 
+use adapters::http::dto::common::task_dto::TaskScheduleDto;
+use adapters::http::task::create_task::CreateTaskDto;
+use adapters::http::task::get_tasks::TasksResponseDto;
 use adapters::http::{
     category::create_category::CreateCategoryDto,
     dto::common::session_type_enum::SessionTypeEnum,
@@ -10,7 +13,6 @@ use adapters::http::{
     users::create_user::CreateUserDto,
 };
 use chrono::Utc;
-use shared::task::{CreateTaskDto, TaskScheduleDto, TasksResponseDto};
 use tracing::info;
 
 use crate::common::setup;

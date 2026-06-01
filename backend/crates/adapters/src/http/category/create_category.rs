@@ -9,7 +9,6 @@ use axum::{extract::State, Extension, Json};
 use lazy_static::lazy_static;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
-use shared::category::CreateCategoryResponseDto;
 use tracing::debug;
 use utoipa::ToSchema;
 use validator::Validate;
@@ -38,6 +37,11 @@ pub struct CreateCategoryDto {
     pub name: String,
     #[validate(regex(path = *COLOR_REGEX, message = "Color must be a valid hex code"))]
     pub color: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
+pub struct CreateCategoryResponseDto {
+    pub category_id: String,
 }
 
 #[utoipa::path(

@@ -1,11 +1,11 @@
 use crate::http::app_state::AppState;
+use crate::http::validators::validate_uuid::validate_uuid;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::TASK_TAG;
 use application::use_cases::task::delete_task::DeleteTaskError;
 use axum::extract::{Query, State};
 use axum::Json;
 use serde::{Deserialize, Serialize};
-use shared::validators::validate_uuid::validate_uuid;
 use utoipa::ToSchema;
 use validator::Validate;
 
@@ -24,7 +24,11 @@ pub struct DeleteTasksDto {
     pub task_id: String,
 }
 
-pub use shared::task::DeleteTaskResponseDto;
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct DeleteTaskResponseDto {
+    pub deleted_id: String,
+}
 
 #[utoipa::path(
     delete,

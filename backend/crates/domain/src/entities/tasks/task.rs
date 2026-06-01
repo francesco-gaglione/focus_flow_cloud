@@ -515,6 +515,8 @@ mod tests {
             None,
         );
         let reminder = Reminder::new(
+            None,
+            user_id,
             "Test Reminder".to_string(),
             Utc::now() + Duration::from_secs(20),
             "description".to_string(),
@@ -533,6 +535,8 @@ mod tests {
             None,
         );
         let reminder = Reminder::new(
+            None,
+            user_id,
             "Test Reminder".to_string(),
             Utc::now() - Duration::from_secs(20),
             "description".to_string(),
@@ -553,6 +557,8 @@ mod tests {
             None,
         );
         let reminder = Reminder::new(
+            None,
+            user_id,
             "Test Reminder".to_string(),
             Utc::now() - Duration::from_secs(20),
             "description".to_string(),
