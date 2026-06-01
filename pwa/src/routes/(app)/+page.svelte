@@ -11,6 +11,7 @@
         EyeClosedIcon,
     } from "lucide-svelte";
     import { categories, tasks } from "@/lib/api";
+    import { isToday } from "@/lib/utils";
 
     const PRIORITY_LEGEND = [
         { label: "Low", color: "#46a758" },
@@ -19,12 +20,15 @@
         { label: "Urgent", color: "#7c3aed" },
     ] as const;
 
+    type Period = "all" | "today" | "week";
+
     let sheetOpen = $state(false);
     let filtersOpen = $state(false);
     let showCompleted = $state(false);
 
     // null = all selected (default). Explicit Set = user has filtered.
     let selectedCatIds = $state<Set<string> | null>(null);
+    let selectedPeriod = $state<Period>("all");
 
     const tasksQuery = createQuery({
         queryKey: ["tasks"],
@@ -45,10 +49,11 @@
     }
 
     function toggleCat(id: string) {
-        console.debug("selectedCatIds", selectedCatIds, "id", id);
-
+        console.log("[cat] toggleCat called, id=", id, "selectedCatIds=", selectedCatIds);
         if (id === "all") {
-            selectedCatIds = null;
+            // toggle: if all selected → deselect all; otherwise → select all
+            selectedCatIds = selectedCatIds === null ? new Set() : null;
+            console.log("[cat] after all toggle, selectedCatIds=", selectedCatIds);
             return;
         }
 
@@ -67,10 +72,46 @@
         }
     }
 
+    function getTaskTs(task: (typeof allTasks)[number]): number | null {
+        const s = task.schedule;
+        if (s.type === "allDay") return s.date;
+        if (s.type === "at" || s.type === "span") return s.startsAt;
+        return null;
+    }
+
+    function isThisWeek(ts: number): boolean {
+        const d = new Date(ts * 1000);
+        const now = new Date();
+        const day = now.getDay();
+        const startOfWeek = new Date(now);
+        startOfWeek.setDate(now.getDate() - (day === 0 ? 6 : day - 1));
+        startOfWeek.setHours(0, 0, 0, 0);
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(startOfWeek.getDate() + 7);
+        return d >= startOfWeek && d < endOfWeek;
+    }
+
+    let periodFilteredTasks = $derived(
+        (() => {
+            console.log("[period] selectedPeriod=", selectedPeriod, "allTasks.length=", allTasks.length);
+            if (selectedPeriod === "all") return allTasks;
+            const result = allTasks.filter((t) => {
+                const ts = getTaskTs(t);
+                console.log("[period] task", t.id, "schedule.type=", t.schedule.type, "ts=", ts);
+                if (ts === null) return false;
+                const matches = selectedPeriod === "today" ? isToday(ts) : isThisWeek(ts);
+                console.log("[period] task", t.id, "matches=", matches);
+                return matches;
+            });
+            console.log("[period] result.length=", result.length);
+            return result;
+        })()
+    );
+
     let filteredTasks = $derived(
         selectedCatIds === null
-            ? allTasks
-            : allTasks.filter((t) =>
+            ? periodFilteredTasks
+            : periodFilteredTasks.filter((t) =>
                   t.categoryId != null
                       ? selectedCatIds!.has(t.categoryId)
                       : selectedCatIds!.has("none"),
@@ -80,7 +121,17 @@
     let active = $derived(filteredTasks.filter((t) => !t.completedAt));
     let done = $derived(filteredTasks.filter((t) => !!t.completedAt));
 
-    let filterActive = $derived(selectedCatIds !== null);
+    let filterActive = $derived(
+        selectedCatIds !== null || selectedPeriod !== "all",
+    );
+
+    let periodLabel = $derived(
+        selectedPeriod === "today"
+            ? "Oggi"
+            : selectedPeriod === "week"
+              ? "Questa settimana"
+              : "Periodo",
+    );
 </script>
 
 <div class="flex-1 min-h-0 flex flex-col overflow-hidden">
@@ -96,34 +147,60 @@
         {#if filtersOpen}
             <div class="flex flex-row gap-2 mb-3 px-2 pt-2">
                 <div class="flex-1">
-                    <Menu>
-                        <Menu.Trigger class="btn preset-outlined w-full text-sm"
-                            >Periodo</Menu.Trigger
+                    <Menu
+                        onSelect={(e) => {
+                            console.log("[period] onSelect fired, e=", e, "e.value=", e.value);
+                            selectedPeriod = e.value as Period;
+                            console.log("[period] selectedPeriod set to", selectedPeriod);
+                        }}
+                    >
+                        <Menu.Trigger
+                            class="btn preset-outlined w-full text-sm relative"
                         >
+                            {periodLabel}
+                            {#if selectedPeriod !== "all"}
+                                <span
+                                    class="absolute -top-1 -right-1 size-2 rounded-full bg-primary-500"
+                                ></span>
+                            {/if}
+                        </Menu.Trigger>
                         <Portal>
                             <Menu.Positioner>
                                 <Menu.Content
-                                    class="bg-surface-900 border border-surface-700 rounded-md shadow-xl min-w-[140px]"
+                                    class="bg-surface-900 border border-surface-700 rounded-md shadow-xl min-w-[160px]"
                                 >
                                     <Menu.Item
                                         value="all"
-                                        class="px-3 py-2 text-sm text-surface-100 hover:bg-surface-700 rounded cursor-pointer"
+                                        class="flex items-center gap-2 px-3 py-2 text-sm text-surface-100 hover:bg-surface-700 rounded cursor-pointer"
                                     >
-                                        <Menu.ItemText>Tutti</Menu.ItemText>
+                                        <Menu.ItemText class="flex-1"
+                                            >Tutti</Menu.ItemText
+                                        >
+                                        {#if selectedPeriod === "all"}
+                                            <CheckIcon class="size-4" />
+                                        {/if}
                                     </Menu.Item>
                                     <Menu.Item
                                         value="today"
-                                        class="px-3 py-2 text-sm text-surface-100 hover:bg-surface-700 rounded cursor-pointer"
+                                        class="flex items-center gap-2 px-3 py-2 text-sm text-surface-100 hover:bg-surface-700 rounded cursor-pointer"
                                     >
-                                        <Menu.ItemText>Oggi</Menu.ItemText>
+                                        <Menu.ItemText class="flex-1"
+                                            >Oggi</Menu.ItemText
+                                        >
+                                        {#if selectedPeriod === "today"}
+                                            <CheckIcon class="size-4" />
+                                        {/if}
                                     </Menu.Item>
                                     <Menu.Item
                                         value="week"
-                                        class="px-3 py-2 text-sm text-surface-100 hover:bg-surface-700 rounded cursor-pointer"
+                                        class="flex items-center gap-2 px-3 py-2 text-sm text-surface-100 hover:bg-surface-700 rounded cursor-pointer"
                                     >
-                                        <Menu.ItemText
+                                        <Menu.ItemText class="flex-1"
                                             >Questa settimana</Menu.ItemText
                                         >
+                                        {#if selectedPeriod === "week"}
+                                            <CheckIcon class="size-4" />
+                                        {/if}
                                     </Menu.Item>
                                 </Menu.Content>
                             </Menu.Positioner>
