@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.4] - 2026-06-01
+
+### Bug Fixes
+
+- Tasks filters now filter correct tasks
+
+### Miscellaneous Tasks
+
+- Trigger version bump from release/* branches
+
+### Other
+
+- Add section for old project versions in CHANGELOG
+- Merge branch 'release/1.0'
+
 ## [1.0.3] - 2026-05-31
 
 ### Bug Fixes
