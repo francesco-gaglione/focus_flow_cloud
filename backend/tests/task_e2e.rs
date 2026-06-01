@@ -155,7 +155,6 @@ async fn update_task_test() {
         schedule: None,
         completed: None,
         priority: None,
-        reminders: None,
     };
 
     let update_res = context
@@ -181,7 +180,6 @@ async fn update_task_test() {
         schedule: None,
         completed: Some(true),
         priority: None,
-        reminders: None,
     };
 
     let complete_res = context

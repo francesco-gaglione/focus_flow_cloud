@@ -29,6 +29,7 @@ async fn create_new_session_and_list() {
         subtasks: None,
         category_id: None,
         priority: None,
+        reminders: None,
     };
 
     let create_task_body = context.create_task(&create_task_dto).await;
@@ -137,6 +138,7 @@ async fn update_session_and_list() {
         subtasks: None,
         category_id: None,
         priority: None,
+        reminders: None,
     };
 
     let create_task_body = context.create_task(&create_task_dto).await;
@@ -148,6 +150,7 @@ async fn update_session_and_list() {
         subtasks: None,
         category_id: None,
         priority: None,
+        reminders: None,
     };
 
     let create_task_body_2 = context.create_task(&create_task_dto).await;
@@ -345,6 +348,7 @@ async fn find_sessions_by_task_category() {
         subtasks: None,
         category_id: None,
         priority: None,
+        reminders: None,
     };
     let task = context.create_task(&create_task_dto).await;
 
