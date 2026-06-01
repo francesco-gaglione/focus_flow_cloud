@@ -1,4 +1,6 @@
-use crate::persistence::db_models::db_push_subscription::{DbPushSubscription, NewDbPushSubscription};
+use crate::persistence::db_models::db_push_subscription::{
+    DbPushSubscription, NewDbPushSubscription,
+};
 use crate::persistence::schema;
 use crate::persistence::PostgresPersistence;
 use application::repository_traits::persistence_error::{PersistenceError, PersistenceResult};
@@ -68,8 +70,7 @@ impl PushSubscriptionPersistence for PostgresPersistence {
     async fn delete(&self, id: Uuid) -> PersistenceResult<()> {
         self.with_transaction(move |conn| {
             diesel::delete(
-                schema::push_subscriptions::table
-                    .filter(schema::push_subscriptions::id.eq(id)),
+                schema::push_subscriptions::table.filter(schema::push_subscriptions::id.eq(id)),
             )
             .execute(conn)
             .map(|_| ())
