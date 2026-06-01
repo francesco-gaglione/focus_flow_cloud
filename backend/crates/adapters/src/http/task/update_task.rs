@@ -1,5 +1,8 @@
 use crate::http::app_state::AppState;
-use crate::http::dto::common::task_dto::task_schedule_dto_to_app_dto;
+use crate::http::dto::common::task_dto::{
+    task_schedule_dto_to_app_dto, TaskPriorityDto, TaskScheduleDto,
+};
+use crate::http::validators::validate_uuid::validate_uuid;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::TASK_TAG;
 use application::use_cases::task::update_task::{UpdateTaskCommand, UpdateTaskError};
@@ -7,8 +10,6 @@ use axum::extract::{Path, State};
 use axum::Json;
 use domain::entities::tasks::task_priority::TaskPriority as DomainPriority;
 use serde::{Deserialize, Serialize};
-use shared::task::{TaskPriority, UpdateTaskDto, UpdateTaskResponseDto};
-use shared::validators::validate_uuid::validate_uuid;
 use utoipa::ToSchema;
 use uuid::Uuid;
 use validator::Validate;
@@ -28,6 +29,28 @@ impl From<UpdateTaskError> for HttpError {
 pub struct UpdateTaskPathDto {
     #[validate(custom(function = "validate_uuid"))]
     pub id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateTaskDto {
+    #[validate(length(
+        min = 1,
+        max = 255,
+        message = "Title must be between 1 and 255 characters"
+    ))]
+    pub title: Option<String>,
+    #[validate(length(max = 255, message = "Description must not exceed 255 characters"))]
+    pub description: Option<String>,
+    pub schedule: Option<TaskScheduleDto>,
+    pub completed: Option<bool>,
+    pub priority: Option<TaskPriorityDto>,
+}
+
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateTaskResponseDto {
+    pub success: bool,
 }
 
 #[utoipa::path(
@@ -76,10 +99,10 @@ pub async fn update_task_api(
         description: payload.description,
         schedule,
         priority: payload.priority.map(|p| match p {
-            TaskPriority::Low => DomainPriority::Low,
-            TaskPriority::Medium => DomainPriority::Medium,
-            TaskPriority::High => DomainPriority::High,
-            TaskPriority::Urgent => DomainPriority::Urgent,
+            TaskPriorityDto::Low => DomainPriority::Low,
+            TaskPriorityDto::Medium => DomainPriority::Medium,
+            TaskPriorityDto::High => DomainPriority::High,
+            TaskPriorityDto::Urgent => DomainPriority::Urgent,
         }),
         completed: payload.completed,
     };

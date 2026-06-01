@@ -1,6 +1,7 @@
 use crate::http::app_state::AppState;
 use crate::http::dto::common::session_type_enum::{enum_to_domain, SessionTypeEnum};
 use crate::http::model::session_model::UserSession;
+use crate::http::validators::validate_uuid::validate_uuid;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::SESSION_TAG;
 use application::use_cases::focus_session::create_manual_session::{
@@ -9,7 +10,6 @@ use application::use_cases::focus_session::create_manual_session::{
 use axum::{extract::State, Extension, Json};
 use chrono::DateTime;
 use serde::{Deserialize, Serialize};
-use shared::validators::validate_uuid::validate_uuid;
 use tracing::debug;
 use utoipa::ToSchema;
 use uuid::Uuid;

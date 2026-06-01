@@ -5,7 +5,8 @@ use crate::openapi::CATEGORY_TAG;
 use application::use_cases::category::get_all_category_usecase::GetAllCategoryError;
 use axum::extract::State;
 use axum::Json;
-pub use shared::category::GetAllCategoryResponseDto;
+use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
 
 impl From<GetAllCategoryError> for HttpError {
     fn from(value: GetAllCategoryError) -> Self {
@@ -13,6 +14,12 @@ impl From<GetAllCategoryError> for HttpError {
             GetAllCategoryError::PersistenceError(e) => map_persistence_error(e),
         }
     }
+}
+
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct GetAllCategoryResponseDto {
+    pub categories: Vec<CategoryDto>,
 }
 
 #[utoipa::path(

@@ -4,12 +4,14 @@
 const CACHE_NAME = "focusflow-v1";
 const STATIC_ASSETS = ["/", "/index.html"];
 
-// Install: cache static assets
+// Install: cache static assets (non-fatal — SW activates even if cache fails)
 self.addEventListener("install", (event) => {
     event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS)),
+        caches
+            .open(CACHE_NAME)
+            .then((cache) => cache.addAll(STATIC_ASSETS).catch(() => {}))
+            .then(() => self.skipWaiting()),
     );
-    self.skipWaiting();
 });
 
 // Activate: clean old caches
@@ -58,7 +60,8 @@ self.addEventListener("fetch", (event) => {
 
 // Push: display notification
 self.addEventListener("push", (event) => {
-    let data = { title: "FocusFlow", body: "Time for a focus session!" };
+    console.debug("Push event", event);
+    let data = { title: "FocusFlow", body: "TODO body" };
     try {
         data = event.data ? event.data.json() : data;
     } catch {

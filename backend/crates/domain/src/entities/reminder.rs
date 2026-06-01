@@ -1,7 +1,11 @@
 use chrono::{DateTime, Utc};
+use uuid::Uuid;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Reminder {
+    id: Uuid,
+    task_id: Option<Uuid>,
+    user_id: Uuid,
     title: String,
     description: String,
     date: DateTime<Utc>,
@@ -9,13 +13,54 @@ pub struct Reminder {
 }
 
 impl Reminder {
-    pub fn new(title: String, date: DateTime<Utc>, description: String) -> Self {
+    pub fn new(
+        task_id: Option<Uuid>,
+        user_id: Uuid,
+        title: String,
+        date: DateTime<Utc>,
+        description: String,
+    ) -> Self {
         Self {
+            id: Uuid::new_v4(),
+            task_id,
+            user_id,
             title,
             date,
             description,
             reminder_sent: false,
         }
+    }
+
+    pub fn reconstitute(
+        id: Uuid,
+        task_id: Option<Uuid>,
+        user_id: Uuid,
+        title: String,
+        description: String,
+        date: DateTime<Utc>,
+        reminder_sent: bool,
+    ) -> Self {
+        Self {
+            id,
+            task_id,
+            user_id,
+            title,
+            description,
+            date,
+            reminder_sent,
+        }
+    }
+
+    pub fn id(&self) -> Uuid {
+        self.id
+    }
+
+    pub fn task_id(&self) -> Option<Uuid> {
+        self.task_id
+    }
+
+    pub fn user_id(&self) -> Uuid {
+        self.user_id
     }
 
     pub fn mark_sent(&mut self) {
@@ -26,8 +71,6 @@ impl Reminder {
         self.reminder_sent
     }
 
-    // Returns true if the reminder is overdue (past due date and not sent)
-    // Returns false if the reminder is not overdue or has already been sent
     pub fn is_overdue(&self) -> bool {
         self.date < Utc::now() && !self.reminder_sent
     }
@@ -63,41 +106,44 @@ mod tests {
 
     use super::*;
 
+    fn make_reminder(date: DateTime<Utc>) -> Reminder {
+        Reminder::new(
+            None,
+            Uuid::new_v4(),
+            "Test Reminder".to_string(),
+            date,
+            "Test description".to_string(),
+        )
+    }
+
     #[test]
     fn test_new_reminder() {
         let title = "Test Reminder".to_string();
         let date = Utc::now();
         let description = "Test description".to_string();
-        let reminder = Reminder::new(title.clone(), date, description.clone());
+        let user_id = Uuid::new_v4();
+        let reminder = Reminder::new(None, user_id, title.clone(), date, description.clone());
         assert_eq!(reminder.title, title);
         assert_eq!(reminder.date, date);
         assert_eq!(reminder.description, description);
         assert!(!reminder.reminder_sent);
+        assert_eq!(reminder.task_id, None);
     }
 
-    // TODO: tests getters
     #[test]
     fn test_getters() {
-        let title = "Test Reminder".to_string();
         let date = Utc::now() + Duration::from_mins(10);
-        let description = "Test description".to_string();
-        let reminder = Reminder::new(title.clone(), date, description.clone());
-        assert_eq!(reminder.title(), title);
+        let reminder = make_reminder(date);
+        assert_eq!(reminder.title(), "Test Reminder");
         assert_eq!(reminder.date(), date);
-        assert_eq!(reminder.description(), description);
+        assert_eq!(reminder.description(), "Test description");
         assert!(!reminder.is_overdue());
     }
 
     #[test]
     fn test_update() {
-        let title = "Old title".to_string();
         let date = Utc::now() + Duration::from_mins(20);
-        let description = "Old description".to_string();
-        let mut reminder = Reminder::new(title.clone(), date, description.clone());
-        assert_eq!(reminder.title(), title);
-        assert_eq!(reminder.date(), date);
-        assert_eq!(reminder.description(), description);
-        assert!(!reminder.is_overdue());
+        let mut reminder = make_reminder(date);
         let new_title = "New Title".to_string();
         reminder.update_title(new_title.clone());
         assert_eq!(reminder.title(), new_title);
@@ -113,15 +159,23 @@ mod tests {
 
     #[test]
     fn test_overdue() {
-        let mut reminder = Reminder::new(
-            "Overdue Title".to_string(),
-            Utc::now() - Duration::from_mins(10),
-            "Overdue description".to_string(),
-        );
+        let mut reminder = make_reminder(Utc::now() - Duration::from_mins(10));
         assert!(reminder.is_overdue());
         reminder.mark_sent();
         assert!(reminder.is_sent());
-        // After marking as sent, it should no longer be overdue
         assert!(!reminder.is_overdue());
+    }
+
+    #[test]
+    fn test_task_id() {
+        let task_id = Uuid::new_v4();
+        let reminder = Reminder::new(
+            Some(task_id),
+            Uuid::new_v4(),
+            "Title".to_string(),
+            Utc::now(),
+            "Desc".to_string(),
+        );
+        assert_eq!(reminder.task_id(), Some(task_id));
     }
 }

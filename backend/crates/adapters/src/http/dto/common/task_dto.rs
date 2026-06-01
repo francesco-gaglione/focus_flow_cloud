@@ -1,13 +1,76 @@
 use chrono::{DateTime, Duration, Utc};
-pub use shared::task::TaskDto;
+use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
+use uuid::Uuid;
 
 use application::use_cases::task::{
-    common::task_schedule_app_dto::TaskScheduleAppDto, get_tasks::TaskOutput,
+    common::task_schedule_app_dto::TaskScheduleAppDto,
+    get_tasks::{ReminderOutput, TaskOutput},
 };
 use domain::entities::tasks::task_priority::TaskPriority;
-use shared::task::{SubtaskDto, TaskPriority as SharedTaskPriority, TaskScheduleDto};
 
 use crate::http_error::HttpError;
+
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct TaskDto {
+    pub id: String,
+    pub title: String,
+    pub description: Option<String>,
+    pub priority: Option<TaskPriorityDto>,
+    pub schedule: TaskScheduleDto,
+    pub completed_at: Option<i64>,
+    pub subtasks: Vec<SubtaskDto>,
+    pub category_id: Option<Uuid>,
+    pub reminders: Vec<ReminderDto>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct ReminderDto {
+    pub id: String,
+    pub date_time: i64,
+    pub title: String,
+    pub description: String,
+    pub reminder_sent: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct SubtaskDto {
+    pub id: String,
+    pub title: String,
+    pub description: Option<String>,
+    pub is_completed: bool,
+    pub sort_order: i16,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Copy, ToSchema)]
+#[serde(rename_all = "camelCase")]
+pub enum TaskPriorityDto {
+    Low,
+    Medium,
+    High,
+    Urgent,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, ToSchema)]
+#[serde(tag = "type", rename_all = "camelCase")]
+pub enum TaskScheduleDto {
+    Unscheduled,
+    AllDay {
+        date: i64,
+    },
+    #[serde(rename_all = "camelCase")]
+    At {
+        starts_at: i64,
+    },
+    #[serde(rename_all = "camelCase")]
+    Span {
+        starts_at: i64,
+        duration: i64,
+    },
+}
 
 pub fn task_schedule_dto_to_app_dto(
     schedule: TaskScheduleDto,
@@ -49,7 +112,6 @@ pub fn task_schedule_app_dto_to_dto(schedule: TaskScheduleAppDto) -> TaskSchedul
                 .and_then(|naive_datetime| naive_datetime.and_local_timezone(Utc).single())
                 .map(|dt| dt.timestamp())
                 .unwrap_or(0);
-
             TaskScheduleDto::AllDay { date: timestamp }
         }
         TaskScheduleAppDto::At { starts_at } => TaskScheduleDto::At {
@@ -65,13 +127,23 @@ pub fn task_schedule_app_dto_to_dto(schedule: TaskScheduleAppDto) -> TaskSchedul
     }
 }
 
-fn priority_to_dto(p: Option<TaskPriority>) -> Option<SharedTaskPriority> {
+pub fn priority_to_dto(p: Option<TaskPriority>) -> Option<TaskPriorityDto> {
     p.map(|p| match p {
-        TaskPriority::Low => SharedTaskPriority::Low,
-        TaskPriority::Medium => SharedTaskPriority::Medium,
-        TaskPriority::High => SharedTaskPriority::High,
-        TaskPriority::Urgent => SharedTaskPriority::Urgent,
+        TaskPriority::Low => TaskPriorityDto::Low,
+        TaskPriority::Medium => TaskPriorityDto::Medium,
+        TaskPriority::High => TaskPriorityDto::High,
+        TaskPriority::Urgent => TaskPriorityDto::Urgent,
     })
+}
+
+pub fn reminder_to_dto(r: &ReminderOutput) -> ReminderDto {
+    ReminderDto {
+        id: r.id.to_string(),
+        date_time: r.date_time.timestamp(),
+        title: r.title.clone(),
+        description: r.description.clone(),
+        reminder_sent: r.reminder_sent,
+    }
 }
 
 pub fn from_task_output(v: &TaskOutput) -> TaskDto {
@@ -94,5 +166,6 @@ pub fn from_task_output(v: &TaskOutput) -> TaskDto {
             })
             .collect(),
         category_id: v.category_id,
+        reminders: v.reminders.iter().map(reminder_to_dto).collect(),
     }
 }
