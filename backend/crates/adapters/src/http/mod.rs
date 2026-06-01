@@ -1,4 +1,5 @@
 pub mod app_state;
+pub mod push_subscription;
 pub mod auth;
 pub mod category;
 pub mod dto;

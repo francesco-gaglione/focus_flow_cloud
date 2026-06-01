@@ -7,6 +7,7 @@ use application::use_cases::pomodoro_state::terminate_session::TerminateSessionU
 use application::use_cases::pomodoro_state::update_current_session::UpdateSessionUseCase;
 use application::use_cases::pomodoro_state::update_pomodoro_context::UpdatePomodoroContextUseCase;
 use application::use_cases::stats::get_stats::GetStatsUseCase;
+use application::use_cases::push_subscription::save_push_subscription::SavePushSubscriptionUseCase;
 use application::use_cases::task::add_subtask::AddSubTaskUseCase;
 use application::use_cases::task::get_tasks::GetTasksUseCase;
 use application::use_cases::task::update_subtask::UpdateSubTaskUseCase;
@@ -37,6 +38,7 @@ use opentelemetry::global;
 use opentelemetry::trace::TracerProvider as _;
 use opentelemetry_otlp::WithExportConfig;
 use opentelemetry_sdk::Resource;
+use tracing::info;
 use tracing::subscriber::set_global_default;
 use tracing_bunyan_formatter::{BunyanFormattingLayer, JsonStorageLayer};
 use tracing_subscriber::fmt::MakeWriter;
@@ -54,7 +56,9 @@ use adapters::config::AppConfig;
 use adapters::http::app_state::AppState;
 use adapters::persistence::persistence_impl::persistence::postgres_persistence;
 use adapters::persistence::persistence_impl::pomodoro_state_in_memory_impl::PomodoroStateInMermoryImpl;
-use adapters::persistence::persistence_impl::reminder_worker_port_impl::ReminderWorkerPortImpl;
+use adapters::persistence::persistence_impl::reminder_worker_port_impl::{
+    spawn_reminder_worker, ReminderWorkerPortImpl,
+};
 use application::auth_traits::password_hasher::PasswordHasher;
 use application::repository_traits::user_persistence::UserPersistence;
 use application::use_cases::pomodoro_state::pause_session::PauseSessionUseCase;
@@ -72,11 +76,18 @@ pub async fn init_app_state(
     let sqlx_pool = sqlx::PgPool::connect(&config.database_url)
         .await
         .expect("Failed to create sqlx pool for apalis");
-    let reminder_worker = Arc::new(ReminderWorkerPortImpl::new(sqlx_pool));
-    reminder_worker
-        .setup()
-        .await
-        .expect("Failed to setup apalis schema");
+    let reminder_worker = Arc::new(ReminderWorkerPortImpl::new(sqlx_pool.clone()));
+
+    info!("Spawning reminder worker");
+    spawn_reminder_worker(
+        &sqlx_pool,
+        postgres_arc.clone(),
+        postgres_arc.clone(),
+        config.vapid_private_key.clone(),
+    )
+    .await;
+    info!("Reminder worker spawned");
+
     let pomodoro_state_arc = Arc::new(PomodoroStateInMermoryImpl::new());
 
     // Password Hasher
@@ -125,6 +136,8 @@ pub async fn init_app_state(
         postgres_arc.clone(),
     ));
     let delete_tasks_uc = Arc::new(DeleteTaskUseCase::new(postgres_arc.clone()));
+    let save_push_subscription_uc =
+        Arc::new(SavePushSubscriptionUseCase::new(postgres_arc.clone()));
     let update_task_uc = Arc::new(UpdateTaskUseCase::new(postgres_arc.clone()));
     let update_subtask_uc = Arc::new(UpdateSubTaskUseCase::new(postgres_arc.clone()));
     let add_subtask_uc = Arc::new(AddSubTaskUseCase::new(postgres_arc.clone()));
@@ -244,6 +257,7 @@ pub async fn init_app_state(
         update_password_uc,
         update_user_username_uc,
         get_user_info_uc,
+        save_push_subscription_uc,
         token_service,
         version,
     })

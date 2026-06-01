@@ -1,6 +1,6 @@
 use crate::http::auth::login::{LoginDto, LoginResponseDto};
-use crate::http::auth::oauth_token::{OAuthTokenForm, OAuthTokenResponse};
 use crate::http::auth::logout::LogoutResponseDto;
+use crate::http::auth::oauth_token::{OAuthTokenForm, OAuthTokenResponse};
 use crate::http::auth::refresh::{RefreshDto, RefreshResponseDto};
 use crate::http::category::create_category::{CreateCategoryDto, CreateCategoryResponseDto};
 use crate::http::category::delete_categories::{DeleteCategoriesDto, DeleteCategoriesResponseDto};

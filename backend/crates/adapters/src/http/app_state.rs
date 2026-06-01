@@ -9,6 +9,7 @@ use application::use_cases::pomodoro_state::terminate_session::TerminateSessionU
 use application::use_cases::pomodoro_state::update_current_session::UpdateSessionUseCase;
 use application::use_cases::pomodoro_state::update_pomodoro_context::UpdatePomodoroContextUseCase;
 use application::use_cases::stats::get_stats::GetStatsUseCase;
+use application::use_cases::push_subscription::save_push_subscription::SavePushSubscriptionUseCase;
 use application::use_cases::task::add_subtask::AddSubTaskUseCase;
 use application::use_cases::task::get_tasks::GetTasksUseCase;
 use application::use_cases::task::update_subtask::UpdateSubTaskUseCase;
@@ -91,6 +92,9 @@ pub struct AppState {
     pub update_password_uc: Arc<UpdateUserPasswordUseCase>,
     pub update_user_username_uc: Arc<UpdateUserUsernameUseCase>,
     pub get_user_info_uc: Arc<GetUserInfoUseCase>,
+
+    // Push Subscription Use Cases
+    pub save_push_subscription_uc: Arc<SavePushSubscriptionUseCase>,
 
     // Services
     pub token_service: Arc<dyn TokenService>,

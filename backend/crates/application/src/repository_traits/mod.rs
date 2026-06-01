@@ -2,6 +2,7 @@ pub mod category_persistence;
 pub mod focus_session_repository;
 pub mod persistence_error;
 pub mod pomodoro_state_repository;
+pub mod push_subscription_persistence;
 pub mod reminder_persistence;
 pub mod reminder_worker_port;
 pub mod task_persistence;

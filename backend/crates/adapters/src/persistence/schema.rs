@@ -1,6 +1,17 @@
 // @generated automatically by Diesel CLI.
 
 diesel::table! {
+    _sqlx_migrations (version) {
+        version -> Int8,
+        description -> Text,
+        installed_on -> Timestamptz,
+        success -> Bool,
+        checksum -> Bytea,
+        execution_time -> Int8,
+    }
+}
+
+diesel::table! {
     categories (id) {
         id -> Uuid,
         user_id -> Uuid,
@@ -31,10 +42,20 @@ diesel::table! {
 }
 
 diesel::table! {
+    push_subscriptions (id) {
+        id -> Uuid,
+        user_id -> Uuid,
+        endpoint -> Text,
+        p256dh -> Text,
+        auth -> Text,
+        created_at -> Timestamptz,
+    }
+}
+
+diesel::table! {
     reminders (id) {
         id -> Uuid,
         user_id -> Uuid,
-        task_id -> Nullable<Uuid>,
         #[max_length = 255]
         title -> Varchar,
         description -> Text,
@@ -42,6 +63,7 @@ diesel::table! {
         reminder_sent -> Bool,
         created_at -> Timestamptz,
         updated_at -> Timestamptz,
+        task_id -> Nullable<Uuid>,
     }
 }
 
@@ -111,6 +133,8 @@ diesel::table! {
 diesel::joinable!(categories -> users (user_id));
 diesel::joinable!(focus_session -> tasks (task_id));
 diesel::joinable!(focus_session -> users (user_id));
+diesel::joinable!(push_subscriptions -> users (user_id));
+diesel::joinable!(reminders -> tasks (task_id));
 diesel::joinable!(reminders -> users (user_id));
 diesel::joinable!(subtasks -> tasks (task_id));
 diesel::joinable!(subtasks -> users (user_id));
@@ -119,8 +143,10 @@ diesel::joinable!(tasks -> users (user_id));
 diesel::joinable!(user_settings -> users (user_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
+    _sqlx_migrations,
     categories,
     focus_session,
+    push_subscriptions,
     reminders,
     subtasks,
     tasks,

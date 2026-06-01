@@ -144,6 +144,7 @@ pub async fn setup() -> TestContext {
         jwt_secret: "test_secret".to_string(),
         admin_username: Some("admin".to_string()),
         admin_password: Some("AdminPassword123".to_string()),
+        vapid_private_key: "test_vapid_key".to_string(),
     };
 
     // Initialize App State (this runs migrations)

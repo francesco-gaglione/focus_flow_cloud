@@ -12,6 +12,7 @@ pub fn api_routes(state: AppState) -> Router<AppState> {
         .nest("/setting", crate::http::user_setting::routes::router())
         .nest("/users", crate::http::users::routes::router())
         .nest("/stats", crate::http::stats::routes::router())
+        .nest("/push-subscriptions", crate::http::push_subscription::routes::router())
         .layer(axum::middleware::from_fn_with_state(state, auth_middleware));
 
     Router::new()

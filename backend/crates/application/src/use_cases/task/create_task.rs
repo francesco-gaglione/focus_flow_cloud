@@ -75,6 +75,15 @@ impl CreateTaskUseCase {
             command.schedule.unwrap_or_default().into(),
             command.description.clone(),
         );
+        for reminder in command.reminders.unwrap_or_default() {
+            task.add_reminder(Reminder::new(
+                Some(task.id()),
+                command.user_id,
+                "".to_string(), //FIXME
+                reminder.date,
+                "".to_string(), //FIXME
+            ));
+        }
 
         if let Some(cat_id) = command.category_id {
             task.update_category_id(cat_id);
@@ -94,28 +103,27 @@ impl CreateTaskUseCase {
         }
 
         info!("Creating task: {:?}", task);
-        let task_id = self.task_persistence.create_task(task).await?;
+        let task_id = self.task_persistence.create_task(task.clone()).await?;
         info!("Task created successfully: {}", task_id);
 
-        if let Some(reminders) = command.reminders {
-            for reminder in reminders {
-                let reminder_entity = Reminder::new(
-                    Some(task_id),
-                    command.user_id,
-                    command.title.clone(),
-                    reminder.date,
-                    command.description.clone().unwrap_or_default(),
-                );
-                let reminder_id = self
-                    .reminder_persistence
-                    .save_reminder(reminder_entity)
-                    .await?;
-                info!("Reminder saved: {}", reminder_id);
-                self.reminder_worker
-                    .schedule(reminder_id, reminder.date)
-                    .await?;
-                info!("Reminder scheduled: {}", reminder_id);
-            }
+        info!("Scheduling reminder {:?}", task.reminders());
+        for reminder in task.reminders() {
+            let reminder_entity = Reminder::new(
+                Some(task_id),
+                command.user_id,
+                command.title.clone(),
+                reminder.date(),
+                command.description.clone().unwrap_or_default(),
+            );
+            let reminder_id = self
+                .reminder_persistence
+                .save_reminder(reminder_entity)
+                .await?;
+            info!("Reminder saved: {}", reminder_id);
+            self.reminder_worker
+                .schedule(reminder_id, reminder.date())
+                .await?;
+            info!("Reminder scheduled: {}", reminder_id);
         }
 
         Ok(task_id)

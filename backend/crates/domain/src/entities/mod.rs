@@ -1,6 +1,7 @@
 pub mod focus_session;
 pub mod focus_session_type;
 pub mod pomodoro;
+pub mod push_subscription;
 pub mod reminder;
 pub mod tasks;
 pub mod user;

@@ -36,10 +36,14 @@ regex.workspace = true
 dotenvy.workspace = true
 serde_urlencoded = "0.7.1"
 secrecy.workspace = true
-apalis = "0.7.4"
+apalis = { version = "1.0.0-rc.9" }
 apalis-postgres = { version = "1.0.0-rc.8", features = ["migrate"] }
+apalis-sql = { version = "1.0.0-rc.9", default-features = false }
 apalis-core = { version = "1.0.0-rc.9", features = ["sleep"] }
 sqlx = { version = "0.8.1", features = ["postgres", "runtime-tokio"] }
+web-push = "0.10"
+base64 = "0.13"
+futures = { version = "0.3", features = ["executor"] }
 
 [dev-dependencies]
 testcontainers.workspace = true

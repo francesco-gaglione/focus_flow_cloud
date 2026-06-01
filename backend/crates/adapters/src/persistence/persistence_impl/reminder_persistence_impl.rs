@@ -1,3 +1,4 @@
+use crate::persistence::db_models::db_reminder::UpdateDbReminder;
 use crate::persistence::db_models::db_reminder::{DbReminder, NewDbReminder};
 use crate::persistence::schema;
 use crate::persistence::PostgresPersistence;
@@ -9,10 +10,12 @@ use diesel::{
     SelectableHelper,
 };
 use domain::entities::reminder::Reminder;
+use tracing::instrument;
 use uuid::Uuid;
 
 #[async_trait]
 impl ReminderPersistence for PostgresPersistence {
+    #[instrument(skip(self))]
     async fn save_reminder(&self, reminder: Reminder) -> PersistenceResult<Uuid> {
         let new_db_reminder = NewDbReminder::from(reminder);
         let id = new_db_reminder.id;
@@ -26,6 +29,7 @@ impl ReminderPersistence for PostgresPersistence {
         .await
     }
 
+    #[instrument(skip(self))]
     async fn get_reminder(&self, id: Uuid) -> PersistenceResult<Option<Reminder>> {
         let conn = self
             .pool
@@ -48,6 +52,7 @@ impl ReminderPersistence for PostgresPersistence {
         Ok(result.map(|r| r.into()))
     }
 
+    #[instrument(skip(self))]
     async fn delete_reminder(&self, id: Uuid) -> PersistenceResult<()> {
         let conn = self
             .pool
@@ -66,6 +71,7 @@ impl ReminderPersistence for PostgresPersistence {
         Ok(())
     }
 
+    #[instrument(skip(self))]
     async fn find_by_task_ids(&self, task_ids: Vec<Uuid>) -> PersistenceResult<Vec<Reminder>> {
         if task_ids.is_empty() {
             return Ok(vec![]);
@@ -82,6 +88,25 @@ impl ReminderPersistence for PostgresPersistence {
                 .load(conn)?;
 
             Ok(db_reminders.into_iter().map(|r| r.into()).collect())
+        })
+        .await
+    }
+
+    #[instrument(skip(self))]
+    async fn update_reminder(&self, reminder: Reminder) -> PersistenceResult<()> {
+        let id = reminder.id();
+        let update = UpdateDbReminder {
+            title: Some(reminder.title().to_string()),
+            description: Some(reminder.description().to_string()),
+            date: Some(reminder.date()),
+            reminder_sent: Some(reminder.is_sent()),
+        };
+
+        self.with_transaction(move |conn| {
+            diesel::update(schema::reminders::table.filter(schema::reminders::id.eq(id)))
+                .set(&update)
+                .execute(conn)?;
+            Ok(())
         })
         .await
     }

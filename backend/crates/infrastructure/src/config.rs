@@ -11,6 +11,8 @@ pub fn load_from_env() -> AppConfig {
     let jwt_secret = std::env::var("JWT_SECRET").expect("JWT_SECRET must be set");
     let admin_username = std::env::var("ADMIN_USERNAME").ok();
     let admin_password = std::env::var("ADMIN_PASSWORD").ok();
+    let vapid_private_key =
+        std::env::var("VAPID_PRIVATE_KEY").expect("VAPID_PRIVATE_KEY must be set");
 
     let database_url = format!(
         "postgres://{}:{}@{}/{}",
@@ -24,5 +26,6 @@ pub fn load_from_env() -> AppConfig {
         jwt_secret,
         admin_username,
         admin_password,
+        vapid_private_key,
     }
 }
