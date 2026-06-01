@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - release/*
 
 jobs:
   bump:
@@ -69,4 +70,4 @@ jobs:
 
       - name: Push Changes
         # Important: origin must be authenticated with the PAT for protected branch push
-        run: git push origin master --tags
+        run: git push origin HEAD --tags
