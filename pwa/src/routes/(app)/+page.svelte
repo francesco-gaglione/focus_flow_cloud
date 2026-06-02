@@ -135,7 +135,7 @@
 </script>
 
 <div class="flex-1 min-h-0 flex flex-col overflow-hidden">
-    <div class="flex-1 overflow-y-auto" style="padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 80px)">
+    <div class="flex-1 overflow-y-auto pb-20">
         {#if $tasksQuery.isPending}
             <div
                 class="flex items-center justify-center py-16 text-surface-500 text-sm font-mono"
@@ -383,7 +383,7 @@
     <button
         onclick={() => (sheetOpen = true)}
         class="fixed right-4 z-30 size-12 rounded-full btn preset-filled-primary-500 shadow-lg"
-        style="bottom: calc(env(safe-area-inset-bottom, 0px) + 80px)"
+        style="bottom: calc(env(safe-area-inset-bottom, 0px) + 68px)"
         aria-label="New task"
     >
         <svg

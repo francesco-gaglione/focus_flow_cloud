@@ -45,7 +45,7 @@
             <button
                 onclick={() => goto(tab.to)}
                 class={[
-                    'flex flex-col items-center justify-center gap-1 py-2 text-[10px] font-medium transition-colors',
+                    'flex flex-col items-center justify-center gap-1 py-1.5 text-[10px] font-medium transition-colors',
                     isActive(tab.to)
                         ? 'text-primary-400 bg-primary-500/10'
                         : 'text-surface-500 hover:text-surface-300',
