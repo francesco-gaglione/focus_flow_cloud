@@ -2,7 +2,8 @@ mod common;
 
 use crate::common::setup;
 use adapters::http::category::create_category::CreateCategoryDto;
-use shared::category::{GetAllCategoryResponseDto, UpdateCategoryDto, UpdateCategoryResponseDto};
+use adapters::http::category::get_all_categories::GetAllCategoryResponseDto;
+use adapters::http::category::update_category::{UpdateCategoryDto, UpdateCategoryResponseDto};
 
 #[tokio::test]
 async fn create_and_list_category() {

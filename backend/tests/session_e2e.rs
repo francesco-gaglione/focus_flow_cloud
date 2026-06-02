@@ -1,5 +1,8 @@
 mod common;
 
+use adapters::http::dto::common::task_dto::TaskScheduleDto;
+use adapters::http::task::create_task::CreateTaskDto;
+use adapters::http::task::get_tasks::TasksResponseDto;
 use adapters::http::{
     category::create_category::CreateCategoryDto,
     dto::common::session_type_enum::SessionTypeEnum,
@@ -10,7 +13,6 @@ use adapters::http::{
     users::create_user::CreateUserDto,
 };
 use chrono::Utc;
-use shared::task::{CreateTaskDto, TaskScheduleDto, TasksResponseDto};
 use tracing::info;
 
 use crate::common::setup;
@@ -27,6 +29,7 @@ async fn create_new_session_and_list() {
         subtasks: None,
         category_id: None,
         priority: None,
+        reminders: None,
     };
 
     let create_task_body = context.create_task(&create_task_dto).await;
@@ -135,6 +138,7 @@ async fn update_session_and_list() {
         subtasks: None,
         category_id: None,
         priority: None,
+        reminders: None,
     };
 
     let create_task_body = context.create_task(&create_task_dto).await;
@@ -146,6 +150,7 @@ async fn update_session_and_list() {
         subtasks: None,
         category_id: None,
         priority: None,
+        reminders: None,
     };
 
     let create_task_body_2 = context.create_task(&create_task_dto).await;
@@ -343,6 +348,7 @@ async fn find_sessions_by_task_category() {
         subtasks: None,
         category_id: None,
         priority: None,
+        reminders: None,
     };
     let task = context.create_task(&create_task_dto).await;
 

@@ -28,6 +28,8 @@ impl From<RegisterUserError> for HttpError {
 }
 
 #[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
 pub struct CreateUserDto {
     pub username: String,
     pub password: String,

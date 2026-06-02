@@ -1,13 +1,12 @@
-use crate::http::dto::common::task_dto;
+use crate::http::dto::common::task_dto::{self, TaskDto};
 use crate::http_error::{map_persistence_error, HttpResult};
 use crate::openapi::TASK_TAG;
 use crate::{http::app_state::AppState, http_error::HttpError};
 use application::use_cases::task::get_tasks::{GetTaskError, GetTasksCommand};
 use axum::extract::{Query, State};
 use axum::Json;
-use serde::Deserialize;
-use shared::task::TasksResponseDto;
-use utoipa::IntoParams;
+use serde::{Deserialize, Serialize};
+use utoipa::{IntoParams, ToSchema};
 
 impl From<GetTaskError> for HttpError {
     fn from(err: GetTaskError) -> Self {
@@ -15,6 +14,14 @@ impl From<GetTaskError> for HttpError {
             GetTaskError::PersistenceError(e) => map_persistence_error(e),
         }
     }
+}
+
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
+#[serde(rename_all = "camelCase")]
+pub struct TasksResponseDto {
+    pub tasks: Vec<TaskDto>,
 }
 
 #[derive(Debug, Deserialize, IntoParams)]

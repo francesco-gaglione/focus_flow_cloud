@@ -1,5 +1,5 @@
 set shell := ["bash", "-c"]
-set dotenv-load := true
+set dotenv-load
 
 # Default recipe (shows help)
 default:
@@ -76,6 +76,10 @@ pwa-check:
 # Install PWA dependencies
 pwa-install:
     cd pwa && bun install
+
+# Generate PWA dto definitions
+pwa-generate-type:
+    cd pwa && bun run generate:types
 
 # ============================================================================
 # Doc

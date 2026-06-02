@@ -33,6 +33,8 @@ impl From<UpdatePasswordError> for HttpError {
 }
 
 #[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
 pub struct UpdatePasswordDto {
     #[validate(length(min = 1, message = "Old password is required"))]
     pub old_password: String,

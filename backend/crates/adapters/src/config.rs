@@ -8,4 +8,5 @@ pub struct AppConfig {
     pub jwt_secret: String,
     pub admin_username: Option<String>,
     pub admin_password: Option<String>,
+    pub vapid_private_key: String,
 }

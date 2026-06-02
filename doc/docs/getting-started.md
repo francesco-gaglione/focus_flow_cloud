@@ -55,6 +55,10 @@ The easiest way to run the FocusFlow backend is using Docker Compose. This autom
           # Must be a long, random string
           - JWT_SECRET=change_me_to_a_secure_random_secret
 
+          # Web Push (VAPID)
+          # Generate with: npx web-push generate-vapid-keys
+          - VAPID_PRIVATE_KEY=your_vapid_private_key
+
           # Initial Admin User (Optional)
           # Uncomment to create an admin user on first run
           # - ADMIN_USERNAME=admin
@@ -92,6 +96,21 @@ The easiest way to run the FocusFlow backend is using Docker Compose. This autom
 2.  **Authentication**:
     The backend uses JWT for authentication. You **MUST** provide a `JWT_SECRET` environment variable. Generate a strong random string (e.g., `openssl rand -base64 32`) and set it.
 
+3.  **Web Push (VAPID keys)**:
+    Push notifications require a VAPID key pair. Generate it once and store both keys permanently — regenerating them invalidates all existing browser subscriptions.
+
+    ```bash
+    npx web-push generate-vapid-keys
+    ```
+
+    This outputs:
+    ```
+    Public Key:  BKq9se...   ← goes in PWA env as VITE_VAPID_PUBLIC_KEY
+    Private Key: 1772RK...   ← goes in backend env as VAPID_PRIVATE_KEY
+    ```
+
+    The **private key** must only be set on the backend. The **public key** is used by the PWA to subscribe the browser and is safe to expose.
+
 3.  **Initial Admin User**:
     Since registration is private, you can seed an initial admin user by setting the `ADMIN_USERNAME` and `ADMIN_PASSWORD` environment variables. The user will be created on startup if it doesn't exist.
 
@@ -121,6 +140,7 @@ All environment variables required for the backend:
 | `POSTGRES_PASSWORD` | Database password                           | `secure_password`                |
 | `ADMIN_USERNAME`    | (Optional) Initial admin username           | `admin`                          |
 | `ADMIN_PASSWORD`    | (Optional) Initial admin password           | `password`                       |
+| `VAPID_PRIVATE_KEY` | Private key for Web Push notifications      | generated via `npx web-push generate-vapid-keys` |
 | `OTLP_ENDPOINT`     | (Optional) OpenTelemetry collector endpoint | `http://localhost:4317`          |
 
 ### Observability (Optional)
@@ -252,10 +272,16 @@ bun run preview
 
 ### Environment
 
-The PWA reads the backend URL from `PUBLIC_API_BASE_URL`. Create a `.env` file in `pwa/`:
+The PWA reads configuration from environment variables. Create a `.env` file in `pwa/`:
 
 ```env
 PUBLIC_API_BASE_URL=http://localhost:8080
+VITE_VAPID_PUBLIC_KEY=your_vapid_public_key
 ```
 
-In production, set this to your backend's public URL before building.
+| Variable               | Description                                              |
+| :--------------------- | :------------------------------------------------------- |
+| `PUBLIC_API_BASE_URL`  | Backend public URL                                       |
+| `VITE_VAPID_PUBLIC_KEY`| VAPID public key for Web Push (pair of `VAPID_PRIVATE_KEY`) |
+
+In production, set these before building. The VAPID public key is generated together with the private key via `npx web-push generate-vapid-keys`.

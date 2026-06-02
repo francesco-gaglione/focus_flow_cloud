@@ -4,7 +4,27 @@ use crate::{http::app_state::AppState, http_error::HttpError};
 use application::use_cases::user::refresh_token::{RefreshTokenCommand, RefreshTokenError};
 use axum::extract::State;
 use axum::Json;
-use shared::auth::{RefreshDto, RefreshResponseDto};
+use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
+use validator::Validate;
+
+#[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
+#[serde(rename_all = "camelCase")]
+pub struct RefreshDto {
+    #[validate(length(min = 1, message = "Refresh token is required"))]
+    pub refresh_token: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
+#[serde(rename_all = "camelCase")]
+pub struct RefreshResponseDto {
+    pub token: String,
+    pub refresh_token: String,
+}
 
 impl From<RefreshTokenError> for HttpError {
     fn from(value: RefreshTokenError) -> Self {

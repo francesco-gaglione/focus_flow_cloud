@@ -1,5 +1,7 @@
 use adapters::app::create_app;
 use adapters::config::AppConfig;
+use adapters::http::category::create_category::CreateCategoryResponseDto;
+use adapters::http::task::create_task::{CreateTaskDto, CreateTaskResponseDto};
 use adapters::http::{
     category::create_category::CreateCategoryDto,
     session::create_manual_session::{CreateManualSessionDto, CreateManualSessionResponseDto},
@@ -8,8 +10,6 @@ use adapters::http::{
     },
 };
 use infrastructure::setup::{init_app_state, init_tracing};
-use shared::category::CreateCategoryResponseDto;
-use shared::task::{CreateTaskDto, CreateTaskResponseDto};
 use std::sync::Once;
 use testcontainers::runners::AsyncRunner;
 use testcontainers_modules::postgres::Postgres;
@@ -144,6 +144,7 @@ pub async fn setup() -> TestContext {
         jwt_secret: "test_secret".to_string(),
         admin_username: Some("admin".to_string()),
         admin_password: Some("AdminPassword123".to_string()),
+        vapid_private_key: "test_vapid_key".to_string(),
     };
 
     // Initialize App State (this runs migrations)

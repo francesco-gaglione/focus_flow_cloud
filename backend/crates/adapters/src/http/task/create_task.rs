@@ -1,20 +1,78 @@
 use crate::http::app_state::AppState;
 use crate::http::dto::common::task_dto::task_schedule_dto_to_app_dto;
+use crate::http::dto::common::task_dto::{TaskPriorityDto, TaskScheduleDto};
 use crate::http::model::session_model::UserSession;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::TASK_TAG;
 use application::use_cases::task::create_task::{
-    CreateSubtaskCommand, CreateTaskCommand, CreateTaskError,
+    AddReminderCommand, CreateSubtaskCommand, CreateTaskCommand, CreateTaskError,
 };
 use axum::{extract::State, Extension, Json};
+use chrono::DateTime;
 use domain::entities::tasks::task_priority::TaskPriority as DomainPriority;
-use shared::task::{CreateTaskDto, CreateTaskResponseDto, TaskPriority as SharedPriority};
+use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
+use uuid::Uuid;
 use validator::Validate;
+
+#[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
+#[serde(rename_all = "camelCase")]
+pub struct CreateSubtaskDto {
+    #[validate(length(
+        min = 1,
+        max = 255,
+        message = "Title must be between 1 and 255 characters"
+    ))]
+    pub title: String,
+    #[validate(length(max = 255, message = "Description must not exceed 255 characters"))]
+    pub description: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
+#[serde(rename_all = "camelCase")]
+pub struct CreateReminderDto {
+    #[cfg_attr(feature = "ts", ts(type = "number"))]
+    pub date: i64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
+#[serde(rename_all = "camelCase")]
+pub struct CreateTaskDto {
+    #[validate(length(
+        min = 1,
+        max = 255,
+        message = "Title must be between 1 and 255 characters"
+    ))]
+    pub title: String,
+    #[validate(length(max = 255, message = "Description must not exceed 255 characters"))]
+    pub description: Option<String>,
+    pub schedule: Option<TaskScheduleDto>,
+    #[validate(nested)]
+    pub subtasks: Option<Vec<CreateSubtaskDto>>,
+    #[cfg_attr(feature = "ts", ts(type = "string | null"))]
+    pub category_id: Option<Uuid>,
+    pub priority: Option<TaskPriorityDto>,
+    pub reminders: Option<Vec<CreateReminderDto>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
+pub struct CreateTaskResponseDto {
+    pub id: String,
+}
 
 impl From<CreateTaskError> for HttpError {
     fn from(value: CreateTaskError) -> Self {
         match value {
             CreateTaskError::PersistenceError(e) => HttpError::GenericError(e.to_string()),
+            CreateTaskError::WorkerPortError(e) => HttpError::GenericError(e.to_string()),
         }
     }
 }
@@ -62,10 +120,10 @@ pub async fn create_task_api(
     });
 
     let priority = payload.priority.map(|p| match p {
-        SharedPriority::Low => DomainPriority::Low,
-        SharedPriority::Medium => DomainPriority::Medium,
-        SharedPriority::High => DomainPriority::High,
-        SharedPriority::Urgent => DomainPriority::Urgent,
+        TaskPriorityDto::Low => DomainPriority::Low,
+        TaskPriorityDto::Medium => DomainPriority::Medium,
+        TaskPriorityDto::High => DomainPriority::High,
+        TaskPriorityDto::Urgent => DomainPriority::Urgent,
     });
 
     let command = CreateTaskCommand {
@@ -76,6 +134,14 @@ pub async fn create_task_api(
         subtasks,
         category_id: payload.category_id,
         priority,
+        reminders: payload.reminders.map(|items| {
+            items
+                .into_iter()
+                .map(|r| AddReminderCommand {
+                    date: DateTime::from_timestamp(r.date, 0).unwrap(),
+                })
+                .collect()
+        }),
     };
 
     tracing::info!("Creating task with command: {:?}", command);

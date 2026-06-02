@@ -3,12 +3,134 @@ use application::use_cases::stats::get_stats::{
 };
 use axum::extract::{Extension, Query, State};
 use axum::Json;
-use serde::Deserialize;
-use shared::stats::{
-    CategoryCountDto, CompletedByPriorityDto, CompletedFocusSessionsDto, CompletedTasksCountsDto,
-    DayCountDto, GetStatsResponseDto, OverdueTrendDto, OverdueTrendTypeDto, PeakWindowRangeDto,
-    WeekCountDto,
-};
+use chrono::NaiveDate;
+use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
+use uuid::Uuid;
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
+#[serde(rename_all = "camelCase")]
+pub struct GetStatsResponseDto {
+    pub completed_tasks_counts: CompletedTasksCountsDto,
+    pub peak_window: Vec<PeakWindowRangeDto>,
+    pub completed_by_priority: CompletedByPriorityDto,
+    pub completed_focus_sessions: CompletedFocusSessionsDto,
+    pub overdue_trend: OverdueTrendDto,
+    pub count_by_category: Vec<CategoryCountDto>,
+    pub last_14d: Vec<DayCountDto>,
+    pub last_8w: Vec<WeekCountDto>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
+#[serde(rename_all = "camelCase")]
+pub struct CompletedTasksCountsDto {
+    #[cfg_attr(feature = "ts", ts(type = "number"))]
+    pub completed_today: i64,
+    #[cfg_attr(feature = "ts", ts(type = "number"))]
+    pub completed_this_week: i64,
+    #[cfg_attr(feature = "ts", ts(type = "number"))]
+    pub week_delta: i64,
+    #[cfg_attr(feature = "ts", ts(type = "number"))]
+    pub completed_this_month: i64,
+    pub day_avg: f64,
+    #[cfg_attr(feature = "ts", ts(type = "number"))]
+    pub focus_sessions: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
+#[serde(rename_all = "camelCase")]
+pub struct PeakWindowRangeDto {
+    pub start: String,
+    pub end: String,
+    #[cfg_attr(feature = "ts", ts(type = "number"))]
+    pub count: usize,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
+#[serde(rename_all = "camelCase")]
+pub struct CompletedByPriorityDto {
+    #[cfg_attr(feature = "ts", ts(type = "number"))]
+    pub low: usize,
+    #[cfg_attr(feature = "ts", ts(type = "number"))]
+    pub medium: usize,
+    #[cfg_attr(feature = "ts", ts(type = "number"))]
+    pub high: usize,
+    #[cfg_attr(feature = "ts", ts(type = "number"))]
+    pub urgent: usize,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
+#[serde(rename_all = "camelCase")]
+pub struct CompletedFocusSessionsDto {
+    #[cfg_attr(feature = "ts", ts(type = "number"))]
+    pub count: usize,
+    #[cfg_attr(feature = "ts", ts(type = "number"))]
+    pub avg_duration_secs: i64,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum OverdueTrendTypeDto {
+    Increasing,
+    Decreasing,
+    #[default]
+    Stable,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
+#[serde(rename_all = "camelCase")]
+pub struct OverdueTrendDto {
+    pub trend_type: OverdueTrendTypeDto,
+    pub trend_value: f64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
+#[serde(rename_all = "camelCase")]
+pub struct CategoryCountDto {
+    #[cfg_attr(feature = "ts", ts(type = "string"))]
+    pub category_id: Uuid,
+    pub category_name: String,
+    #[cfg_attr(feature = "ts", ts(type = "number"))]
+    pub count: u64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
+#[serde(rename_all = "camelCase")]
+pub struct DayCountDto {
+    #[cfg_attr(feature = "ts", ts(type = "string"))]
+    pub day: NaiveDate,
+    #[cfg_attr(feature = "ts", ts(type = "number"))]
+    pub count: usize,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
+#[serde(rename_all = "camelCase")]
+pub struct WeekCountDto {
+    #[cfg_attr(feature = "ts", ts(type = "string"))]
+    pub week_start: NaiveDate,
+    #[cfg_attr(feature = "ts", ts(type = "number"))]
+    pub count: usize,
+}
 
 use crate::http::app_state::AppState;
 use crate::http::model::session_model::UserSession;

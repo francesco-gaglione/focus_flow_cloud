@@ -1,12 +1,13 @@
 mod common;
 
+use adapters::http::dto::common::task_dto::TaskScheduleDto;
+use adapters::http::task::create_task::CreateTaskDto;
+use adapters::http::task::get_tasks::TasksResponseDto;
+use adapters::http::task::update_task::{UpdateTaskDto, UpdateTaskResponseDto};
 use adapters::http::{
     category::create_category::CreateCategoryDto, task::delete_tasks::DeleteTaskResponseDto,
 };
 use chrono::Utc;
-use shared::task::{
-    CreateTaskDto, TaskScheduleDto, TasksResponseDto, UpdateTaskDto, UpdateTaskResponseDto,
-};
 
 use crate::common::setup;
 
@@ -29,6 +30,7 @@ async fn create_new_task_and_list() {
         subtasks: None,
         category_id: None,
         priority: None,
+        reminders: None,
     };
 
     let create_task_body = context.create_task(&create_task_dto).await;
@@ -62,6 +64,7 @@ async fn create_new_orphan_and_list() {
         subtasks: None,
         category_id: None,
         priority: None,
+        reminders: None,
     };
 
     let create_task_body = context.create_task(&create_task_dto).await;
@@ -106,6 +109,7 @@ async fn create_scheduled_task_and_list() {
         subtasks: None,
         category_id: None,
         priority: None,
+        reminders: None,
     };
 
     context.create_task(&create_task_dto).await;
@@ -138,6 +142,7 @@ async fn update_task_test() {
         subtasks: None,
         category_id: None,
         priority: None,
+        reminders: None,
     };
 
     let create_body = context.create_task(&create_task_dto).await;
@@ -210,6 +215,7 @@ async fn delete_tasks_test() {
         subtasks: None,
         category_id: None,
         priority: None,
+        reminders: None,
     };
 
     let create_body = context.create_task(&create_task_dto).await;

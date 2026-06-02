@@ -5,10 +5,33 @@ use crate::openapi::TASK_TAG;
 use application::use_cases::task::add_subtask::{AddSubTaskCommand, AddSubTaskError};
 use axum::extract::{Path, State};
 use axum::{Extension, Json};
-use shared::task::{CreateSubtaskDto, CreateSubtaskResponseDto};
+use serde::{Deserialize, Serialize};
 use tracing::error;
+use utoipa::ToSchema;
 use uuid::Uuid;
 use validator::Validate;
+
+#[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
+#[serde(rename_all = "camelCase")]
+pub struct CreateSubtaskDto {
+    #[validate(length(
+        min = 1,
+        max = 255,
+        message = "Title must be between 1 and 255 characters"
+    ))]
+    pub title: String,
+    #[validate(length(max = 255, message = "Description must not exceed 255 characters"))]
+    pub description: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
+pub struct CreateSubtaskResponseDto {
+    pub id: String,
+}
 
 impl From<AddSubTaskError> for HttpError {
     fn from(value: AddSubTaskError) -> Self {
