@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-    "generate:types": "cd .. && TS_RS_EXPORT_DIR=../../../pwa/src/types/generated cargo test -p shared --features ts 2>&1"
+    "generate:types": "cd .. && TS_RS_EXPORT_DIR=../../../pwa/src/types/generated cargo test -p adapters --features ts 2>&1"
   },
   "dependencies": {
     "@skeletonlabs/skeleton": "^4.15.2",

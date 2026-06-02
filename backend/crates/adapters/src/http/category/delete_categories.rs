@@ -12,12 +12,16 @@ use uuid::Uuid;
 use validator::Validate;
 
 #[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
 pub struct DeleteCategoriesDto {
     #[validate(custom(function = "validate_uuid"))]
     pub id: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
 pub struct DeleteCategoriesResponseDto {
     pub deleted_ids: Vec<String>,
 }

@@ -7,6 +7,8 @@ use application::use_cases::category::update_category_usecase::{
 };
 
 #[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateCategoryDto {
     #[validate(length(
@@ -19,6 +21,8 @@ pub struct UpdateCategoryDto {
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateCategoryResponseDto {
     pub success: bool,

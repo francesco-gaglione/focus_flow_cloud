@@ -3,7 +3,11 @@ name = "adapters"
 version = "0.1.0"
 edition = "2021"
 
+[features]
+ts = ["dep:ts-rs"]
+
 [dependencies]
+ts-rs = { workspace = true, optional = true }
 domain = { path = "../domain" }
 application = { path = "../application" }
 axum = { workspace = true, features=["ws"]}

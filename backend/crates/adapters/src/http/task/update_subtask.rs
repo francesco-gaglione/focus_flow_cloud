@@ -9,12 +9,16 @@ use axum::{extract::State, Extension, Json};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateSubTaskDto {
     pub completed: Option<bool>,
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateSubTaskResponseDto {
     pub id: String,

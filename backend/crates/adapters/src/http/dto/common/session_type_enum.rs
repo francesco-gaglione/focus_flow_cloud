@@ -5,6 +5,8 @@ use application::use_cases::pomodoro_state::fetch_user_pomodoro_state::UserSessi
 use domain::entities::focus_session_type::FocusSessionType;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
 pub enum SessionTypeEnum {
     Work,
     ShortBreak,

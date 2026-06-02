@@ -5,12 +5,14 @@
         useQueryClient,
     } from "@tanstack/svelte-query";
     import type {
+        CreateReminderDto,
         CreateTaskDto,
         GetAllCategoryResponseDto,
         TaskPriority,
         TaskScheduleDto,
     } from "@/types";
     import { categories, tasks } from "@/lib/api";
+    import { CalendarIcon } from "lucide-svelte";
 
     const { open, onClose }: { open: boolean; onClose: () => void } = $props();
 
@@ -35,6 +37,8 @@
     let duration = $state(25);
     let subtasks = $state<string[]>([]);
     let subtaskInput = $state("");
+    let reminders = $state<number[]>([]);
+    let reminderInput = $state("");
 
     const catsQuery = createQuery<GetAllCategoryResponseDto>({
         queryKey: ["categories"],
@@ -75,6 +79,9 @@
                     title: t,
                     description: null,
                 })),
+                reminders: reminders.map(
+                    (ts): CreateReminderDto => ({ date: ts }),
+                ),
             };
             return tasks.create(dto);
         },
@@ -95,6 +102,8 @@
         duration = 25;
         subtasks = [];
         subtaskInput = "";
+        reminders = [];
+        reminderInput = "";
         onClose();
     }
 
@@ -107,6 +116,19 @@
 
     function removeSubtask(i: number) {
         subtasks = subtasks.filter((_, j) => j !== i);
+    }
+
+    function addReminder() {
+        if (!reminderInput) return;
+        const ts = Math.floor(new Date(reminderInput).getTime() / 1000);
+        if (!isNaN(ts)) {
+            reminders = [...reminders, ts];
+            reminderInput = "";
+        }
+    }
+
+    function removeReminder(i: number) {
+        reminders = reminders.filter((_, j) => j !== i);
     }
 </script>
 
@@ -323,6 +345,45 @@
                     <button
                         onclick={addSubtask}
                         disabled={!subtaskInput.trim()}
+                        class="btn preset-tonal-surface text-sm px-3 disabled:opacity-50"
+                    >
+                        Add
+                    </button>
+                </div>
+            </div>
+
+            <div>
+                <p
+                    class="text-xs font-mono text-surface-500 uppercase tracking-widest mb-2"
+                >
+                    Reminders
+                </p>
+                {#each reminders as ts, i (i)}
+                    <div class="flex items-center gap-2 mb-1.5">
+                        <span class="text-xs text-surface-300 flex-1 truncate">
+                            {new Date(ts * 1000).toLocaleString()}
+                        </span>
+                        <button
+                            onclick={() => removeReminder(i)}
+                            class="btn btn-icon preset-tonal-error size-6 shrink-0"
+                            aria-label="Remove reminder"
+                        >
+                            <CalendarIcon class="size-4" />
+                        </button>
+                    </div>
+                {/each}
+                <div class="flex gap-2">
+                    <input
+                        type="datetime-local"
+                        class="input flex-1 text-sm"
+                        bind:value={reminderInput}
+                        onkeydown={(e) => {
+                            if (e.key === "Enter") addReminder();
+                        }}
+                    />
+                    <button
+                        onclick={addReminder}
+                        disabled={!reminderInput}
                         class="btn preset-tonal-surface text-sm px-3 disabled:opacity-50"
                     >
                         Add

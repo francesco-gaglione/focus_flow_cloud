@@ -1,7 +1,7 @@
 use crate::workers::reminder_worker::process_reminder_job;
 use apalis::layers::retry::RetryPolicy;
 use apalis::prelude::*;
-use apalis_postgres::{PgPool, PostgresStorage};
+use apalis_postgres::{Config, PgPool, PostgresStorage};
 use apalis_sql::ext::TaskBuilderExt;
 use application::repository_traits::push_subscription_persistence::PushSubscriptionPersistence;
 use application::repository_traits::reminder_persistence::ReminderPersistence;
@@ -86,7 +86,11 @@ pub async fn spawn_reminder_worker(
     vapid_private_key: String,
 ) {
     PostgresStorage::setup(pool).await.unwrap();
-    let storage = PostgresStorage::new(pool);
+    let poll_strategy = StrategyBuilder::new()
+        .apply(IntervalStrategy::new(Duration::from_secs(30)))
+        .build();
+    let config = Config::new("reminder-worker").with_poll_interval(poll_strategy);
+    let storage = PostgresStorage::new_with_config(pool, &config);
     let worker = WorkerBuilder::new("reminder-worker")
         .backend(storage)
         .data(reminder_persistence)

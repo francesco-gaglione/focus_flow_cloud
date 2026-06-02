@@ -26,6 +26,8 @@ use utoipa::ToSchema;
 use validator::Validate;
 
 #[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
 pub struct UpdateUsernameDto {
     #[validate(length(min = 1, message = "New username is required"))]
     pub new_username: String,

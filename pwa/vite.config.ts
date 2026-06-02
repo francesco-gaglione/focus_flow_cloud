@@ -8,6 +8,7 @@ const config: UserConfig = {
     tailwindcss(),
   ],
   server: {
+    hmr: { port: 24678 },
     proxy: {
       '/api': {
         target: process.env.VITE_API_BASE_URL || 'http://localhost:8080',

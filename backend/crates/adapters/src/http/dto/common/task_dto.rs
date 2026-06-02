@@ -12,6 +12,8 @@ use domain::entities::tasks::task_priority::TaskPriority;
 use crate::http_error::HttpError;
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
 #[serde(rename_all = "camelCase")]
 pub struct TaskDto {
     pub id: String,
@@ -19,16 +21,21 @@ pub struct TaskDto {
     pub description: Option<String>,
     pub priority: Option<TaskPriorityDto>,
     pub schedule: TaskScheduleDto,
+    #[cfg_attr(feature = "ts", ts(type = "number | null"))]
     pub completed_at: Option<i64>,
     pub subtasks: Vec<SubtaskDto>,
+    #[cfg_attr(feature = "ts", ts(type = "string | null"))]
     pub category_id: Option<Uuid>,
     pub reminders: Vec<ReminderDto>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
 #[serde(rename_all = "camelCase")]
 pub struct ReminderDto {
     pub id: String,
+    #[cfg_attr(feature = "ts", ts(type = "number"))]
     pub date_time: i64,
     pub title: String,
     pub description: String,
@@ -36,16 +43,21 @@ pub struct ReminderDto {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
 #[serde(rename_all = "camelCase")]
 pub struct SubtaskDto {
     pub id: String,
     pub title: String,
     pub description: Option<String>,
     pub is_completed: bool,
+    #[cfg_attr(feature = "ts", ts(type = "number"))]
     pub sort_order: i16,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Copy, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export, rename = "TaskPriority"))]
 #[serde(rename_all = "camelCase")]
 pub enum TaskPriorityDto {
     Low,
@@ -55,19 +67,25 @@ pub enum TaskPriorityDto {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum TaskScheduleDto {
     Unscheduled,
     AllDay {
+        #[cfg_attr(feature = "ts", ts(type = "number"))]
         date: i64,
     },
     #[serde(rename_all = "camelCase")]
     At {
+        #[cfg_attr(feature = "ts", ts(type = "number"))]
         starts_at: i64,
     },
     #[serde(rename_all = "camelCase")]
     Span {
+        #[cfg_attr(feature = "ts", ts(type = "number"))]
         starts_at: i64,
+        #[cfg_attr(feature = "ts", ts(type = "number"))]
         duration: i64,
     },
 }

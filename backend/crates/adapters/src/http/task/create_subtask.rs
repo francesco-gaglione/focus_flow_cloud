@@ -12,6 +12,8 @@ use uuid::Uuid;
 use validator::Validate;
 
 #[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
 #[serde(rename_all = "camelCase")]
 pub struct CreateSubtaskDto {
     #[validate(length(
@@ -25,6 +27,8 @@ pub struct CreateSubtaskDto {
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
 pub struct CreateSubtaskResponseDto {
     pub id: String,
 }

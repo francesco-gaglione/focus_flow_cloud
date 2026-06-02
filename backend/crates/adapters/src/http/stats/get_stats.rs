@@ -9,6 +9,8 @@ use utoipa::ToSchema;
 use uuid::Uuid;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
 #[serde(rename_all = "camelCase")]
 pub struct GetStatsResponseDto {
     pub completed_tasks_counts: CompletedTasksCountsDto,
@@ -22,41 +24,63 @@ pub struct GetStatsResponseDto {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
 #[serde(rename_all = "camelCase")]
 pub struct CompletedTasksCountsDto {
+    #[cfg_attr(feature = "ts", ts(type = "number"))]
     pub completed_today: i64,
+    #[cfg_attr(feature = "ts", ts(type = "number"))]
     pub completed_this_week: i64,
+    #[cfg_attr(feature = "ts", ts(type = "number"))]
     pub week_delta: i64,
+    #[cfg_attr(feature = "ts", ts(type = "number"))]
     pub completed_this_month: i64,
     pub day_avg: f64,
+    #[cfg_attr(feature = "ts", ts(type = "number"))]
     pub focus_sessions: i64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
 #[serde(rename_all = "camelCase")]
 pub struct PeakWindowRangeDto {
     pub start: String,
     pub end: String,
+    #[cfg_attr(feature = "ts", ts(type = "number"))]
     pub count: usize,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
 #[serde(rename_all = "camelCase")]
 pub struct CompletedByPriorityDto {
+    #[cfg_attr(feature = "ts", ts(type = "number"))]
     pub low: usize,
+    #[cfg_attr(feature = "ts", ts(type = "number"))]
     pub medium: usize,
+    #[cfg_attr(feature = "ts", ts(type = "number"))]
     pub high: usize,
+    #[cfg_attr(feature = "ts", ts(type = "number"))]
     pub urgent: usize,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
 #[serde(rename_all = "camelCase")]
 pub struct CompletedFocusSessionsDto {
+    #[cfg_attr(feature = "ts", ts(type = "number"))]
     pub count: usize,
+    #[cfg_attr(feature = "ts", ts(type = "number"))]
     pub avg_duration_secs: i64,
 }
 
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum OverdueTrendTypeDto {
     Increasing,
@@ -66,6 +90,8 @@ pub enum OverdueTrendTypeDto {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
 #[serde(rename_all = "camelCase")]
 pub struct OverdueTrendDto {
     pub trend_type: OverdueTrendTypeDto,
@@ -73,24 +99,36 @@ pub struct OverdueTrendDto {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
 #[serde(rename_all = "camelCase")]
 pub struct CategoryCountDto {
+    #[cfg_attr(feature = "ts", ts(type = "string"))]
     pub category_id: Uuid,
     pub category_name: String,
+    #[cfg_attr(feature = "ts", ts(type = "number"))]
     pub count: u64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
 #[serde(rename_all = "camelCase")]
 pub struct DayCountDto {
+    #[cfg_attr(feature = "ts", ts(type = "string"))]
     pub day: NaiveDate,
+    #[cfg_attr(feature = "ts", ts(type = "number"))]
     pub count: usize,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
 #[serde(rename_all = "camelCase")]
 pub struct WeekCountDto {
+    #[cfg_attr(feature = "ts", ts(type = "string"))]
     pub week_start: NaiveDate,
+    #[cfg_attr(feature = "ts", ts(type = "number"))]
     pub count: usize,
 }
 

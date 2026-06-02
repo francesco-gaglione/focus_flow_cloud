@@ -9,6 +9,8 @@ use utoipa::ToSchema;
 use validator::Validate;
 
 #[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
 #[serde(rename_all = "camelCase")]
 pub struct RefreshDto {
     #[validate(length(min = 1, message = "Refresh token is required"))]
@@ -16,6 +18,8 @@ pub struct RefreshDto {
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
 #[serde(rename_all = "camelCase")]
 pub struct RefreshResponseDto {
     pub token: String,

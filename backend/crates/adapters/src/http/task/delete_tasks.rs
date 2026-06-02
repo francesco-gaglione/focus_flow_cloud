@@ -18,6 +18,8 @@ impl From<DeleteTaskError> for HttpError {
 }
 
 #[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteTasksDto {
     #[validate(custom(function = "validate_uuid"))]
@@ -25,6 +27,8 @@ pub struct DeleteTasksDto {
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteTaskResponseDto {
     pub deleted_id: String,

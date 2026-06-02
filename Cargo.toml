@@ -61,3 +61,6 @@ dotenvy = "0.15.7"
 mockall = "0.11"
 testcontainers = "0.23"
 testcontainers-modules = { version = "0.11", features = ["postgres"] }
+
+# Type generation
+ts-rs = { version = "8", features = ["chrono", "uuid"] }

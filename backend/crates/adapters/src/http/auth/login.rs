@@ -11,6 +11,8 @@ use utoipa::ToSchema;
 use validator::Validate;
 
 #[derive(Debug, Serialize, Deserialize, Validate, Clone, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
 #[serde(rename_all = "camelCase")]
 pub struct LoginDto {
     #[validate(length(min = 1, message = "Username is required"))]
@@ -20,6 +22,8 @@ pub struct LoginDto {
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export))]
 #[serde(rename_all = "camelCase")]
 pub struct LoginResponseDto {
     pub token: String,

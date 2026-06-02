@@ -106,7 +106,6 @@ impl CreateTaskUseCase {
         let task_id = self.task_persistence.create_task(task.clone()).await?;
         info!("Task created successfully: {}", task_id);
 
-        info!("Scheduling reminder {:?}", task.reminders());
         for reminder in task.reminders() {
             let reminder_entity = Reminder::new(
                 Some(task_id),
@@ -115,6 +114,7 @@ impl CreateTaskUseCase {
                 reminder.date(),
                 command.description.clone().unwrap_or_default(),
             );
+            info!("Scheduling reminder {:?}", reminder_entity);
             let reminder_id = self
                 .reminder_persistence
                 .save_reminder(reminder_entity)

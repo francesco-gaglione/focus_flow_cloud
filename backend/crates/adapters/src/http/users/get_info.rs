@@ -17,7 +17,10 @@ impl From<UserInfoError> for HttpError {
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[cfg_attr(feature = "ts", ts(export, rename = "UserInfoDto"))]
 pub struct UserInfoResponseDto {
+    #[cfg_attr(feature = "ts", ts(type = "string"))]
     pub id: uuid::Uuid,
     pub username: String,
     pub role: String,
