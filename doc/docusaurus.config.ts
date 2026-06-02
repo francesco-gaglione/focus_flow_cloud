@@ -8,7 +8,7 @@ const config: Config = {
     title: "FocusFlow – Open Source Pomodoro Tracker",
     tagline:
         "A comprehensive Pomodoro technique tracking solution featuring a Rust backend and a Dioxus (Rust) cross-platform application.",
-    favicon: "img/app_icon.png",
+    favicon: "img/app_icon.svg",
 
     // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
     future: {
@@ -92,12 +92,16 @@ const config: Config = {
     markdown: {
         mermaid: true,
     },
-    themes: ['@docusaurus/theme-mermaid'],
+    themes: ["@docusaurus/theme-mermaid"],
 
     themeConfig: {
-        image: "img/app_icon.png",
+        image: "img/app_icon.svg",
         metadata: [
-            { name: "keywords", content: "pomodoro, focus timer, productivity, task management, rust, dioxus, open source, time tracking" },
+            {
+                name: "keywords",
+                content:
+                    "pomodoro, focus timer, productivity, task management, rust, dioxus, open source, time tracking",
+            },
             { name: "author", content: "Francesco Gaglione" },
             { name: "robots", content: "index, follow" },
             { property: "og:type", content: "website" },
@@ -110,7 +114,7 @@ const config: Config = {
             title: "Focus Flow",
             logo: {
                 alt: "Focus Flow Logo",
-                src: "img/app_icon.png",
+                src: "img/app_icon.svg",
             },
             items: [
                 {
