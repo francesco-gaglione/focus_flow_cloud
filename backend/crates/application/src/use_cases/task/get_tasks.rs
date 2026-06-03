@@ -315,8 +315,7 @@ mod tests {
 
         mock_persistence
             .expect_find_all()
-            .with(mockall::predicate::eq(Some(false)))
-            .returning(move |_| Ok(returned_tasks.clone()));
+            .returning(move || Ok(returned_tasks.clone()));
 
         mock_reminder
             .expect_find_by_task_ids()
@@ -356,8 +355,7 @@ mod tests {
 
         mock_persistence
             .expect_find_all()
-            .with(mockall::predicate::eq(Some(true)))
-            .returning(move |_| Ok(vec![]));
+            .returning(move || Ok(vec![]));
 
         mock_reminder
             .expect_find_by_task_ids()

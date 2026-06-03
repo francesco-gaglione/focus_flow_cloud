@@ -28,14 +28,37 @@ pub struct TasksResponseDto {
     pub incoming: Vec<TaskDto>,
 }
 
+impl TasksResponseDto {
+    pub fn all_tasks(&self) -> impl Iterator<Item = &TaskDto> {
+        self.today
+            .iter()
+            .chain(self.next_week.iter())
+            .chain(self.incoming.iter())
+            .chain(self.unscheduled.iter())
+            .chain(self.completed.iter())
+    }
+}
+
 #[derive(Debug, Deserialize, IntoParams)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", default)]
 pub struct GetTasksParams {
     pub completed: bool,
     pub today: bool,
     pub next_week: bool,
     pub unscheduled: bool,
     pub incoming: bool,
+}
+
+impl Default for GetTasksParams {
+    fn default() -> Self {
+        Self {
+            completed: false,
+            today: true,
+            next_week: true,
+            unscheduled: true,
+            incoming: true,
+        }
+    }
 }
 
 #[utoipa::path(

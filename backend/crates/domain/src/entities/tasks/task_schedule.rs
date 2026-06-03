@@ -91,7 +91,6 @@ mod tests {
     fn test_is_overdue() {
         let now = Utc::now();
         let yesterday = now - Duration::days(1);
-        let tomorrow = now + Duration::days(1);
 
         assert!(!TaskSchedule::Unscheduled.is_overdue());
 

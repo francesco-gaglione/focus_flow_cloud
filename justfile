@@ -27,7 +27,7 @@ backend-run-debug:
 
 # Run backend tests
 backend-test:
-    cd backend && cargo test --workspace --lib --bins
+    cargo test --workspace --lib --bins
 
 # Run backend E2E tests
 backend-test-e2e:
@@ -35,11 +35,11 @@ backend-test-e2e:
 
 # Check backend formatting
 backend-fmt-check:
-    cd backend && cargo fmt --all -- --check
+    cargo fmt --all -- --check
 
 # Lint backend
 backend-lint:
-    cd backend && cargo clippy --workspace -- -D warnings
+    cargo clippy --workspace -- -D warnings
 
 # Backend test coverage
 backend-cov:
@@ -49,7 +49,7 @@ backend-cov:
         --include-build-script \
         --ignore-filename-regex "(src/main\.rs|mod\.rs|lib\.rs|schema\.rs|config\.rs|setup\.rs|migrations\.rs|db_models/|persistence_traits/|auth_traits/|domain/src/traits/|http_error\.rs|persistence_error\.rs|openapi\.rs)"
 
-# Run all backend checks
+# Run all backend checks (quick, no coverage)
 backend-check: backend-fmt-check backend-lint backend-test
     @echo "Backend checks passed!"
 
@@ -104,8 +104,23 @@ install:
 # Run all tests
 test-all: backend-test pwa-check
 
-# Check everything
-check-all: backend-check pwa-check
+# Check everything — mirrors CI pipeline exactly
+# Backend: fmt → clippy → llvm-cov (tests + coverage) → build
+# PWA:     type-check → build
+check-all:
+    @echo "=== Backend: fmt ==="
+    cargo fmt --all -- --check
+    @echo "=== Backend: clippy ==="
+    cargo clippy --workspace -- -D warnings
+    @echo "=== Backend: tests + coverage ==="
+    cargo llvm-cov --workspace --lcov --output-path lcov.info
+    @echo "=== Backend: build ==="
+    cargo build
+    @echo "=== PWA: type-check ==="
+    cd pwa && bun run check
+    @echo "=== PWA: build ==="
+    cd pwa && bun run build
+    @echo "All checks passed!"
 
 # Build Docker image for backend
 docker-build-backend:

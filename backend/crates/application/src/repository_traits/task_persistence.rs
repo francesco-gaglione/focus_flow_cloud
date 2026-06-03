@@ -58,11 +58,8 @@ mod tests {
     #[tokio::test]
     async fn test_find_all() {
         let mut mock = MockTaskPersistence::new();
-        mock.expect_find_all()
-            .with(mockall::predicate::eq(Some(false)))
-            .times(1)
-            .returning(|_| Ok(vec![]));
-        let result = mock.find_all(Some(false)).await;
+        mock.expect_find_all().times(1).returning(|| Ok(vec![]));
+        let result = mock.find_all().await;
         assert!(result.is_ok());
     }
 

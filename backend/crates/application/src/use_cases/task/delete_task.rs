@@ -69,7 +69,7 @@ mod tests {
             .returning(|_| Err(PersistenceError::Unexpected("Error".to_string())));
 
         let use_case = DeleteTaskUseCase::new(Arc::new(mock_persistence));
-        let result = use_case.execute(id1).await;
+        let _ = use_case.execute(id1).await;
         let result = use_case.execute(id2).await;
 
         assert!(result.is_err());
