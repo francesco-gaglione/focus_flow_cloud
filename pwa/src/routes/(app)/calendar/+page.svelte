@@ -84,10 +84,15 @@
     let current = $state(new Date())
     let selected = $state(new Date())
 
-    const tasksQuery = createQuery({ queryKey: ['tasks'], queryFn: tasks.getAll })
+    const tasksQuery = createQuery({ queryKey: ['tasks'], queryFn: () => tasks.getAll(false, true, true, true, true) })
     const catsQuery = createQuery({ queryKey: ['categories'], queryFn: categories.getAll })
 
-    let allTasks = $derived($tasksQuery.data?.tasks ?? [])
+    let allTasks = $derived([
+        ...($tasksQuery.data?.today ?? []),
+        ...($tasksQuery.data?.nextWeek ?? []),
+        ...($tasksQuery.data?.incoming ?? []),
+        ...($tasksQuery.data?.unscheduled ?? []),
+    ])
     let allCats = $derived($catsQuery.data?.categories ?? [])
 
     // MONTH
