@@ -54,3 +54,4 @@ testcontainers.workspace = true
 testcontainers-modules = { workspace = true, features = ["postgres"] }
 tokio = { workspace = true, features = ["full"] }
 futures = "0.3"
+mockall = { workspace = true }

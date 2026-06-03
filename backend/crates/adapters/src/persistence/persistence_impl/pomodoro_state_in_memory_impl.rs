@@ -124,3 +124,82 @@ impl PomodoroStateRepository for PomodoroStateInMermoryImpl {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use application::repository_traits::pomodoro_state_repository::{
+        PomodoroStateRepository, PomodoroStateRepositoryError,
+    };
+
+    fn make_repo() -> PomodoroStateInMermoryImpl {
+        PomodoroStateInMermoryImpl::new()
+    }
+
+    #[tokio::test]
+    async fn test_init_creates_state() {
+        let repo = make_repo();
+        let user_id = Uuid::new_v4();
+
+        repo.init_user_state(user_id).await.unwrap();
+        let state = repo.fetch_user_state(user_id).await.unwrap();
+        assert_eq!(state.user_id(), Uuid::nil());
+    }
+
+    #[tokio::test]
+    async fn test_init_is_idempotent() {
+        let repo = make_repo();
+        let user_id = Uuid::new_v4();
+
+        repo.init_user_state(user_id).await.unwrap();
+        repo.init_user_state(user_id).await.unwrap();
+
+        // Should still be exactly one entry
+        let state = repo.fetch_user_state(user_id).await.unwrap();
+        assert_eq!(state.user_id(), Uuid::nil());
+    }
+
+    #[tokio::test]
+    async fn test_fetch_unknown_user_returns_error() {
+        let repo = make_repo();
+        let err = repo.fetch_user_state(Uuid::new_v4()).await.unwrap_err();
+        assert!(matches!(err, PomodoroStateRepositoryError::UserNotFound));
+    }
+
+    #[tokio::test]
+    async fn test_update_unknown_user_returns_error() {
+        let repo = make_repo();
+        let state = PomodoroState::new();
+        let err = repo
+            .update_user_state(Uuid::new_v4(), state)
+            .await
+            .unwrap_err();
+        assert!(matches!(err, PomodoroStateRepositoryError::UserNotFound));
+    }
+
+    #[tokio::test]
+    async fn test_clear_removes_state() {
+        let repo = make_repo();
+        let user_id = Uuid::new_v4();
+
+        repo.init_user_state(user_id).await.unwrap();
+        repo.clear_user_state(user_id).await.unwrap();
+
+        let err = repo.fetch_user_state(user_id).await.unwrap_err();
+        assert!(matches!(err, PomodoroStateRepositoryError::UserNotFound));
+    }
+
+    #[tokio::test]
+    async fn test_clear_nonexistent_user_is_ok() {
+        let repo = make_repo();
+        let result = repo.clear_user_state(Uuid::new_v4()).await;
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_default_creates_empty_repo() {
+        let repo = PomodoroStateInMermoryImpl::default();
+        let err = repo.fetch_user_state(Uuid::new_v4()).await.unwrap_err();
+        assert!(matches!(err, PomodoroStateRepositoryError::UserNotFound));
+    }
+}

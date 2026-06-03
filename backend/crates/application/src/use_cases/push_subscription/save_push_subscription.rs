@@ -35,3 +35,57 @@ impl SavePushSubscriptionUseCase {
         Ok(self.persistence.upsert(sub).await?)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::repository_traits::persistence_error::PersistenceError;
+    use crate::repository_traits::push_subscription_persistence::MockPushSubscriptionPersistence;
+    use std::sync::Arc;
+
+    #[tokio::test]
+    async fn test_execute_success() {
+        let mut mock = MockPushSubscriptionPersistence::new();
+        let expected_id = Uuid::new_v4();
+
+        mock.expect_upsert()
+            .times(1)
+            .returning(move |_| Ok(expected_id));
+
+        let uc = SavePushSubscriptionUseCase::new(Arc::new(mock));
+        let result = uc
+            .execute(
+                Uuid::new_v4(),
+                "https://push.example.com/ep".to_string(),
+                "p256dh".to_string(),
+                "auth".to_string(),
+            )
+            .await;
+
+        assert_eq!(result.unwrap(), expected_id);
+    }
+
+    #[tokio::test]
+    async fn test_execute_persistence_error() {
+        let mut mock = MockPushSubscriptionPersistence::new();
+
+        mock.expect_upsert()
+            .times(1)
+            .returning(|_| Err(PersistenceError::Unexpected("db error".to_string())));
+
+        let uc = SavePushSubscriptionUseCase::new(Arc::new(mock));
+        let result = uc
+            .execute(
+                Uuid::new_v4(),
+                "https://push.example.com/ep".to_string(),
+                "p256dh".to_string(),
+                "auth".to_string(),
+            )
+            .await;
+
+        assert!(matches!(
+            result.unwrap_err(),
+            SavePushSubscriptionError::PersistenceError(_)
+        ));
+    }
+}

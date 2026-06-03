@@ -73,3 +73,125 @@ impl AddSubTaskUseCase {
         Ok(subtask_id)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::repository_traits::persistence_error::PersistenceError;
+    use crate::repository_traits::task_persistence::MockTaskPersistence;
+    use domain::entities::tasks::task::Task;
+    use domain::entities::tasks::task_schedule::TaskSchedule;
+    use std::sync::Arc;
+
+    fn make_task(user_id: Uuid) -> Task {
+        Task::new(user_id, "Task".to_string(), TaskSchedule::Unscheduled, None)
+    }
+
+    #[tokio::test]
+    async fn test_add_subtask_success() {
+        let mut mock = MockTaskPersistence::new();
+        let user_id = Uuid::new_v4();
+        let task = make_task(user_id);
+        let task_id = task.id();
+        let task_clone = task.clone();
+
+        mock.expect_find_by_id()
+            .times(1)
+            .returning(move |_| Ok(task_clone.clone()));
+
+        mock.expect_update_task().times(1).returning(|t| Ok(t));
+
+        let uc = AddSubTaskUseCase::new(Arc::new(mock));
+        let result = uc
+            .execute(AddSubTaskCommand {
+                task_id,
+                user_id,
+                title: "Subtask".to_string(),
+                description: None,
+            })
+            .await;
+
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_add_subtask_task_not_found() {
+        let mut mock = MockTaskPersistence::new();
+        let task_id = Uuid::new_v4();
+
+        mock.expect_find_by_id()
+            .times(1)
+            .returning(move |_| Err(PersistenceError::NotFound("not found".to_string())));
+
+        let uc = AddSubTaskUseCase::new(Arc::new(mock));
+        let result = uc
+            .execute(AddSubTaskCommand {
+                task_id,
+                user_id: Uuid::new_v4(),
+                title: "Subtask".to_string(),
+                description: None,
+            })
+            .await;
+
+        assert!(matches!(
+            result.unwrap_err(),
+            AddSubTaskError::TaskNotFound(_)
+        ));
+    }
+
+    #[tokio::test]
+    async fn test_add_subtask_unauthorized() {
+        let mut mock = MockTaskPersistence::new();
+        let task_owner = Uuid::new_v4();
+        let other_user = Uuid::new_v4();
+        let task = make_task(task_owner);
+        let task_id = task.id();
+
+        mock.expect_find_by_id()
+            .times(1)
+            .returning(move |_| Ok(task.clone()));
+
+        let uc = AddSubTaskUseCase::new(Arc::new(mock));
+        let result = uc
+            .execute(AddSubTaskCommand {
+                task_id,
+                user_id: other_user,
+                title: "Subtask".to_string(),
+                description: None,
+            })
+            .await;
+
+        assert!(matches!(result.unwrap_err(), AddSubTaskError::Unauthorized));
+    }
+
+    #[tokio::test]
+    async fn test_add_subtask_persistence_error_on_update() {
+        let mut mock = MockTaskPersistence::new();
+        let user_id = Uuid::new_v4();
+        let task = make_task(user_id);
+        let task_id = task.id();
+
+        mock.expect_find_by_id()
+            .times(1)
+            .returning(move |_| Ok(task.clone()));
+
+        mock.expect_update_task()
+            .times(1)
+            .returning(|_| Err(PersistenceError::Unexpected("db error".to_string())));
+
+        let uc = AddSubTaskUseCase::new(Arc::new(mock));
+        let result = uc
+            .execute(AddSubTaskCommand {
+                task_id,
+                user_id,
+                title: "Subtask".to_string(),
+                description: None,
+            })
+            .await;
+
+        assert!(matches!(
+            result.unwrap_err(),
+            AddSubTaskError::PersistenceError(_)
+        ));
+    }
+}
