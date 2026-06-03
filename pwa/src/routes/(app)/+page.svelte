@@ -1,5 +1,6 @@
 <script lang="ts">
     import { createQuery } from "@tanstack/svelte-query";
+    import { writable } from "svelte/store";
     import { _ } from "svelte-i18n";
     import TaskRow from "@/components/tasks/TaskRow.svelte";
     import CreateTaskSheet from "@/components/tasks/CreateTaskSheet.svelte";
@@ -11,7 +12,6 @@
         EyeClosedIcon,
     } from "lucide-svelte";
     import { categories, tasks } from "@/lib/api";
-    import { isToday } from "@/lib/utils";
 
     const PRIORITY_LEGEND = [
         { label: "Low", color: "#46a758" },
@@ -20,28 +20,54 @@
         { label: "Urgent", color: "#7c3aed" },
     ] as const;
 
-    type Period = "all" | "today" | "week";
-
     let sheetOpen = $state(false);
     let filtersOpen = $state(false);
     let showCompleted = $state(false);
 
-    // null = all selected (default). Explicit Set = user has filtered.
     let selectedCatIds = $state<Set<string> | null>(null);
-    let selectedPeriod = $state<Period>("all");
 
-    const tasksQuery = createQuery({
-        queryKey: ["tasks"],
-        queryFn: tasks.getAll,
+    let openSections = $state({
+        today: true,
+        nextWeek: false,
+        incoming: false,
+        unscheduled: false,
     });
+
+    const tasksQueryOpts = writable({
+        queryKey: ["tasks", { ...openSections, completed: showCompleted }],
+        queryFn: () =>
+            tasks.getAll(
+                showCompleted,
+                openSections.today,
+                openSections.nextWeek,
+                openSections.unscheduled,
+                openSections.incoming,
+            ),
+        placeholderData: (prev: any) => prev,
+        staleTime: 30_000,
+    });
+
+    $effect(() => {
+        const s = { ...openSections };
+        const c = showCompleted;
+        tasksQueryOpts.set({
+            queryKey: ["tasks", { ...s, completed: c }],
+            queryFn: () =>
+                tasks.getAll(c, s.today, s.nextWeek, s.unscheduled, s.incoming),
+            placeholderData: (prev: any) => prev,
+            staleTime: 30_000,
+        });
+    });
+
+    const tasksQuery = createQuery(tasksQueryOpts);
+
+    // Fetch available categories
     const catsQuery = createQuery({
         queryKey: ["categories"],
         queryFn: categories.getAll,
     });
 
-    let allTasks = $derived($tasksQuery.data?.tasks ?? []);
     let allCats = $derived($catsQuery.data?.categories ?? []);
-
     let allOptionIds = $derived([...allCats.map((c) => c.id), "none"]);
 
     function isCatSelected(id: string): boolean {
@@ -49,16 +75,24 @@
     }
 
     function toggleCat(id: string) {
-        console.log("[cat] toggleCat called, id=", id, "selectedCatIds=", selectedCatIds);
+        console.log(
+            "[cat] toggleCat called, id=",
+            id,
+            "selectedCatIds=",
+            selectedCatIds,
+        );
         if (id === "all") {
-            // toggle: if all selected → deselect all; otherwise → select all
+            // Toggle all: if currently filtered, reset to null (all selected)
             selectedCatIds = selectedCatIds === null ? new Set() : null;
-            console.log("[cat] after all toggle, selectedCatIds=", selectedCatIds);
+            console.log(
+                "[cat] after all toggle, selectedCatIds=",
+                selectedCatIds,
+            );
             return;
         }
 
         if (selectedCatIds === null) {
-            // deselect one: create set with all except this
+            // Deselect one: create a new set containing everything except the toggled id
             selectedCatIds = new Set(allOptionIds.filter((i) => i !== id));
         } else {
             const next = new Set(selectedCatIds);
@@ -67,72 +101,103 @@
             } else {
                 next.add(id);
             }
-            // if all selected again, reset to null
+            // If the updated set includes all items, reset it to null
             selectedCatIds = next.size === allOptionIds.length ? null : next;
         }
     }
 
-    function getTaskTs(task: (typeof allTasks)[number]): number | null {
-        const s = task.schedule;
-        if (s.type === "allDay") return s.date;
-        if (s.type === "at" || s.type === "span") return s.startsAt;
-        return null;
+    // Map the API payload structure including the new unscheduled tasks group
+    let taskGroups = $derived(
+        $tasksQuery.data || {
+            today: [],
+            nextWeek: [],
+            incoming: [],
+            unscheduled: [],
+            completed: [],
+        },
+    );
+
+    // Filter a task list based on the selected categories
+    function filterByCategory(taskList: any[] | undefined) {
+        if (!taskList) return [];
+        if (selectedCatIds === null) return taskList;
+        return taskList.filter((t) =>
+            t.categoryId != null
+                ? selectedCatIds!.has(t.categoryId)
+                : selectedCatIds!.has("none"),
+        );
     }
 
-    function isThisWeek(ts: number): boolean {
-        const d = new Date(ts * 1000);
-        const now = new Date();
-        const day = now.getDay();
-        const startOfWeek = new Date(now);
-        startOfWeek.setDate(now.getDate() - (day === 0 ? 6 : day - 1));
-        startOfWeek.setHours(0, 0, 0, 0);
-        const endOfWeek = new Date(startOfWeek);
-        endOfWeek.setDate(startOfWeek.getDate() + 7);
-        return d >= startOfWeek && d < endOfWeek;
-    }
+    // Derived reactive filtered task groups
+    let todayTasks = $derived(filterByCategory(taskGroups.today));
+    let nextWeekTasks = $derived(filterByCategory(taskGroups.nextWeek));
+    let incomingTasks = $derived(filterByCategory(taskGroups.incoming));
+    let unscheduledTasks = $derived(filterByCategory(taskGroups.unscheduled));
+    let completedTasks = $derived(filterByCategory(taskGroups.completed));
 
-    let periodFilteredTasks = $derived(
-        (() => {
-            console.log("[period] selectedPeriod=", selectedPeriod, "allTasks.length=", allTasks.length);
-            if (selectedPeriod === "all") return allTasks;
-            const result = allTasks.filter((t) => {
-                const ts = getTaskTs(t);
-                console.log("[period] task", t.id, "schedule.type=", t.schedule.type, "ts=", ts);
-                if (ts === null) return false;
-                const matches = selectedPeriod === "today" ? isToday(ts) : isThisWeek(ts);
-                console.log("[period] task", t.id, "matches=", matches);
-                return matches;
-            });
-            console.log("[period] result.length=", result.length);
-            return result;
-        })()
+    // Dynamic task counter taking into account all visible groups
+    let totalTasksCount = $derived(
+        todayTasks.length +
+            nextWeekTasks.length +
+            incomingTasks.length +
+            unscheduledTasks.length +
+            (showCompleted ? completedTasks.length : 0),
     );
 
-    let filteredTasks = $derived(
-        selectedCatIds === null
-            ? periodFilteredTasks
-            : periodFilteredTasks.filter((t) =>
-                  t.categoryId != null
-                      ? selectedCatIds!.has(t.categoryId)
-                      : selectedCatIds!.has("none"),
-              ),
-    );
-
-    let active = $derived(filteredTasks.filter((t) => !t.completedAt));
-    let done = $derived(filteredTasks.filter((t) => !!t.completedAt));
-
-    let filterActive = $derived(
-        selectedCatIds !== null || selectedPeriod !== "all",
-    );
-
-    let periodLabel = $derived(
-        selectedPeriod === "today"
-            ? "Oggi"
-            : selectedPeriod === "week"
-              ? "Questa settimana"
-              : "Periodo",
-    );
+    let filterActive = $derived(selectedCatIds !== null);
 </script>
+
+{#snippet taskSection(
+    title: string,
+    tasksList: any[],
+    isOpen: boolean,
+    onToggle: (v: boolean) => void,
+)}
+    <details
+        class="group"
+        open={isOpen}
+        ontoggle={(e) => onToggle((e.currentTarget as HTMLDetailsElement).open)}
+    >
+        <summary
+            class="flex items-center justify-between px-4 py-3 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden"
+        >
+            <span
+                class="text-xs font-mono text-surface-500 tracking-widest uppercase"
+            >
+                {title}
+            </span>
+            <div class="flex items-center gap-2 text-surface-500">
+                {#if tasksList.length > 0}
+                    <span class="badge preset-tonal-surface text-[10px]"
+                        >{tasksList.length}</span
+                    >
+                {/if}
+                <svg
+                    class="size-4 transition-transform group-open:rotate-180"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <path d="m6 9 6 6 6-6" />
+                </svg>
+            </div>
+        </summary>
+        <div class="pb-2">
+            {#if $tasksQuery.isFetching && tasksList.length === 0}
+                <div class="px-4 py-2 text-xs text-surface-500 font-mono">
+                    …
+                </div>
+            {:else}
+                {#each tasksList as task (task.id)}
+                    <TaskRow {task} categories={allCats} />
+                {/each}
+            {/if}
+        </div>
+    </details>
+{/snippet}
 
 <div class="flex-1 min-h-0 flex flex-col overflow-hidden">
     <div class="flex-1 overflow-y-auto pb-20">
@@ -146,67 +211,6 @@
 
         {#if filtersOpen}
             <div class="flex flex-row gap-2 mb-3 px-2 pt-2">
-                <div class="flex-1">
-                    <Menu
-                        onSelect={(e) => {
-                            console.log("[period] onSelect fired, e=", e, "e.value=", e.value);
-                            selectedPeriod = e.value as Period;
-                            console.log("[period] selectedPeriod set to", selectedPeriod);
-                        }}
-                    >
-                        <Menu.Trigger
-                            class="btn preset-outlined w-full text-sm relative"
-                        >
-                            {periodLabel}
-                            {#if selectedPeriod !== "all"}
-                                <span
-                                    class="absolute -top-1 -right-1 size-2 rounded-full bg-primary-500"
-                                ></span>
-                            {/if}
-                        </Menu.Trigger>
-                        <Portal>
-                            <Menu.Positioner>
-                                <Menu.Content
-                                    class="bg-surface-900 border border-surface-700 rounded-md shadow-xl min-w-[160px]"
-                                >
-                                    <Menu.Item
-                                        value="all"
-                                        class="flex items-center gap-2 px-3 py-2 text-sm text-surface-100 hover:bg-surface-700 rounded cursor-pointer"
-                                    >
-                                        <Menu.ItemText class="flex-1"
-                                            >Tutti</Menu.ItemText
-                                        >
-                                        {#if selectedPeriod === "all"}
-                                            <CheckIcon class="size-4" />
-                                        {/if}
-                                    </Menu.Item>
-                                    <Menu.Item
-                                        value="today"
-                                        class="flex items-center gap-2 px-3 py-2 text-sm text-surface-100 hover:bg-surface-700 rounded cursor-pointer"
-                                    >
-                                        <Menu.ItemText class="flex-1"
-                                            >Oggi</Menu.ItemText
-                                        >
-                                        {#if selectedPeriod === "today"}
-                                            <CheckIcon class="size-4" />
-                                        {/if}
-                                    </Menu.Item>
-                                    <Menu.Item
-                                        value="week"
-                                        class="flex items-center gap-2 px-3 py-2 text-sm text-surface-100 hover:bg-surface-700 rounded cursor-pointer"
-                                    >
-                                        <Menu.ItemText class="flex-1"
-                                            >Questa settimana</Menu.ItemText
-                                        >
-                                        {#if selectedPeriod === "week"}
-                                            <CheckIcon class="size-4" />
-                                        {/if}
-                                    </Menu.Item>
-                                </Menu.Content>
-                            </Menu.Positioner>
-                        </Portal>
-                    </Menu>
-                </div>
                 <div class="flex-1">
                     <Menu onSelect={(e) => toggleCat(e.value)}>
                         <Menu.Trigger
@@ -285,7 +289,7 @@
                     type="button"
                     onclick={() => (filtersOpen = false)}
                     class="btn-icon preset-outlined"
-                    aria-label="Chiudi filtri"
+                    aria-label="Close filters"
                 >
                     <FunnelIcon size={18} />
                 </button>
@@ -296,7 +300,7 @@
                     type="button"
                     onclick={() => (showCompleted = !showCompleted)}
                     class="btn-icon preset-outlined relative mr-3"
-                    aria-label="Apri filtri"
+                    aria-label="Toggle completed tasks"
                 >
                     {#if showCompleted}
                         <EyeIcon size={18} />
@@ -308,7 +312,7 @@
                     type="button"
                     onclick={() => (filtersOpen = true)}
                     class="btn-icon preset-outlined relative"
-                    aria-label="Apri filtri"
+                    aria-label="Open filters"
                 >
                     <FunnelIcon size={18} />
                     {#if filterActive}
@@ -320,27 +324,41 @@
             </div>
         {/if}
 
-        {#each active as task (task.id)}
-            <TaskRow {task} categories={allCats} />
-        {/each}
+        {@render taskSection(
+            "Today",
+            todayTasks,
+            openSections.today,
+            (v) => (openSections.today = v),
+        )}
+        {@render taskSection(
+            "Next Week",
+            nextWeekTasks,
+            openSections.nextWeek,
+            (v) => (openSections.nextWeek = v),
+        )}
+        {@render taskSection(
+            "Incoming",
+            incomingTasks,
+            openSections.incoming,
+            (v) => (openSections.incoming = v),
+        )}
+        {@render taskSection(
+            "Unscheduled",
+            unscheduledTasks,
+            openSections.unscheduled,
+            (v) => (openSections.unscheduled = v),
+        )}
 
-        {#if done.length > 0 && showCompleted}
-            <div class="px-4 pt-5 pb-1.5 flex items-center justify-between">
-                <span
-                    class="text-xs font-mono text-surface-500 tracking-widest uppercase"
-                >
-                    {$_("todo.completed")}
-                </span>
-                <span class="badge preset-tonal-surface text-[10px]"
-                    >{done.length}</span
-                >
-            </div>
-            {#each done as task (task.id)}
-                <TaskRow {task} categories={allCats} />
-            {/each}
+        {#if showCompleted}
+            {@render taskSection(
+                $_("todo.completed"),
+                completedTasks,
+                true,
+                () => {},
+            )}
         {/if}
 
-        {#if !$tasksQuery.isPending && allTasks.length === 0}
+        {#if !$tasksQuery.isPending && totalTasksCount === 0}
             <div
                 class="flex flex-col items-center justify-center py-20 gap-3 text-surface-500"
             >
@@ -358,7 +376,7 @@
             </div>
         {/if}
 
-        {#if !$tasksQuery.isPending && allTasks.length > 0}
+        {#if !$tasksQuery.isPending && totalTasksCount > 0}
             <div class="mt-4 px-4 pb-3">
                 <p class="text-[10px] font-mono text-surface-600 mb-2">
                     Priority legend

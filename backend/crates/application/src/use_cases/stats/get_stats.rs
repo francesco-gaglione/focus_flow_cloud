@@ -188,7 +188,7 @@ impl GetStatsUseCase {
 
     #[instrument(skip(self))]
     pub async fn execute(&self, command: GetStatsCommand) -> GetStatsResult<StatsOutput> {
-        let tasks = self.task_persistence.find_all(None).await?;
+        let tasks = self.task_persistence.find_all().await?;
         let sessions = self
             .focus_session_repository
             .find_by_filters(FindByFiltersCommand {

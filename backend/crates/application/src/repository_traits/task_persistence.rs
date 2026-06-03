@@ -9,7 +9,7 @@ use uuid::Uuid;
 pub trait TaskPersistence: Send + Sync {
     async fn create_task(&self, task: Task) -> PersistenceResult<Uuid>;
 
-    async fn find_all(&self, completed: Option<bool>) -> PersistenceResult<Vec<Task>>;
+    async fn find_all(&self) -> PersistenceResult<Vec<Task>>;
 
     async fn find_by_id(&self, task_id: Uuid) -> PersistenceResult<Task>;
 
