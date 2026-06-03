@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0] - 2026-06-03
+
+### Bug Fixes
+
+- Register new reminder in create task form sheet
+- Bottom menu positions
+
+### Features
+
+- Reminders
+- New icon
+- Improved task view. Task grouped by period
+
 ## [1.0.6] - 2026-06-02
 
 ### Bug Fixes
