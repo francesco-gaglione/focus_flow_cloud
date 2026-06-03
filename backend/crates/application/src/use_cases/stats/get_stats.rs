@@ -188,7 +188,7 @@ impl GetStatsUseCase {
 
     #[instrument(skip(self))]
     pub async fn execute(&self, command: GetStatsCommand) -> GetStatsResult<StatsOutput> {
-        let tasks = self.task_persistence.find_all(None).await?;
+        let tasks = self.task_persistence.find_all().await?;
         let sessions = self
             .focus_session_repository
             .find_by_filters(FindByFiltersCommand {
@@ -251,6 +251,7 @@ impl GetStatsUseCase {
 
 #[cfg(test)]
 mod tests {
+    #[allow(unused_imports)]
     use mockall::predicate::eq;
 
     use crate::repository_traits::{
@@ -264,10 +265,7 @@ mod tests {
     #[tokio::test]
     async fn test_get_stats_success() {
         let mut mock_tasks = MockTaskPersistence::new();
-        mock_tasks
-            .expect_find_all()
-            .with(eq(None))
-            .returning(|_| Ok(vec![]));
+        mock_tasks.expect_find_all().returning(|| Ok(vec![]));
 
         let user_id = Uuid::new_v4();
         let mut mock_sessions = MockFocusSessionRepository::new();
@@ -305,7 +303,7 @@ mod tests {
         let mut mock_tasks = MockTaskPersistence::new();
         mock_tasks
             .expect_find_all()
-            .returning(|_| Err(PersistenceError::Unexpected("db down".to_string())));
+            .returning(|| Err(PersistenceError::Unexpected("db down".to_string())));
 
         let mock_sessions = MockFocusSessionRepository::new();
         let mock_categories = MockCategoryPersistence::new();

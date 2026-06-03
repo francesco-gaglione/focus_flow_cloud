@@ -13,17 +13,30 @@ import type {
 } from "@/types";
 
 export const tasks = {
-    getAll: (completed?: boolean | any) => {
-        const isBool = typeof completed === "boolean";
+    getAll: (
+        completed: boolean,
+        today: boolean,
+        next_week: boolean,
+        unscheduled: boolean,
+        incoming: boolean,
+    ) => {
         return apiClient
             .get<TasksResponseDto>("/api/task", {
-                params: isBool ? { completed } : undefined,
+                params: {
+                    completed,
+                    today,
+                    nextWeek: next_week,
+                    unscheduled,
+                    incoming,
+                },
             })
             .then((r) => r.data);
     },
 
     create: (dto: CreateTaskDto) =>
-        apiClient.post<CreateTaskResponseDto>("/api/task", dto).then((r) => r.data),
+        apiClient
+            .post<CreateTaskResponseDto>("/api/task", dto)
+            .then((r) => r.data),
 
     update: (id: string, dto: UpdateTaskDto) =>
         apiClient

@@ -21,13 +21,44 @@ impl From<GetTaskError> for HttpError {
 #[cfg_attr(feature = "ts", ts(export))]
 #[serde(rename_all = "camelCase")]
 pub struct TasksResponseDto {
-    pub tasks: Vec<TaskDto>,
+    pub completed: Vec<TaskDto>,
+    pub today: Vec<TaskDto>,
+    pub next_week: Vec<TaskDto>,
+    pub unscheduled: Vec<TaskDto>,
+    pub incoming: Vec<TaskDto>,
+}
+
+impl TasksResponseDto {
+    pub fn all_tasks(&self) -> impl Iterator<Item = &TaskDto> {
+        self.today
+            .iter()
+            .chain(self.next_week.iter())
+            .chain(self.incoming.iter())
+            .chain(self.unscheduled.iter())
+            .chain(self.completed.iter())
+    }
 }
 
 #[derive(Debug, Deserialize, IntoParams)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", default)]
 pub struct GetTasksParams {
-    pub completed: Option<bool>,
+    pub completed: bool,
+    pub today: bool,
+    pub next_week: bool,
+    pub unscheduled: bool,
+    pub incoming: bool,
+}
+
+impl Default for GetTasksParams {
+    fn default() -> Self {
+        Self {
+            completed: false,
+            today: true,
+            next_week: true,
+            unscheduled: true,
+            incoming: true,
+        }
+    }
 }
 
 #[utoipa::path(
@@ -56,10 +87,34 @@ pub async fn get_tasks_api(
         .get_tasks_uc
         .execute(GetTasksCommand {
             completed: params.completed,
+            today: params.today,
+            next_week: params.next_week,
+            unscheduled: params.unscheduled,
+            incoming: params.incoming,
         })
         .await?;
-    tracing::info!("Fetched {} tasks", res.len());
+    tracing::info!("Fetched tasks");
     Ok(Json(TasksResponseDto {
-        tasks: res.iter().map(task_dto::from_task_output).collect(),
+        completed: res
+            .completed
+            .iter()
+            .map(task_dto::from_task_output)
+            .collect(),
+        today: res.today.iter().map(task_dto::from_task_output).collect(),
+        next_week: res
+            .next_week
+            .iter()
+            .map(task_dto::from_task_output)
+            .collect(),
+        unscheduled: res
+            .unscheduled
+            .iter()
+            .map(task_dto::from_task_output)
+            .collect(),
+        incoming: res
+            .incoming
+            .iter()
+            .map(task_dto::from_task_output)
+            .collect(),
     }))
 }

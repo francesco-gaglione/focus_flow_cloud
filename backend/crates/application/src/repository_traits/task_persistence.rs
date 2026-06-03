@@ -9,7 +9,7 @@ use uuid::Uuid;
 pub trait TaskPersistence: Send + Sync {
     async fn create_task(&self, task: Task) -> PersistenceResult<Uuid>;
 
-    async fn find_all(&self, completed: Option<bool>) -> PersistenceResult<Vec<Task>>;
+    async fn find_all(&self) -> PersistenceResult<Vec<Task>>;
 
     async fn find_by_id(&self, task_id: Uuid) -> PersistenceResult<Task>;
 
@@ -58,11 +58,8 @@ mod tests {
     #[tokio::test]
     async fn test_find_all() {
         let mut mock = MockTaskPersistence::new();
-        mock.expect_find_all()
-            .with(mockall::predicate::eq(Some(false)))
-            .times(1)
-            .returning(|_| Ok(vec![]));
-        let result = mock.find_all(Some(false)).await;
+        mock.expect_find_all().times(1).returning(|| Ok(vec![]));
+        let result = mock.find_all().await;
         assert!(result.is_ok());
     }
 

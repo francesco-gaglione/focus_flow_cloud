@@ -50,18 +50,12 @@ impl TaskPersistence for PostgresPersistence {
     }
 
     #[instrument(skip(self))]
-    async fn find_all(&self, completed: Option<bool>) -> PersistenceResult<Vec<Task>> {
+    async fn find_all(&self) -> PersistenceResult<Vec<Task>> {
         let tasks = self
             .with_transaction(move |conn| {
-                let mut query = schema::tasks::table
+                let query = schema::tasks::table
                     .filter(schema::tasks::deleted_at.is_null())
                     .into_boxed();
-
-                if completed.is_some() && completed.unwrap() {
-                    query = query.filter(schema::tasks::completed_at.is_not_null());
-                } else if completed.is_some() && !completed.unwrap() {
-                    query = query.filter(schema::tasks::completed_at.is_null());
-                }
 
                 let db_tasks: Vec<DbTask> = query
                     .select(DbTask::as_select())

@@ -47,12 +47,11 @@ async fn create_new_session_and_list() {
         .json()
         .await
         .expect("Failed to deserialize response");
-    assert!(body.tasks.len() == 1);
+    assert!(body.all_tasks().count() == 1);
     assert!(body
-        .tasks
-        .iter()
+        .all_tasks()
         .any(|t| t.id.eq(&create_task_body.id.clone())));
-    assert!(body.tasks.iter().any(|t| t.title.eq("Task")));
+    assert!(body.all_tasks().any(|t| t.title.eq("Task")));
 
     // Create manual work session
     let create_manual_session_dto = CreateManualSessionDto {
@@ -122,13 +121,13 @@ async fn update_session_and_list() {
         name: "Work".to_string(),
         color: Some("#FF5733".to_string()),
     };
-    let category_body = context.create_category(&create_category_dto).await;
+    let _category_body = context.create_category(&create_category_dto).await;
 
     let create_category_dto = CreateCategoryDto {
         name: "Study".to_string(),
         color: Some("#FF5734".to_string()),
     };
-    let category_body_2 = context.create_category(&create_category_dto).await;
+    let _category_body_2 = context.create_category(&create_category_dto).await;
 
     // Create Task
     let create_task_dto = CreateTaskDto {

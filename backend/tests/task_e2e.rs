@@ -47,9 +47,9 @@ async fn create_new_task_and_list() {
         .json()
         .await
         .expect("Failed to deserialize response");
-    assert!(body.tasks.len() == 1);
-    assert!(body.tasks.iter().any(|t| t.id.eq(&create_task_body.id)));
-    assert!(body.tasks.iter().any(|t| t.title.eq("Task")));
+    assert!(body.all_tasks().count() == 1);
+    assert!(body.all_tasks().any(|t| t.id.eq(&create_task_body.id)));
+    assert!(body.all_tasks().any(|t| t.title.eq("Task")));
 }
 
 #[tokio::test]
@@ -83,8 +83,7 @@ async fn create_new_orphan_and_list() {
         .expect("Failed to deserialize response");
 
     let orphans: Vec<_> = body
-        .tasks
-        .iter()
+        .all_tasks()
         .filter(|t| t.category_id.is_none())
         .collect();
 
@@ -122,10 +121,10 @@ async fn create_scheduled_task_and_list() {
         .expect("Failed to fetch task");
 
     let tasks_body: TasksResponseDto = tasks_res.json().await.expect("Failed to deserialize tasks");
-    assert_eq!(tasks_body.tasks.len(), 1);
-    let task = tasks_body.tasks.first().unwrap();
+    assert_eq!(tasks_body.today.len(), 1);
+    let task = tasks_body.today.first().unwrap();
     match &task.schedule {
-        TaskScheduleDto::At { starts_at } => assert_eq!(*starts_at, due.timestamp()),
+        TaskScheduleDto::At { starts_at } => assert_eq!(starts_at, &due.timestamp()),
         _ => panic!("Expected At schedule"),
     }
 }
@@ -200,7 +199,7 @@ async fn update_task_test() {
         .expect("Failed to fetch task");
 
     let tasks_body: TasksResponseDto = tasks_res.json().await.expect("Failed to deserialize tasks");
-    assert_eq!(tasks_body.tasks.len(), 1);
+    assert_eq!(tasks_body.completed.len(), 1);
 }
 
 #[tokio::test]
@@ -246,5 +245,5 @@ async fn delete_tasks_test() {
         .expect("Failed to list tasks");
 
     let list_body: TasksResponseDto = list_res.json().await.expect("Failed to deserialize list");
-    assert!(!list_body.tasks.iter().any(|t| t.id == task_id));
+    assert!(!list_body.all_tasks().any(|t| t.id == task_id));
 }
