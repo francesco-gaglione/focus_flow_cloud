@@ -1,5 +1,6 @@
 import axios, { AxiosError } from "axios";
 import type { RefreshResponseDto } from "@/types";
+import { serverUrlStore } from "$lib/stores/serverUrl";
 
 // ── Custom error ─────────────────────────────────────────────────
 export class ApiError extends Error {
@@ -44,18 +45,16 @@ export function getRefreshToken() {
 }
 
 // ── Axios instance ───────────────────────────────────────────────
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
-
 export const apiClient = axios.create({
-    baseURL: BASE_URL,
     headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
     },
 });
 
-// Request interceptor — attach access token
+// Request interceptor — dynamic baseURL + access token
 apiClient.interceptors.request.use((config) => {
+    config.baseURL = serverUrlStore.get();
     if (accessToken) {
         config.headers.Authorization = `Bearer ${accessToken}`;
     }
@@ -68,9 +67,8 @@ let refreshPromise: Promise<boolean> | null = null;
 async function tryRefresh(): Promise<boolean> {
     if (!refreshToken) return false;
     try {
-        // Use raw axios to avoid interceptor loops
         const res = await axios.post<RefreshResponseDto>(
-            `${BASE_URL}/api/auth/refresh`,
+            `${serverUrlStore.get()}/api/auth/refresh`,
             { refreshToken },
             { headers: { "Content-Type": "application/json" } },
         );

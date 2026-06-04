@@ -4,6 +4,7 @@
     import { _ } from 'svelte-i18n'
     import { authStore } from '$lib/stores/auth'
     import { auth, ApiError } from '$lib/api'
+    import { serverUrlStore } from '$lib/stores/serverUrl'
 
     let username = $state('')
     let password = $state('')
@@ -11,7 +12,8 @@
     let loading = $state(false)
 
     onMount(() => {
-        if ($authStore.isAuthenticated) goto('/')
+        if (!serverUrlStore.isConfigured()) goto('/setup')
+        else if ($authStore.isAuthenticated) goto('/')
     })
 
     async function handleSubmit(e: SubmitEvent) {

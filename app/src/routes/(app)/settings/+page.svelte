@@ -4,9 +4,20 @@
     import { users as usersApi, auth as authApi, ApiError } from "$lib/api";
     import { authStore } from "$lib/stores/auth";
     import { themeStore, THEMES, type Theme } from "$lib/stores/theme";
+    import { serverUrlStore } from "$lib/stores/serverUrl";
     import SettingsSection from "@/components/settings/SettingsSection.svelte";
 
     const meQuery = createQuery({ queryKey: ["me"], queryFn: usersApi.me });
+
+    let serverUrl = $state(serverUrlStore.get())
+    let serverUrlOk = $state(false)
+
+    function saveServerUrl() {
+        if (!serverUrl.trim()) return
+        serverUrlStore.set(serverUrl.trim())
+        serverUrlOk = true
+        setTimeout(() => (serverUrlOk = false), 2000)
+    }
 
     let newUsername = $state("");
     let oldPassword = $state("");
@@ -57,6 +68,32 @@
 
 <div class="flex-1 min-h-0 flex flex-col overflow-hidden">
     <div class="flex-1 overflow-y-auto pb-24 px-4 pt-3">
+        <SettingsSection title="Server">
+            <label class="label mb-3">
+                <span class="label-text text-xs font-mono tracking-widest uppercase text-surface-400">
+                    Server URL
+                </span>
+                <input
+                    class="input"
+                    bind:value={serverUrl}
+                    placeholder="https://api.example.com"
+                    type="url"
+                />
+            </label>
+            {#if serverUrlOk}
+                <aside class="alert preset-tonal-success mb-2">
+                    <p class="alert-message text-xs">Server URL updated!</p>
+                </aside>
+            {/if}
+            <button
+                onclick={saveServerUrl}
+                disabled={!serverUrl.trim()}
+                class="btn preset-filled-primary-500 text-sm disabled:opacity-50"
+            >
+                Save
+            </button>
+        </SettingsSection>
+
         <SettingsSection title="Appearance">
             <label class="label">
                 <span

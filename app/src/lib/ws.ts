@@ -2,6 +2,7 @@ import { writable, get } from 'svelte/store'
 import type { PomodoroWsState, WsSessionType } from '@/types'
 import { getAccessToken } from '$lib/api'
 import { showNotification } from '$lib/notifications'
+import { serverUrlStore } from '$lib/stores/serverUrl'
 
 export type WsCmd =
     | { type: 'start' }
@@ -27,7 +28,7 @@ const SESSION_NOTIFICATIONS: Record<WsSessionType, { title: string; body: string
 }
 
 function getWsUrl(): string {
-    const base = import.meta.env.VITE_API_BASE_URL || window.location.origin
+    const base = serverUrlStore.get() || window.location.origin
     return base.replace(/^https?:\/\//, (m: string) =>
         m.startsWith('https') ? 'wss://' : 'ws://'
     )

@@ -1,7 +1,7 @@
 ---
 sidebar_position: 4
 description: "Contribute to FocusFlow: development workflow, code style, commit guidelines, and pull request process."
-keywords: [focusflow, contributing, open source, rust, sveltekit, pwa, conventional commits]
+keywords: [focusflow, contributing, open source, rust, tauri, sveltekit, conventional commits]
 ---
 
 # Contributing
@@ -30,11 +30,12 @@ We welcome contributions to FocusFlow! Whether you're fixing a bug, improving do
 - **Testing**: Ensure all tests pass with `just backend-test`.
 - **All-in-one**: Run `just backend-check` to run all verification steps.
 
-### SvelteKit (PWA)
+### SvelteKit + Tauri (App)
 
-- **Type checking**: Run `bun run check` (uses `svelte-check`).
-- **Build**: Run `bun run build` to verify the production build compiles cleanly.
-- **All-in-one**: Run `just pwa-check` to run all verification steps.
+- **Type checking**: Run `bun run check` inside `app/` (uses `svelte-check`).
+- **Build**: Run `bun run build` to verify the SvelteKit production build compiles cleanly.
+- **All-in-one**: Run `just app-check` to run all verification steps.
+- **Tauri desktop**: Run `just app-tauri-dev` to test the full native app.
 
 ## Commit Guidelines
 
@@ -66,7 +67,7 @@ feat!: remove legacy API endpoints
 
 1.  **Update Documentation**: If you changed APIs or features, update the relevant docs in `doc/`.
 2.  **Open PR**: Submit your pull request against the `master` branch.
-3.  **CI Checks**: Ensure all GitHub Action checks pass (backend CI + PWA CI).
+3.  **CI Checks**: Ensure all GitHub Action checks pass (backend CI + app CI).
 
 ## Reporting Issues
 
@@ -74,4 +75,4 @@ If you find a bug, please open an issue on GitHub with:
 
 - Steps to reproduce.
 - Expected vs. actual behavior.
-- Environment details (OS, browser, versions).
+- Environment details (OS, app version, backend version).
