@@ -83,5 +83,11 @@
                 {loading ? $_('common.loading') : $_('login.sign_in')}
             </button>
         </form>
+
+        <p class="text-center text-xs text-surface-500 mt-4">
+            <a href="/setup" class="hover:text-surface-300 underline underline-offset-2">
+                Change server
+            </a>
+        </p>
     </div>
 </div>

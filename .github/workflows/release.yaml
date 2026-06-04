@@ -247,6 +247,28 @@ jobs:
         working-directory: app
         run: bun install --frozen-lockfile
 
+      - name: Set version from tag
+        shell: bash
+        run: |
+          TAG="${{ github.ref_name }}"
+          VERSION="${TAG#app-v}"
+          VERSION="${VERSION#v}"
+          python3 -c "
+          import json, re
+          v = '$VERSION'
+          with open('app/src-tauri/tauri.conf.json') as f:
+              cfg = json.load(f)
+          cfg['version'] = v
+          with open('app/src-tauri/tauri.conf.json', 'w') as f:
+              json.dump(cfg, f, indent=2)
+          with open('app/src-tauri/Cargo.toml') as f:
+              content = f.read()
+          content = re.sub(r'^version = \".*\"', f'version = \"{v}\"', content, flags=re.MULTILINE, count=1)
+          with open('app/src-tauri/Cargo.toml', 'w') as f:
+              f.write(content)
+          print(f'Version set to {v}')
+          "
+
       - name: Build Tauri app
         working-directory: app
         run: bunx tauri build ${{ matrix.tauri-args }}
@@ -327,9 +349,47 @@ jobs:
         working-directory: app
         run: bun install --frozen-lockfile
 
+      - name: Set version from tag
+        run: |
+          TAG="${{ github.ref_name }}"
+          VERSION="${TAG#app-v}"
+          VERSION="${VERSION#v}"
+          python3 -c "
+          import json, re
+          v = '$VERSION'
+          with open('app/src-tauri/tauri.conf.json') as f:
+              cfg = json.load(f)
+          cfg['version'] = v
+          with open('app/src-tauri/tauri.conf.json', 'w') as f:
+              json.dump(cfg, f, indent=2)
+          with open('app/src-tauri/Cargo.toml') as f:
+              content = f.read()
+          content = re.sub(r'^version = \".*\"', f'version = \"{v}\"', content, flags=re.MULTILINE, count=1)
+          with open('app/src-tauri/Cargo.toml', 'w') as f:
+              f.write(content)
+          print(f'Version set to {v}')
+          "
+
       - name: Initialize Tauri Android project
         working-directory: app
         run: bunx tauri android init
+
+      - name: Configure Android cleartext HTTP
+        run: |
+          XML_DIR="app/src-tauri/gen/android/app/src/main/res/xml"
+          mkdir -p "$XML_DIR"
+          cat > "$XML_DIR/network_security_config.xml" << 'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <network-security-config>
+              <base-config cleartextTrafficPermitted="true">
+                  <trust-anchors>
+                      <certificates src="system" />
+                  </trust-anchors>
+              </base-config>
+          </network-security-config>
+          EOF
+          MANIFEST="app/src-tauri/gen/android/app/src/main/AndroidManifest.xml"
+          sed -i 's/<application/<application android:networkSecurityConfig="@xml\/network_security_config"/' "$MANIFEST"
 
       - name: Set up Android signing
         env:
