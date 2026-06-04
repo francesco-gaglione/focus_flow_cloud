@@ -65,30 +65,20 @@ jobs:
 
       - name: Configure System
         run: |
-          # Add arm64 architecture
           sudo dpkg --add-architecture arm64
-
-          # Remove default sources and conflicting PGDG (Postgres) sources
           sudo rm -f /etc/apt/sources.list.d/ubuntu.sources
           sudo rm -f /etc/apt/sources.list.d/pgdg.sources.list
-
-          # Rewrite sources.list to strictly separate architectures
-          # amd64 -> archive.ubuntu.com / azure.archive.ubuntu.com
-          # arm64 -> ports.ubuntu.com
           sudo tee /etc/apt/sources.list <<EOF
           deb [arch=amd64] http://azure.archive.ubuntu.com/ubuntu/ $(lsb_release -cs) main restricted universe multiverse
           deb [arch=amd64] http://azure.archive.ubuntu.com/ubuntu/ $(lsb_release -cs)-updates main restricted universe multiverse
           deb [arch=amd64] http://azure.archive.ubuntu.com/ubuntu/ $(lsb_release -cs)-backports main restricted universe multiverse
           deb [arch=amd64] http://azure.archive.ubuntu.com/ubuntu/ $(lsb_release -cs)-security main restricted universe multiverse
-
           deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release -cs) main restricted universe multiverse
           deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release -cs)-updates main restricted universe multiverse
           deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release -cs)-backports main restricted universe multiverse
           deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release -cs)-security main restricted universe multiverse
           EOF
-
           sudo apt-get update
-          # Explicitly remove conflicting libpq packages to ensure clean state
           sudo apt-get remove -y libpq-dev libpq5
           sudo apt-get autoremove -y
 
@@ -107,7 +97,6 @@ jobs:
         run: |
           sudo apt-get install -y libpq-dev
           cargo build --release --target x86_64-unknown-linux-gnu --package focus_flow_cloud
-          # Remove amd64 libs to clean up for arm64 build
           sudo apt-get remove -y libpq-dev libpq5
 
       - name: Build binaries (arm64)
@@ -207,18 +196,26 @@ jobs:
             name: linux-x86_64
             rust-targets: ''
             tauri-args: ''
+            bundle-path: app/src-tauri/target/release/bundle
+
           - platform: macos-latest
             name: macos-aarch64
             rust-targets: aarch64-apple-darwin
             tauri-args: --target aarch64-apple-darwin
+            bundle-path: app/src-tauri/target/aarch64-apple-darwin/release/bundle
+
           - platform: macos-latest
             name: macos-x86_64
             rust-targets: x86_64-apple-darwin
             tauri-args: --target x86_64-apple-darwin
+            bundle-path: app/src-tauri/target/x86_64-apple-darwin/release/bundle
+
           - platform: windows-latest
             name: windows-x86_64
             rust-targets: ''
             tauri-args: ''
+            bundle-path: app/src-tauri/target/release/bundle
+
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
@@ -251,14 +248,38 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Build Tauri app
-        uses: tauri-apps/tauri-action@v0
+        working-directory: app
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+        run: bunx tauri build ${{ matrix.tauri-args }}
+
+      - name: Upload Linux artifacts
+        if: matrix.platform == 'ubuntu-22.04'
+        uses: actions/upload-artifact@v4
         with:
-          projectPath: app
-          tauriScript: bunx tauri
-          args: ${{ matrix.tauri-args }}
+          name: desktop-${{ matrix.name }}
+          path: |
+            ${{ matrix.bundle-path }}/deb/*.deb
+            ${{ matrix.bundle-path }}/appimage/*.AppImage
+          if-no-files-found: error
+
+      - name: Upload macOS artifacts
+        if: startsWith(matrix.platform, 'macos')
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-${{ matrix.name }}
+          path: ${{ matrix.bundle-path }}/dmg/*.dmg
+          if-no-files-found: error
+
+      - name: Upload Windows artifacts
+        if: matrix.platform == 'windows-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-${{ matrix.name }}
+          path: |
+            ${{ matrix.bundle-path }}/nsis/*.exe
+            ${{ matrix.bundle-path }}/msi/*.msi
+          if-no-files-found: error
 
       - name: Cancel Workflow on Failure
         if: failure()
@@ -311,6 +332,67 @@ jobs:
       - name: Initialize Tauri Android project
         working-directory: app
         run: bunx tauri android init
+
+      - name: Set up Android signing
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KS_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD || 'focusflow-ci' }}
+          KS_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS || 'focusflow' }}
+          KS_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD || 'focusflow-ci' }}
+        run: |
+          KEYSTORE_PATH="${{ github.workspace }}/app/src-tauri/gen/android/keystore.jks"
+
+          if [ -n "$ANDROID_KEYSTORE_BASE64" ]; then
+            echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$KEYSTORE_PATH"
+          else
+            keytool -genkey -v \
+              -keystore "$KEYSTORE_PATH" \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -alias "$KS_ALIAS" \
+              -storepass "$KS_PASSWORD" \
+              -keypass "$KS_KEY_PASSWORD" \
+              -dname "CN=FocusFlow, OU=Dev, O=FocusFlow, L=Unknown, ST=Unknown, C=IT"
+          fi
+
+          echo "ANDROID_KEYSTORE_PATH=$KEYSTORE_PATH" >> $GITHUB_ENV
+          echo "ANDROID_KEYSTORE_PASSWORD=$KS_PASSWORD" >> $GITHUB_ENV
+          echo "ANDROID_KEY_ALIAS=$KS_ALIAS" >> $GITHUB_ENV
+          echo "ANDROID_KEY_PASSWORD=$KS_KEY_PASSWORD" >> $GITHUB_ENV
+
+      - name: Inject signing config into build.gradle.kts
+        run: |
+          python3 - <<'PYEOF'
+          import re
+
+          path = "app/src-tauri/gen/android/app/build.gradle.kts"
+          with open(path) as f:
+              content = f.read()
+
+          signing_block = '''    signingConfigs {
+              create("release") {
+                  storeFile = file(System.getenv("ANDROID_KEYSTORE_PATH")!!)
+                  storePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD")!!
+                  keyAlias = System.getenv("ANDROID_KEY_ALIAS")!!
+                  keyPassword = System.getenv("ANDROID_KEY_PASSWORD")!!
+              }
+          }
+          '''
+
+          # Add signingConfig ref inside release buildType
+          content = re.sub(
+              r'(getByName\("release"\)\s*\{)',
+              r'\1\n            signingConfig = signingConfigs.getByName("release")',
+              content
+          )
+
+          # Insert signingConfigs block before buildTypes
+          content = content.replace("    buildTypes {", signing_block + "    buildTypes {", 1)
+
+          with open(path, "w") as f:
+              f.write(content)
+
+          print("Signing config injected.")
+          PYEOF
 
       - name: Build Android APK
         working-directory: app
