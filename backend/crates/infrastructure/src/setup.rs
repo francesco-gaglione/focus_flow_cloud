@@ -192,7 +192,7 @@ pub async fn init_app_state(
 
     // Seed Admin User
     if let (Some(username), Some(password)) = (&config.admin_username, &config.admin_password) {
-        use domain::entities::{user::User, user_role::UserRole};
+        use domain::user::entities::{user::User, user_role::UserRole};
         use tracing::{error, info};
 
         info!("Checking for admin user: {}", username);

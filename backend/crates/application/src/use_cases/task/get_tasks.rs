@@ -3,11 +3,11 @@ use crate::repository_traits::reminder_persistence::ReminderPersistence;
 use crate::repository_traits::task_persistence::TaskPersistence;
 use crate::use_cases::task::common::task_schedule_app_dto::TaskScheduleAppDto;
 use chrono::{DateTime, Utc};
-use domain::entities::reminder::Reminder;
-use domain::entities::tasks::subtask::Subtask;
-use domain::entities::tasks::task::Task;
-use domain::entities::tasks::task_priority::TaskPriority;
-use domain::entities::tasks::task_schedule::TaskSchedule;
+use domain::tasks::entities::reminder::Reminder;
+use domain::tasks::entities::subtask::Subtask;
+use domain::tasks::entities::task::Task;
+use domain::tasks::entities::task_priority::TaskPriority;
+use domain::tasks::entities::task_schedule::TaskSchedule;
 use std::collections::HashMap;
 use std::sync::Arc;
 use thiserror::Error;
@@ -263,7 +263,7 @@ mod tests {
     use crate::repository_traits::reminder_persistence::MockReminderPersistence;
     use crate::repository_traits::task_persistence::MockTaskPersistence;
     use chrono::{Duration, Utc};
-    use domain::entities::tasks::task_schedule::TaskSchedule;
+    use domain::tasks::entities::task_schedule::TaskSchedule;
 
     fn create_dummy_task(title: &str, schedule: TaskSchedule) -> Task {
         Task::new(Uuid::new_v4(), title.to_string(), schedule, None)

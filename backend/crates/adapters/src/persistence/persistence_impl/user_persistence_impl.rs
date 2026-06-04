@@ -9,7 +9,7 @@ use application::repository_traits::persistence_error::{PersistenceError, Persis
 use application::repository_traits::user_persistence::UserPersistence;
 use async_trait::async_trait;
 use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper};
-use domain::entities::user::User;
+use domain::user::entities::user::User;
 use tracing::{error, info, instrument, warn};
 use uuid::Uuid;
 
@@ -189,8 +189,8 @@ mod tests {
     use application::repository_traits::persistence_error::PersistenceError;
     use application::repository_traits::user_persistence::UserPersistence;
     use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
-    use domain::entities::user::User;
-    use domain::entities::user_role::UserRole;
+    use domain::user::entities::user::User;
+    use domain::user::entities::user_role::UserRole;
     use testcontainers::runners::AsyncRunner;
     use testcontainers_modules::postgres::Postgres;
     use uuid::Uuid;

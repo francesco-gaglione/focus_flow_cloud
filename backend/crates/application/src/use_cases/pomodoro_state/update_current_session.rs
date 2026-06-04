@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use domain::entities::focus_session::FocusSessionError;
+use domain::tasks::entities::focus_session::FocusSessionError;
 use thiserror::Error;
 use tracing::instrument;
 use uuid::Uuid;
@@ -79,8 +79,8 @@ mod tests {
     use crate::repository_traits::pomodoro_state_repository::{
         MockPomodoroStateRepository, PomodoroStateRepositoryError,
     };
-    use domain::entities::focus_session_type::FocusSessionType;
-    use domain::entities::pomodoro::pomodoro_state::PomodoroState;
+    use domain::tasks::entities::focus_session_type::FocusSessionType;
+    use domain::tasks::entities::pomodoro::pomodoro_state::PomodoroState;
     use std::sync::Arc;
     use uuid::Uuid;
 

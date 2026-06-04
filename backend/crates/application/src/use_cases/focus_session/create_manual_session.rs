@@ -1,7 +1,7 @@
 use crate::repository_traits::focus_session_repository::FocusSessionRepository;
 use crate::repository_traits::persistence_error::PersistenceError;
 use chrono::{DateTime, Utc};
-use domain::entities::{
+use domain::tasks::entities::{
     focus_session::{FocusSession, FocusSessionError, TerminatedSession},
     focus_session_type::FocusSessionType,
 };
@@ -74,7 +74,7 @@ mod tests {
 
     use super::*;
     use chrono::DateTime;
-    use domain::entities::focus_session_type::FocusSessionType;
+    use domain::tasks::entities::focus_session_type::FocusSessionType;
     use std::sync::Arc;
     use uuid::Uuid;
 

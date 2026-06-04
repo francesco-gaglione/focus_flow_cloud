@@ -9,7 +9,7 @@ use application::repository_traits::focus_session_repository::{
 use application::repository_traits::persistence_error::{PersistenceError, PersistenceResult};
 use async_trait::async_trait;
 use diesel::{BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper};
-use domain::entities::focus_session::{FocusSession, TerminatedSession};
+use domain::tasks::entities::focus_session::{FocusSession, TerminatedSession};
 use tracing::{error, info};
 use uuid::Uuid;
 

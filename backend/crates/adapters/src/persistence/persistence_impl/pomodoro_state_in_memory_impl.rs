@@ -5,8 +5,8 @@ use application::repository_traits::pomodoro_state_repository::{
     PomodoroStateRepository, PomodoroStateRepositoryError, PomodoroStateResult,
 };
 use async_trait::async_trait;
-use domain::entities::focus_session::{FocusSession, RunningSession, TerminatedSession};
-use domain::entities::pomodoro::pomodoro_state::PomodoroState;
+use domain::tasks::entities::focus_session::{FocusSession, RunningSession, TerminatedSession};
+use domain::tasks::entities::pomodoro::pomodoro_state::PomodoroState;
 use tokio::sync::RwLock;
 use tracing::debug;
 use uuid::Uuid;

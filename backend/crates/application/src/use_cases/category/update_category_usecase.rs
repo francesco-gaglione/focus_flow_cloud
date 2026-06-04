@@ -59,7 +59,7 @@ mod tests {
             UpdateCategoryCommand, UpdateCategoryUseCases,
         },
     };
-    use domain::entities::tasks::category::Category;
+    use domain::tasks::entities::category::Category;
 
     #[tokio::test]
     async fn test_update_category_usecase() {

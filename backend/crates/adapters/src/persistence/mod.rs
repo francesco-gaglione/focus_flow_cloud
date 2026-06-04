@@ -3,7 +3,7 @@ use std::sync::Arc;
 use application::repository_traits::persistence_error::{PersistenceError, PersistenceResult};
 use deadpool_diesel::postgres::Pool;
 use diesel::{pg::PgConnection, result::QueryResult, Connection};
-use domain::entities::focus_session::{FocusSession, RunningSession};
+use domain::tasks::entities::focus_session::{FocusSession, RunningSession};
 use tokio::sync::RwLock;
 
 pub mod db_models;

@@ -1,6 +1,6 @@
 use crate::repository_traits::persistence_error::PersistenceError;
 use crate::repository_traits::user_persistence::UserPersistence;
-use domain::services::token_service::{TokenService, TokenServiceError};
+use domain::user::services::token_service::{TokenService, TokenServiceError};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use thiserror::Error;
@@ -87,9 +87,9 @@ impl RefreshTokenUseCase {
 mod tests {
     use super::*;
     use crate::repository_traits::user_persistence::MockUserPersistence;
-    use domain::entities::user::User;
-    use domain::entities::user_role::UserRole;
-    use domain::services::token_service::MockTokenService;
+    use domain::user::entities::user::User;
+    use domain::user::entities::user_role::UserRole;
+    use domain::user::services::token_service::MockTokenService;
 
     #[tokio::test]
     async fn test_refresh_token_success() {

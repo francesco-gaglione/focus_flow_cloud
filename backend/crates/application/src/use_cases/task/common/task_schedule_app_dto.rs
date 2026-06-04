@@ -1,5 +1,5 @@
 use chrono::{DateTime, Duration, NaiveDate, Utc};
-use domain::entities::tasks::task_schedule::TaskSchedule;
+use domain::tasks::entities::task_schedule::TaskSchedule;
 
 #[derive(Debug, Clone, Default)]
 pub enum TaskScheduleAppDto {

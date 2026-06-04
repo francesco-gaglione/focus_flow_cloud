@@ -7,8 +7,8 @@ use uuid::Uuid;
 use crate::repository_traits::category_persistence::CategoryPersistence;
 use crate::repository_traits::persistence_error::PersistenceError;
 use domain::{
-    entities::tasks::category::{Category, CategoryError},
     helpers::random_hex_color,
+    tasks::entities::category::{Category, CategoryError},
 };
 
 #[derive(Debug, Error)]

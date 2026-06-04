@@ -2,7 +2,7 @@ use crate::repository_traits::{
     focus_session_repository::FocusSessionRepository, persistence_error::PersistenceError,
 };
 use chrono::{DateTime, Utc};
-use domain::entities::focus_session::FocusSessionError;
+use domain::tasks::entities::focus_session::FocusSessionError;
 use std::sync::Arc;
 use thiserror::Error;
 use tracing::instrument;
@@ -77,8 +77,10 @@ mod tests {
     use crate::repository_traits::focus_session_repository::MockFocusSessionRepository;
     use crate::use_cases::focus_session::update_focus_session::UpdateFocusSessionCommand;
     use crate::use_cases::focus_session::update_focus_session::UpdateFocusSessionUseCase;
-    use domain::entities::focus_session::TerminatedSession;
-    use domain::entities::{focus_session::FocusSession, focus_session_type::FocusSessionType};
+    use domain::tasks::entities::focus_session::TerminatedSession;
+    use domain::tasks::entities::{
+        focus_session::FocusSession, focus_session_type::FocusSessionType,
+    };
 
     #[tokio::test]
     async fn update_focus_session() {

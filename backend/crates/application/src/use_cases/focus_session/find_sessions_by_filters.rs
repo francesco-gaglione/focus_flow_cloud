@@ -3,8 +3,8 @@ use crate::repository_traits::focus_session_repository::{
 };
 use crate::repository_traits::persistence_error::PersistenceError;
 use chrono::{DateTime, Utc};
-use domain::entities::focus_session::{FocusSession, TerminatedSession};
-use domain::entities::focus_session_type::FocusSessionType;
+use domain::tasks::entities::focus_session::{FocusSession, TerminatedSession};
+use domain::tasks::entities::focus_session_type::FocusSessionType;
 use std::sync::Arc;
 use thiserror::Error;
 use tracing::instrument;
@@ -148,7 +148,7 @@ mod tests {
 
     use super::*;
     use chrono::DateTime;
-    use domain::entities::focus_session_type::FocusSessionType;
+    use domain::tasks::entities::focus_session_type::FocusSessionType;
     use std::sync::Arc;
     use uuid::Uuid;
 

@@ -3,7 +3,7 @@ use crate::{
     repository_traits::persistence_error::PersistenceError,
     use_cases::task::common::task_schedule_app_dto::TaskScheduleAppDto,
 };
-use domain::entities::tasks::task_priority::TaskPriority;
+use domain::tasks::entities::task_priority::TaskPriority;
 use std::sync::Arc;
 use thiserror::Error;
 use tracing::{error, info, instrument};
@@ -83,7 +83,7 @@ impl UpdateTaskUseCase {
 mod tests {
     use super::*;
     use crate::repository_traits::task_persistence::MockTaskPersistence;
-    use domain::entities::tasks::{task::Task, task_schedule::TaskSchedule};
+    use domain::tasks::entities::{task::Task, task_schedule::TaskSchedule};
 
     #[tokio::test]
     async fn test_update_task_success() {

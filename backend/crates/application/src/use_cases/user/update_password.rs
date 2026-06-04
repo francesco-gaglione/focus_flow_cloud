@@ -1,7 +1,7 @@
 use crate::auth_traits::password_hasher::{HashingError, PasswordHasher};
 use crate::repository_traits::persistence_error::PersistenceError;
 use crate::repository_traits::user_persistence::UserPersistence;
-use domain::traits::password_policy::{PasswordPolicy, PasswordPolicyError};
+use domain::user::traits::password_policy::{PasswordPolicy, PasswordPolicyError};
 use secrecy::{ExposeSecret, SecretBox};
 use std::sync::Arc;
 use thiserror::Error;
@@ -105,8 +105,8 @@ mod tests {
     use crate::use_cases::user::update_password::{
         UpdatePasswordError, UpdateUserPasswordCommand, UpdateUserPasswordUseCase,
     };
-    use domain::entities::{user::User, user_role::UserRole};
-    use domain::traits::password_policy::{MockPasswordPolicy, PasswordPolicyError};
+    use domain::user::entities::{user::User, user_role::UserRole};
+    use domain::user::traits::password_policy::{MockPasswordPolicy, PasswordPolicyError};
     use mockall::predicate::eq;
     use uuid::Uuid;
 

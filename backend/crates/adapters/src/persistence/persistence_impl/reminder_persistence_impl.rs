@@ -9,7 +9,7 @@ use diesel::{
     ExpressionMethods, NullableExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
     SelectableHelper,
 };
-use domain::entities::reminder::Reminder;
+use domain::tasks::entities::reminder::Reminder;
 use tracing::instrument;
 use uuid::Uuid;
 
@@ -121,7 +121,7 @@ mod tests {
     use chrono::Utc;
     use diesel::RunQueryDsl;
     use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
-    use domain::entities::reminder::Reminder;
+    use domain::tasks::entities::reminder::Reminder;
     use testcontainers::runners::AsyncRunner;
     use testcontainers_modules::postgres::Postgres;
     use uuid::Uuid;

@@ -9,7 +9,7 @@ use application::use_cases::task::create_task::{
 };
 use axum::{extract::State, Extension, Json};
 use chrono::DateTime;
-use domain::entities::tasks::task_priority::TaskPriority as DomainPriority;
+use domain::tasks::entities::task_priority::TaskPriority as DomainPriority;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use uuid::Uuid;

@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use domain::entities::tasks::subtask::Subtask;
+use domain::tasks::entities::subtask::Subtask;
 use thiserror::Error;
 use tracing::{error, info, instrument};
 use uuid::Uuid;
@@ -79,8 +79,8 @@ mod tests {
     use super::*;
     use crate::repository_traits::persistence_error::PersistenceError;
     use crate::repository_traits::task_persistence::MockTaskPersistence;
-    use domain::entities::tasks::task::Task;
-    use domain::entities::tasks::task_schedule::TaskSchedule;
+    use domain::tasks::entities::task::Task;
+    use domain::tasks::entities::task_schedule::TaskSchedule;
     use std::sync::Arc;
 
     fn make_task(user_id: Uuid) -> Task {

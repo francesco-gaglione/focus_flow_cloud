@@ -51,7 +51,7 @@ impl UpdateSettingUseCase {
 mod tests {
     use super::*;
     use crate::repository_traits::user_setting_persistence::MockUserSettingPersistence;
-    use domain::entities::user_setting::UserSetting;
+    use domain::user::entities::user_setting::UserSetting;
 
     #[tokio::test]
     async fn test_update_setting_existing() {

@@ -63,7 +63,7 @@ mod tests {
     use crate::repository_traits::pomodoro_state_repository::{
         MockPomodoroStateRepository, PomodoroStateRepositoryError,
     };
-    use domain::entities::pomodoro::pomodoro_state::PomodoroState;
+    use domain::tasks::entities::pomodoro::pomodoro_state::PomodoroState;
     use std::sync::Arc;
     use uuid::Uuid;
 

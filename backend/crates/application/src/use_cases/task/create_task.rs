@@ -6,8 +6,8 @@ use crate::{
     use_cases::task::common::task_schedule_app_dto::TaskScheduleAppDto,
 };
 use chrono::{DateTime, Utc};
-use domain::entities::reminder::Reminder;
-use domain::entities::tasks::{subtask::Subtask, task::Task, task_priority::TaskPriority};
+use domain::tasks::entities::reminder::Reminder;
+use domain::tasks::entities::{subtask::Subtask, task::Task, task_priority::TaskPriority};
 use std::sync::Arc;
 use thiserror::Error;
 use tracing::{info, instrument};

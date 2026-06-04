@@ -1,6 +1,6 @@
 use crate::repository_traits::persistence_error::PersistenceError;
 use crate::repository_traits::push_subscription_persistence::PushSubscriptionPersistence;
-use domain::entities::push_subscription::PushSubscription;
+use domain::tasks::entities::push_subscription::PushSubscription;
 use std::sync::Arc;
 use thiserror::Error;
 use tracing::instrument;

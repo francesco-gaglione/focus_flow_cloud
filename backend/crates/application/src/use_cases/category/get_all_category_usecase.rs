@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use crate::repository_traits::category_persistence::CategoryPersistence;
 use crate::repository_traits::persistence_error::PersistenceError;
-use domain::entities::tasks::category::Category;
+use domain::tasks::entities::category::Category;
 use thiserror::Error;
 use tracing::instrument;
 use uuid::Uuid;
@@ -67,7 +67,7 @@ mod tests {
         repository_traits::category_persistence::MockCategoryPersistence,
         use_cases::category::get_all_category_usecase::GetAllCategoryUseCases,
     };
-    use domain::entities::tasks::category::Category;
+    use domain::tasks::entities::category::Category;
 
     #[tokio::test]
     async fn test_get_category_usecase() {

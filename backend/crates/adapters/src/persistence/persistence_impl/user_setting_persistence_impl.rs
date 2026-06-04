@@ -8,7 +8,7 @@ use crate::persistence::{
 };
 use application::repository_traits::persistence_error::{PersistenceError, PersistenceResult};
 use application::repository_traits::user_setting_persistence::UserSettingPersistence;
-use domain::entities::user_setting::UserSetting;
+use domain::user::entities::user_setting::UserSetting;
 
 #[async_trait]
 impl UserSettingPersistence for PostgresPersistence {

@@ -8,7 +8,7 @@ use crate::openapi::TASK_TAG;
 use application::use_cases::task::update_task::{UpdateTaskCommand, UpdateTaskError};
 use axum::extract::{Path, State};
 use axum::Json;
-use domain::entities::tasks::task_priority::TaskPriority as DomainPriority;
+use domain::tasks::entities::task_priority::TaskPriority as DomainPriority;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use uuid::Uuid;

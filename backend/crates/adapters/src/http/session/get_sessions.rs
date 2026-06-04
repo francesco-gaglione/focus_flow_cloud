@@ -25,7 +25,7 @@ impl From<FindSessionByFiltersError> for HttpError {
 }
 use axum::extract::{Extension, Query, State};
 use axum::Json;
-use domain::entities::focus_session_type::FocusSessionType;
+use domain::tasks::entities::focus_session_type::FocusSessionType;
 use serde::{Deserialize, Deserializer, Serialize};
 use tracing::debug;
 use utoipa::{IntoParams, ToSchema};

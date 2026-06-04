@@ -1,6 +1,6 @@
 use crate::repository_traits::persistence_error::PersistenceResult;
 use async_trait::async_trait;
-use domain::entities::user_setting::UserSetting;
+use domain::user::entities::user_setting::UserSetting;
 use uuid::Uuid;
 
 #[cfg_attr(test, mockall::automock)]

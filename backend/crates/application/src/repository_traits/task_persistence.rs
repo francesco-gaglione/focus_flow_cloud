@@ -1,7 +1,7 @@
 use crate::repository_traits::persistence_error::PersistenceResult;
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
-use domain::entities::tasks::task::Task;
+use domain::tasks::entities::task::Task;
 use uuid::Uuid;
 
 #[cfg_attr(test, mockall::automock)]
@@ -36,7 +36,7 @@ pub trait TaskPersistence: Send + Sync {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use domain::entities::tasks::task_schedule::TaskSchedule;
+    use domain::tasks::entities::task_schedule::TaskSchedule;
     use uuid::Uuid;
 
     #[tokio::test]

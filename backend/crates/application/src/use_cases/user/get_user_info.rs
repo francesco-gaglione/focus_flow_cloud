@@ -46,8 +46,8 @@ impl GetUserInfoUseCase {
 mod tests {
     use super::*;
     use crate::repository_traits::user_persistence::MockUserPersistence;
-    use domain::entities::user::User;
-    use domain::entities::user_role::UserRole;
+    use domain::user::entities::user::User;
+    use domain::user::entities::user_role::UserRole;
 
     #[tokio::test]
     async fn test_get_user_info_success() {

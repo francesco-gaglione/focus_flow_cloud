@@ -6,7 +6,7 @@ use application::repository_traits::persistence_error::{PersistenceError, Persis
 use async_trait::async_trait;
 use chrono::Utc;
 use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, SelectableHelper};
-use domain::entities::tasks::category::Category;
+use domain::tasks::entities::category::Category;
 use tracing::{error, info, instrument};
 use uuid::Uuid;
 

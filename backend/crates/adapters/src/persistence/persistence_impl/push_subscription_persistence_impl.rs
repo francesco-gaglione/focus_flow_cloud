@@ -8,7 +8,7 @@ use application::repository_traits::push_subscription_persistence::PushSubscript
 use async_trait::async_trait;
 use chrono::Utc;
 use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper};
-use domain::entities::push_subscription::PushSubscription;
+use domain::tasks::entities::push_subscription::PushSubscription;
 use tracing::instrument;
 use uuid::Uuid;
 
@@ -81,14 +81,13 @@ impl PushSubscriptionPersistence for PostgresPersistence {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use crate::persistence::db_models::db_user::NewDbUser;
     use crate::persistence::persistence_impl::persistence::postgres_persistence;
     use crate::persistence::schema;
     use application::repository_traits::push_subscription_persistence::PushSubscriptionPersistence;
     use diesel::RunQueryDsl;
     use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
-    use domain::entities::push_subscription::PushSubscription;
+    use domain::tasks::entities::push_subscription::PushSubscription;
     use testcontainers::runners::AsyncRunner;
     use testcontainers_modules::postgres::Postgres;
     use uuid::Uuid;

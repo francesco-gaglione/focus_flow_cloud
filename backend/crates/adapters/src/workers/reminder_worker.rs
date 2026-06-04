@@ -2,7 +2,7 @@ use crate::persistence::persistence_impl::reminder_worker_port_impl::ReminderJob
 use apalis::prelude::Data;
 use application::repository_traits::push_subscription_persistence::PushSubscriptionPersistence;
 use application::repository_traits::reminder_persistence::ReminderPersistence;
-use domain::entities::push_subscription::PushSubscription;
+use domain::tasks::entities::push_subscription::PushSubscription;
 use std::sync::Arc;
 use tracing::{error, info, instrument, warn};
 use web_push::{
@@ -121,8 +121,8 @@ mod tests {
     use application::repository_traits::persistence_error::PersistenceError;
     use application::repository_traits::persistence_error::PersistenceResult;
     use async_trait::async_trait;
-    use domain::entities::push_subscription::PushSubscription;
-    use domain::entities::reminder::Reminder;
+    use domain::tasks::entities::push_subscription::PushSubscription;
+    use domain::tasks::entities::reminder::Reminder;
 
     mockall::mock! {
         ReminderPersistenceMock {}

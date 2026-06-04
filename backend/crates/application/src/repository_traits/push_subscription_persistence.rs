@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use domain::entities::push_subscription::PushSubscription;
+use domain::tasks::entities::push_subscription::PushSubscription;
 use uuid::Uuid;
 
 use super::persistence_error::PersistenceResult;

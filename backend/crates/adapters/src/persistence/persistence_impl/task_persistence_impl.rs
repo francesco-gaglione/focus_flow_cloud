@@ -7,7 +7,7 @@ use application::repository_traits::task_persistence::TaskPersistence;
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, SelectableHelper};
-use domain::entities::tasks::task::Task;
+use domain::tasks::entities::task::Task;
 use tracing::{debug, info, instrument};
 use uuid::Uuid;
 

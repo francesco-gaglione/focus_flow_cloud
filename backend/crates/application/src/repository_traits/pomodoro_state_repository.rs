@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use domain::entities::pomodoro::pomodoro_state::PomodoroState;
+use domain::tasks::entities::pomodoro::pomodoro_state::PomodoroState;
 use thiserror::Error;
 use uuid::Uuid;
 

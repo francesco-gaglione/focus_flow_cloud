@@ -84,8 +84,8 @@ mod tests {
     use crate::use_cases::user::update_user_username::{
         UpdateUserUsernameCommand, UpdateUserUsernameError, UpdateUserUsernameUseCase,
     };
-    use domain::entities::user::User;
-    use domain::entities::user_role::UserRole;
+    use domain::user::entities::user::User;
+    use domain::user::entities::user_role::UserRole;
     use mockall::predicate::eq;
     use uuid::Uuid;
 

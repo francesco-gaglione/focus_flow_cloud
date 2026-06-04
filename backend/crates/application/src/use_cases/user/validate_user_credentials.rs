@@ -81,7 +81,7 @@ impl ValidateUserCredentialsUseCase {
 
 #[cfg(test)]
 mod tests {
-    use domain::entities::{user::User, user_role::UserRole};
+    use domain::user::entities::{user::User, user_role::UserRole};
     use uuid::Uuid;
 
     #[test]

@@ -1,6 +1,6 @@
 use crate::auth_traits::password_hasher::PasswordHasher;
 use crate::repository_traits::user_persistence::UserPersistence;
-use domain::services::token_service::{TokenService, TokenServiceError};
+use domain::user::services::token_service::{TokenService, TokenServiceError};
 use secrecy::{ExposeSecret, SecretBox};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;

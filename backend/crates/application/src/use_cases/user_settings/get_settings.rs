@@ -1,6 +1,6 @@
 use crate::repository_traits::persistence_error::PersistenceError;
 use crate::repository_traits::user_setting_persistence::UserSettingPersistence;
-use domain::entities::user_setting::UserSetting;
+use domain::user::entities::user_setting::UserSetting;
 use std::sync::Arc;
 use thiserror::Error;
 use tracing::instrument;
@@ -55,7 +55,7 @@ impl GetSettingsUseCase {
 mod tests {
     use super::*;
     use crate::repository_traits::user_setting_persistence::MockUserSettingPersistence;
-    use domain::entities::user_setting::UserSetting;
+    use domain::user::entities::user_setting::UserSetting;
 
     #[tokio::test]
     async fn test_get_settings_success() {

@@ -37,7 +37,7 @@ use application::use_cases::{
     },
 };
 use axum::extract::ws::Message;
-use domain::services::token_service::TokenService;
+use domain::user::services::token_service::TokenService;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::mpsc::UnboundedSender;

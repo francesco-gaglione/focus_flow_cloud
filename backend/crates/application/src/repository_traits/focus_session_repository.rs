@@ -2,9 +2,9 @@ use crate::repository_traits::persistence_error::PersistenceResult;
 use async_trait::async_trait;
 use chrono::DateTime;
 use chrono::Utc;
-use domain::entities::focus_session::FocusSession;
-use domain::entities::focus_session::TerminatedSession;
-use domain::entities::focus_session_type::FocusSessionType;
+use domain::tasks::entities::focus_session::FocusSession;
+use domain::tasks::entities::focus_session::TerminatedSession;
+use domain::tasks::entities::focus_session_type::FocusSessionType;
 use uuid::Uuid;
 
 pub struct FindByFiltersCommand {

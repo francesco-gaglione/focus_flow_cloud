@@ -2,24 +2,26 @@ use std::sync::Arc;
 
 use chrono::NaiveDate;
 use chrono::NaiveTime;
+use domain::tasks::services::stats::completed_by_priority_service::CompletedByPriorityService;
 use thiserror::Error;
 use tracing::instrument;
 use uuid::Uuid;
 
-use domain::entities::tasks::task_priority::TaskPriority;
-use domain::services::stats::completed_by_priority_service::CompletedByPriorityService;
-use domain::services::stats::completed_focus_sessions_service::CompletedFocusSessionsService;
-use domain::services::stats::completed_tasks_counts_service::CompletedTasksCountsService;
-use domain::services::stats::count_by_category_service::CountByCategoryService;
-use domain::services::stats::last_14d_counts_service::Last14dCountsService;
-use domain::services::stats::last_8w_counts_service::Last8wCountsService;
-use domain::services::stats::overdue_trend_service::OverdueTrendService;
-use domain::services::stats::peak_window_service::{PeakWindowService, PeakWindowServiceError};
-use domain::value_objects::stats::count_by_category::CategoryCount;
-use domain::value_objects::stats::last_14d_counts::DayCounts;
-use domain::value_objects::stats::last_8w_counts::WeekCounts;
-use domain::value_objects::stats::overdue_trend::{OverdueTrend, OverdueTrendType};
-use domain::value_objects::stats::peak_window::PwTimeRange;
+use domain::tasks::entities::task_priority::TaskPriority;
+use domain::tasks::services::stats::completed_focus_sessions_service::CompletedFocusSessionsService;
+use domain::tasks::services::stats::completed_tasks_counts_service::CompletedTasksCountsService;
+use domain::tasks::services::stats::count_by_category_service::CountByCategoryService;
+use domain::tasks::services::stats::last_14d_counts_service::Last14dCountsService;
+use domain::tasks::services::stats::last_8w_counts_service::Last8wCountsService;
+use domain::tasks::services::stats::overdue_trend_service::OverdueTrendService;
+use domain::tasks::services::stats::peak_window_service::{
+    PeakWindowService, PeakWindowServiceError,
+};
+use domain::tasks::value_objects::stats::count_by_category::CategoryCount;
+use domain::tasks::value_objects::stats::last_14d_counts::DayCounts;
+use domain::tasks::value_objects::stats::last_8w_counts::WeekCounts;
+use domain::tasks::value_objects::stats::overdue_trend::{OverdueTrend, OverdueTrendType};
+use domain::tasks::value_objects::stats::peak_window::PwTimeRange;
 
 use crate::repository_traits::category_persistence::CategoryPersistence;
 use crate::repository_traits::focus_session_repository::{
