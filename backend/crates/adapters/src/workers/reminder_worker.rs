@@ -133,6 +133,7 @@ mod tests {
             async fn delete_reminder(&self, id: uuid::Uuid) -> PersistenceResult<()>;
             async fn find_by_task_ids(&self, task_ids: Vec<uuid::Uuid>) -> PersistenceResult<Vec<Reminder>>;
             async fn update_reminder(&self, reminder: Reminder) -> PersistenceResult<()>;
+            async fn find_pending_by_user(&self, user_id: uuid::Uuid) -> PersistenceResult<Vec<Reminder>>;
         }
     }
 

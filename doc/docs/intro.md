@@ -1,8 +1,8 @@
 ---
 sidebar_position: 1
-description: "FocusFlow is an open-source Pomodoro tracker with real-time sync, task management, and productivity analytics. Built with Rust and SvelteKit."
+description: "FocusFlow is an open-source Pomodoro tracker with real-time sync, task management, and productivity analytics. Built with Rust and Tauri v2 + SvelteKit."
 keywords:
-  [focusflow, pomodoro, productivity, open source, rust, sveltekit, pwa, time tracking]
+  [focusflow, pomodoro, productivity, open source, rust, tauri, sveltekit, time tracking]
 ---
 
 # Introduction
@@ -34,20 +34,29 @@ FocusFlow provides a synchronized experience across all your devices:
 
   ![Statistics](/img/screenshots/stats.png)
 
+- **Native Notifications**: System-level notifications for Pomodoro transitions and task reminders — no browser required.
+
 ## Platforms
 
 FocusFlow is a cross-platform solution:
 
-- **PWA**: A Progressive Web App built with [SvelteKit](https://svelte.dev/) — runs in any modern browser and can be installed on iOS, Android, and Desktop without an app store.
+- **Native App**: Built with [Tauri v2](https://tauri.app/) + [SvelteKit](https://svelte.dev/) — available as a native desktop app for macOS, Windows, and Linux, and as an APK for Android. Download from the [Releases](https://github.com/francesco-gaglione/focus_flow_cloud/releases) page.
 - **Cloud Backend**: Powered by [Rust](https://www.rust-lang.org/) (Axum, Tokio), ensuring high performance and reliability.
 
-## Installing the PWA
+## Installing the App
 
-Once the backend is running and the PWA is served:
+1. Download the appropriate package for your platform from the [GitHub Releases](https://github.com/francesco-gaglione/focus_flow_cloud/releases) page.
+2. Install and launch the app.
+3. On first launch, enter your backend server URL (e.g. `https://api.example.com`).
+4. Log in and start tracking.
 
-1. Open the app URL in a supported browser (Chrome, Edge, Safari 16.4+, Firefox on Android).
-2. Look for the **"Install"** button in the address bar, or use the browser menu → **"Add to Home Screen"**.
-3. The app installs and runs like a native application, with offline support.
+| Platform | Package |
+| :--- | :--- |
+| macOS (Apple Silicon) | `.dmg` |
+| macOS (Intel) | `.dmg` |
+| Linux | `.deb` / `.AppImage` |
+| Windows | `.exe` / `.msi` |
+| Android | `.apk` (enable Unknown Sources) |
 
 ## Open Source
 
