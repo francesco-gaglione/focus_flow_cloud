@@ -4,8 +4,14 @@
     import { onMount } from "svelte";
     import { authStore } from "$lib/stores/auth";
     import { subscribeToPush } from "$lib/push";
-    import { requestNotificationPermission, isTauri as checkIsTauri } from "$lib/notifications";
-    import { startReminderPoller, stopReminderPoller } from "$lib/reminderPoller";
+    import {
+        requestNotificationPermission,
+        isTauri as checkIsTauri,
+    } from "$lib/notifications";
+    import {
+        startReminderPoller,
+        stopReminderPoller,
+    } from "$lib/reminderPoller";
     import "../app.css";
 
     const { children } = $props();

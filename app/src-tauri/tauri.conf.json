@@ -2,7 +2,7 @@
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "FocusFlow",
   "version": "1.1.0",
-  "identifier": "com.focusflow.app",
+  "identifier": "com.francescopio.focusflow",
   "build": {
     "frontendDist": "../build",
     "devUrl": "http://localhost:5173",

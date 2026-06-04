@@ -3,5 +3,10 @@
   "no_tasks": "No tasks yet",
   "no_category": "No category",
   "all_categories": "All",
-  "category_filter": "Category"
+  "category_filter": "Category",
+  "empty_list": "Empty list",
+  "incoming": "Incoming",
+  "unscheduled": "Unscheduled",
+  "today": "Today",
+  "next_week": "Next week"
 }

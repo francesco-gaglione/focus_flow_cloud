@@ -139,8 +139,7 @@ pub async fn init_app_state(
     let delete_tasks_uc = Arc::new(DeleteTaskUseCase::new(postgres_arc.clone()));
     let save_push_subscription_uc =
         Arc::new(SavePushSubscriptionUseCase::new(postgres_arc.clone()));
-    let get_pending_reminders_uc =
-        Arc::new(GetPendingRemindersUseCase::new(postgres_arc.clone()));
+    let get_pending_reminders_uc = Arc::new(GetPendingRemindersUseCase::new(postgres_arc.clone()));
     let update_task_uc = Arc::new(UpdateTaskUseCase::new(postgres_arc.clone()));
     let update_subtask_uc = Arc::new(UpdateSubTaskUseCase::new(postgres_arc.clone()));
     let add_subtask_uc = Arc::new(AddSubTaskUseCase::new(postgres_arc.clone()));

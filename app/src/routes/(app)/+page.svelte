@@ -26,7 +26,14 @@
 
     let selectedCatIds = $state<Set<string> | null>(null);
 
-    let openSections = $state({
+    let apiSectionsOpen = $state({
+        today: true,
+        nextWeek: false,
+        incoming: false,
+        unscheduled: false,
+    });
+
+    let uiSectionsOpen = $state({
         today: true,
         nextWeek: false,
         incoming: false,
@@ -34,21 +41,21 @@
     });
 
     const tasksQueryOpts = writable({
-        queryKey: ["tasks", { ...openSections, completed: showCompleted }],
+        queryKey: ["tasks", { ...apiSectionsOpen, completed: showCompleted }],
         queryFn: () =>
             tasks.getAll(
                 showCompleted,
-                openSections.today,
-                openSections.nextWeek,
-                openSections.unscheduled,
-                openSections.incoming,
+                apiSectionsOpen.today,
+                apiSectionsOpen.nextWeek,
+                apiSectionsOpen.unscheduled,
+                apiSectionsOpen.incoming,
             ),
         placeholderData: (prev: any) => prev,
         staleTime: 30_000,
     });
 
     $effect(() => {
-        const s = { ...openSections };
+        const s = { ...apiSectionsOpen };
         const c = showCompleted;
         tasksQueryOpts.set({
             queryKey: ["tasks", { ...s, completed: c }],
@@ -61,7 +68,27 @@
 
     const tasksQuery = createQuery(tasksQueryOpts);
 
-    // Fetch available categories
+    $effect(() => {
+        if (!$tasksQuery.isFetching) {
+            uiSectionsOpen.today = apiSectionsOpen.today;
+            uiSectionsOpen.nextWeek = apiSectionsOpen.nextWeek;
+            uiSectionsOpen.incoming = apiSectionsOpen.incoming;
+            uiSectionsOpen.unscheduled = apiSectionsOpen.unscheduled;
+        }
+    });
+
+    function handleToggle(
+        section: keyof typeof apiSectionsOpen,
+        isOpen: boolean,
+    ) {
+        if (isOpen) {
+            apiSectionsOpen[section] = true;
+        } else {
+            apiSectionsOpen[section] = false;
+            uiSectionsOpen[section] = false;
+        }
+    }
+
     const catsQuery = createQuery({
         queryKey: ["categories"],
         queryFn: categories.getAll,
@@ -75,24 +102,12 @@
     }
 
     function toggleCat(id: string) {
-        console.log(
-            "[cat] toggleCat called, id=",
-            id,
-            "selectedCatIds=",
-            selectedCatIds,
-        );
         if (id === "all") {
-            // Toggle all: if currently filtered, reset to null (all selected)
             selectedCatIds = selectedCatIds === null ? new Set() : null;
-            console.log(
-                "[cat] after all toggle, selectedCatIds=",
-                selectedCatIds,
-            );
             return;
         }
 
         if (selectedCatIds === null) {
-            // Deselect one: create a new set containing everything except the toggled id
             selectedCatIds = new Set(allOptionIds.filter((i) => i !== id));
         } else {
             const next = new Set(selectedCatIds);
@@ -101,12 +116,10 @@
             } else {
                 next.add(id);
             }
-            // If the updated set includes all items, reset it to null
             selectedCatIds = next.size === allOptionIds.length ? null : next;
         }
     }
 
-    // Map the API payload structure including the new unscheduled tasks group
     let taskGroups = $derived(
         $tasksQuery.data || {
             today: [],
@@ -117,7 +130,6 @@
         },
     );
 
-    // Filter a task list based on the selected categories
     function filterByCategory(taskList: any[] | undefined) {
         if (!taskList) return [];
         if (selectedCatIds === null) return taskList;
@@ -128,14 +140,12 @@
         );
     }
 
-    // Derived reactive filtered task groups
     let todayTasks = $derived(filterByCategory(taskGroups.today));
     let nextWeekTasks = $derived(filterByCategory(taskGroups.nextWeek));
     let incomingTasks = $derived(filterByCategory(taskGroups.incoming));
     let unscheduledTasks = $derived(filterByCategory(taskGroups.unscheduled));
     let completedTasks = $derived(filterByCategory(taskGroups.completed));
 
-    // Dynamic task counter taking into account all visible groups
     let totalTasksCount = $derived(
         todayTasks.length +
             nextWeekTasks.length +
@@ -151,10 +161,11 @@
     title: string,
     tasksList: any[],
     isOpen: boolean,
+    isFetchingData: boolean,
     onToggle: (v: boolean) => void,
 )}
     <details
-        class="group"
+        class="group animated-details"
         open={isOpen}
         ontoggle={(e) => onToggle((e.currentTarget as HTMLDetailsElement).open)}
     >
@@ -167,6 +178,13 @@
                 {title}
             </span>
             <div class="flex items-center gap-2 text-surface-500">
+                {#if isFetchingData}
+                    <span
+                        class="text-[10px] font-mono text-primary-500 animate-pulse mr-1"
+                    >
+                        ...
+                    </span>
+                {/if}
                 {#if tasksList.length > 0}
                     <span class="badge preset-tonal-surface text-[10px]"
                         >{tasksList.length}</span
@@ -185,16 +203,18 @@
                 </svg>
             </div>
         </summary>
-        <div class="pb-2">
-            {#if $tasksQuery.isFetching && tasksList.length === 0}
-                <div class="px-4 py-2 text-xs text-surface-500 font-mono">
-                    …
-                </div>
-            {:else}
+
+        <div class="details-content">
+            <div class="pb-2">
+                {#if tasksList.length === 0 && !isFetchingData}
+                    <div class="px-4 py-2 text-xs font-mono">
+                        {$_("todo.empty_list")}
+                    </div>
+                {/if}
                 {#each tasksList as task (task.id)}
                     <TaskRow {task} categories={allCats} />
                 {/each}
-            {/if}
+            </div>
         </div>
     </details>
 {/snippet}
@@ -255,11 +275,9 @@
                                         <div
                                             class="size-2.5 rounded-full shrink-0 border border-surface-500 border-dashed"
                                         ></div>
-                                        <Menu.ItemText class="flex-1"
-                                            >{$_(
-                                                "todo.no_category",
-                                            )}</Menu.ItemText
-                                        >
+                                        <Menu.ItemText class="flex-1">
+                                            {$_("todo.no_category")}
+                                        </Menu.ItemText>
                                         {#if isCatSelected("none")}
                                             <CheckIcon class="size-4" />
                                         {/if}
@@ -325,28 +343,40 @@
         {/if}
 
         {@render taskSection(
-            "Today",
+            $_("todo.today"),
             todayTasks,
-            openSections.today,
-            (v) => (openSections.today = v),
+            uiSectionsOpen.today,
+            $tasksQuery.isFetching &&
+                apiSectionsOpen.today &&
+                !uiSectionsOpen.today,
+            (v) => handleToggle("today", v),
         )}
         {@render taskSection(
-            "Next Week",
+            $_("todo.next_week"),
             nextWeekTasks,
-            openSections.nextWeek,
-            (v) => (openSections.nextWeek = v),
+            uiSectionsOpen.nextWeek,
+            $tasksQuery.isFetching &&
+                apiSectionsOpen.nextWeek &&
+                !uiSectionsOpen.nextWeek,
+            (v) => handleToggle("nextWeek", v),
         )}
         {@render taskSection(
-            "Incoming",
+            $_("todo.incoming"),
             incomingTasks,
-            openSections.incoming,
-            (v) => (openSections.incoming = v),
+            uiSectionsOpen.incoming,
+            $tasksQuery.isFetching &&
+                apiSectionsOpen.incoming &&
+                !uiSectionsOpen.incoming,
+            (v) => handleToggle("incoming", v),
         )}
         {@render taskSection(
-            "Unscheduled",
+            $_("todo.unscheduled"),
             unscheduledTasks,
-            openSections.unscheduled,
-            (v) => (openSections.unscheduled = v),
+            uiSectionsOpen.unscheduled,
+            $tasksQuery.isFetching &&
+                apiSectionsOpen.unscheduled &&
+                !uiSectionsOpen.unscheduled,
+            (v) => handleToggle("unscheduled", v),
         )}
 
         {#if showCompleted}
@@ -354,6 +384,7 @@
                 $_("todo.completed"),
                 completedTasks,
                 true,
+                false,
                 () => {},
             )}
         {/if}
@@ -420,3 +451,31 @@
 
     <CreateTaskSheet open={sheetOpen} onClose={() => (sheetOpen = false)} />
 </div>
+
+<style>
+    :root {
+        interpolate-size: allow-keywords;
+    }
+
+    .animated-details {
+        transition:
+            height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+            content-visibility 0.35s allow-discrete;
+        height: 3rem;
+        overflow: hidden;
+    }
+
+    .animated-details[open] {
+        height: auto;
+    }
+
+    .animated-details .details-content {
+        opacity: 0;
+        transition: opacity 0.25s ease-out;
+    }
+
+    .animated-details[open] .details-content {
+        opacity: 1;
+        transition-delay: 0.1s;
+    }
+</style>

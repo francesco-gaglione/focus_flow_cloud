@@ -28,7 +28,9 @@ pub struct GetPendingRemindersUseCase {
 
 impl GetPendingRemindersUseCase {
     pub fn new(reminder_persistence: Arc<dyn ReminderPersistence>) -> Self {
-        Self { reminder_persistence }
+        Self {
+            reminder_persistence,
+        }
     }
 
     #[instrument(skip(self))]
@@ -36,7 +38,10 @@ impl GetPendingRemindersUseCase {
         &self,
         user_id: Uuid,
     ) -> Result<Vec<PendingReminderOutput>, GetPendingRemindersError> {
-        let reminders = self.reminder_persistence.find_pending_by_user(user_id).await?;
+        let reminders = self
+            .reminder_persistence
+            .find_pending_by_user(user_id)
+            .await?;
 
         Ok(reminders
             .into_iter()
