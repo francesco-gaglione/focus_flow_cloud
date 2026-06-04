@@ -31,3 +31,5 @@ doc/.docusaurus/
 *.iml
 *.ipr
 *.iws
+
+*.jks
