@@ -256,17 +256,19 @@ jobs:
           python3 -c "
           import json, re
           v = '$VERSION'
+          # MSI (WiX) requires numeric-only pre-release — strip pre-release suffix entirely
+          v_clean = v.split('-')[0]
           with open('app/src-tauri/tauri.conf.json') as f:
               cfg = json.load(f)
-          cfg['version'] = v
+          cfg['version'] = v_clean
           with open('app/src-tauri/tauri.conf.json', 'w') as f:
               json.dump(cfg, f, indent=2)
           with open('app/src-tauri/Cargo.toml') as f:
               content = f.read()
-          content = re.sub(r'^version = \".*\"', f'version = \"{v}\"', content, flags=re.MULTILINE, count=1)
+          content = re.sub(r'^version = \".*\"', f'version = \"{v_clean}\"', content, flags=re.MULTILINE, count=1)
           with open('app/src-tauri/Cargo.toml', 'w') as f:
               f.write(content)
-          print(f'Version set to {v}')
+          print(f'Version set to {v_clean} (from tag {v})')
           "
 
       - name: Build Tauri app
@@ -357,17 +359,19 @@ jobs:
           python3 -c "
           import json, re
           v = '$VERSION'
+          # MSI (WiX) requires numeric-only pre-release — strip pre-release suffix entirely
+          v_clean = v.split('-')[0]
           with open('app/src-tauri/tauri.conf.json') as f:
               cfg = json.load(f)
-          cfg['version'] = v
+          cfg['version'] = v_clean
           with open('app/src-tauri/tauri.conf.json', 'w') as f:
               json.dump(cfg, f, indent=2)
           with open('app/src-tauri/Cargo.toml') as f:
               content = f.read()
-          content = re.sub(r'^version = \".*\"', f'version = \"{v}\"', content, flags=re.MULTILINE, count=1)
+          content = re.sub(r'^version = \".*\"', f'version = \"{v_clean}\"', content, flags=re.MULTILINE, count=1)
           with open('app/src-tauri/Cargo.toml', 'w') as f:
               f.write(content)
-          print(f'Version set to {v}')
+          print(f'Version set to {v_clean} (from tag {v})')
           "
 
       - name: Initialize Tauri Android project
