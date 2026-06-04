@@ -249,8 +249,6 @@ jobs:
 
       - name: Build Tauri app
         working-directory: app
-        env:
-
         run: bunx tauri build ${{ matrix.tauri-args }}
 
       - name: Upload Linux artifacts
@@ -396,8 +394,6 @@ jobs:
 
       - name: Build Android APK
         working-directory: app
-        env:
-
         run: bunx tauri android build --apk
 
       - name: Upload Android APK
