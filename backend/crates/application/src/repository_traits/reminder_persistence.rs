@@ -15,4 +15,6 @@ pub trait ReminderPersistence: Send + Sync {
     async fn find_by_task_ids(&self, task_ids: Vec<Uuid>) -> PersistenceResult<Vec<Reminder>>;
 
     async fn update_reminder(&self, reminder: Reminder) -> PersistenceResult<()>;
+
+    async fn find_pending_by_user(&self, user_id: Uuid) -> PersistenceResult<Vec<Reminder>>;
 }

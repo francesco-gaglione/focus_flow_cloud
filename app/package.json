@@ -1,5 +1,5 @@
 {
-  "name": "pwa",
+  "name": "app",
   "private": true,
   "version": "1.1.0",
   "type": "module",
@@ -8,7 +8,10 @@
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-    "generate:types": "cd .. && TS_RS_EXPORT_DIR=../../../pwa/src/types/generated cargo test -p adapters --features ts 2>&1"
+    "generate:types": "cd .. && TS_RS_EXPORT_DIR=../../../app/src/types/generated cargo test -p adapters --features ts 2>&1",
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build"
   },
   "dependencies": {
     "@skeletonlabs/skeleton": "^4.15.2",
@@ -16,6 +19,8 @@
     "@sveltejs/kit": "^2.16.0",
     "@tailwindcss/vite": "^4.3.0",
     "@tanstack/svelte-query": "^5.80.0",
+    "@tauri-apps/api": "^2",
+    "@tauri-apps/plugin-notification": "^2.3.3",
     "axios": "^1.16.1",
     "clsx": "^2.1.1",
     "lucide-svelte": "^0.511.0",
@@ -27,6 +32,7 @@
   "devDependencies": {
     "@sveltejs/adapter-static": "^3.0.8",
     "@sveltejs/vite-plugin-svelte": "^5.0.0",
+    "@tauri-apps/cli": "^2",
     "@types/node": "^24.12.3",
     "svelte-check": "^4.0.0",
     "typescript": "~5.8.0",

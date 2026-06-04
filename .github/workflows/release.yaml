@@ -5,7 +5,7 @@ on:
     tags:
       - "v*"
       - "backend-v*"
-      - "pwa-v*"
+      - "app-v*"
 
 env:
   CARGO_TERM_COLOR: always
@@ -139,15 +139,15 @@ jobs:
       - name: Set up Bun
         uses: oven-sh/setup-bun@v2
 
-      - name: Build PWA for Docker image
-        working-directory: pwa
+      - name: Build App for Docker image
+        working-directory: app
         run: |
           bun install --frozen-lockfile
           bun run build
 
-      - name: Copy PWA build into Docker context
+      - name: Copy App build into Docker context
         working-directory: .
-        run: cp -r pwa/build backend/pwa-dist
+        run: cp -r app/build backend/pwa-dist
 
       - name: Extract version from Cargo.toml
         id: crate-version
@@ -193,40 +193,136 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh run cancel ${{ github.run_id }}
 
-  # PWA
-  pwa-build:
-    if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/pwa-v')
-    runs-on: ubuntu-latest
+  # APP — Desktop (Linux, macOS, Windows)
+  app-desktop:
+    if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/app-v')
     permissions:
       contents: write
       actions: write
-    defaults:
-      run:
-        working-directory: pwa
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: ubuntu-22.04
+            name: linux-x86_64
+            rust-targets: ''
+            tauri-args: ''
+          - platform: macos-latest
+            name: macos-aarch64
+            rust-targets: aarch64-apple-darwin
+            tauri-args: --target aarch64-apple-darwin
+          - platform: macos-latest
+            name: macos-x86_64
+            rust-targets: x86_64-apple-darwin
+            tauri-args: --target x86_64-apple-darwin
+          - platform: windows-latest
+            name: windows-x86_64
+            rust-targets: ''
+            tauri-args: ''
+    runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install Linux system dependencies
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libappindicator3-dev \
+            librsvg2-dev \
+            patchelf
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.rust-targets }}
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          key: ${{ runner.os }}-${{ matrix.name }}-tauri-${{ hashFiles('app/src-tauri/Cargo.lock') }}
+          workspaces: app/src-tauri -> target
 
       - name: Set up Bun
         uses: oven-sh/setup-bun@v2
 
-      - name: Install dependencies
+      - name: Install frontend dependencies
+        working-directory: app
         run: bun install --frozen-lockfile
 
-      - name: Type check
-        run: bun run check
+      - name: Build Tauri app
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+        with:
+          projectPath: app
+          tauriScript: bunx tauri
+          args: ${{ matrix.tauri-args }}
 
-      - name: Build
-        run: bun run build
+      - name: Cancel Workflow on Failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: gh run cancel ${{ github.run_id }}
 
-      - name: Package build output
-        working-directory: .
-        run: tar -czf pwa-build.tar.gz pwa/build/
+  # APP — Android
+  app-android:
+    if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/app-v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write
+    steps:
+      - uses: actions/checkout@v4
 
-      - name: Upload PWA artifact
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: temurin
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android NDK
+        run: |
+          sdkmanager "ndk;27.0.12077973"
+          echo "NDK_HOME=$ANDROID_HOME/ndk/27.0.12077973" >> $GITHUB_ENV
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          key: android-tauri-${{ hashFiles('app/src-tauri/Cargo.lock') }}
+          workspaces: app/src-tauri -> target
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install frontend dependencies
+        working-directory: app
+        run: bun install --frozen-lockfile
+
+      - name: Initialize Tauri Android project
+        working-directory: app
+        run: bunx tauri android init
+
+      - name: Build Android APK
+        working-directory: app
+        env:
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+        run: bunx tauri android build --apk
+
+      - name: Upload Android APK
         uses: actions/upload-artifact@v4
         with:
-          name: pwa-build
-          path: pwa-build.tar.gz
+          name: android-apk
+          path: app/src-tauri/gen/android/app/build/outputs/apk/universal/release/*.apk
           if-no-files-found: error
 
       - name: Cancel Workflow on Failure
@@ -238,10 +334,10 @@ jobs:
   # RELEASE
   publish-release:
     name: Publish Release
-    needs: [backend-build, pwa-build]
+    needs: [backend-build, app-desktop, app-android]
     if: |
       always() &&
-      (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/backend-v') || startsWith(github.ref, 'refs/tags/pwa-v')) &&
+      (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/backend-v') || startsWith(github.ref, 'refs/tags/app-v')) &&
       !contains(needs.*.result, 'failure') &&
       !contains(needs.*.result, 'cancelled')
     runs-on: ubuntu-latest
@@ -264,6 +360,11 @@ jobs:
           files: |
             release_assets/**/focus_flow_cloud-amd64
             release_assets/**/focus_flow_cloud-arm64
-            release_assets/**/pwa-build.tar.gz
+            release_assets/**/*.deb
+            release_assets/**/*.AppImage
+            release_assets/**/*.dmg
+            release_assets/**/*.exe
+            release_assets/**/*.msi
+            release_assets/**/*.apk
           generate_release_notes: true
           fail_on_unmatched_files: false

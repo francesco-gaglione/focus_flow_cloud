@@ -16,6 +16,7 @@ pub fn api_routes(state: AppState) -> Router<AppState> {
             "/push-subscriptions",
             crate::http::push_subscription::routes::router(),
         )
+        .nest("/reminders", crate::http::reminder::routes::router())
         .layer(axum::middleware::from_fn_with_state(state, auth_middleware));
 
     Router::new()

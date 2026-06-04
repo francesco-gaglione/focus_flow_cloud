@@ -1,24 +1,24 @@
-name: PWA CI
+name: App CI
 
 on:
   pull_request:
     branches: ["*"]
     paths:
-      - "pwa/**"
-      - ".github/workflows/ci-pwa.yaml"
+      - "app/**"
+      - ".github/workflows/ci-app.yaml"
   push:
     branches: ["master"]
     paths:
-      - "pwa/**"
-      - ".github/workflows/ci-pwa.yaml"
+      - "app/**"
+      - ".github/workflows/ci-app.yaml"
 
 jobs:
-  build:
+  check:
     if: "!contains(github.event.head_commit.message, 'chore: bump')"
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: pwa
+        working-directory: app
 
     steps:
       - uses: actions/checkout@v4
@@ -32,5 +32,5 @@ jobs:
       - name: Type check
         run: bun run check
 
-      - name: Build
+      - name: Build (SvelteKit only)
         run: bun run build

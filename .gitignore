@@ -3,12 +3,14 @@ backend/target/
 backend/.env
 target/
 
-# PWA (SvelteKit)
-pwa/node_modules/
-pwa/build/
-pwa/.svelte-kit/
-pwa/.env
-pwa/pwa-dist/
+# App (SvelteKit)
+app/node_modules/
+app/build/
+app/.svelte-kit/
+app/.env
+app/pwa-dist/
+app/src-tauri/target/
+app/src-tauri/gen/
 
 # Docs
 doc/node_modules/

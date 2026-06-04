@@ -4,6 +4,8 @@
     import { onMount } from "svelte";
     import { authStore } from "$lib/stores/auth";
     import { subscribeToPush } from "$lib/push";
+    import { requestNotificationPermission, isTauri as checkIsTauri } from "$lib/notifications";
+    import { startReminderPoller, stopReminderPoller } from "$lib/reminderPoller";
     import "../app.css";
 
     const { children } = $props();
@@ -23,21 +25,35 @@
         },
     });
 
+    const isTauri = checkIsTauri();
+
     onMount(() => {
-        if ("serviceWorker" in navigator && !import.meta.env.DEV) {
+        if (!isTauri && "serviceWorker" in navigator && !import.meta.env.DEV) {
             navigator.serviceWorker.register("/sw.js").catch(() => {});
+        }
+
+        if (isTauri) {
+            requestNotificationPermission().catch(() => {});
         }
 
         const unsubscribe = authStore.subscribe((state) => {
             if (state.isAuthenticated) {
-                console.log("subscribing to push notifications");
-                subscribeToPush().catch((e) =>
-                    console.error("[push] subscribe failed:", e),
-                );
+                if (isTauri) {
+                    startReminderPoller();
+                } else {
+                    subscribeToPush().catch((e) =>
+                        console.error("[push] subscribe failed:", e),
+                    );
+                }
+            } else {
+                stopReminderPoller();
             }
         });
 
-        return unsubscribe;
+        return () => {
+            unsubscribe();
+            stopReminderPoller();
+        };
     });
 </script>
 

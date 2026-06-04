@@ -6,3 +6,4 @@ export { categories } from "./categories";
 export { statsApi } from "./stats";
 export { users } from "./users";
 export { pushApi } from "./push";
+export { remindersApi } from "./reminders";
