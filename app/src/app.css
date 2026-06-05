@@ -41,6 +41,28 @@
         font-size: max(16px, 1em);
     }
 
+    /* Fix invisible date/time pickers on iOS WebView */
+    input[type="date"],
+    input[type="time"],
+    input[type="datetime-local"] {
+        color-scheme: dark;
+        -webkit-appearance: textfield;
+        appearance: textfield;
+        position: relative;
+        min-height: 2.5rem;
+        display: flex;
+        align-items: center;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator,
+    input[type="time"]::-webkit-calendar-picker-indicator,
+    input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+        opacity: 1 !important;
+        display: block !important;
+        cursor: pointer;
+        filter: invert(1);
+    }
+
     ::-webkit-scrollbar {
         width: 3px;
         height: 3px;
