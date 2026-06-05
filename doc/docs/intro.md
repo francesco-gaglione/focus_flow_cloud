@@ -57,6 +57,7 @@ FocusFlow is a cross-platform solution:
 | Linux | `.deb` / `.AppImage` |
 | Windows | `.exe` / `.msi` |
 | Android | `.apk` (enable Unknown Sources) |
+| iOS | Build from source + Sideloadly — [see guide](./getting-started#ios-install) |
 
 ## Open Source
 

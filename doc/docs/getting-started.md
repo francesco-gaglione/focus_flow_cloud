@@ -249,6 +249,36 @@ Android APKs are distributed outside the Play Store. To install:
 2. Transfer the `.apk` file to your device.
 3. Open and install it.
 
+### iOS Install
+
+iOS does not allow installing apps outside the App Store without an Apple Developer account ($99/year). There is no pre-built IPA in the releases.
+
+**Option A — Free (7-day expiry):**
+
+Requires a Mac with Xcode and [Sideloadly](https://sideloadly.io) or [AltStore](https://altstore.io).
+
+1. Clone the repo and build the IPA locally:
+
+   ```bash
+   git clone https://github.com/francesco-gaglione/focus_flow_cloud.git
+   cd focus_flow_cloud/app
+   bun install
+   bunx tauri ios init
+   bunx tauri ios build
+   ```
+
+   The IPA will be generated in `app/src-tauri/gen/apple/build/arm64/`.
+
+2. Connect your iPhone via USB.
+3. Open Sideloadly, drag the `.ipa` into it, sign with your free Apple ID, and install.
+4. On the iPhone, go to **Settings → General → VPN & Device Management** and trust the developer certificate.
+
+> **Note:** Apps signed with a free Apple ID expire after **7 days**. Repeat the signing step to renew.
+
+**Option B — Paid ($99/year):**
+
+With an Apple Developer account you can distribute via TestFlight (no expiry, up to 10,000 testers). See Apple's [TestFlight documentation](https://developer.apple.com/testflight/) for setup.
+
 ### Running locally (Development)
 
 Prerequisites: [Rust 1.77+](https://rustup.rs/), [Bun](https://bun.sh/), [Tauri prerequisites](https://tauri.app/start/prerequisites/) for your platform.
