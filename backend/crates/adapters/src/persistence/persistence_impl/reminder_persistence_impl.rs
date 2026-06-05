@@ -5,6 +5,7 @@ use crate::persistence::PostgresPersistence;
 use application::repository_traits::persistence_error::{PersistenceError, PersistenceResult};
 use application::repository_traits::reminder_persistence::ReminderPersistence;
 use async_trait::async_trait;
+use chrono::Utc;
 use diesel::{
     ExpressionMethods, NullableExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
     SelectableHelper,
@@ -84,6 +85,23 @@ impl ReminderPersistence for PostgresPersistence {
                         .assume_not_null()
                         .eq_any(&task_ids),
                 )
+                .select(DbReminder::as_select())
+                .load(conn)?;
+
+            Ok(db_reminders.into_iter().map(|r| r.into()).collect())
+        })
+        .await
+    }
+
+    #[instrument(skip(self))]
+    async fn find_pending_by_user(&self, user_id: Uuid) -> PersistenceResult<Vec<Reminder>> {
+        let now = Utc::now();
+
+        self.with_transaction(move |conn| {
+            let db_reminders: Vec<DbReminder> = schema::reminders::table
+                .filter(schema::reminders::user_id.eq(user_id))
+                .filter(schema::reminders::reminder_sent.eq(false))
+                .filter(schema::reminders::date.le(now))
                 .select(DbReminder::as_select())
                 .load(conn)?;
 

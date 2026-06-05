@@ -1,8 +1,16 @@
 ---
 sidebar_position: 2
-description: "Learn how to deploy FocusFlow with Docker Compose, configure the backend, and run or install the PWA."
+description: "Learn how to deploy FocusFlow with Docker Compose, configure the backend, and install the native app."
 keywords:
-  [focusflow, getting started, docker, deployment, self-hosting, pwa, sveltekit]
+  [
+    focusflow,
+    getting started,
+    docker,
+    deployment,
+    self-hosting,
+    tauri,
+    sveltekit,
+  ]
 ---
 
 # Getting Started
@@ -55,7 +63,7 @@ The easiest way to run the FocusFlow backend is using Docker Compose. This autom
           # Must be a long, random string
           - JWT_SECRET=change_me_to_a_secure_random_secret
 
-          # Web Push (VAPID)
+          # Web Push (VAPID) — used for browser push notifications
           # Generate with: npx web-push generate-vapid-keys
           - VAPID_PRIVATE_KEY=your_vapid_private_key
 
@@ -97,31 +105,30 @@ The easiest way to run the FocusFlow backend is using Docker Compose. This autom
     The backend uses JWT for authentication. You **MUST** provide a `JWT_SECRET` environment variable. Generate a strong random string (e.g., `openssl rand -base64 32`) and set it.
 
 3.  **Web Push (VAPID keys)**:
-    Push notifications require a VAPID key pair. Generate it once and store both keys permanently — regenerating them invalidates all existing browser subscriptions.
+    Push notifications for the browser require a VAPID key pair. Generate it once and store both keys permanently — regenerating them invalidates all existing browser subscriptions.
 
     ```bash
     npx web-push generate-vapid-keys
     ```
 
     This outputs:
+
     ```
-    Public Key:  BKq9se...   ← goes in PWA env as VITE_VAPID_PUBLIC_KEY
+    Public Key:  BKq9se...   ← safe to expose (not currently required for the native app)
     Private Key: 1772RK...   ← goes in backend env as VAPID_PRIVATE_KEY
     ```
 
-    The **private key** must only be set on the backend. The **public key** is used by the PWA to subscribe the browser and is safe to expose.
-
-3.  **Initial Admin User**:
+4.  **Initial Admin User**:
     Since registration is private, you can seed an initial admin user by setting the `ADMIN_USERNAME` and `ADMIN_PASSWORD` environment variables. The user will be created on startup if it doesn't exist.
 
-4.  **Start the services**:
+5.  **Start the services**:
     Run the following command in the same directory as your `docker-compose.yml`:
 
     ```bash
     docker-compose up -d
     ```
 
-5.  **Verify**:
+6.  **Verify**:
     The backend should now be running at `http://localhost:8080`.
     You can check the logs with: `docker-compose logs -f backend`
 
@@ -129,19 +136,19 @@ The easiest way to run the FocusFlow backend is using Docker Compose. This autom
 
 All environment variables required for the backend:
 
-| Variable            | Description                                 | Example                          |
-| :------------------ | :------------------------------------------ | :------------------------------- |
-| `SERVER_PORT`       | Port the server listens on                  | `8080`                           |
-| `CORS_ORIGIN`       | Allowed CORS origin                         | `*` or `https://app.example.com` |
-| `JWT_SECRET`        | Secret key for signing tokens               | `random_string`                  |
-| `DATABASE_BASE_URL` | Hostname and port of the database           | `db:5432`                        |
-| `POSTGRES_DB`       | Database name                               | `focusflow`                      |
-| `POSTGRES_USER`     | Database user                               | `focusflow`                      |
-| `POSTGRES_PASSWORD` | Database password                           | `secure_password`                |
-| `ADMIN_USERNAME`    | (Optional) Initial admin username           | `admin`                          |
-| `ADMIN_PASSWORD`    | (Optional) Initial admin password           | `password`                       |
+| Variable            | Description                                 | Example                                          |
+| :------------------ | :------------------------------------------ | :----------------------------------------------- |
+| `SERVER_PORT`       | Port the server listens on                  | `8080`                                           |
+| `CORS_ORIGIN`       | Allowed CORS origin                         | `*` or `https://app.example.com`                 |
+| `JWT_SECRET`        | Secret key for signing tokens               | `random_string`                                  |
+| `DATABASE_BASE_URL` | Hostname and port of the database           | `db:5432`                                        |
+| `POSTGRES_DB`       | Database name                               | `focusflow`                                      |
+| `POSTGRES_USER`     | Database user                               | `focusflow`                                      |
+| `POSTGRES_PASSWORD` | Database password                           | `secure_password`                                |
+| `ADMIN_USERNAME`    | (Optional) Initial admin username           | `admin`                                          |
+| `ADMIN_PASSWORD`    | (Optional) Initial admin password           | `password`                                       |
 | `VAPID_PRIVATE_KEY` | Private key for Web Push notifications      | generated via `npx web-push generate-vapid-keys` |
-| `OTLP_ENDPOINT`     | (Optional) OpenTelemetry collector endpoint | `http://localhost:4317`          |
+| `OTLP_ENDPOINT`     | (Optional) OpenTelemetry collector endpoint | `http://localhost:4317`                          |
 
 ### Observability (Optional)
 
@@ -164,14 +171,10 @@ Kubernetes manifests are provided in the [`k8s/`](https://github.com/francesco-g
 
 #### 1. Clone the repository
 
-Clone the repository
-
 ```bash
 git clone https://github.com/francesco-gaglione/focus_flow_cloud.git
 cd focus_flow_cloud/k8s
 ```
-
-or copy paste all 'yaml' files on your host.
 
 #### 2. Configure secrets and settings
 
@@ -180,7 +183,6 @@ Before applying, edit the files to match your environment:
 **`postgres-secret.yaml`** — base64-encoded database credentials:
 
 ```bash
-# Generate base64 values
 echo -n "your_user" | base64
 echo -n "your_password" | base64
 echo -n "your_db" | base64
@@ -212,13 +214,8 @@ kubectl apply -f focus-flow-cloud.yaml
 #### 4. Verify the deployment
 
 ```bash
-# Check all resources are running
 kubectl get all -n focus-flow-cloud
-
-# Check app logs
 kubectl logs -l app=focus-flow-cloud -n focus-flow-cloud
-
-# Check postgres logs
 kubectl logs -l app=postgres -n focus-flow-cloud
 ```
 
@@ -227,61 +224,85 @@ The backend will be available on the `NodePort` defined in `focus-flow-cloud.yam
 #### Production notes
 
 - **PersistentVolume**: The default manifest uses `hostPath` storage, which is only suitable for single-node clusters.
-- **Secrets management**: Consider using [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets) or an external secrets operator instead of committing base64 secrets to the repo.
+- **Secrets management**: Consider using [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets) or an external secrets operator.
 - **Ingress**: The default Service type is `NodePort`. For production, add an Ingress resource with TLS termination.
 
-## PWA
+## Native App
 
-The FocusFlow PWA is a [Progressive Web App](https://web.dev/progressive-web-apps/) built with SvelteKit. It connects to the backend and can be installed on any device directly from the browser — no app store required.
+FocusFlow is a native cross-platform application built with [Tauri v2](https://tauri.app/) + SvelteKit. It connects to any self-hosted FocusFlow backend.
 
-### Using the hosted PWA
+### Downloading
 
-Pre-built PWA releases are available on the [GitHub Releases](https://github.com/francesco-gaglione/focus_flow_cloud/releases) page as `pwa-build.tar.gz`. Extract and serve the `build/` folder with any static file server (nginx, Caddy, etc.).
+Pre-built binaries are available on the [GitHub Releases](https://github.com/francesco-gaglione/focus_flow_cloud/releases) page:
 
-### Installing the PWA
+| Platform              | File                   |
+| :-------------------- | :--------------------- |
+| macOS (Apple Silicon) | `.dmg`                 |
+| macOS (Intel)         | `.dmg`                 |
+| Linux (Debian/Ubuntu) | `.deb`                 |
+| Linux (universal)     | `.AppImage`            |
+| Windows               | `.exe` (NSIS) / `.msi` |
+| Android               | `.apk`                 |
 
-Once the PWA is served over HTTPS (or `localhost` for development):
+### First Launch
 
-1. Open the URL in a supported browser.
-2. You will see an **"Install"** button in the address bar (Chrome/Edge), or use the browser menu → **"Add to Home Screen"** (Safari on iOS).
-3. After installing, the app launches like a native app with its own window.
+On first launch you will see a **Connect to your server** screen. Enter the full URL of your backend (e.g. `https://api.example.com` or `http://192.168.1.100:8080`) and tap **Connect**. The app validates the connection before proceeding to the login screen.
 
-**Supported browsers**: Chrome 67+, Edge 79+, Safari 16.4+ (iOS/macOS), Firefox on Android.
+The server URL can be changed at any time from **Settings → Server**.
 
-> **Note**: PWA install requires HTTPS in production. On `localhost` the browser allows installation without TLS.
+### Android APK Install
 
-### Running locally
+Android APKs are distributed outside the Play Store. To install:
 
-Prerequisites: [Bun](https://bun.sh/)
+1. Enable **Install from unknown sources** in your device security settings.
+2. Transfer the `.apk` file to your device.
+3. Open and install it.
+
+### iOS Install
+
+iOS does not allow installing apps outside the App Store without an Apple Developer account ($99/year). There is no pre-built IPA in the releases.
+
+**Option A — Free (7-day expiry):**
+
+Requires a Mac with Xcode and [Sideloadly](https://sideloadly.io).
+
+1. Clone the repo and build the IPA locally:
+
+   ```bash
+   git clone https://github.com/francesco-gaglione/focus_flow_cloud.git
+   cd focus_flow_cloud/app
+   bun install
+   bunx tauri ios init
+   bunx tauri ios build
+   ```
+
+   The IPA will be generated in `app/src-tauri/gen/apple/build/arm64/`.
+
+2. Connect your iPhone via USB.
+3. Open Sideloadly, drag the `.ipa` into it, sign with your free Apple ID, and install.
+4. On the iPhone, go to **Settings → General → VPN & Device Management** and trust the developer certificate.
+
+> **Note:** Apps signed with a free Apple ID expire after **7 days**. Repeat the signing step to renew.
+
+**Option B — Paid ($99/year):**
+
+With an Apple Developer account you can distribute via TestFlight (no expiry, up to 10,000 testers). See Apple's [TestFlight documentation](https://developer.apple.com/testflight/) for setup.
+
+### Running locally (Development)
+
+Prerequisites: [Rust 1.77+](https://rustup.rs/), [Bun](https://bun.sh/), [Tauri prerequisites](https://tauri.app/start/prerequisites/) for your platform.
 
 ```bash
 git clone https://github.com/francesco-gaglione/focus_flow_cloud.git
-cd focus_flow_cloud/pwa
+cd focus_flow_cloud/app
 bun install
-bun run dev
+bun run tauri:dev
 ```
 
-The dev server starts at `http://localhost:5173`.
+On first launch, enter `http://localhost:8080` (or wherever your backend is running) as the server URL.
 
-To preview the production build (and test PWA install):
+To build a production binary:
 
 ```bash
-bun run build
-bun run preview
+bun run tauri:build
 ```
-
-### Environment
-
-The PWA reads configuration from environment variables. Create a `.env` file in `pwa/`:
-
-```env
-PUBLIC_API_BASE_URL=http://localhost:8080
-VITE_VAPID_PUBLIC_KEY=your_vapid_public_key
-```
-
-| Variable               | Description                                              |
-| :--------------------- | :------------------------------------------------------- |
-| `PUBLIC_API_BASE_URL`  | Backend public URL                                       |
-| `VITE_VAPID_PUBLIC_KEY`| VAPID public key for Web Push (pair of `VAPID_PRIVATE_KEY`) |
-
-In production, set these before building. The VAPID public key is generated together with the private key via `npx web-push generate-vapid-keys`.

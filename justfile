@@ -54,32 +54,28 @@ backend-check: backend-fmt-check backend-lint backend-test
     @echo "Backend checks passed!"
 
 # ============================================================================
-# PWA (SvelteKit)
+# APP (SvelteKit + Tauri)
 # ============================================================================
 
-# Run PWA dev server
-pwa-dev:
-    cd pwa && bun run dev
+# Run app dev server
+app-dev:
+    cd app && bun run tauri:dev
 
-# Build PWA for production
-pwa-build:
-    cd pwa && bun run build
+# Build app for production
+app-build:
+    cd app && bun run tauri:build
 
-# Preview PWA production build
-pwa-preview:
-    cd pwa && bun run preview
+# Type-check app
+app-check:
+    cd app && bun run check
 
-# Type-check PWA
-pwa-check:
-    cd pwa && bun run check
+# Install app dependencies
+app-install:
+    cd app && bun install
 
-# Install PWA dependencies
-pwa-install:
-    cd pwa && bun install
-
-# Generate PWA dto definitions
-pwa-generate-type:
-    cd pwa && bun run generate:types
+# Generate app dto definitions
+app-generate-type:
+    cd app && bun run generate:types
 
 # ============================================================================
 # Doc
@@ -98,15 +94,15 @@ doc-build:
 # Install all dependencies
 install:
     cd backend && cargo fetch
-    cd pwa && bun install
+    cd app && bun install
     @echo "Dependencies installed."
 
 # Run all tests
-test-all: backend-test pwa-check
+test-all: backend-test app-check
 
 # Check everything — mirrors CI pipeline exactly
 # Backend: fmt → clippy → llvm-cov (tests + coverage) → build
-# PWA:     type-check → build
+# App:     type-check → build
 check-all:
     @echo "=== Backend: fmt ==="
     cargo fmt --all -- --check
@@ -116,10 +112,10 @@ check-all:
     cargo llvm-cov --workspace --lcov --output-path lcov.info
     @echo "=== Backend: build ==="
     cargo build
-    @echo "=== PWA: type-check ==="
-    cd pwa && bun run check
-    @echo "=== PWA: build ==="
-    cd pwa && bun run build
+    @echo "=== App: type-check ==="
+    cd app && bun run check
+    @echo "=== App: build ==="
+    cd app && bun run build
     @echo "All checks passed!"
 
 # Build Docker image for backend
@@ -236,7 +232,7 @@ _bump_semver part target:
 
     # Paths
     be_cargo = 'backend/Cargo.toml'
-    pwa_pkg = 'pwa/package.json'
+    app_pkg = 'app/package.json'
 
     files_to_commit = []
     tag_name = ''
@@ -255,19 +251,19 @@ _bump_semver part target:
         if target == 'backend':
             tag_name = f'backend-v{next_v}'
 
-    # 2. Bump PWA
-    if target in ['pwa', 'both']:
-        curr = get_version(pwa_pkg, r'\"version\":\s*\"(.*?)\"')
+    # 2. Bump App
+    if target in ['app', 'both']:
+        curr = get_version(app_pkg, r'\"version\":\s*\"(.*?)\"')
         next_v = bump(curr, part)
-        print(f'Bumping PWA: {curr} -> {next_v}')
+        print(f'Bumping App: {curr} -> {next_v}')
 
-        with open(pwa_pkg, 'r') as f: s = f.read()
+        with open(app_pkg, 'r') as f: s = f.read()
         s = re.sub(r'(\"version\":\s*\")(.*?)(\")', f'\\\\g<1>{next_v}\\\\g<3>', s)
-        with open(pwa_pkg, 'w') as f: f.write(s)
+        with open(app_pkg, 'w') as f: f.write(s)
 
-        files_to_commit.append(pwa_pkg)
-        if target == 'pwa':
-            tag_name = f'pwa-v{next_v}'
+        files_to_commit.append(app_pkg)
+        if target == 'app':
+            tag_name = f'app-v{next_v}'
         # If target is both, use simple vX.Y.Z tag
 
     # 3. Determine Tag for 'both'

@@ -1,13 +1,13 @@
-# FocusFlow Cloud & PWA
+# FocusFlow
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Backend CI](https://github.com/francesco-gaglione/focus_flow_cloud/actions/workflows/ci-backend.yaml/badge.svg)](https://github.com/francesco-gaglione/focus_flow_cloud/actions)
-[![PWA CI](https://github.com/francesco-gaglione/focus_flow_cloud/actions/workflows/ci-pwa.yaml/badge.svg)](https://github.com/francesco-gaglione/focus_flow_cloud/actions)
+[![App CI](https://github.com/francesco-gaglione/focus_flow_cloud/actions/workflows/ci-app.yaml/badge.svg)](https://github.com/francesco-gaglione/focus_flow_cloud/actions)
 [![Documentation](https://img.shields.io/badge/docs-focusflow-brightgreen)](https://francesco-gaglione.github.io/focus_flow_cloud/)
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=flat&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/francescogaglione)
 [![codecov](https://codecov.io/gh/francesco-gaglione/focus_flow_cloud/branch/master/graph/badge.svg)](https://codecov.io/gh/francesco-gaglione/focus_flow_cloud)
 
-A comprehensive Pomodoro technique tracking solution featuring a Rust backend and a Progressive Web App (PWA). This monorepo contains both the cloud infrastructure and the client application.
+A comprehensive Pomodoro technique tracking solution featuring a Rust backend and a native cross-platform app built with Tauri v2 + SvelteKit. This monorepo contains both the cloud infrastructure and the client application.
 
 > **Full Documentation**: [https://francesco-gaglione.github.io/focus_flow_cloud/](https://francesco-gaglione.github.io/focus_flow_cloud/)
 
@@ -38,7 +38,7 @@ FocusFlow is a complete ecosystem for time management using the Pomodoro techniq
 - **Sync in Real-time**: Synchronize state across multiple devices using WebSockets.
 - **Organize Tasks**: Categorize, prioritize, and schedule your to-dos.
 - **Analyze Productivity**: View detailed statistics and patterns.
-- **Install as App**: Works as a PWA — install it on any device directly from the browser.
+- **Native Experience**: Download and install the native app on macOS, Windows, Linux, and Android.
 
 I built this project for my personal use to optimize my daily workflow and decided to share it as an open-source project.
 
@@ -47,7 +47,7 @@ I built this project for my personal use to optimize my daily workflow and decid
 This is a monorepo containing:
 
 - **[`backend/`](backend/)**: Server-side application built with Rust (Axum, Diesel, Tokio).
-- **[`pwa/`](pwa/)**: Progressive Web App built with SvelteKit + TypeScript.
+- **[`app/`](app/)**: Native cross-platform app built with Tauri v2 + SvelteKit + TypeScript.
 
 ## Features
 
@@ -57,20 +57,31 @@ This is a monorepo containing:
 - **Real-time Synchronization**: WebSocket broadcasting to all connected clients.
 - **RESTful API**: Documented via OpenAPI/Swagger.
 - **Clean Architecture**: Domain-driven design.
+- **Push Notifications**: Reminder delivery via Web Push (VAPID).
 
-### PWA
+### App
 
 - **Timer UI**: Clean, responsive interface for managing focus sessions.
 - **Task Management**: Create, edit, prioritize, and schedule tasks with category support.
 - **Calendar**: Month and week views with time-positioned task blocks colored by priority.
 - **Statistics**: Visual insights into your productivity (sessions, tasks by priority/category, overdue trend, peak hours).
-- **Installable**: Works offline and can be installed on any device (iOS, Android, Desktop) from the browser.
+- **Native Notifications**: System-level notifications for Pomodoro transitions and reminders.
+- **Cross-platform**: macOS, Windows, Linux, Android — download from [Releases](https://github.com/francesco-gaglione/focus_flow_cloud/releases).
+- **Self-hosted friendly**: On first launch, enter your backend URL — no config files needed.
 
-## Using the PWA
+## Downloading the App
 
-Once the backend is running, open the PWA URL in any modern browser. You will see an **"Install"** prompt (or use the browser menu → "Add to Home Screen") to install it as a native-like app.
+Pre-built binaries are available on the [GitHub Releases](https://github.com/francesco-gaglione/focus_flow_cloud/releases) page:
 
-Supported browsers: Chrome, Edge, Safari (iOS 16.4+), Firefox (Android).
+| Platform | File |
+| :--- | :--- |
+| macOS (Apple Silicon) | `.dmg` |
+| macOS (Intel) | `.dmg` |
+| Linux | `.deb` / `.AppImage` |
+| Windows | `.exe` / `.msi` |
+| Android | `.apk` |
+
+On first launch, enter your backend server URL to connect.
 
 ## Getting Started
 
@@ -93,6 +104,7 @@ services:
       - POSTGRES_DB=focusflow
       - JWT_SECRET=change_me
       - CORS_ORIGIN=*
+      - VAPID_PRIVATE_KEY=your_vapid_private_key
     ports: ["8080:8080"]
     depends_on: [db]
   db:
@@ -103,7 +115,7 @@ services:
       - POSTGRES_DB=focusflow
 ```
 
-After starting the backend, serve the PWA build (from `pwa/build/`) via any static file server (nginx, Caddy, etc.) or run it locally with `bun run preview`.
+After starting the backend, download the app from [Releases](https://github.com/francesco-gaglione/focus_flow_cloud/releases), install it, and enter your server URL on first launch.
 
 ### Self-Hosting with Kubernetes
 
@@ -121,21 +133,20 @@ kubectl apply -f focus-flow-cloud-config.yaml
 kubectl apply -f focus-flow-cloud.yaml
 ```
 
-Edit `postgres-secret.yaml`, `focus-flow-cloud-secret.yaml`, and `focus-flow-cloud-config.yaml` with your own values before applying. See the [full Kubernetes guide](doc/docs/getting-started.md#kubernetes) for details.
-
 ### Development Setup
 
 We use [`just`](https://github.com/casey/just) to manage commands for the entire repository.
 
-**Prerequisites**: Rust 1.70+, [Bun](https://bun.sh/), Docker.
+**Prerequisites**: Rust 1.77+, [Bun](https://bun.sh/), Docker, [Tauri prerequisites](https://tauri.app/start/prerequisites/) for your platform.
 
 **Quick Commands**:
 
-| Command            | Description                  |
-| :----------------- | :--------------------------- |
+| Command | Description |
+| :--- | :--- |
 | `just backend-run` | Run the Rust backend locally |
-| `just pwa-dev`     | Start the PWA dev server     |
-| `just test-all`    | Run all tests                |
+| `just app-dev` | Start the SvelteKit dev server |
+| `just app-tauri-dev` | Run the full Tauri desktop app in dev mode |
+| `just test-all` | Run all tests |
 
 #### 1. Setup Backend (Local)
 
@@ -147,19 +158,21 @@ We use [`just`](https://github.com/casey/just) to manage commands for the entire
    ```
 3. **Run**: `just backend-run`
 
-#### 2. Setup PWA (Local)
+#### 2. Setup App (Local)
 
-1. Install dependencies: `cd pwa && bun install`
-2. Start dev server: `bun run dev`
-3. The PWA is available at `http://localhost:5173`
+```bash
+cd app
+bun install
+bun run tauri:dev   # launches Tauri desktop app with hot-reload
+```
 
-> For PWA install to work locally, use `bun run preview` after `bun run build` (requires HTTPS or localhost).
+On first launch, enter `http://localhost:8080` as the server URL.
 
 ## Contributing
 
 Contributions are welcome! This monorepo allows you to work on the full stack.
 
-- If you change the API, please ensure the PWA client is updated accordingly.
+- If you change the API, update the app client accordingly.
 - Run `just test-all` before submitting a PR.
 
 ### Commit Guidelines

@@ -9,6 +9,7 @@ use application::use_cases::pomodoro_state::terminate_session::TerminateSessionU
 use application::use_cases::pomodoro_state::update_current_session::UpdateSessionUseCase;
 use application::use_cases::pomodoro_state::update_pomodoro_context::UpdatePomodoroContextUseCase;
 use application::use_cases::push_subscription::save_push_subscription::SavePushSubscriptionUseCase;
+use application::use_cases::reminder::get_pending_reminders::GetPendingRemindersUseCase;
 use application::use_cases::stats::get_stats::GetStatsUseCase;
 use application::use_cases::task::add_subtask::AddSubTaskUseCase;
 use application::use_cases::task::get_tasks::GetTasksUseCase;
@@ -95,6 +96,9 @@ pub struct AppState {
 
     // Push Subscription Use Cases
     pub save_push_subscription_uc: Arc<SavePushSubscriptionUseCase>,
+
+    // Reminder Use Cases
+    pub get_pending_reminders_uc: Arc<GetPendingRemindersUseCase>,
 
     // Services
     pub token_service: Arc<dyn TokenService>,

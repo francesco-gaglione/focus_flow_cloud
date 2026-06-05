@@ -5,7 +5,7 @@ on:
     tags:
       - "v*"
       - "backend-v*"
-      - "pwa-v*"
+      - "app-v*"
 
 env:
   CARGO_TERM_COLOR: always
@@ -65,30 +65,20 @@ jobs:
 
       - name: Configure System
         run: |
-          # Add arm64 architecture
           sudo dpkg --add-architecture arm64
-
-          # Remove default sources and conflicting PGDG (Postgres) sources
           sudo rm -f /etc/apt/sources.list.d/ubuntu.sources
           sudo rm -f /etc/apt/sources.list.d/pgdg.sources.list
-
-          # Rewrite sources.list to strictly separate architectures
-          # amd64 -> archive.ubuntu.com / azure.archive.ubuntu.com
-          # arm64 -> ports.ubuntu.com
           sudo tee /etc/apt/sources.list <<EOF
           deb [arch=amd64] http://azure.archive.ubuntu.com/ubuntu/ $(lsb_release -cs) main restricted universe multiverse
           deb [arch=amd64] http://azure.archive.ubuntu.com/ubuntu/ $(lsb_release -cs)-updates main restricted universe multiverse
           deb [arch=amd64] http://azure.archive.ubuntu.com/ubuntu/ $(lsb_release -cs)-backports main restricted universe multiverse
           deb [arch=amd64] http://azure.archive.ubuntu.com/ubuntu/ $(lsb_release -cs)-security main restricted universe multiverse
-
           deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release -cs) main restricted universe multiverse
           deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release -cs)-updates main restricted universe multiverse
           deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release -cs)-backports main restricted universe multiverse
           deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release -cs)-security main restricted universe multiverse
           EOF
-
           sudo apt-get update
-          # Explicitly remove conflicting libpq packages to ensure clean state
           sudo apt-get remove -y libpq-dev libpq5
           sudo apt-get autoremove -y
 
@@ -107,7 +97,6 @@ jobs:
         run: |
           sudo apt-get install -y libpq-dev
           cargo build --release --target x86_64-unknown-linux-gnu --package focus_flow_cloud
-          # Remove amd64 libs to clean up for arm64 build
           sudo apt-get remove -y libpq-dev libpq5
 
       - name: Build binaries (arm64)
@@ -139,15 +128,15 @@ jobs:
       - name: Set up Bun
         uses: oven-sh/setup-bun@v2
 
-      - name: Build PWA for Docker image
-        working-directory: pwa
+      - name: Build App for Docker image
+        working-directory: app
         run: |
           bun install --frozen-lockfile
           bun run build
 
-      - name: Copy PWA build into Docker context
+      - name: Copy App build into Docker context
         working-directory: .
-        run: cp -r pwa/build backend/pwa-dist
+        run: cp -r app/build backend/pwa-dist
 
       - name: Extract version from Cargo.toml
         id: crate-version
@@ -193,40 +182,289 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh run cancel ${{ github.run_id }}
 
-  # PWA
-  pwa-build:
-    if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/pwa-v')
-    runs-on: ubuntu-latest
+  # APP — Desktop (Linux, macOS, Windows)
+  app-desktop:
+    if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/app-v')
     permissions:
       contents: write
       actions: write
-    defaults:
-      run:
-        working-directory: pwa
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: ubuntu-22.04
+            name: linux-x86_64
+            rust-targets: ''
+            tauri-args: ''
+            bundle-path: app/src-tauri/target/release/bundle
+
+          - platform: macos-latest
+            name: macos-aarch64
+            rust-targets: aarch64-apple-darwin
+            tauri-args: --target aarch64-apple-darwin
+            bundle-path: app/src-tauri/target/aarch64-apple-darwin/release/bundle
+
+          - platform: macos-latest
+            name: macos-x86_64
+            rust-targets: x86_64-apple-darwin
+            tauri-args: --target x86_64-apple-darwin
+            bundle-path: app/src-tauri/target/x86_64-apple-darwin/release/bundle
+
+          - platform: windows-latest
+            name: windows-x86_64
+            rust-targets: ''
+            tauri-args: ''
+            bundle-path: app/src-tauri/target/release/bundle
+
+    runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install Linux system dependencies
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libappindicator3-dev \
+            librsvg2-dev \
+            patchelf
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.rust-targets }}
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          key: ${{ runner.os }}-${{ matrix.name }}-tauri-${{ hashFiles('app/src-tauri/Cargo.lock') }}
+          workspaces: app/src-tauri -> target
 
       - name: Set up Bun
         uses: oven-sh/setup-bun@v2
 
-      - name: Install dependencies
+      - name: Install frontend dependencies
+        working-directory: app
         run: bun install --frozen-lockfile
 
-      - name: Type check
-        run: bun run check
+      - name: Set version from tag
+        shell: bash
+        run: |
+          TAG="${{ github.ref_name }}"
+          VERSION="${TAG#app-v}"
+          VERSION="${VERSION#v}"
+          python3 -c "
+          import json, re
+          v = '$VERSION'
+          # MSI (WiX) requires numeric-only pre-release — strip pre-release suffix entirely
+          v_clean = v.split('-')[0]
+          with open('app/src-tauri/tauri.conf.json') as f:
+              cfg = json.load(f)
+          cfg['version'] = v_clean
+          with open('app/src-tauri/tauri.conf.json', 'w') as f:
+              json.dump(cfg, f, indent=2)
+          with open('app/src-tauri/Cargo.toml') as f:
+              content = f.read()
+          content = re.sub(r'^version = \".*\"', f'version = \"{v_clean}\"', content, flags=re.MULTILINE, count=1)
+          with open('app/src-tauri/Cargo.toml', 'w') as f:
+              f.write(content)
+          print(f'Version set to {v_clean} (from tag {v})')
+          "
 
-      - name: Build
-        run: bun run build
+      - name: Build Tauri app
+        working-directory: app
+        run: bunx tauri build ${{ matrix.tauri-args }}
 
-      - name: Package build output
-        working-directory: .
-        run: tar -czf pwa-build.tar.gz pwa/build/
-
-      - name: Upload PWA artifact
+      - name: Upload Linux artifacts
+        if: matrix.platform == 'ubuntu-22.04'
         uses: actions/upload-artifact@v4
         with:
-          name: pwa-build
-          path: pwa-build.tar.gz
+          name: desktop-${{ matrix.name }}
+          path: |
+            ${{ matrix.bundle-path }}/deb/*.deb
+            ${{ matrix.bundle-path }}/appimage/*.AppImage
+          if-no-files-found: error
+
+      - name: Upload macOS artifacts
+        if: startsWith(matrix.platform, 'macos')
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-${{ matrix.name }}
+          path: ${{ matrix.bundle-path }}/dmg/*.dmg
+          if-no-files-found: error
+
+      - name: Upload Windows artifacts
+        if: matrix.platform == 'windows-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-${{ matrix.name }}
+          path: |
+            ${{ matrix.bundle-path }}/nsis/*.exe
+            ${{ matrix.bundle-path }}/msi/*.msi
+          if-no-files-found: error
+
+      - name: Cancel Workflow on Failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: gh run cancel ${{ github.run_id }}
+
+  # APP — Android
+  app-android:
+    if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/app-v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: temurin
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android NDK
+        run: |
+          sdkmanager "ndk;27.0.12077973"
+          echo "NDK_HOME=$ANDROID_HOME/ndk/27.0.12077973" >> $GITHUB_ENV
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          key: android-tauri-${{ hashFiles('app/src-tauri/Cargo.lock') }}
+          workspaces: app/src-tauri -> target
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install frontend dependencies
+        working-directory: app
+        run: bun install --frozen-lockfile
+
+      - name: Set version from tag
+        run: |
+          TAG="${{ github.ref_name }}"
+          VERSION="${TAG#app-v}"
+          VERSION="${VERSION#v}"
+          python3 -c "
+          import json, re
+          v = '$VERSION'
+          # MSI (WiX) requires numeric-only pre-release — strip pre-release suffix entirely
+          v_clean = v.split('-')[0]
+          with open('app/src-tauri/tauri.conf.json') as f:
+              cfg = json.load(f)
+          cfg['version'] = v_clean
+          with open('app/src-tauri/tauri.conf.json', 'w') as f:
+              json.dump(cfg, f, indent=2)
+          with open('app/src-tauri/Cargo.toml') as f:
+              content = f.read()
+          content = re.sub(r'^version = \".*\"', f'version = \"{v_clean}\"', content, flags=re.MULTILINE, count=1)
+          with open('app/src-tauri/Cargo.toml', 'w') as f:
+              f.write(content)
+          print(f'Version set to {v_clean} (from tag {v})')
+          "
+
+      - name: Initialize Tauri Android project
+        working-directory: app
+        run: bunx tauri android init
+
+      - name: Configure Android cleartext HTTP
+        run: |
+          XML_DIR="app/src-tauri/gen/android/app/src/main/res/xml"
+          mkdir -p "$XML_DIR"
+          cat > "$XML_DIR/network_security_config.xml" << 'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <network-security-config>
+              <base-config cleartextTrafficPermitted="true">
+                  <trust-anchors>
+                      <certificates src="system" />
+                  </trust-anchors>
+              </base-config>
+          </network-security-config>
+          EOF
+          MANIFEST="app/src-tauri/gen/android/app/src/main/AndroidManifest.xml"
+          sed -i 's/<application/<application android:networkSecurityConfig="@xml\/network_security_config"/' "$MANIFEST"
+
+      - name: Set up Android signing
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KS_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD || 'focusflow-ci' }}
+          KS_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS || 'focusflow' }}
+          KS_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD || 'focusflow-ci' }}
+        run: |
+          KEYSTORE_PATH="${{ github.workspace }}/app/src-tauri/gen/android/keystore.jks"
+
+          if [ -n "$ANDROID_KEYSTORE_BASE64" ]; then
+            echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$KEYSTORE_PATH"
+          else
+            keytool -genkey -v \
+              -keystore "$KEYSTORE_PATH" \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -alias "$KS_ALIAS" \
+              -storepass "$KS_PASSWORD" \
+              -keypass "$KS_KEY_PASSWORD" \
+              -dname "CN=FocusFlow, OU=Dev, O=FocusFlow, L=Unknown, ST=Unknown, C=IT"
+          fi
+
+          echo "ANDROID_KEYSTORE_PATH=$KEYSTORE_PATH" >> $GITHUB_ENV
+          echo "ANDROID_KEYSTORE_PASSWORD=$KS_PASSWORD" >> $GITHUB_ENV
+          echo "ANDROID_KEY_ALIAS=$KS_ALIAS" >> $GITHUB_ENV
+          echo "ANDROID_KEY_PASSWORD=$KS_KEY_PASSWORD" >> $GITHUB_ENV
+
+      - name: Inject signing config into build.gradle.kts
+        run: |
+          python3 - <<'PYEOF'
+          import re
+
+          path = "app/src-tauri/gen/android/app/build.gradle.kts"
+          with open(path) as f:
+              content = f.read()
+
+          signing_block = '''    signingConfigs {
+              create("release") {
+                  storeFile = file(System.getenv("ANDROID_KEYSTORE_PATH")!!)
+                  storePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD")!!
+                  keyAlias = System.getenv("ANDROID_KEY_ALIAS")!!
+                  keyPassword = System.getenv("ANDROID_KEY_PASSWORD")!!
+              }
+          }
+          '''
+
+          # Add signingConfig ref inside release buildType
+          content = re.sub(
+              r'(getByName\("release"\)\s*\{)',
+              r'\1\n            signingConfig = signingConfigs.getByName("release")',
+              content
+          )
+
+          # Insert signingConfigs block before buildTypes
+          content = content.replace("    buildTypes {", signing_block + "    buildTypes {", 1)
+
+          with open(path, "w") as f:
+              f.write(content)
+
+          print("Signing config injected.")
+          PYEOF
+
+      - name: Build Android APK
+        working-directory: app
+        run: bunx tauri android build --apk
+
+      - name: Upload Android APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: app/src-tauri/gen/android/app/build/outputs/apk/universal/release/*.apk
           if-no-files-found: error
 
       - name: Cancel Workflow on Failure
@@ -238,10 +476,10 @@ jobs:
   # RELEASE
   publish-release:
     name: Publish Release
-    needs: [backend-build, pwa-build]
+    needs: [backend-build, app-desktop, app-android]
     if: |
       always() &&
-      (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/backend-v') || startsWith(github.ref, 'refs/tags/pwa-v')) &&
+      (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/backend-v') || startsWith(github.ref, 'refs/tags/app-v')) &&
       !contains(needs.*.result, 'failure') &&
       !contains(needs.*.result, 'cancelled')
     runs-on: ubuntu-latest
@@ -264,6 +502,11 @@ jobs:
           files: |
             release_assets/**/focus_flow_cloud-amd64
             release_assets/**/focus_flow_cloud-arm64
-            release_assets/**/pwa-build.tar.gz
+            release_assets/**/*.deb
+            release_assets/**/*.AppImage
+            release_assets/**/*.dmg
+            release_assets/**/*.exe
+            release_assets/**/*.msi
+            release_assets/**/*.apk
           generate_release_notes: true
           fail_on_unmatched_files: false

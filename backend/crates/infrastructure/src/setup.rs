@@ -7,6 +7,7 @@ use application::use_cases::pomodoro_state::terminate_session::TerminateSessionU
 use application::use_cases::pomodoro_state::update_current_session::UpdateSessionUseCase;
 use application::use_cases::pomodoro_state::update_pomodoro_context::UpdatePomodoroContextUseCase;
 use application::use_cases::push_subscription::save_push_subscription::SavePushSubscriptionUseCase;
+use application::use_cases::reminder::get_pending_reminders::GetPendingRemindersUseCase;
 use application::use_cases::stats::get_stats::GetStatsUseCase;
 use application::use_cases::task::add_subtask::AddSubTaskUseCase;
 use application::use_cases::task::get_tasks::GetTasksUseCase;
@@ -138,6 +139,7 @@ pub async fn init_app_state(
     let delete_tasks_uc = Arc::new(DeleteTaskUseCase::new(postgres_arc.clone()));
     let save_push_subscription_uc =
         Arc::new(SavePushSubscriptionUseCase::new(postgres_arc.clone()));
+    let get_pending_reminders_uc = Arc::new(GetPendingRemindersUseCase::new(postgres_arc.clone()));
     let update_task_uc = Arc::new(UpdateTaskUseCase::new(postgres_arc.clone()));
     let update_subtask_uc = Arc::new(UpdateSubTaskUseCase::new(postgres_arc.clone()));
     let add_subtask_uc = Arc::new(AddSubTaskUseCase::new(postgres_arc.clone()));
@@ -258,6 +260,7 @@ pub async fn init_app_state(
         update_user_username_uc,
         get_user_info_uc,
         save_push_subscription_uc,
+        get_pending_reminders_uc,
         token_service,
         version,
     })
