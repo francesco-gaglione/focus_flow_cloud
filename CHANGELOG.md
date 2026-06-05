@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.1] - 2026-06-05
+
+### Bug Fixes
+
+- Disabled zoom
+-  fix: date picker components are now visible
+- App icon
+
+### Other
+
+- Ios installation info
+
 ## [1.2.0] - 2026-06-04
 
 ### Other
