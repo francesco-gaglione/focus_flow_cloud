@@ -1,11 +1,5 @@
 use uuid::Uuid;
 
-//TODO guarda la chat con claude sulla destra.
-// Io credo che il tree deve essere logica di dominio e non mi piace come lo suggerisce claude, secondo me bisogna costruire un vero e proprio albero.
-// Pero il probleblema é che é davvero pesante caricare in memoria tutto l'albero anche per fare operazioni stupide, quindi devo inventarmi una struttura inteliggente
-// quindi quando carico l'albero non carica tutti i dati ma carica magari solo i metadati e quando fa delle operazioni per cui servono i dati allora li carica al volo.
-// Cosi facendo magari posso ottimizzare ancora di piu e magari caricare metadati e dati sepratamente cosi ottimizzo ancora di  piu che se devo fare operazioni in cui mi servono solo metadati é unitile caricare tutto
-
 pub struct Folder<T> {
     id: Uuid,
     user_id: Uuid,
