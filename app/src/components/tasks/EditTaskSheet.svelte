@@ -2,6 +2,8 @@
     import { createMutation, useQueryClient } from "@tanstack/svelte-query";
     import type { TaskDto, TaskPriority, TaskScheduleDto } from "@/types";
     import { tasks } from "@/lib/api";
+    import DateInput from "@/components/DateInput.svelte";
+    import TimeInput from "@/components/TimeInput.svelte";
 
     const {
         task,
@@ -205,24 +207,12 @@
                     {/each}
                 </div>
                 {#if scheduleType === "AllDay"}
-                    <input
-                        type="date"
-                        class="input w-full text-sm"
-                        bind:value={scheduleDate}
-                    />
+                    <DateInput bind:value={scheduleDate} class="w-full" />
                 {/if}
                 {#if scheduleType === "At" || scheduleType === "Span"}
                     <div class="flex gap-2">
-                        <input
-                            type="date"
-                            class="input flex-1 text-sm"
-                            bind:value={scheduleDate}
-                        />
-                        <input
-                            type="time"
-                            class="input flex-1 text-sm"
-                            bind:value={scheduleTime}
-                        />
+                        <DateInput bind:value={scheduleDate} class="flex-1" />
+                        <TimeInput bind:value={scheduleTime} class="flex-1" />
                     </div>
                 {/if}
                 {#if scheduleType === "Span"}
