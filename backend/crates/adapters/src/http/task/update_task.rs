@@ -5,7 +5,7 @@ use crate::http::dto::common::task_dto::{
 use crate::http::validators::validate_uuid::validate_uuid;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::TASK_TAG;
-use application::use_cases::task::update_task::{UpdateTaskCommand, UpdateTaskError};
+use application::tasks::use_cases::task::update_task::{UpdateTaskCommand, UpdateTaskError};
 use axum::extract::{Path, State};
 use axum::Json;
 use domain::tasks::entities::task_priority::TaskPriority as DomainPriority;

@@ -3,7 +3,7 @@ use crate::http::model::session_model::UserSession;
 use crate::http::validators::validate_uuid::validate_uuid;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::TASK_TAG;
-use application::use_cases::task::update_subtask::{UpdateSubTaskCommand, UpdateSubTaskError};
+use application::tasks::use_cases::task::update_subtask::{UpdateSubTaskCommand, UpdateSubTaskError};
 use axum::extract::Path;
 use axum::{extract::State, Extension, Json};
 use serde::{Deserialize, Serialize};

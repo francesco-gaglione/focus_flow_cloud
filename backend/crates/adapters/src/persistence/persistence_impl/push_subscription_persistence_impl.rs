@@ -3,8 +3,8 @@ use crate::persistence::db_models::db_push_subscription::{
 };
 use crate::persistence::schema;
 use crate::persistence::PostgresPersistence;
-use application::repository_traits::persistence_error::{PersistenceError, PersistenceResult};
-use application::repository_traits::push_subscription_persistence::PushSubscriptionPersistence;
+use application::shared::traits::persistence_error::{PersistenceError, PersistenceResult};
+use application::shared::traits::push_subscription_persistence::PushSubscriptionPersistence;
 use async_trait::async_trait;
 use chrono::Utc;
 use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper};
@@ -84,7 +84,7 @@ mod tests {
     use crate::persistence::db_models::db_user::NewDbUser;
     use crate::persistence::persistence_impl::persistence::postgres_persistence;
     use crate::persistence::schema;
-    use application::repository_traits::push_subscription_persistence::PushSubscriptionPersistence;
+    use application::shared::traits::push_subscription_persistence::PushSubscriptionPersistence;
     use diesel::RunQueryDsl;
     use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
     use domain::tasks::entities::push_subscription::PushSubscription;

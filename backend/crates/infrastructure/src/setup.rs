@@ -1,40 +1,33 @@
-use application::use_cases::category::get_all_category_usecase::GetAllCategoryUseCases;
-use application::use_cases::focus_session::update_focus_session::UpdateFocusSessionUseCase;
-use application::use_cases::pomodoro_state::fetch_user_pomodoro_state::FetchUserPomodoroStateUseCase;
-use application::use_cases::pomodoro_state::init_pomodoro_state::InitPomodoroStateUseCase;
-use application::use_cases::pomodoro_state::start_session::StartSessionUseCase;
-use application::use_cases::pomodoro_state::terminate_session::TerminateSessionUseCase;
-use application::use_cases::pomodoro_state::update_current_session::UpdateSessionUseCase;
-use application::use_cases::pomodoro_state::update_pomodoro_context::UpdatePomodoroContextUseCase;
-use application::use_cases::push_subscription::save_push_subscription::SavePushSubscriptionUseCase;
-use application::use_cases::reminder::get_pending_reminders::GetPendingRemindersUseCase;
-use application::use_cases::stats::get_stats::GetStatsUseCase;
-use application::use_cases::task::add_subtask::AddSubTaskUseCase;
-use application::use_cases::task::get_tasks::GetTasksUseCase;
-use application::use_cases::task::update_subtask::UpdateSubTaskUseCase;
-use application::use_cases::user::get_user_info::GetUserInfoUseCase;
-use application::use_cases::user::refresh_token::RefreshTokenUseCase;
-use application::use_cases::user::register_user::RegisterUserUseCase;
-use application::use_cases::user::update_password::UpdateUserPasswordUseCase;
-use application::use_cases::user::update_user_username::UpdateUserUsernameUseCase;
-use application::use_cases::user_settings::get_settings::GetSettingsUseCase;
-use application::use_cases::user_settings::update_setting::UpdateSettingUseCase;
-use application::use_cases::{
-    category::{
-        create_category_usecase::CreateCategoryUseCases,
-        delete_categories_usecase::DeleteCategoriesUseCases,
-        update_category_usecase::UpdateCategoryUseCases,
-    },
-    focus_session::{
-        create_manual_session::CreateManualSessionUseCase,
-        find_sessions_by_filters::FindSessionsByFiltersUseCase,
-    },
-    task::{
-        create_task::CreateTaskUseCase, delete_task::DeleteTaskUseCase,
-        update_task::UpdateTaskUseCase,
-    },
-    user::login_user::LoginUseCase,
-};
+use application::tasks::use_cases::category::get_all_category_usecase::GetAllCategoryUseCases;
+use application::tasks::use_cases::focus_session::update_focus_session::UpdateFocusSessionUseCase;
+use application::tasks::use_cases::pomodoro_state::fetch_user_pomodoro_state::FetchUserPomodoroStateUseCase;
+use application::tasks::use_cases::pomodoro_state::init_pomodoro_state::InitPomodoroStateUseCase;
+use application::tasks::use_cases::pomodoro_state::start_session::StartSessionUseCase;
+use application::tasks::use_cases::pomodoro_state::terminate_session::TerminateSessionUseCase;
+use application::tasks::use_cases::pomodoro_state::update_current_session::UpdateSessionUseCase;
+use application::tasks::use_cases::pomodoro_state::update_pomodoro_context::UpdatePomodoroContextUseCase;
+use application::shared::use_cases::push_subscription::save_push_subscription::SavePushSubscriptionUseCase;
+use application::shared::use_cases::reminder::get_pending_reminders::GetPendingRemindersUseCase;
+use application::tasks::use_cases::stats::get_stats::GetStatsUseCase;
+use application::tasks::use_cases::task::add_subtask::AddSubTaskUseCase;
+use application::tasks::use_cases::task::get_tasks::GetTasksUseCase;
+use application::tasks::use_cases::task::update_subtask::UpdateSubTaskUseCase;
+use application::user::use_cases::user::get_user_info::GetUserInfoUseCase;
+use application::user::use_cases::user::refresh_token::RefreshTokenUseCase;
+use application::user::use_cases::user::register_user::RegisterUserUseCase;
+use application::user::use_cases::user::update_password::UpdateUserPasswordUseCase;
+use application::user::use_cases::user::update_user_username::UpdateUserUsernameUseCase;
+use application::user::use_cases::user_settings::get_settings::GetSettingsUseCase;
+use application::user::use_cases::user_settings::update_setting::UpdateSettingUseCase;
+use application::tasks::use_cases::category::create_category_usecase::CreateCategoryUseCases;
+use application::tasks::use_cases::category::delete_categories_usecase::DeleteCategoriesUseCases;
+use application::tasks::use_cases::category::update_category_usecase::UpdateCategoryUseCases;
+use application::tasks::use_cases::focus_session::create_manual_session::CreateManualSessionUseCase;
+use application::tasks::use_cases::focus_session::find_sessions_by_filters::FindSessionsByFiltersUseCase;
+use application::tasks::use_cases::task::create_task::CreateTaskUseCase;
+use application::tasks::use_cases::task::delete_task::DeleteTaskUseCase;
+use application::tasks::use_cases::task::update_task::UpdateTaskUseCase;
+use application::user::use_cases::user::login_user::LoginUseCase;
 use opentelemetry::global;
 use opentelemetry::trace::TracerProvider as _;
 use opentelemetry_otlp::WithExportConfig;
@@ -60,9 +53,9 @@ use adapters::persistence::persistence_impl::pomodoro_state_in_memory_impl::Pomo
 use adapters::persistence::persistence_impl::reminder_worker_port_impl::{
     spawn_reminder_worker, ReminderWorkerPortImpl,
 };
-use application::auth_traits::password_hasher::PasswordHasher;
-use application::repository_traits::user_persistence::UserPersistence;
-use application::use_cases::pomodoro_state::pause_session::PauseSessionUseCase;
+use application::user::traits::password_hasher::PasswordHasher;
+use application::user::traits::user_persistence::UserPersistence;
+use application::tasks::use_cases::pomodoro_state::pause_session::PauseSessionUseCase;
 use tracing_log::LogTracer;
 use tracing_subscriber::{layer::SubscriberExt, EnvFilter};
 

@@ -2,7 +2,7 @@ use crate::http::app_state::AppState;
 use crate::http::model::session_model::UserSession;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::USERS_TAG;
-use application::use_cases::user::update_password::{
+use application::user::use_cases::user::update_password::{
     UpdatePasswordError, UpdateUserPasswordCommand,
 };
 use axum::extract::{Extension, State};

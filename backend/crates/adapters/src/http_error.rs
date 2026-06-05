@@ -1,4 +1,4 @@
-use application::repository_traits::persistence_error::PersistenceError;
+use application::shared::traits::persistence_error::PersistenceError;
 use axum::{
     response::{IntoResponse, Response},
     Json,

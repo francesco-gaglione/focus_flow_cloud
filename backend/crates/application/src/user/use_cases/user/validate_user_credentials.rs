@@ -1,0 +1,170 @@
+use std::sync::Arc;
+
+use crate::user::traits::password_hasher::{HashingError, PasswordHasher};
+use crate::shared::traits::persistence_error::PersistenceError;
+use crate::user::traits::user_persistence::UserPersistence;
+use secrecy::{ExposeSecret, SecretBox};
+use thiserror::Error;
+use tracing::info;
+
+#[derive(Debug, Error)]
+pub enum ValidateUserCredentialsError {
+    #[error("Invalid user parameters")]
+    InvalidUserParams(String),
+
+    #[error("Invalid password")]
+    InvalidPassword(#[from] HashingError),
+
+    #[error("Persistence error")]
+    PersistenceError(#[from] PersistenceError),
+}
+
+pub type ValidateUserCredentialsResult<T> = Result<T, ValidateUserCredentialsError>;
+
+pub struct ValidateUserCredentialsCommand {
+    pub username: String,
+    pub password: SecretBox<str>,
+}
+
+pub struct ValidateUserCredentialsUseCase {
+    user_persistence: Arc<dyn UserPersistence>,
+    password_hasher: Arc<dyn PasswordHasher>,
+}
+
+impl ValidateUserCredentialsUseCase {
+    pub fn new(
+        user_persistence: Arc<dyn UserPersistence>,
+        password_hasher: Arc<dyn PasswordHasher>,
+    ) -> Self {
+        Self {
+            user_persistence,
+            password_hasher,
+        }
+    }
+
+    pub async fn execute(
+        &self,
+        cmd: ValidateUserCredentialsCommand,
+    ) -> ValidateUserCredentialsResult<()> {
+        // Validate user params
+        if cmd.username.is_empty() || cmd.password.expose_secret().is_empty() {
+            return Err(ValidateUserCredentialsError::InvalidUserParams(
+                "Username or password is empty".to_string(),
+            ));
+        }
+
+        // Validate user credentials
+        let user = self
+            .user_persistence
+            .find_user_by_username(&cmd.username)
+            .await
+            .map_err(|err| match err {
+                PersistenceError::NotFound(msg) => {
+                    info!("User not found: {}", msg);
+                    ValidateUserCredentialsError::InvalidUserParams("Invalid username".to_string())
+                }
+                _ => ValidateUserCredentialsError::from(err),
+            })?;
+
+        if !self
+            .password_hasher
+            .verify_password(cmd.password.expose_secret(), user.hashed_password())?
+        {
+            return Err(ValidateUserCredentialsError::InvalidUserParams(
+                "Invalid password".to_string(),
+            ));
+        }
+
+        Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use domain::user::entities::{user::User, user_role::UserRole};
+    use uuid::Uuid;
+
+    #[test]
+    fn test_new_user() {
+        let user = User::new(
+            "test_user".to_string(),
+            "hashed_password".to_string(),
+            UserRole::User,
+        );
+
+        assert_eq!(user.id().to_string().len(), 36);
+        assert_eq!(user.username(), "test_user");
+        assert_eq!(user.hashed_password(), "hashed_password");
+
+        assert_eq!(user.role(), &UserRole::User);
+        assert!(
+            !user.is_admin(),
+            "Un nuovo utente User non dovrebbe essere admin"
+        );
+    }
+
+    #[test]
+    fn test_reconstitute_user() {
+        let id = Uuid::new_v4();
+
+        let user = User::reconstitute(
+            id,
+            "admin_user".to_string(),
+            "secure_hash".to_string(),
+            UserRole::Admin,
+        );
+
+        assert_eq!(user.id(), id);
+        assert_eq!(user.username(), "admin_user");
+        assert_eq!(user.hashed_password(), "secure_hash");
+
+        assert_eq!(user.role(), &UserRole::Admin);
+        assert!(
+            user.is_admin(),
+            "Un utente ricostituito come Admin deve essere admin"
+        );
+    }
+
+    #[test]
+    fn test_update_user_details() {
+        let mut user = User::new(
+            "old_name".to_string(),
+            "old_pass".to_string(),
+            UserRole::User,
+        );
+
+        user.update_username("new_name".to_string());
+        user.update_password("new_pass".to_string());
+
+        assert_eq!(user.username(), "new_name");
+        assert_eq!(user.hashed_password(), "new_pass");
+
+        assert_eq!(user.role(), &UserRole::User);
+    }
+
+    #[test]
+    fn test_update_role() {
+        let mut user = User::new("user".to_string(), "pass".to_string(), UserRole::User);
+
+        assert!(!user.is_admin());
+
+        user.update_role(UserRole::Admin);
+
+        assert_eq!(user.role(), &UserRole::Admin);
+        assert!(user.is_admin());
+
+        user.update_role(UserRole::User);
+
+        assert_eq!(user.role(), &UserRole::User);
+        assert!(!user.is_admin());
+    }
+
+    #[test]
+    fn test_is_admin_logic() {
+        let regular_user = User::new("u".into(), "p".into(), UserRole::User);
+        let admin_user = User::new("a".into(), "p".into(), UserRole::Admin);
+
+        assert_eq!(regular_user.is_admin(), false);
+        assert_eq!(admin_user.is_admin(), true);
+    }
+}

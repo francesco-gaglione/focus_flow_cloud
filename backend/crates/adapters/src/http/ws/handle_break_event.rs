@@ -1,7 +1,7 @@
 use crate::http::ws::error::WsHandlerResult;
 use crate::http::{app_state::AppState, ws::update_pomodoro_state::UpdatePomodoroState};
-use application::use_cases::pomodoro_state::fetch_user_pomodoro_state::FetchUserPomodoroStateCommand;
-use application::use_cases::pomodoro_state::pause_session::PauseSessionCommand;
+use application::tasks::use_cases::pomodoro_state::fetch_user_pomodoro_state::FetchUserPomodoroStateCommand;
+use application::tasks::use_cases::pomodoro_state::pause_session::PauseSessionCommand;
 use tracing::debug;
 use uuid::Uuid;
 

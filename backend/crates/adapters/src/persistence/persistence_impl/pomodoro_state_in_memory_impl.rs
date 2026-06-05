@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
-use application::repository_traits::pomodoro_state_repository::{
+use application::tasks::traits::pomodoro_state_repository::{
     PomodoroStateRepository, PomodoroStateRepositoryError, PomodoroStateResult,
 };
 use async_trait::async_trait;
@@ -128,7 +128,7 @@ impl PomodoroStateRepository for PomodoroStateInMermoryImpl {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use application::repository_traits::pomodoro_state_repository::{
+    use application::tasks::traits::pomodoro_state_repository::{
         PomodoroStateRepository, PomodoroStateRepositoryError,
     };
 

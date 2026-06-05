@@ -2,7 +2,7 @@ use crate::http::app_state::AppState;
 use crate::http::validators::validate_uuid::validate_uuid;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::CATEGORY_TAG;
-use application::use_cases::category::delete_categories_usecase::DeleteCategoriesError;
+use application::tasks::use_cases::category::delete_categories_usecase::DeleteCategoriesError;
 use axum::extract::{Path, State};
 use axum::Json;
 use serde::{Deserialize, Serialize};

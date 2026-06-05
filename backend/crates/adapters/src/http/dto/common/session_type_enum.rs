@@ -2,7 +2,7 @@ use domain::tasks::entities::focus_session_type::FocusSessionType;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
-use application::use_cases::pomodoro_state::fetch_user_pomodoro_state::UserSessionType;
+use application::tasks::use_cases::pomodoro_state::fetch_user_pomodoro_state::UserSessionType;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, ToSchema)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS))]

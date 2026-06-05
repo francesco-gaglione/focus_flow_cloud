@@ -1,7 +1,7 @@
 use crate::http::app_state::AppState;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::AUTH_TAG;
-use application::use_cases::user::login_user::LoginCommand;
+use application::user::use_cases::user::login_user::LoginCommand;
 use axum::extract::State;
 use axum::Form;
 use axum::Json;

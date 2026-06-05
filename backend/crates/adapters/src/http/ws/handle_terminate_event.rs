@@ -1,4 +1,4 @@
-use application::use_cases::pomodoro_state::{
+use application::tasks::use_cases::pomodoro_state::{
     fetch_user_pomodoro_state::FetchUserPomodoroStateCommand,
     terminate_session::TerminateSessionCommand,
 };

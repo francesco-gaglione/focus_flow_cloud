@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use application::repository_traits::persistence_error::{PersistenceError, PersistenceResult};
+use application::shared::traits::persistence_error::{PersistenceError, PersistenceResult};
 use deadpool_diesel::postgres::Pool;
 use diesel::{pg::PgConnection, result::QueryResult, Connection};
 use domain::tasks::entities::focus_session::{FocusSession, RunningSession};

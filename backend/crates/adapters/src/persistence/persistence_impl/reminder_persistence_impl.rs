@@ -2,8 +2,8 @@ use crate::persistence::db_models::db_reminder::UpdateDbReminder;
 use crate::persistence::db_models::db_reminder::{DbReminder, NewDbReminder};
 use crate::persistence::schema;
 use crate::persistence::PostgresPersistence;
-use application::repository_traits::persistence_error::{PersistenceError, PersistenceResult};
-use application::repository_traits::reminder_persistence::ReminderPersistence;
+use application::shared::traits::persistence_error::{PersistenceError, PersistenceResult};
+use application::shared::traits::reminder_persistence::ReminderPersistence;
 use async_trait::async_trait;
 use chrono::Utc;
 use diesel::{
@@ -135,7 +135,7 @@ mod tests {
     use crate::persistence::db_models::db_user::NewDbUser;
     use crate::persistence::persistence_impl::persistence::postgres_persistence;
     use crate::persistence::schema;
-    use application::repository_traits::reminder_persistence::ReminderPersistence;
+    use application::shared::traits::reminder_persistence::ReminderPersistence;
     use chrono::Utc;
     use diesel::RunQueryDsl;
     use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};

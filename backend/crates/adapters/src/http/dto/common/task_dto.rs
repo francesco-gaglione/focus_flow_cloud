@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use uuid::Uuid;
 
-use application::use_cases::task::{
+use application::tasks::use_cases::task::{
     common::task_schedule_app_dto::TaskScheduleAppDto,
     get_tasks::{ReminderOutput, TaskOutput},
 };

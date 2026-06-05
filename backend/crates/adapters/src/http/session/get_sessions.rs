@@ -2,7 +2,7 @@ use crate::http::app_state::AppState;
 use crate::http::validators::validate_uuids::validate_uuids;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::SESSION_TAG;
-use application::use_cases::focus_session::find_sessions_by_filters::{
+use application::tasks::use_cases::focus_session::find_sessions_by_filters::{
     ConcentrationScoreFilter, FindSessionByFiltersError, FindSessionFiltersCommand,
     FocusSessionDateFilter, FocusSessionOutput,
 };

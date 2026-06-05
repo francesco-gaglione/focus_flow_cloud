@@ -1,4 +1,4 @@
-use application::use_cases::pomodoro_state::{
+use application::tasks::use_cases::pomodoro_state::{
     fetch_user_pomodoro_state::FetchUserPomodoroStateError, pause_session::PauseSessionError,
     start_session::StartSessionError, terminate_session::TerminateSessionError,
     update_current_session::UpdateSessionError,
