@@ -29,10 +29,16 @@
         height: 100%;
         margin: 0;
         padding: 0;
+        touch-action: pan-x pan-y;
     }
 
     body {
         overflow: hidden;
+    }
+
+    /* Prevent iOS WebView auto-zoom on input focus (triggered when font-size < 16px) */
+    input, textarea, select {
+        font-size: max(16px, 1em);
     }
 
     ::-webkit-scrollbar {
