@@ -1,7 +1,7 @@
 use crate::persistence::schema;
 use chrono::{DateTime, Utc};
 use diesel::{AsChangeset, Insertable, Queryable, Selectable};
-use domain::entities::reminder::Reminder;
+use domain::tasks::entities::reminder::Reminder;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 

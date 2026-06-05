@@ -1,4 +1,4 @@
-use application::auth_traits::password_hasher::{HashingError, PasswordHasher};
+use application::user::traits::password_hasher::{HashingError, PasswordHasher};
 use argon2::{
     password_hash::{
         rand_core::OsRng, PasswordHash, PasswordHasher as ArgonTrait, PasswordVerifier, SaltString,

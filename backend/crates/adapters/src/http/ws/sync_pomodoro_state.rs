@@ -2,7 +2,7 @@ use crate::http::{
     app_state::AppState,
     ws::{error::WsHandlerResult, update_pomodoro_state::UpdatePomodoroState},
 };
-use application::use_cases::pomodoro_state::fetch_user_pomodoro_state::FetchUserPomodoroStateCommand;
+use application::tasks::use_cases::pomodoro_state::fetch_user_pomodoro_state::FetchUserPomodoroStateCommand;
 use uuid::Uuid;
 
 pub async fn sync_pomodoro_state(

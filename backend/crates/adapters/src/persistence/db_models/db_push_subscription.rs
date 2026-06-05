@@ -1,6 +1,6 @@
 use crate::persistence::schema;
 use diesel::{Insertable, Queryable, Selectable};
-use domain::entities::push_subscription::PushSubscription;
+use domain::tasks::entities::push_subscription::PushSubscription;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 

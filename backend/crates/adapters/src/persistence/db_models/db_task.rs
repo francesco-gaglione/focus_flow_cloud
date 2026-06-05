@@ -1,7 +1,7 @@
 use crate::persistence::schema;
 use chrono::{DateTime, NaiveDate, NaiveTime, Utc};
 use diesel::{AsChangeset, Insertable, Queryable, Selectable};
-use domain::entities::tasks::{
+use domain::tasks::entities::{
     subtask::Subtask, task::Task, task_priority::TaskPriority, task_schedule::TaskSchedule,
 };
 use serde::{Deserialize, Serialize};

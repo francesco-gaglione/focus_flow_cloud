@@ -1,4 +1,6 @@
-use domain::traits::password_policy::{PasswordPolicy, PasswordPolicyError, PasswordPolicyResult};
+use domain::user::traits::password_policy::{
+    PasswordPolicy, PasswordPolicyError, PasswordPolicyResult,
+};
 
 pub struct PasswordPolicyImpl;
 

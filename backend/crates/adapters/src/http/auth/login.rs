@@ -2,7 +2,7 @@ use crate::http::model::session_model::{UserSession, SESSION_KEY};
 use crate::http_error::HttpResult;
 use crate::openapi::AUTH_TAG;
 use crate::{http::app_state::AppState, http_error::HttpError};
-use application::use_cases::user::login_user::{LoginCommand, LoginError};
+use application::user::use_cases::user::login_user::{LoginCommand, LoginError};
 use axum::extract::State;
 use axum::Json;
 use secrecy::SecretBox;

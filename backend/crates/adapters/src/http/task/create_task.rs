@@ -4,12 +4,12 @@ use crate::http::dto::common::task_dto::{TaskPriorityDto, TaskScheduleDto};
 use crate::http::model::session_model::UserSession;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::TASK_TAG;
-use application::use_cases::task::create_task::{
+use application::tasks::use_cases::task::create_task::{
     AddReminderCommand, CreateSubtaskCommand, CreateTaskCommand, CreateTaskError,
 };
 use axum::{extract::State, Extension, Json};
 use chrono::DateTime;
-use domain::entities::tasks::task_priority::TaskPriority as DomainPriority;
+use domain::tasks::entities::task_priority::TaskPriority as DomainPriority;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use uuid::Uuid;

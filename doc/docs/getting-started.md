@@ -2,7 +2,15 @@
 sidebar_position: 2
 description: "Learn how to deploy FocusFlow with Docker Compose, configure the backend, and install the native app."
 keywords:
-  [focusflow, getting started, docker, deployment, self-hosting, tauri, sveltekit]
+  [
+    focusflow,
+    getting started,
+    docker,
+    deployment,
+    self-hosting,
+    tauri,
+    sveltekit,
+  ]
 ---
 
 # Getting Started
@@ -104,6 +112,7 @@ The easiest way to run the FocusFlow backend is using Docker Compose. This autom
     ```
 
     This outputs:
+
     ```
     Public Key:  BKq9se...   ← safe to expose (not currently required for the native app)
     Private Key: 1772RK...   ← goes in backend env as VAPID_PRIVATE_KEY
@@ -127,19 +136,19 @@ The easiest way to run the FocusFlow backend is using Docker Compose. This autom
 
 All environment variables required for the backend:
 
-| Variable            | Description                                 | Example                          |
-| :------------------ | :------------------------------------------ | :------------------------------- |
-| `SERVER_PORT`       | Port the server listens on                  | `8080`                           |
-| `CORS_ORIGIN`       | Allowed CORS origin                         | `*` or `https://app.example.com` |
-| `JWT_SECRET`        | Secret key for signing tokens               | `random_string`                  |
-| `DATABASE_BASE_URL` | Hostname and port of the database           | `db:5432`                        |
-| `POSTGRES_DB`       | Database name                               | `focusflow`                      |
-| `POSTGRES_USER`     | Database user                               | `focusflow`                      |
-| `POSTGRES_PASSWORD` | Database password                           | `secure_password`                |
-| `ADMIN_USERNAME`    | (Optional) Initial admin username           | `admin`                          |
-| `ADMIN_PASSWORD`    | (Optional) Initial admin password           | `password`                       |
+| Variable            | Description                                 | Example                                          |
+| :------------------ | :------------------------------------------ | :----------------------------------------------- |
+| `SERVER_PORT`       | Port the server listens on                  | `8080`                                           |
+| `CORS_ORIGIN`       | Allowed CORS origin                         | `*` or `https://app.example.com`                 |
+| `JWT_SECRET`        | Secret key for signing tokens               | `random_string`                                  |
+| `DATABASE_BASE_URL` | Hostname and port of the database           | `db:5432`                                        |
+| `POSTGRES_DB`       | Database name                               | `focusflow`                                      |
+| `POSTGRES_USER`     | Database user                               | `focusflow`                                      |
+| `POSTGRES_PASSWORD` | Database password                           | `secure_password`                                |
+| `ADMIN_USERNAME`    | (Optional) Initial admin username           | `admin`                                          |
+| `ADMIN_PASSWORD`    | (Optional) Initial admin password           | `password`                                       |
 | `VAPID_PRIVATE_KEY` | Private key for Web Push notifications      | generated via `npx web-push generate-vapid-keys` |
-| `OTLP_ENDPOINT`     | (Optional) OpenTelemetry collector endpoint | `http://localhost:4317`          |
+| `OTLP_ENDPOINT`     | (Optional) OpenTelemetry collector endpoint | `http://localhost:4317`                          |
 
 ### Observability (Optional)
 
@@ -226,14 +235,14 @@ FocusFlow is a native cross-platform application built with [Tauri v2](https://t
 
 Pre-built binaries are available on the [GitHub Releases](https://github.com/francesco-gaglione/focus_flow_cloud/releases) page:
 
-| Platform | File |
-| :--- | :--- |
-| macOS (Apple Silicon) | `.dmg` |
-| macOS (Intel) | `.dmg` |
-| Linux (Debian/Ubuntu) | `.deb` |
-| Linux (universal) | `.AppImage` |
-| Windows | `.exe` (NSIS) / `.msi` |
-| Android | `.apk` |
+| Platform              | File                   |
+| :-------------------- | :--------------------- |
+| macOS (Apple Silicon) | `.dmg`                 |
+| macOS (Intel)         | `.dmg`                 |
+| Linux (Debian/Ubuntu) | `.deb`                 |
+| Linux (universal)     | `.AppImage`            |
+| Windows               | `.exe` (NSIS) / `.msi` |
+| Android               | `.apk`                 |
 
 ### First Launch
 
@@ -255,7 +264,7 @@ iOS does not allow installing apps outside the App Store without an Apple Develo
 
 **Option A — Free (7-day expiry):**
 
-Requires a Mac with Xcode and [Sideloadly](https://sideloadly.io) or [AltStore](https://altstore.io).
+Requires a Mac with Xcode and [Sideloadly](https://sideloadly.io).
 
 1. Clone the repo and build the IPA locally:
 

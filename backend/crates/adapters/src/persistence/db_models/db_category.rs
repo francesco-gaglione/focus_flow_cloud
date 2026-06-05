@@ -1,8 +1,8 @@
 use crate::persistence::schema;
-use application::repository_traits::persistence_error::PersistenceError;
+use application::shared::traits::persistence_error::PersistenceError;
 use chrono::{DateTime, Utc};
 use diesel::{AsChangeset, Insertable, Queryable, Selectable};
-use domain::entities::tasks::category::Category;
+use domain::tasks::entities::category::Category;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
