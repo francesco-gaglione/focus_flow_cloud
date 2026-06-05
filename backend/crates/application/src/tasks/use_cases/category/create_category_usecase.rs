@@ -4,8 +4,8 @@ use thiserror::Error;
 use tracing::instrument;
 use uuid::Uuid;
 
-use crate::tasks::traits::category_persistence::CategoryPersistence;
 use crate::shared::traits::persistence_error::PersistenceError;
+use crate::tasks::traits::category_persistence::CategoryPersistence;
 use domain::{
     helpers::random_hex_color,
     tasks::entities::category::{Category, CategoryError},

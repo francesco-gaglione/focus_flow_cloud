@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
-use crate::tasks::traits::category_persistence::CategoryPersistence;
 use crate::shared::traits::persistence_error::PersistenceError;
+use crate::tasks::traits::category_persistence::CategoryPersistence;
 use thiserror::Error;
 use tracing::instrument;
 use uuid::Uuid;

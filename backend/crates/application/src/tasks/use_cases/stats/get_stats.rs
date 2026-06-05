@@ -23,11 +23,11 @@ use domain::tasks::value_objects::stats::last_8w_counts::WeekCounts;
 use domain::tasks::value_objects::stats::overdue_trend::{OverdueTrend, OverdueTrendType};
 use domain::tasks::value_objects::stats::peak_window::PwTimeRange;
 
+use crate::shared::traits::persistence_error::PersistenceError;
 use crate::tasks::traits::category_persistence::CategoryPersistence;
 use crate::tasks::traits::focus_session_repository::{
     FindByFiltersCommand, FocusSessionRepository,
 };
-use crate::shared::traits::persistence_error::PersistenceError;
 use crate::tasks::traits::task_persistence::TaskPersistence;
 
 #[derive(Debug, Error)]
@@ -257,8 +257,8 @@ mod tests {
     use mockall::predicate::eq;
 
     use crate::tasks::traits::category_persistence::MockCategoryPersistence;
-use crate::tasks::traits::focus_session_repository::MockFocusSessionRepository;
-use crate::tasks::traits::task_persistence::MockTaskPersistence;
+    use crate::tasks::traits::focus_session_repository::MockFocusSessionRepository;
+    use crate::tasks::traits::task_persistence::MockTaskPersistence;
 
     use super::*;
 

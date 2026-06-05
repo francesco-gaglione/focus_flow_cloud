@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
-use crate::user::traits::password_hasher::{HashingError, PasswordHasher};
 use crate::shared::traits::persistence_error::PersistenceError;
+use crate::user::traits::password_hasher::{HashingError, PasswordHasher};
 use crate::user::traits::user_persistence::UserPersistence;
 use domain::user::entities::{user::User, user_role::UserRole};
 use domain::user::traits::password_policy::{PasswordPolicy, PasswordPolicyError};
@@ -93,8 +93,8 @@ impl RegisterUserUseCase {
 mod tests {
     use std::sync::Arc;
 
-    use crate::user::traits::password_hasher::MockPasswordHasher;
     use crate::shared::traits::persistence_error::PersistenceError;
+    use crate::user::traits::password_hasher::MockPasswordHasher;
     use crate::user::traits::user_persistence::MockUserPersistence;
     use domain::user::entities::{user::User, user_role::UserRole};
     use domain::user::traits::password_policy::{MockPasswordPolicy, PasswordPolicyError};

@@ -1,5 +1,5 @@
-use crate::tasks::traits::focus_session_repository::FocusSessionRepository;
 use crate::shared::traits::persistence_error::PersistenceError;
+use crate::tasks::traits::focus_session_repository::FocusSessionRepository;
 use crate::tasks::traits::pomodoro_state_repository::{
     PomodoroStateRepository, PomodoroStateRepositoryError,
 };

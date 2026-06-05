@@ -3,10 +3,10 @@ use crate::persistence::db_models::db_focus_session::{
 };
 use crate::persistence::schema;
 use crate::persistence::PostgresPersistence;
+use application::shared::traits::persistence_error::{PersistenceError, PersistenceResult};
 use application::tasks::traits::focus_session_repository::{
     FindByFiltersCommand, FocusSessionRepository,
 };
-use application::shared::traits::persistence_error::{PersistenceError, PersistenceResult};
 use async_trait::async_trait;
 use diesel::{BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper};
 use domain::tasks::entities::focus_session::{FocusSession, TerminatedSession};

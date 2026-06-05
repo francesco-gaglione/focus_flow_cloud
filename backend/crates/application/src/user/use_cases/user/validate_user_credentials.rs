@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
-use crate::user::traits::password_hasher::{HashingError, PasswordHasher};
 use crate::shared::traits::persistence_error::PersistenceError;
+use crate::user::traits::password_hasher::{HashingError, PasswordHasher};
 use crate::user::traits::user_persistence::UserPersistence;
 use secrecy::{ExposeSecret, SecretBox};
 use thiserror::Error;

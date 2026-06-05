@@ -1,6 +1,6 @@
 use crate::{
-    shared::traits::push_subscription_persistence::PushSubscriptionPersistence,
     shared::traits::persistence_error::PersistenceError,
+    shared::traits::push_subscription_persistence::PushSubscriptionPersistence,
 };
 use domain::tasks::entities::push_subscription::PushSubscription;
 use std::sync::Arc;
