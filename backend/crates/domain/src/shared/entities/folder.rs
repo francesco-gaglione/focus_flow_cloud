@@ -1,22 +1,16 @@
 use uuid::Uuid;
 
+use crate::shared::entities::folder_metadata::FolderMetadata;
+
 pub struct Folder<T> {
-    id: Uuid,
-    user_id: Uuid,
-    name: String,
-    parent_id: Option<Uuid>,
-    path: String, // root = "/", children = "/{id}", grandchildren = "/{id}/{id}"
+    metadata: FolderMetadata,
     file: Vec<T>,
 }
 
 impl<T> Folder<T> {
     pub fn new(name: &str, user_id: Uuid) -> Self {
         Self {
-            id: Uuid::new_v4(),
-            user_id,
-            name: name.to_string(),
-            parent_id: None,
-            path: "/".to_string(),
+            metadata: FolderMetadata::new(name, user_id),
             file: Vec::new(),
         }
     }
@@ -26,36 +20,38 @@ impl<T> Folder<T> {
         let path = if parent.is_root() {
             format!("/{}", id)
         } else {
-            format!("{}/{}", parent.path, id)
+            format!("{}/{}", parent.metadata.path(), id)
         };
         Self {
-            id,
-            user_id,
-            name: name.to_string(),
-            parent_id: Some(parent.id),
-            path,
+            metadata: FolderMetadata::reconstitute(
+                id,
+                user_id,
+                name.to_string(),
+                Some(parent.metadata.id()),
+                path,
+            ),
             file: Vec::new(),
         }
     }
 
     pub fn id(&self) -> Uuid {
-        self.id
+        self.metadata.id()
     }
 
     pub fn user_id(&self) -> Uuid {
-        self.user_id
+        self.metadata.user_id()
     }
 
     pub fn name(&self) -> &str {
-        &self.name
+        self.metadata.name()
     }
 
     pub fn parent_id(&self) -> Option<Uuid> {
-        self.parent_id
+        self.metadata.parent_id()
     }
 
     pub fn path(&self) -> &str {
-        &self.path
+        self.metadata.path()
     }
 
     pub fn files(&self) -> &[T] {
@@ -63,32 +59,33 @@ impl<T> Folder<T> {
     }
 
     pub fn is_root(&self) -> bool {
-        self.parent_id.is_none()
+        self.metadata.is_root()
     }
 
     pub fn depth(&self) -> usize {
-        if self.is_root() {
-            return 0;
-        }
-        self.path.matches('/').count()
+        self.metadata.depth()
     }
 
     pub fn rename(&mut self, new_name: &str) {
-        self.name = new_name.to_string();
+        self.metadata.rename(new_name);
     }
 
     pub fn add_file(&mut self, file: T) {
         self.file.push(file);
     }
 
+    pub fn metadata(&self) -> &FolderMetadata {
+        &self.metadata
+    }
+
     pub fn is_ancestor_of(&self, other: &Folder<T>) -> bool {
-        if self.id == other.id {
+        if self.id() == other.id() {
             return false;
         }
         if self.is_root() {
             return true;
         }
-        other.path.starts_with(&format!("{}/", self.path))
+        other.path().starts_with(&format!("{}/", self.path()))
     }
 
     // Returns false if: moving into itself, moving into a descendant, or moving root
@@ -96,7 +93,7 @@ impl<T> Folder<T> {
         if self.is_root() {
             return false;
         }
-        if self.id == target.id {
+        if self.id() == target.id() {
             return false;
         }
         !self.is_ancestor_of(target)

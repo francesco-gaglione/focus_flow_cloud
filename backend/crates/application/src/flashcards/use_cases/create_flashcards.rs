@@ -22,6 +22,14 @@ pub enum CreateFlashcardError {
 
 pub type CreateFlashcardResult<T> = Result<T, CreateFlashcardError>;
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CreateFlashcardCommand {
+    front: String,
+    back: String,
+    user_id: Uuid,
+    folder_id: Uuid,
+}
+
 pub struct CreateFlashcardUseCase {
     pub flashcard_persistence: Arc<dyn FlashcardPersistence>,
 }
@@ -34,21 +42,19 @@ impl CreateFlashcardUseCase {
     }
 
     #[instrument(skip(self))]
-    pub async fn execute(
-        &self,
-        front: &str,
-        back: &str,
-        user_id: Uuid,
-    ) -> CreateFlashcardResult<()> {
-        if front.is_empty() {
+    pub async fn execute(&self, command: CreateFlashcardCommand) -> CreateFlashcardResult<()> {
+        if command.front.is_empty() {
             return Err(CreateFlashcardError::InvalidFrontSideCard);
         }
-        if back.is_empty() {
+        if command.back.is_empty() {
             return Err(CreateFlashcardError::InvalidBackSideCard);
         }
 
-        let flashcard = Flashcard::new(front, back, user_id);
-        self.flashcard_persistence.save(&flashcard).await?;
+        let flashcard = Flashcard::new(&command.front, &command.back, command.user_id);
+        self.flashcard_persistence
+            .save_to_folder(&flashcard, &command.folder_id)
+            .await?;
+
         Ok(())
     }
 }
@@ -61,22 +67,30 @@ mod tests_create_flashcard_use_case {
 
     use crate::flashcards::{
         traits::flashcard_persistence::MockFlashcardPersistence,
-        use_cases::create_flashcards::CreateFlashcardUseCase,
+        use_cases::create_flashcards::{CreateFlashcardCommand, CreateFlashcardUseCase},
     };
+
+    fn make_command(front: &str, back: &str) -> CreateFlashcardCommand {
+        CreateFlashcardCommand {
+            front: front.to_string(),
+            back: back.to_string(),
+            user_id: Uuid::new_v4(),
+            folder_id: Uuid::new_v4(),
+        }
+    }
 
     #[tokio::test]
     async fn create_flashcard() {
         let mut mock_persistence = MockFlashcardPersistence::new();
 
         mock_persistence
-            .expect_save()
+            .expect_save_to_folder()
             .times(1)
-            .returning(|_| Ok(()));
+            .returning(|_, _| Ok(()));
 
         let use_case = CreateFlashcardUseCase::new(Arc::new(mock_persistence));
-        let user_id = Uuid::new_v4();
 
-        let res = use_case.execute("front", "back", user_id).await;
+        let res = use_case.execute(make_command("front", "back")).await;
         assert!(res.is_ok());
     }
 
@@ -84,12 +98,11 @@ mod tests_create_flashcard_use_case {
     async fn invalid_front_side_card() {
         let mut mock_persistence = MockFlashcardPersistence::new();
 
-        mock_persistence.expect_save().times(0);
+        mock_persistence.expect_save_to_folder().times(0);
 
         let use_case = CreateFlashcardUseCase::new(Arc::new(mock_persistence));
-        let user_id = Uuid::new_v4();
 
-        let res = use_case.execute("", "back", user_id).await;
+        let res = use_case.execute(make_command("", "back")).await;
         assert!(res.is_err());
     }
 
@@ -97,12 +110,11 @@ mod tests_create_flashcard_use_case {
     async fn invalid_back_side_card() {
         let mut mock_persistence = MockFlashcardPersistence::new();
 
-        mock_persistence.expect_save().times(0);
+        mock_persistence.expect_save_to_folder().times(0);
 
         let use_case = CreateFlashcardUseCase::new(Arc::new(mock_persistence));
-        let user_id = Uuid::new_v4();
 
-        let res = use_case.execute("front", "", user_id).await;
+        let res = use_case.execute(make_command("front", "")).await;
         assert!(res.is_err());
     }
 }
