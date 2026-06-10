@@ -8,7 +8,7 @@ use async_trait::async_trait;
 use domain::tasks::entities::focus_session::{FocusSession, RunningSession, TerminatedSession};
 use domain::tasks::entities::pomodoro::pomodoro_state::PomodoroState;
 use tokio::sync::RwLock;
-use tracing::debug;
+use tracing::{debug, instrument};
 use uuid::Uuid;
 
 #[derive(Clone, Debug)]
@@ -82,6 +82,7 @@ impl Default for PomodoroStateInMermoryImpl {
 
 #[async_trait]
 impl PomodoroStateRepository for PomodoroStateInMermoryImpl {
+    #[instrument(skip(self))]
     async fn init_user_state(&self, user_id: Uuid) -> PomodoroStateResult<()> {
         let mut stores = self.stores.write().await;
         if stores.contains_key(&user_id) {
@@ -91,6 +92,7 @@ impl PomodoroStateRepository for PomodoroStateInMermoryImpl {
         Ok(())
     }
 
+    #[instrument(skip(self))]
     async fn fetch_user_state(&self, user_id: Uuid) -> PomodoroStateResult<PomodoroState> {
         debug!("Fetching user state for user: {:?}", user_id);
         let stores = self.stores.read().await;
@@ -105,6 +107,7 @@ impl PomodoroStateRepository for PomodoroStateInMermoryImpl {
         Ok(user_state.clone().into())
     }
 
+    #[instrument(skip(self))]
     async fn update_user_state(
         &self,
         user_id: Uuid,
@@ -118,6 +121,7 @@ impl PomodoroStateRepository for PomodoroStateInMermoryImpl {
         Ok(())
     }
 
+    #[instrument(skip(self))]
     async fn clear_user_state(&self, user_id: Uuid) -> PomodoroStateResult<()> {
         let mut stores = self.stores.write().await;
         stores.remove(&user_id);

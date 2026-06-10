@@ -10,11 +10,12 @@ use application::tasks::traits::focus_session_repository::{
 use async_trait::async_trait;
 use diesel::{BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper};
 use domain::tasks::entities::focus_session::{FocusSession, TerminatedSession};
-use tracing::{error, info};
+use tracing::{error, info, instrument};
 use uuid::Uuid;
 
 #[async_trait]
 impl FocusSessionRepository for PostgresPersistence {
+    #[instrument(skip(self))]
     async fn create_manual_session(
         &self,
         session: FocusSession<TerminatedSession>,
@@ -42,6 +43,7 @@ impl FocusSessionRepository for PostgresPersistence {
         Ok(())
     }
 
+    #[instrument(skip(self))]
     async fn find_session_by_id(
         &self,
         session_id: Uuid,
@@ -67,6 +69,7 @@ impl FocusSessionRepository for PostgresPersistence {
         Ok(result.into())
     }
 
+    #[instrument(skip(self))]
     async fn find_by_filters(
         &self,
         filters: FindByFiltersCommand,
@@ -137,6 +140,7 @@ impl FocusSessionRepository for PostgresPersistence {
         Ok(result.into_iter().map(|s| s.into()).collect())
     }
 
+    #[instrument(skip(self))]
     async fn update_session(
         &self,
         session: FocusSession<TerminatedSession>,

@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use tracing::instrument;
 
 use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, SelectableHelper};
 
@@ -12,6 +13,7 @@ use domain::user::entities::user_setting::UserSetting;
 
 #[async_trait]
 impl UserSettingPersistence for PostgresPersistence {
+    #[instrument(skip(self))]
     async fn find_all(&self) -> PersistenceResult<Vec<UserSetting>> {
         let conn = self
             .pool
@@ -34,6 +36,7 @@ impl UserSettingPersistence for PostgresPersistence {
         Ok(tasks)
     }
 
+    #[instrument(skip(self))]
     async fn update_setting(
         &self,
         user_id: uuid::Uuid,
@@ -67,6 +70,7 @@ impl UserSettingPersistence for PostgresPersistence {
         }
     }
 
+    #[instrument(skip(self))]
     async fn create_setting(
         &self,
         user_id: uuid::Uuid,

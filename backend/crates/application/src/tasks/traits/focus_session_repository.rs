@@ -7,6 +7,7 @@ use domain::tasks::entities::focus_session::TerminatedSession;
 use domain::tasks::entities::focus_session_type::FocusSessionType;
 use uuid::Uuid;
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FindByFiltersCommand {
     pub user_id: Uuid,
     pub start_date: Option<DateTime<Utc>>,

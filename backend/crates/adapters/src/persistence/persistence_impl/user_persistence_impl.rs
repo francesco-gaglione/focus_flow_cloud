@@ -15,6 +15,7 @@ use uuid::Uuid;
 
 #[async_trait]
 impl UserPersistence for PostgresPersistence {
+    #[instrument(skip(self))]
     async fn create_user(&self, user: User) -> PersistenceResult<Uuid> {
         let conn = self
             .pool
