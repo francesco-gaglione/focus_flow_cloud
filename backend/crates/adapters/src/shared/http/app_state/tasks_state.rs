@@ -1,6 +1,3 @@
-use crate::config::AppConfig;
-use application::shared::use_cases::push_subscription::save_push_subscription::SavePushSubscriptionUseCase;
-use application::shared::use_cases::reminder::get_pending_reminders::GetPendingRemindersUseCase;
 use application::tasks::use_cases::category::create_category_usecase::CreateCategoryUseCases;
 use application::tasks::use_cases::category::delete_categories_usecase::DeleteCategoriesUseCases;
 use application::tasks::use_cases::category::get_all_category_usecase::GetAllCategoryUseCases;
@@ -22,35 +19,17 @@ use application::tasks::use_cases::task::delete_task::DeleteTaskUseCase;
 use application::tasks::use_cases::task::get_tasks::GetTasksUseCase;
 use application::tasks::use_cases::task::update_subtask::UpdateSubTaskUseCase;
 use application::tasks::use_cases::task::update_task::UpdateTaskUseCase;
-use application::user::use_cases::user::get_user_info::GetUserInfoUseCase;
-use application::user::use_cases::user::login_user::LoginUseCase;
-use application::user::use_cases::user::refresh_token::RefreshTokenUseCase;
-use application::user::use_cases::user::register_user::RegisterUserUseCase;
-use application::user::use_cases::user::update_password::UpdateUserPasswordUseCase;
-use application::user::use_cases::user::update_user_username::UpdateUserUsernameUseCase;
-use application::user::use_cases::user_settings::get_settings::GetSettingsUseCase;
-use application::user::use_cases::user_settings::update_setting::UpdateSettingUseCase;
-use axum::extract::ws::Message;
-use domain::user::services::token_service::TokenService;
-use std::collections::HashMap;
 use std::sync::Arc;
-use tokio::sync::mpsc::UnboundedSender;
-use tokio::sync::RwLock;
-
-pub type Clients = Arc<RwLock<HashMap<usize, UnboundedSender<Message>>>>;
 
 #[derive(Clone)]
-pub struct AppState {
-    pub ws_clients: Clients,
-    pub config: AppConfig,
-
-    // Category Use Cases
+pub struct TasksState {
+    // Category
     pub create_category_uc: Arc<CreateCategoryUseCases>,
     pub delete_categories_uc: Arc<DeleteCategoriesUseCases>,
     pub get_all_category_uc: Arc<GetAllCategoryUseCases>,
     pub update_category_uc: Arc<UpdateCategoryUseCases>,
 
-    // Pomodoro state use cases
+    // Pomodoro
     pub init_pomodoro_state_uc: Arc<InitPomodoroStateUseCase>,
     pub pause_pomo_session_uc: Arc<PauseSessionUseCase>,
     pub fetch_pomo_session_uc: Arc<FetchUserPomodoroStateUseCase>,
@@ -59,7 +38,7 @@ pub struct AppState {
     pub terminate_session_uc: Arc<TerminateSessionUseCase>,
     pub update_current_session_uc: Arc<UpdateSessionUseCase>,
 
-    // Task Use Cases
+    // Task
     pub create_task_uc: Arc<CreateTaskUseCase>,
     pub delete_tasks_uc: Arc<DeleteTaskUseCase>,
     pub get_tasks_uc: Arc<GetTasksUseCase>,
@@ -67,35 +46,11 @@ pub struct AppState {
     pub update_subtask_uc: Arc<UpdateSubTaskUseCase>,
     pub add_subtask_uc: Arc<AddSubTaskUseCase>,
 
-    // Stats Use Cases
+    // Stats
     pub get_stats_uc: Arc<GetStatsUseCase>,
 
-    // Focus Session Use Cases
+    // Focus Session
     pub create_manual_session_uc: Arc<CreateManualSessionUseCase>,
     pub update_focus_session_uc: Arc<UpdateFocusSessionUseCase>,
     pub find_sessions_by_filters_uc: Arc<FindSessionsByFiltersUseCase>,
-
-    // User Setting Use Cases
-    pub update_user_setting_uc: Arc<UpdateSettingUseCase>,
-    pub get_user_settings_uc: Arc<GetSettingsUseCase>,
-
-    // User Use Cases
-    pub register_user_uc: Arc<RegisterUserUseCase>,
-    pub login_uc: Arc<LoginUseCase>,
-    pub refresh_token_uc: Arc<RefreshTokenUseCase>,
-    pub update_password_uc: Arc<UpdateUserPasswordUseCase>,
-    pub update_user_username_uc: Arc<UpdateUserUsernameUseCase>,
-    pub get_user_info_uc: Arc<GetUserInfoUseCase>,
-
-    // Push Subscription Use Cases
-    pub save_push_subscription_uc: Arc<SavePushSubscriptionUseCase>,
-
-    // Reminder Use Cases
-    pub get_pending_reminders_uc: Arc<GetPendingRemindersUseCase>,
-
-    // Services
-    pub token_service: Arc<dyn TokenService>,
-
-    // Version
-    pub version: String,
 }

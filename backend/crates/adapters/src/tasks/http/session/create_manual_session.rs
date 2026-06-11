@@ -103,7 +103,7 @@ pub async fn create_manual_session_api(
         ended_at,
     };
 
-    let session_id = state.create_manual_session_uc.execute(command).await?;
+    let session_id = state.tasks.create_manual_session_uc.execute(command).await?;
 
     Ok(Json(CreateManualSessionResponseDto {
         success: true,

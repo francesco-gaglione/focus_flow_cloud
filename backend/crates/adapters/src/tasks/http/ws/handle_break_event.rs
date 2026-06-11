@@ -14,10 +14,10 @@ pub async fn handle_break_event(
 
     let command = PauseSessionCommand { user_id };
 
-    state.pause_pomo_session_uc.execute(command).await?;
+    state.tasks.pause_pomo_session_uc.execute(command).await?;
 
     let pomodoro_state = state
-        .fetch_pomo_session_uc
+        .tasks.fetch_pomo_session_uc
         .execute(FetchUserPomodoroStateCommand { user_id })
         .await?;
 

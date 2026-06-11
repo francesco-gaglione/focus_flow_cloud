@@ -16,10 +16,10 @@ pub async fn handle_start_event(
 
     let command = StartSessionCommand { user_id };
 
-    state.start_session_uc.execute(command).await?;
+    state.tasks.start_session_uc.execute(command).await?;
 
     let pomodoro_state = state
-        .fetch_pomo_session_uc
+        .tasks.fetch_pomo_session_uc
         .execute(FetchUserPomodoroStateCommand { user_id })
         .await?;
 

@@ -100,7 +100,7 @@ pub async fn update_subtask_api(
 
     debug!("Executing complete subtask command: {:?}", command);
 
-    state.update_subtask_uc.execute(command).await?;
+    state.tasks.update_subtask_uc.execute(command).await?;
 
     Ok(Json(UpdateSubTaskResponseDto {
         id: sub_task_id.to_string(),

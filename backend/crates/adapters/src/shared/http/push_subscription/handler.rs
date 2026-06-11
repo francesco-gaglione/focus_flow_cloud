@@ -36,7 +36,7 @@ pub async fn save_push_subscription_api(
     Json(payload): Json<SavePushSubscriptionDto>,
 ) -> HttpResult<Json<SavePushSubscriptionResponseDto>> {
     let id = state
-        .save_push_subscription_uc
+        .shared.save_push_subscription_uc
         .execute(
             user.user_id,
             payload.endpoint,

@@ -59,7 +59,7 @@ pub async fn refresh_api(
         refresh_token: payload.refresh_token,
     };
 
-    let result = state.refresh_token_uc.execute(cmd).await?;
+    let result = state.user.refresh_token_uc.execute(cmd).await?;
 
     Ok(Json(RefreshResponseDto {
         token: result.token,

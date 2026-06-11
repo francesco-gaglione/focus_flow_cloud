@@ -237,7 +237,7 @@ pub async fn get_stats_api(
     Query(query): Query<GetStatsQuery>,
 ) -> HttpResult<Json<GetStatsResponseDto>> {
     let result = state
-        .get_stats_uc
+        .tasks.get_stats_uc
         .execute(GetStatsCommand {
             user_id: session.user_id,
             tz_offset_minutes: query.tz_offset.unwrap_or(0),

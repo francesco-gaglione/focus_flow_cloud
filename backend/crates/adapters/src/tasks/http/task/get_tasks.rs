@@ -85,7 +85,7 @@ pub async fn get_tasks_api(
 ) -> HttpResult<Json<TasksResponseDto>> {
     tracing::info!("Fetching tasks with completed: {:?}", params.completed);
     let res = state
-        .get_tasks_uc
+        .tasks.get_tasks_uc
         .execute(GetTasksCommand {
             completed: params.completed,
             today: params.today,

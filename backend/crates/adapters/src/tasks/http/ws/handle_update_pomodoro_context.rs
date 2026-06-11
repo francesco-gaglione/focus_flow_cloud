@@ -38,10 +38,10 @@ pub async fn handle_update_pomodoro_context(
         task_id: message.task_id().map(|id| id.parse().unwrap()),
     };
 
-    state.update_pomodoro_context_uc.execute(command).await?;
+    state.tasks.update_pomodoro_context_uc.execute(command).await?;
 
     let pomodoro_state = state
-        .fetch_pomo_session_uc
+        .tasks.fetch_pomo_session_uc
         .execute(FetchUserPomodoroStateCommand { user_id })
         .await?;
 

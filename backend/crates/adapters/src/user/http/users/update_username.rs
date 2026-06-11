@@ -59,7 +59,7 @@ pub async fn update_username_api(
         new_username: payload.new_username,
     };
 
-    state.update_user_username_uc.execute(cmd).await?;
+    state.user.update_user_username_uc.execute(cmd).await?;
 
     Ok(())
 }

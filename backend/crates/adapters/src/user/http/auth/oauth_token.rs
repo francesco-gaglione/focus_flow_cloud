@@ -45,7 +45,7 @@ pub async fn oauth_token_api(
         password: SecretBox::new(form.password.into_boxed_str()),
     };
 
-    let result = state.login_uc.execute(cmd).await.map_err(HttpError::from)?;
+    let result = state.user.login_uc.execute(cmd).await.map_err(HttpError::from)?;
 
     Ok(Json(OAuthTokenResponse {
         access_token: result.token,

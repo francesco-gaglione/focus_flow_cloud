@@ -1,16 +1,19 @@
-use crate::user::http::auth::login::{LoginDto, LoginResponseDto};
-use crate::user::http::auth::logout::LogoutResponseDto;
-use crate::user::http::auth::oauth_token::{OAuthTokenForm, OAuthTokenResponse};
-use crate::user::http::auth::refresh::{RefreshDto, RefreshResponseDto};
+use crate::flashcards::http::create_flashcard::{CreateFlashcardDto, CreateFlashcardResponseDto};
 use crate::tasks::http::category::create_category::{CreateCategoryDto, CreateCategoryResponseDto};
-use crate::tasks::http::category::delete_categories::{DeleteCategoriesDto, DeleteCategoriesResponseDto};
+use crate::tasks::http::category::delete_categories::{
+    DeleteCategoriesDto, DeleteCategoriesResponseDto,
+};
 use crate::tasks::http::category::get_all_categories::GetAllCategoryResponseDto;
 use crate::tasks::http::category::update_category::{UpdateCategoryDto, UpdateCategoryResponseDto};
 use crate::tasks::http::session::create_manual_session::{
     CreateManualSessionDto, CreateManualSessionResponseDto,
 };
-use crate::tasks::http::session::get_sessions::{GetSessionFiltersDto, GetSessionFiltersResponseDto};
-use crate::tasks::http::session::update_session::{UpdateFocusSessionDto, UpdateFocusSessionResponseDto};
+use crate::tasks::http::session::get_sessions::{
+    GetSessionFiltersDto, GetSessionFiltersResponseDto,
+};
+use crate::tasks::http::session::update_session::{
+    UpdateFocusSessionDto, UpdateFocusSessionResponseDto,
+};
 use crate::tasks::http::stats::get_stats::GetStatsResponseDto;
 use crate::tasks::http::task::create_subtask::{CreateSubtaskDto, CreateSubtaskResponseDto};
 use crate::tasks::http::task::create_task::{CreateTaskDto, CreateTaskResponseDto};
@@ -18,6 +21,10 @@ use crate::tasks::http::task::delete_tasks::{DeleteTaskResponseDto, DeleteTasksD
 use crate::tasks::http::task::get_tasks::TasksResponseDto;
 use crate::tasks::http::task::update_subtask::{UpdateSubTaskDto, UpdateSubTaskResponseDto};
 use crate::tasks::http::task::update_task::{UpdateTaskDto, UpdateTaskResponseDto};
+use crate::user::http::auth::login::{LoginDto, LoginResponseDto};
+use crate::user::http::auth::logout::LogoutResponseDto;
+use crate::user::http::auth::oauth_token::{OAuthTokenForm, OAuthTokenResponse};
+use crate::user::http::auth::refresh::{RefreshDto, RefreshResponseDto};
 use crate::user::http::user_setting::get_user_settings::UserSettingsResponseDto;
 use crate::user::http::user_setting::update_setting::UpdateUserSettingDto;
 use crate::user::http::users::create_user::CreateUserDto;
@@ -36,6 +43,7 @@ pub const SESSION_TAG: &str = "Session";
 pub const STATS_TAG: &str = "Statistics";
 pub const SETTING_TAG: &str = "User Settings";
 pub const USERS_TAG: &str = "Users";
+pub const FLASHCARD_TAG: &str = "Flashcard";
 
 pub struct SecurityAddon;
 
@@ -66,7 +74,7 @@ impl Modify for SecurityAddon {
 #[openapi(
     info(
         title = "Focus flow app API",
-        version = "0.1.0"
+        version = "1.2.1"
     ),
     modifiers(&SecurityAddon),
     tags(
@@ -76,7 +84,8 @@ impl Modify for SecurityAddon {
         (name = STATS_TAG, description = "Endpoints for retrieving statistics"),
         (name = SETTING_TAG, description = "Endpoints for managing user settings"),
         (name = USERS_TAG, description = "Endpoints for managing user"),
-        (name = AUTH_TAG, description = "Endpoints for authentication")
+        (name = AUTH_TAG, description = "Endpoints for authentication"),
+        (name = FLASHCARD_TAG, description = "Endpoints for flashcards")
     ),
     paths(
         crate::tasks::http::category::create_category::create_category_api,
@@ -103,6 +112,7 @@ impl Modify for SecurityAddon {
         crate::tasks::http::stats::get_stats::get_stats_api,
         crate::user::http::user_setting::get_user_settings::get_settings_api,
         crate::user::http::user_setting::update_setting::update_setting_api,
+        crate::flashcards::http::create_flashcard::create_flashcard_api,
     ),
     components(
         schemas(CreateCategoryDto, CreateCategoryResponseDto),
@@ -115,6 +125,7 @@ impl Modify for SecurityAddon {
         schemas(CreateSubtaskDto, CreateSubtaskResponseDto),
         schemas(CreateTaskDto),
         schemas(DeleteTasksDto, DeleteTaskResponseDto),
+        schemas(CreateFlashcardDto, CreateFlashcardResponseDto),
         schemas(CreateManualSessionDto, CreateManualSessionResponseDto),
         schemas(UpdateFocusSessionDto, UpdateFocusSessionResponseDto),
         schemas(GetSessionFiltersDto, GetSessionFiltersResponseDto),

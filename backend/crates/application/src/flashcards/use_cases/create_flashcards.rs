@@ -24,10 +24,10 @@ pub type CreateFlashcardResult<T> = Result<T, CreateFlashcardError>;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CreateFlashcardCommand {
-    front: String,
-    back: String,
-    user_id: Uuid,
-    folder_id: Uuid,
+    pub front: String,
+    pub back: String,
+    pub user_id: Uuid,
+    pub folder_id: Uuid,
 }
 
 pub struct CreateFlashcardUseCase {

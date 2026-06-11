@@ -111,7 +111,7 @@ pub async fn update_task_api(
         completed: payload.completed,
     };
 
-    state.update_task_uc.execute(command).await?;
+    state.tasks.update_task_uc.execute(command).await?;
 
     Ok(Json(UpdateTaskResponseDto { success: true }))
 }

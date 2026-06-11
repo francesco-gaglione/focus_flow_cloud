@@ -59,7 +59,7 @@ async fn handle_socket(ws: WebSocket, state: AppState, request_id: RequestId, us
 
         // Init user state
         if let Err(e) = state
-            .init_pomodoro_state_uc
+            .tasks.init_pomodoro_state_uc
             .execute(InitPomodoroStateCommand { user_id })
             .await
         {

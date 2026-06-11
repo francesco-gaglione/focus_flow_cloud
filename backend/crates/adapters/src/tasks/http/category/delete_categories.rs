@@ -69,7 +69,7 @@ pub async fn delete_categories_api(
     })?;
 
     let res = state
-        .delete_categories_uc
+        .tasks.delete_categories_uc
         .execute(vec![category_id])
         .await?;
 

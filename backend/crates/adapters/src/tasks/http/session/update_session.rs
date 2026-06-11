@@ -113,7 +113,7 @@ pub async fn update_session_api(
         ended_at,
     };
 
-    state.update_focus_session_uc.execute(command).await?;
+    state.tasks.update_focus_session_uc.execute(command).await?;
 
     Ok(Json(UpdateFocusSessionResponseDto {}))
 }

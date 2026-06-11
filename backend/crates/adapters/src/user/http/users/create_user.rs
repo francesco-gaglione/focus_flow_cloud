@@ -65,7 +65,7 @@ pub async fn create_user_api(
         requester_user_id: requester_id,
     };
 
-    state.register_user_uc.execute(cmd).await?;
+    state.user.register_user_uc.execute(cmd).await?;
 
     Ok(())
 }

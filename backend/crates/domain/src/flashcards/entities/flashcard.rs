@@ -2,6 +2,7 @@ use crate::flashcards::value_objects::memory_state::MemoryState;
 use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
+#[derive(Debug, Clone, PartialEq)]
 pub struct Flashcard {
     id: Uuid,
     user_id: Uuid,
@@ -20,6 +21,24 @@ impl Flashcard {
             user_id,
             memory_state: MemoryState::new(0., 0.),
             due_date: None,
+        }
+    }
+
+    pub fn reconstitute(
+        id: Uuid,
+        user_id: Uuid,
+        front: String,
+        back: String,
+        memory_state: MemoryState,
+        due_date: Option<DateTime<Utc>>,
+    ) -> Self {
+        Self {
+            id,
+            user_id,
+            front,
+            back,
+            memory_state,
+            due_date,
         }
     }
 

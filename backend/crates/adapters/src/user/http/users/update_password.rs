@@ -69,7 +69,7 @@ pub async fn update_password_api(
         new_password: SecretBox::new(payload.new_password.into_boxed_str()),
     };
 
-    state.update_password_uc.execute(cmd).await?;
+    state.user.update_password_uc.execute(cmd).await?;
 
     Ok(())
 }

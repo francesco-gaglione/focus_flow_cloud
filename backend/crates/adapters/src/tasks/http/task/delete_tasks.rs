@@ -59,7 +59,7 @@ pub async fn delete_tasks_api(
         .map_err(|e| HttpError::BadRequest(e.to_string()))?;
 
     let res = state
-        .delete_tasks_uc
+        .tasks.delete_tasks_uc
         .execute(
             payload.task_id.parse().unwrap(), // should be safe due to dto validation
         )

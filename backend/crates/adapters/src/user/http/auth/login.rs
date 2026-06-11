@@ -65,7 +65,7 @@ pub async fn login_api(
         password: SecretBox::new(payload.password.into_boxed_str()),
     };
 
-    let result = state.login_uc.execute(cmd).await?;
+    let result = state.user.login_uc.execute(cmd).await?;
 
     let session_data = UserSession {
         user_id: result.user_id,

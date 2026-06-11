@@ -42,7 +42,7 @@ pub struct GetAllCategoryResponseDto {
 pub async fn get_all_categories_api(
     State(state): State<AppState>,
 ) -> HttpResult<Json<GetAllCategoryResponseDto>> {
-    let categories = state.get_all_category_uc.execute().await?;
+    let categories = state.tasks.get_all_category_uc.execute().await?;
 
     let response = GetAllCategoryResponseDto {
         categories: categories

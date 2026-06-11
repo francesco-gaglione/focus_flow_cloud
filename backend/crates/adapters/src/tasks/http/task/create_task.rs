@@ -146,7 +146,7 @@ pub async fn create_task_api(
 
     tracing::info!("Creating task with command: {:?}", command);
 
-    let id = state.create_task_uc.execute(command).await?;
+    let id = state.tasks.create_task_uc.execute(command).await?;
     tracing::info!("Task created successfully: {}", id);
 
     Ok(Json(CreateTaskResponseDto { id: id.to_string() }))

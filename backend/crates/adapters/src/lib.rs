@@ -4,6 +4,7 @@ pub mod flashcards;
 pub mod http_error;
 pub mod middleware;
 pub mod openapi;
+mod routes;
 pub mod shared;
 pub mod tasks;
 pub mod user;

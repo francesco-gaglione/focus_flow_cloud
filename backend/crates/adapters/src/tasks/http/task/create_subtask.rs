@@ -80,7 +80,7 @@ pub async fn create_subtask_api(
         description: payload.description,
     };
 
-    let subtask_id = state.add_subtask_uc.execute(command).await?;
+    let subtask_id = state.tasks.add_subtask_uc.execute(command).await?;
 
     Ok(Json(CreateSubtaskResponseDto {
         id: subtask_id.to_string(),

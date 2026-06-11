@@ -37,7 +37,7 @@ pub async fn get_pending_reminders_api(
     State(state): State<AppState>,
     Extension(user): Extension<UserSession>,
 ) -> HttpResult<Json<GetPendingRemindersResponseDto>> {
-    let reminders = state.get_pending_reminders_uc.execute(user.user_id).await?;
+    let reminders = state.shared.get_pending_reminders_uc.execute(user.user_id).await?;
 
     Ok(Json(GetPendingRemindersResponseDto {
         reminders: reminders
