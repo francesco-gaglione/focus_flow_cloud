@@ -1,4 +1,10 @@
-use crate::flashcards::http::create_flashcard::{CreateFlashcardDto, CreateFlashcardResponseDto};
+use crate::flashcards::http::flashcards::create_flashcard::{
+    CreateFlashcardDto, CreateFlashcardResponseDto,
+};
+use crate::flashcards::http::folder::get_folder_content::{
+    FlashcardDto, FolderContentsResponseDto, FolderDto,
+};
+use crate::flashcards::http::folder::get_root_folder_content::RootFolderContentsResponseDto;
 use crate::tasks::http::category::create_category::{CreateCategoryDto, CreateCategoryResponseDto};
 use crate::tasks::http::category::delete_categories::{
     DeleteCategoriesDto, DeleteCategoriesResponseDto,
@@ -112,7 +118,9 @@ impl Modify for SecurityAddon {
         crate::tasks::http::stats::get_stats::get_stats_api,
         crate::user::http::user_setting::get_user_settings::get_settings_api,
         crate::user::http::user_setting::update_setting::update_setting_api,
-        crate::flashcards::http::create_flashcard::create_flashcard_api,
+        crate::flashcards::http::flashcards::create_flashcard::create_flashcard_api,
+        crate::flashcards::http::folder::get_folder_content::get_folder_contents_api,
+        crate::flashcards::http::folder::get_root_folder_content::get_root_folder_contents_api,
     ),
     components(
         schemas(CreateCategoryDto, CreateCategoryResponseDto),
@@ -126,6 +134,8 @@ impl Modify for SecurityAddon {
         schemas(CreateTaskDto),
         schemas(DeleteTasksDto, DeleteTaskResponseDto),
         schemas(CreateFlashcardDto, CreateFlashcardResponseDto),
+        schemas(FolderContentsResponseDto, FolderDto, FlashcardDto),
+        schemas(RootFolderContentsResponseDto),
         schemas(CreateManualSessionDto, CreateManualSessionResponseDto),
         schemas(UpdateFocusSessionDto, UpdateFocusSessionResponseDto),
         schemas(GetSessionFiltersDto, GetSessionFiltersResponseDto),

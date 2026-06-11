@@ -31,6 +31,7 @@ impl DeleteFlashcardUseCase {
     #[instrument(skip(self))]
     pub async fn execute(&self, id: Uuid) -> DeleteFlashcardResult<()> {
         self.flashcard_persistence.delete(id).await?;
+        tracing::info!("Flashcard deleted id={}", id);
         Ok(())
     }
 }

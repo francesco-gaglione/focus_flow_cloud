@@ -41,6 +41,7 @@ impl UpdateFlashcardUseCase {
     #[instrument(skip(self))]
     pub async fn execute(&self, command: UpdateFlashcardCommand) -> UpdateFlashcardResult<()> {
         if command.front.is_none() && command.back.is_none() {
+            tracing::warn!("Update flashcard called with nothing to do id={}", command.card_id);
             return Err(UpdateFlashcardError::NothingToDo);
         }
 
@@ -58,7 +59,7 @@ impl UpdateFlashcardUseCase {
         }
 
         self.flashcard_persistence.update(&flashcard).await?;
-
+        tracing::info!("Flashcard updated id={}", command.card_id);
         Ok(())
     }
 }

@@ -1,6 +1,7 @@
 use crate::flashcards::persistence::db_models::db_flashcard::{
     DbFlashcard, DbFlashcardFolderItem, NewDbFlashcard, UpdateDbFlashcard,
 };
+use crate::flashcards::persistence::db_models::db_folder::{DbFolder, NewDbFolder};
 use crate::shared::persistence::schema;
 use crate::shared::persistence::PostgresPersistence;
 use application::flashcards::traits::flashcard_persistence::FlashcardPersistence;
@@ -8,6 +9,7 @@ use application::shared::traits::persistence_error::{PersistenceError, Persisten
 use async_trait::async_trait;
 use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, SelectableHelper};
 use domain::flashcards::entities::flashcard::Flashcard;
+use domain::shared::entities::folder_metadata::FolderMetadata;
 use tracing::instrument;
 use uuid::Uuid;
 
@@ -146,6 +148,85 @@ impl FlashcardPersistence for PostgresPersistence {
                 id
             ))),
         }
+    }
+
+    #[instrument(skip(self))]
+    async fn find_subfolders_by_parent(
+        &self,
+        parent_id: &Uuid,
+    ) -> PersistenceResult<Vec<FolderMetadata>> {
+        let parent_id = *parent_id;
+
+        let rows = self
+            .with_transaction(move |conn| {
+                schema::flashcard_folders::table
+                    .filter(schema::flashcard_folders::parent_id.eq(parent_id))
+                    .select(DbFolder::as_select())
+                    .load::<DbFolder>(conn)
+            })
+            .await?;
+
+        Ok(rows.into_iter().map(FolderMetadata::from).collect())
+    }
+
+    #[instrument(skip(self))]
+    async fn find_root_folder_by_user(
+        &self,
+        user_id: &Uuid,
+    ) -> PersistenceResult<FolderMetadata> {
+        let user_id = *user_id;
+
+        let conn = self
+            .pool
+            .get()
+            .await
+            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?;
+
+        let result = conn
+            .interact(move |conn| {
+                schema::flashcard_folders::table
+                    .filter(schema::flashcard_folders::user_id.eq(user_id))
+                    .filter(schema::flashcard_folders::parent_id.is_null())
+                    .select(DbFolder::as_select())
+                    .first(conn)
+                    .optional()
+            })
+            .await
+            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?
+            .map_err(|e| PersistenceError::Unexpected(e.to_string()))?;
+
+        match result {
+            Some(row) => Ok(FolderMetadata::from(row)),
+            None => Err(PersistenceError::NotFound(format!(
+                "Root folder for user {} not found",
+                user_id
+            ))),
+        }
+    }
+
+    #[instrument(skip(self))]
+    async fn create_root_folder_for_user(
+        &self,
+        user_id: &Uuid,
+    ) -> PersistenceResult<FolderMetadata> {
+        let folder = FolderMetadata::new("root", *user_id);
+        let row = NewDbFolder {
+            id: folder.id(),
+            user_id: folder.user_id(),
+            name: folder.name().to_string(),
+            parent_id: None,
+            path: "/".to_string(),
+        };
+
+        self.with_transaction(move |conn| {
+            diesel::insert_into(schema::flashcard_folders::table)
+                .values(&row)
+                .execute(conn)?;
+            Ok(())
+        })
+        .await?;
+
+        Ok(folder)
     }
 
     #[instrument(skip(self))]

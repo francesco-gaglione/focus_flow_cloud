@@ -5,7 +5,7 @@ use crate::{
 use domain::flashcards::entities::flashcard::Flashcard;
 use std::sync::Arc;
 use thiserror::Error;
-use tracing::instrument;
+use tracing::{instrument, warn};
 use uuid::Uuid;
 
 #[derive(Debug, Error)]
@@ -44,9 +44,11 @@ impl CreateFlashcardUseCase {
     #[instrument(skip(self))]
     pub async fn execute(&self, command: CreateFlashcardCommand) -> CreateFlashcardResult<()> {
         if command.front.is_empty() {
+            warn!("Invalid front side for user_id={}", command.user_id);
             return Err(CreateFlashcardError::InvalidFrontSideCard);
         }
         if command.back.is_empty() {
+            warn!("Invalid back side for user_id={}", command.user_id);
             return Err(CreateFlashcardError::InvalidBackSideCard);
         }
 
@@ -55,6 +57,12 @@ impl CreateFlashcardUseCase {
             .save_to_folder(&flashcard, &command.folder_id)
             .await?;
 
+        tracing::info!(
+            "Flashcard created id={} user_id={} folder_id={}",
+            flashcard.id(),
+            command.user_id,
+            command.folder_id
+        );
         Ok(())
     }
 }

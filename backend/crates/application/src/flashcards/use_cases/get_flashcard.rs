@@ -31,6 +31,7 @@ impl GetFlashcardUseCase {
 
     #[instrument(skip(self))]
     pub async fn execute(&self, id: Uuid) -> GetFlashcardResult<Flashcard> {
+        tracing::info!("Fetching flashcard id={}", id);
         let flashcard = self.flashcard_persistence.find_by_id(id).await?;
         Ok(flashcard)
     }

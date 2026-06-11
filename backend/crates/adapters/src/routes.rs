@@ -8,6 +8,8 @@ pub fn api_routes(state: AppState) -> Router<AppState> {
         Router::new().nest("/version", crate::shared::http::version::routes::router());
 
     let protected_routes = Router::new()
+        .merge(crate::flashcards::http::flashcards::routes::routes())
+        .merge(crate::flashcards::http::folder::routes::routes())
         .nest("/category", crate::tasks::http::category::routes::router())
         .nest("/task", crate::tasks::http::task::routes::router())
         .nest(

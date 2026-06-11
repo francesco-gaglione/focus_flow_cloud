@@ -1,5 +1,6 @@
 use uuid::Uuid;
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FolderMetadata {
     id: Uuid,
     user_id: Uuid,
@@ -26,7 +27,13 @@ impl FolderMetadata {
         parent_id: Option<Uuid>,
         path: String,
     ) -> Self {
-        Self { id, user_id, name, parent_id, path }
+        Self {
+            id,
+            user_id,
+            name,
+            parent_id,
+            path,
+        }
     }
 
     pub fn id(&self) -> Uuid {

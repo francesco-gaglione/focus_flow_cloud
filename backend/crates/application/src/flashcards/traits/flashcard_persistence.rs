@@ -1,6 +1,7 @@
 use crate::shared::traits::persistence_error::PersistenceResult;
 use async_trait::async_trait;
 use domain::flashcards::entities::flashcard::Flashcard;
+use domain::shared::entities::folder_metadata::FolderMetadata;
 use uuid::Uuid;
 
 #[cfg_attr(test, mockall::automock)]
@@ -27,4 +28,16 @@ pub trait FlashcardPersistence: Send + Sync {
     async fn find_by_id(&self, id: Uuid) -> PersistenceResult<Flashcard>;
 
     async fn delete(&self, id: Uuid) -> PersistenceResult<()>;
+
+    async fn find_subfolders_by_parent(
+        &self,
+        parent_id: &Uuid,
+    ) -> PersistenceResult<Vec<FolderMetadata>>;
+
+    async fn find_root_folder_by_user(&self, user_id: &Uuid) -> PersistenceResult<FolderMetadata>;
+
+    async fn create_root_folder_for_user(
+        &self,
+        user_id: &Uuid,
+    ) -> PersistenceResult<FolderMetadata>;
 }

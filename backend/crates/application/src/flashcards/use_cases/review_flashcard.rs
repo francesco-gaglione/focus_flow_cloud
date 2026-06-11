@@ -83,6 +83,12 @@ impl ReviewFlashcardUseCase {
 
         self.flashcard_persistence.update(&flashcard).await?;
 
+        tracing::info!(
+            "Flashcard reviewed id={} rating={:?} interval_days={}",
+            command.flashcard_id,
+            command.rating,
+            chosen.interval_days
+        );
         Ok(())
     }
 }
