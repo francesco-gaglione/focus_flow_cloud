@@ -1,4 +1,5 @@
 pub mod category_persistence_impl;
+pub mod fsrs_adapter;
 pub mod focus_session_persistence_impl;
 pub mod persistence;
 pub mod pomodoro_state_in_memory_impl;

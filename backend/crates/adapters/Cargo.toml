@@ -48,6 +48,7 @@ sqlx = { version = "0.8.1", features = ["postgres", "runtime-tokio"] }
 web-push = "0.10"
 base64 = "0.13"
 futures = { version = "0.3", features = ["executor"] }
+fsrs = "6"
 
 [dev-dependencies]
 testcontainers.workspace = true
