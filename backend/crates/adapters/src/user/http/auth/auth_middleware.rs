@@ -7,37 +7,44 @@ use axum::{
     middleware::Next,
     response::Response,
 };
-use tracing::instrument;
+use serde::Deserialize;
 
-#[instrument(skip_all, name = "auth_middleware")]
+#[derive(Deserialize)]
+struct AuthQuery {
+    token: Option<String>,
+}
+
 pub async fn auth_middleware(
     State(state): State<AppState>,
     mut req: Request,
     next: Next,
 ) -> Result<Response, HttpError> {
-    let auth_header = req
+    let token = match req
         .headers()
         .get(header::AUTHORIZATION)
         .and_then(|h| h.to_str().ok())
-        .ok_or(HttpError::Unauthorized(
-            "Missing Authorization header".to_string(),
-        ))?;
-
-    let token = if let Some(stripped) = auth_header.strip_prefix("Bearer ") {
-        stripped
-    } else {
-        return Err(HttpError::Unauthorized(
-            "Invalid Authorization header format".to_string(),
-        ));
+        .and_then(|h| h.strip_prefix("Bearer "))
+    {
+        Some(t) => t.to_string(),
+        None => {
+            let query = req.uri().query().unwrap_or("");
+            let query_params: AuthQuery =
+                serde_urlencoded::from_str(query).unwrap_or(AuthQuery { token: None });
+            query_params.token.ok_or(HttpError::Unauthorized(
+                "Missing Authorization header or token query param".to_string(),
+            ))?
+        }
     };
 
     let user_id_str = state
         .token_service
-        .verify_token(token)
+        .verify_token(&token)
         .map_err(|_| HttpError::Unauthorized("Invalid token".to_string()))?;
 
     let user_id = uuid::Uuid::parse_str(&user_id_str)
         .map_err(|_| HttpError::Unauthorized("Invalid user ID in token".to_string()))?;
+
+    tracing::Span::current().record("user_id", user_id.to_string().as_str());
 
     let session = UserSession { user_id };
     req.extensions_mut().insert(session);

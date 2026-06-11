@@ -1,9 +1,8 @@
-use crate::http::{app_state::AppState, request_id::RequestId};
+use crate::shared::http::app_state::AppState;
+use crate::shared::http::request_id::RequestId;
 use crate::middleware::request_id_middleware::RequestIdLayer;
-use crate::{
-    http::routes::{api_routes, ws_routes},
-    openapi::ApiDoc,
-};
+use crate::shared::http::routes::{api_routes, ws_routes};
+use crate::openapi::ApiDoc;
 use axum::Router;
 use http::{header, Method};
 use time::Duration;

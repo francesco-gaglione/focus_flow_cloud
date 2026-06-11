@@ -1,9 +1,9 @@
 pub mod app;
-pub mod auth;
 pub mod config;
-pub mod http;
+pub mod flashcards;
 pub mod http_error;
 pub mod middleware;
 pub mod openapi;
-pub mod persistence;
-pub mod workers;
+pub mod shared;
+pub mod tasks;
+pub mod user;

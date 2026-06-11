@@ -45,12 +45,12 @@ use tokio::sync::RwLock;
 use crate::crypto::password_hasher::Argon2Hasher;
 use crate::database::run_migrations;
 use crate::services::jwt_service::JwtService;
-use adapters::auth::password_policy_impl::PasswordPolicyImpl;
+use adapters::user::auth::password_policy_impl::PasswordPolicyImpl;
 use adapters::config::AppConfig;
-use adapters::http::app_state::AppState;
-use adapters::persistence::persistence_impl::persistence::postgres_persistence;
-use adapters::persistence::persistence_impl::pomodoro_state_in_memory_impl::PomodoroStateInMermoryImpl;
-use adapters::persistence::persistence_impl::reminder_worker_port_impl::{
+use adapters::shared::http::app_state::AppState;
+use adapters::shared::persistence::impls::persistence::postgres_persistence;
+use adapters::tasks::persistence::impls::pomodoro_state_in_memory_impl::PomodoroStateInMermoryImpl;
+use adapters::shared::persistence::impls::reminder_worker_port_impl::{
     spawn_reminder_worker, ReminderWorkerPortImpl,
 };
 use application::tasks::use_cases::pomodoro_state::pause_session::PauseSessionUseCase;
