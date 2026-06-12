@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.2] - 2026-06-12
+
+### Bug Fixes
+
+- Fix doc
+- Add overdue section to task page
+
+### Other
+
+- Merge branch 'master' of https://github.com/francesco-gaglione/focus_flow_cloud
+- Merge branch 'release/1.2' of https://github.com/francesco-gaglione/focus_flow_cloud into release/1.2
+
 ## [1.2.1] - 2026-06-05
 
 ### Bug Fixes

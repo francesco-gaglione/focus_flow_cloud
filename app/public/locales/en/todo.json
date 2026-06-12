@@ -8,5 +8,6 @@
   "incoming": "Incoming",
   "unscheduled": "Unscheduled",
   "today": "Today",
-  "next_week": "Next week"
+  "next_week": "Next week",
+  "overdue": "Overdue"
 }

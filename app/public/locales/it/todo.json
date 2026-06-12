@@ -8,5 +8,6 @@
   "today": "Oggi",
   "next_week": "Prossima settimana",
   "incoming": "In arrivo",
-  "unscheduled": "Non pianificato"
+  "unscheduled": "Non pianificato",
+  "overdue": "In ritardo"
 }

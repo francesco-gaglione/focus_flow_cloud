@@ -27,6 +27,7 @@ pub struct TasksResponseDto {
     pub next_week: Vec<TaskDto>,
     pub unscheduled: Vec<TaskDto>,
     pub incoming: Vec<TaskDto>,
+    pub overdue: Vec<TaskDto>,
 }
 
 impl TasksResponseDto {
@@ -37,6 +38,7 @@ impl TasksResponseDto {
             .chain(self.incoming.iter())
             .chain(self.unscheduled.iter())
             .chain(self.completed.iter())
+            .chain(self.overdue.iter())
     }
 }
 
@@ -48,6 +50,7 @@ pub struct GetTasksParams {
     pub next_week: bool,
     pub unscheduled: bool,
     pub incoming: bool,
+    pub overdue: bool,
 }
 
 impl Default for GetTasksParams {
@@ -58,6 +61,7 @@ impl Default for GetTasksParams {
             next_week: true,
             unscheduled: true,
             incoming: true,
+            overdue: true,
         }
     }
 }
@@ -92,6 +96,7 @@ pub async fn get_tasks_api(
             next_week: params.next_week,
             unscheduled: params.unscheduled,
             incoming: params.incoming,
+            overdue: params.overdue,
         })
         .await?;
     tracing::info!("Fetched tasks");
@@ -117,5 +122,6 @@ pub async fn get_tasks_api(
             .iter()
             .map(task_dto::from_task_output)
             .collect(),
+        overdue: res.overdue.iter().map(task_dto::from_task_output).collect(),
     }))
 }
