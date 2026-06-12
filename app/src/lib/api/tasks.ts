@@ -19,6 +19,7 @@ export const tasks = {
         next_week: boolean,
         unscheduled: boolean,
         incoming: boolean,
+        overdue: boolean = true,
     ) => {
         return apiClient
             .get<TasksResponseDto>("/api/task", {
@@ -28,6 +29,7 @@ export const tasks = {
                     nextWeek: next_week,
                     unscheduled,
                     incoming,
+                    overdue,
                 },
             })
             .then((r) => r.data);
