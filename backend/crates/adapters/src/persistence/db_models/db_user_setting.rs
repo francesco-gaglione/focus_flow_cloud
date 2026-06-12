@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::persistence::schema;
-use domain::entities::user_setting::UserSetting;
+use domain::user::entities::user_setting::UserSetting;
 
 #[derive(Debug, Clone, Queryable, Selectable, Serialize, Deserialize)]
 #[diesel(table_name = schema::user_settings)]

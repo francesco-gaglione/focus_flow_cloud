@@ -1,7 +1,7 @@
 use crate::http_error::HttpResult;
 use crate::openapi::AUTH_TAG;
 use crate::{http::app_state::AppState, http_error::HttpError};
-use application::use_cases::user::refresh_token::{RefreshTokenCommand, RefreshTokenError};
+use application::user::use_cases::user::refresh_token::{RefreshTokenCommand, RefreshTokenError};
 use axum::extract::State;
 use axum::Json;
 use serde::{Deserialize, Serialize};

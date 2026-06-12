@@ -1,7 +1,7 @@
 use crate::http::app_state::AppState;
 use crate::http::model::session_model::UserSession;
 use crate::http_error::{map_persistence_error, HttpError, HttpResult};
-use application::use_cases::reminder::get_pending_reminders::GetPendingRemindersError;
+use application::shared::use_cases::reminder::get_pending_reminders::GetPendingRemindersError;
 use axum::extract::State;
 use axum::Extension;
 use axum::Json;

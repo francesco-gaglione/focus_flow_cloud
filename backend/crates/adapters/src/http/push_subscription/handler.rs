@@ -1,7 +1,7 @@
 use crate::http::app_state::AppState;
 use crate::http::model::session_model::UserSession;
 use crate::http_error::{HttpError, HttpResult};
-use application::use_cases::push_subscription::save_push_subscription::SavePushSubscriptionError;
+use application::shared::use_cases::push_subscription::save_push_subscription::SavePushSubscriptionError;
 use axum::{extract::State, Extension, Json};
 use serde::{Deserialize, Serialize};
 

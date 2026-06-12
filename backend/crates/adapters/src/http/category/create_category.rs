@@ -2,7 +2,7 @@ use crate::http::app_state::AppState;
 use crate::http::model::session_model::UserSession;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::CATEGORY_TAG;
-use application::use_cases::category::create_category_usecase::{
+use application::tasks::use_cases::category::create_category_usecase::{
     CreateCategoryCommand, CreateCategoryError,
 };
 use axum::{extract::State, Extension, Json};

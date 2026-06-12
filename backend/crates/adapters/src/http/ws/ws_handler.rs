@@ -2,7 +2,7 @@ use crate::http::request_id::RequestId;
 use crate::http::ws::error::WsHandlerResult;
 use crate::http::ws::handle_update_pomodoro_context::handle_update_pomodoro_context;
 use crate::http::{model::session_model::UserSession, ws::error::WsHandlerError};
-use application::use_cases::pomodoro_state::init_pomodoro_state::InitPomodoroStateCommand;
+use application::tasks::use_cases::pomodoro_state::init_pomodoro_state::InitPomodoroStateCommand;
 use axum::{
     extract::{
         ws::{Message, WebSocket, WebSocketUpgrade},

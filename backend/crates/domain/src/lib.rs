@@ -1,5 +1,5 @@
-pub mod entities;
+pub mod flashcards;
 pub mod helpers;
-pub mod services;
-pub mod traits;
-pub mod value_objects;
+pub mod shared;
+pub mod tasks;
+pub mod user;

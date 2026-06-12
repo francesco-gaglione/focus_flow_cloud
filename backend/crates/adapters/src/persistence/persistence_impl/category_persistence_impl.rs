@@ -1,12 +1,12 @@
 use crate::persistence::db_models::db_category::{DbCategory, NewDbCategory, UpdateDbCategory};
 use crate::persistence::schema;
 use crate::persistence::PostgresPersistence;
-use application::repository_traits::category_persistence::CategoryPersistence;
-use application::repository_traits::persistence_error::{PersistenceError, PersistenceResult};
+use application::shared::traits::persistence_error::{PersistenceError, PersistenceResult};
+use application::tasks::traits::category_persistence::CategoryPersistence;
 use async_trait::async_trait;
 use chrono::Utc;
 use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, SelectableHelper};
-use domain::entities::tasks::category::Category;
+use domain::tasks::entities::category::Category;
 use tracing::{error, info, instrument};
 use uuid::Uuid;
 

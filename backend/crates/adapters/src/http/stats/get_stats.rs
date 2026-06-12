@@ -1,4 +1,4 @@
-use application::use_cases::stats::get_stats::{
+use application::tasks::use_cases::stats::get_stats::{
     GetStatsCommand, GetStatsError, OverdueTrendTypeOutput, StatsOutput,
 };
 use axum::extract::{Extension, Query, State};

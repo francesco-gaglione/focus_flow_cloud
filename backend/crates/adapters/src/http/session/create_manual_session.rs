@@ -4,7 +4,7 @@ use crate::http::model::session_model::UserSession;
 use crate::http::validators::validate_uuid::validate_uuid;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::SESSION_TAG;
-use application::use_cases::focus_session::create_manual_session::{
+use application::tasks::use_cases::focus_session::create_manual_session::{
     CreateManualFocusSessionCommand, CreateManualSessionError,
 };
 use axum::{extract::State, Extension, Json};

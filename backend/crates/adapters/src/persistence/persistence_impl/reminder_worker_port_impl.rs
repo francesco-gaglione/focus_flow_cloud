@@ -3,9 +3,9 @@ use apalis::layers::retry::RetryPolicy;
 use apalis::prelude::*;
 use apalis_postgres::{Config, PgPool, PostgresStorage};
 use apalis_sql::ext::TaskBuilderExt;
-use application::repository_traits::push_subscription_persistence::PushSubscriptionPersistence;
-use application::repository_traits::reminder_persistence::ReminderPersistence;
-use application::repository_traits::reminder_worker_port::{
+use application::shared::traits::push_subscription_persistence::PushSubscriptionPersistence;
+use application::shared::traits::reminder_persistence::ReminderPersistence;
+use application::shared::traits::reminder_worker_port::{
     ReminderWorkerPort, WorkerPortError, WorkerPortResult,
 };
 use async_trait::async_trait;
