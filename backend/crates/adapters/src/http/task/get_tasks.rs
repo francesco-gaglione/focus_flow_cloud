@@ -2,7 +2,7 @@ use crate::http::dto::common::task_dto::{self, TaskDto};
 use crate::http_error::{map_persistence_error, HttpResult};
 use crate::openapi::TASK_TAG;
 use crate::{http::app_state::AppState, http_error::HttpError};
-use application::use_cases::task::get_tasks::{GetTaskError, GetTasksCommand};
+use application::tasks::use_cases::task::get_tasks::{GetTaskError, GetTasksCommand};
 use axum::extract::{Query, State};
 use axum::Json;
 use serde::{Deserialize, Serialize};

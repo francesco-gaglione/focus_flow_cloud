@@ -2,7 +2,7 @@ use diesel::{
     prelude::{AsChangeset, Insertable, Queryable},
     Selectable,
 };
-use domain::entities::{user::User, user_role::UserRole};
+use domain::user::entities::{user::User, user_role::UserRole};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 

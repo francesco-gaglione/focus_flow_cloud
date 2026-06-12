@@ -6,9 +6,9 @@ use crate::persistence::{
     db_models::db_user_setting::{DbUserSetting, NewDbUserSetting, UpdateDbUserSetting},
     schema, PostgresPersistence,
 };
-use application::repository_traits::persistence_error::{PersistenceError, PersistenceResult};
-use application::repository_traits::user_setting_persistence::UserSettingPersistence;
-use domain::entities::user_setting::UserSetting;
+use application::shared::traits::persistence_error::{PersistenceError, PersistenceResult};
+use application::user::traits::user_setting_persistence::UserSettingPersistence;
+use domain::user::entities::user_setting::UserSetting;
 
 #[async_trait]
 impl UserSettingPersistence for PostgresPersistence {

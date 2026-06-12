@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use chrono::{Duration, Utc};
-use domain::services::token_service::{TokenService, TokenServiceError};
-use domain::{entities::user::User, services::token_service::TokenServiceResult};
+use domain::user::services::token_service::{TokenService, TokenServiceError};
+use domain::user::{entities::user::User, services::token_service::TokenServiceResult};
 use jsonwebtoken::{encode, EncodingKey, Header};
 use secrecy::{ExposeSecret, SecretBox};
 use serde::{Deserialize, Serialize};

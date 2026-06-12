@@ -1,8 +1,8 @@
 use crate::persistence::schema;
 use chrono::{DateTime, Utc};
 use diesel::{AsChangeset, Insertable, Queryable, Selectable};
-use domain::entities::focus_session::{FocusSession, TerminatedSession};
-use domain::entities::focus_session_type::FocusSessionType;
+use domain::tasks::entities::focus_session::{FocusSession, TerminatedSession};
+use domain::tasks::entities::focus_session_type::FocusSessionType;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 

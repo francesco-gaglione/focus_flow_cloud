@@ -2,7 +2,7 @@ use crate::http::app_state::AppState;
 use crate::http::validators::validate_uuid::validate_uuid;
 use crate::http_error::{map_persistence_error, HttpError, HttpResult};
 use crate::openapi::CATEGORY_TAG;
-use application::use_cases::category::update_category_usecase::{
+use application::tasks::use_cases::category::update_category_usecase::{
     UpdateCategoryCommand, UpdateCategoryError,
 };
 

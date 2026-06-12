@@ -2,7 +2,7 @@ use crate::http::model::session_model::UserSession;
 use crate::http_error::HttpResult;
 use crate::openapi::USERS_TAG;
 use crate::{http::app_state::AppState, http_error::HttpError};
-use application::use_cases::user::register_user::{RegisterUserCommand, RegisterUserError};
+use application::user::use_cases::user::register_user::{RegisterUserCommand, RegisterUserError};
 use axum::{extract::State, Extension, Json};
 use secrecy::SecretBox;
 use serde::{Deserialize, Serialize};
