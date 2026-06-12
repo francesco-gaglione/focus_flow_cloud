@@ -29,6 +29,7 @@ pub struct GetTasksCommand {
     pub next_week: bool,
     pub unscheduled: bool,
     pub incoming: bool,
+    pub overdue: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -38,6 +39,7 @@ pub struct TasksOutput {
     pub incoming: Vec<TaskOutput>,
     pub unscheduled: Vec<TaskOutput>,
     pub completed: Vec<TaskOutput>,
+    pub overdue: Vec<TaskOutput>,
 }
 
 #[derive(Debug, Clone)]
@@ -206,6 +208,19 @@ impl GetTasksUseCase {
             Vec::new()
         };
 
+        let mut overdue_tasks: Vec<TaskOutput> = if command.overdue {
+            res.iter()
+                .filter(|t| t.schedule().is_overdue() && !t.is_completed())
+                .map(|t| {
+                    let mut output = TaskOutput::from(t);
+                    output.reminders = reminders_by_task.remove(&t.id()).unwrap_or_default();
+                    output
+                })
+                .collect()
+        } else {
+            Vec::new()
+        };
+
         // Sort tasks by priority
         today_tasks.sort_by_key(|t| match t.priority {
             Some(TaskPriority::Urgent) => 0,
@@ -247,12 +262,21 @@ impl GetTasksUseCase {
             None => 4,
         });
 
+        overdue_tasks.sort_by_key(|t| match t.priority {
+            Some(TaskPriority::Urgent) => 0,
+            Some(TaskPriority::High) => 1,
+            Some(TaskPriority::Medium) => 2,
+            Some(TaskPriority::Low) => 3,
+            None => 4,
+        });
+
         Ok(TasksOutput {
             today: today_tasks,
             next_week: next_week_tasks,
             incoming: incoming_tasks,
             unscheduled: unscheduled_tasks,
             completed,
+            overdue: overdue_tasks,
         })
     }
 }
@@ -329,6 +353,7 @@ mod tests {
             next_week: true,
             incoming: true,
             unscheduled: true,
+            overdue: false,
         };
 
         let result = use_case
@@ -369,6 +394,7 @@ mod tests {
             next_week: false,
             incoming: false,
             unscheduled: false,
+            overdue: false,
         };
 
         let result = use_case
