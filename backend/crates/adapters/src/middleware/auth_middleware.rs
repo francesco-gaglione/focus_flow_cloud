@@ -1,5 +1,5 @@
-use crate::http::app_state::AppState;
-use crate::http::model::session_model::UserSession;
+use crate::shared::http::app_state::AppState;
+use crate::shared::http::model::session_model::UserSession;
 use crate::http_error::HttpError;
 use axum::{
     extract::{Request, State},
