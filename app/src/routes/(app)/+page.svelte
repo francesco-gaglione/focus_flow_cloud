@@ -127,6 +127,7 @@
             incoming: [],
             unscheduled: [],
             completed: [],
+            overdue: [],
         },
     );
 
@@ -145,12 +146,14 @@
     let incomingTasks = $derived(filterByCategory(taskGroups.incoming));
     let unscheduledTasks = $derived(filterByCategory(taskGroups.unscheduled));
     let completedTasks = $derived(filterByCategory(taskGroups.completed));
+    let overdueTasks = $derived(filterByCategory(taskGroups.overdue));
 
     let totalTasksCount = $derived(
         todayTasks.length +
             nextWeekTasks.length +
             incomingTasks.length +
             unscheduledTasks.length +
+            overdueTasks.length +
             (showCompleted ? completedTasks.length : 0),
     );
 
@@ -340,6 +343,43 @@
                     {/if}
                 </button>
             </div>
+        {/if}
+
+        {#if overdueTasks.length > 0}
+            <details class="group animated-details" open>
+                <summary
+                    class="flex items-center justify-between px-4 py-3 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden"
+                >
+                    <span
+                        class="text-xs font-mono tracking-widest uppercase text-error-500"
+                    >
+                        {$_("todo.overdue")}
+                    </span>
+                    <div class="flex items-center gap-2 text-error-500">
+                        <span class="badge preset-tonal-error text-[10px]"
+                            >{overdueTasks.length}</span
+                        >
+                        <svg
+                            class="size-4 transition-transform group-open:rotate-180"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="m6 9 6 6 6-6" />
+                        </svg>
+                    </div>
+                </summary>
+                <div class="details-content">
+                    <div class="pb-2">
+                        {#each overdueTasks as task (task.id)}
+                            <TaskRow {task} categories={allCats} />
+                        {/each}
+                    </div>
+                </div>
+            </details>
         {/if}
 
         {@render taskSection(
