@@ -1,7 +1,7 @@
-use crate::shared::http::app_state::AppState;
-use crate::shared::http::validators::validate_uuids::validate_uuids;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::SESSION_TAG;
+use crate::shared::http::app_state::AppState;
+use crate::shared::http::validators::validate_uuids::validate_uuids;
 use application::tasks::use_cases::focus_session::find_sessions_by_filters::{
     ConcentrationScoreFilter, FindSessionByFiltersError, FindSessionFiltersCommand,
     FocusSessionDateFilter, FocusSessionOutput,
@@ -23,6 +23,11 @@ impl From<FindSessionByFiltersError> for HttpError {
         }
     }
 }
+use crate::shared::http::model::session_model::UserSession;
+use crate::tasks::http::dto::{
+    focus_session::FocusSessionDto,
+    session_type_enum::{domain_to_enum, SessionTypeEnum},
+};
 use axum::extract::{Extension, Query, State};
 use axum::Json;
 use domain::tasks::entities::focus_session_type::FocusSessionType;
@@ -30,12 +35,6 @@ use serde::{Deserialize, Deserializer, Serialize};
 use tracing::debug;
 use utoipa::{IntoParams, ToSchema};
 use validator::Validate;
-
-use crate::tasks::http::dto::{
-    focus_session::FocusSessionDto,
-    session_type_enum::{domain_to_enum, SessionTypeEnum},
-};
-use crate::shared::http::model::session_model::UserSession;
 
 fn deserialize_option_string_or_vec<'de, D>(
     deserializer: D,
@@ -178,7 +177,11 @@ pub async fn get_sessions(
         has_notes: query.has_notes,
     };
 
-    let sessions = state.tasks.find_sessions_by_filters_uc.execute(filters).await?;
+    let sessions = state
+        .tasks
+        .find_sessions_by_filters_uc
+        .execute(filters)
+        .await?;
 
     let response_dto = GetSessionFiltersResponseDto {
         focus_sessions: sessions.into_iter().map(focus_session_to_dto).collect(),

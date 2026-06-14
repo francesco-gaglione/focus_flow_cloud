@@ -1,8 +1,8 @@
+use crate::shared::persistence::schema;
+use crate::shared::persistence::PostgresPersistence;
 use crate::tasks::persistence::db_models::db_focus_session::{
     DbFocusSession, NewDbFocusSession, UpdateDbFocusSession,
 };
-use crate::shared::persistence::schema;
-use crate::shared::persistence::PostgresPersistence;
 use application::shared::traits::persistence_error::{PersistenceError, PersistenceResult};
 use application::tasks::traits::focus_session_repository::{
     FindByFiltersCommand, FocusSessionRepository,

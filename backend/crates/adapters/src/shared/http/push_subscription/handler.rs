@@ -1,6 +1,6 @@
+use crate::http_error::{HttpError, HttpResult};
 use crate::shared::http::app_state::AppState;
 use crate::shared::http::model::session_model::UserSession;
-use crate::http_error::{HttpError, HttpResult};
 use application::shared::use_cases::push_subscription::save_push_subscription::SavePushSubscriptionError;
 use axum::{extract::State, Extension, Json};
 use serde::{Deserialize, Serialize};
@@ -36,7 +36,8 @@ pub async fn save_push_subscription_api(
     Json(payload): Json<SavePushSubscriptionDto>,
 ) -> HttpResult<Json<SavePushSubscriptionResponseDto>> {
     let id = state
-        .shared.save_push_subscription_uc
+        .shared
+        .save_push_subscription_uc
         .execute(
             user.user_id,
             payload.endpoint,

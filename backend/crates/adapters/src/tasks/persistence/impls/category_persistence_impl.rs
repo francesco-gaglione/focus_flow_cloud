@@ -1,6 +1,8 @@
-use crate::tasks::persistence::db_models::db_category::{DbCategory, NewDbCategory, UpdateDbCategory};
 use crate::shared::persistence::schema;
 use crate::shared::persistence::PostgresPersistence;
+use crate::tasks::persistence::db_models::db_category::{
+    DbCategory, NewDbCategory, UpdateDbCategory,
+};
 use application::shared::traits::persistence_error::{PersistenceError, PersistenceResult};
 use application::tasks::traits::category_persistence::CategoryPersistence;
 use async_trait::async_trait;

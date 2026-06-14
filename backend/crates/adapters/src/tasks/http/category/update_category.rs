@@ -1,7 +1,7 @@
-use crate::shared::http::app_state::AppState;
-use crate::shared::http::validators::validate_uuid::validate_uuid;
 use crate::http_error::{map_persistence_error, HttpError, HttpResult};
 use crate::openapi::CATEGORY_TAG;
+use crate::shared::http::app_state::AppState;
+use crate::shared::http::validators::validate_uuid::validate_uuid;
 use application::tasks::use_cases::category::update_category_usecase::{
     UpdateCategoryCommand, UpdateCategoryError,
 };
@@ -84,7 +84,8 @@ pub async fn update_category_api(
         .map_err(|_| HttpError::BadRequest("Category id malformed".to_string()))?;
 
     state
-        .tasks.update_category_uc
+        .tasks
+        .update_category_uc
         .execute(UpdateCategoryCommand {
             id: category_id,
             name: payload.name,

@@ -1,5 +1,8 @@
 pub mod create_flashcards;
+pub mod create_folder;
 pub mod delete_flashcard;
+pub mod delete_folder;
+pub mod get_due_flashcards;
 pub mod get_flashcard;
 pub mod get_folder_contents;
 pub mod review_flashcard;

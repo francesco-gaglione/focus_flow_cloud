@@ -1,7 +1,7 @@
-use crate::shared::http::app_state::AppState;
-use crate::shared::http::validators::validate_uuid::validate_uuid;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::SESSION_TAG;
+use crate::shared::http::app_state::AppState;
+use crate::shared::http::validators::validate_uuid::validate_uuid;
 use application::tasks::use_cases::focus_session::update_focus_session::{
     UpdateFocusSessionCommand, UpdateFocusSessionError,
 };

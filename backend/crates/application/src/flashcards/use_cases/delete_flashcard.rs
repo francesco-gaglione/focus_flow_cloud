@@ -54,9 +54,7 @@ mod tests_delete_flashcard_use_case {
     async fn test_delete_flashcard_success() {
         let mut mock = MockFlashcardPersistence::new();
 
-        mock.expect_delete()
-            .times(1)
-            .returning(|_| Ok(()));
+        mock.expect_delete().times(1).returning(|_| Ok(()));
 
         let uc = DeleteFlashcardUseCase::new(Arc::new(mock));
         let res = uc.execute(Uuid::new_v4()).await;

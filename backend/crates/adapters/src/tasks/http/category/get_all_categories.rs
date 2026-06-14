@@ -1,7 +1,7 @@
-use crate::shared::http::app_state::AppState;
-use crate::tasks::http::dto::category_dto::CategoryDto;
 use crate::http_error::{map_persistence_error, HttpError, HttpResult};
 use crate::openapi::CATEGORY_TAG;
+use crate::shared::http::app_state::AppState;
+use crate::tasks::http::dto::category_dto::CategoryDto;
 use application::tasks::use_cases::category::get_all_category_usecase::GetAllCategoryError;
 use axum::extract::State;
 use axum::Json;

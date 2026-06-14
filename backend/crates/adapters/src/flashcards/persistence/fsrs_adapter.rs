@@ -36,11 +36,7 @@ fn from_fsrs_memory_state(ms: FsrsMemoryState) -> MemoryState {
 }
 
 impl SpacedRepetitionPort for FsrsAdapter {
-    fn next_states(
-        &self,
-        memory_state: Option<MemoryState>,
-        elapsed_days: u32,
-    ) -> SrsNextStates {
+    fn next_states(&self, memory_state: Option<MemoryState>, elapsed_days: u32) -> SrsNextStates {
         let fsrs_state = memory_state.map(to_fsrs_memory_state);
 
         let next = self

@@ -52,6 +52,16 @@ export type { UpdateUsernameDto } from './generated/UpdateUsernameDto'
 export type { UpdatePasswordDto } from './generated/UpdatePasswordDto'
 export type { UserSettingDto } from './generated/UserSettingDto'
 
+export type { FlashcardDto } from './generated/FlashcardDto'
+export type { FolderDto } from './generated/FolderDto'
+export type { FolderContentsResponseDto } from './generated/FolderContentsResponseDto'
+export type { RootFolderContentsResponseDto } from './generated/RootFolderContentsResponseDto'
+export type { CreateFlashcardDto } from './generated/CreateFlashcardDto'
+export type { UpdateFlashcardDto } from './generated/UpdateFlashcardDto'
+export type { ReviewFlashcardDto, CardRating } from './generated/ReviewFlashcardDto'
+export type { DueFlashcardsResponseDto } from './generated/DueFlashcardsResponseDto'
+export type { CreateFolderDto } from './generated/CreateFolderDto'
+
 // WebSocket types (not in backend shared crate yet)
 export type WsSessionType = 'Work' | 'ShortBreak' | 'LongBreak'
 

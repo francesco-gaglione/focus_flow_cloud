@@ -1,7 +1,7 @@
-use crate::shared::http::app_state::AppState;
-use crate::user::http::dto::user_setting_dto::UserSettingDto;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::SETTING_TAG;
+use crate::shared::http::app_state::AppState;
+use crate::user::http::dto::user_setting_dto::UserSettingDto;
 use application::user::use_cases::user_settings::get_settings::GetSettingsError;
 use axum::extract::State;
 use axum::Json;

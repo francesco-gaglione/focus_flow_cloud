@@ -1,14 +1,13 @@
 use adapters::app::create_app;
 use adapters::config::AppConfig;
-use adapters::http::category::create_category::CreateCategoryResponseDto;
-use adapters::http::task::create_task::{CreateTaskDto, CreateTaskResponseDto};
-use adapters::http::{
-    category::create_category::CreateCategoryDto,
-    session::create_manual_session::{CreateManualSessionDto, CreateManualSessionResponseDto},
-    user_setting::{
-        get_user_settings::UserSettingsResponseDto, update_setting::UpdateUserSettingDto,
-    },
+use adapters::tasks::http::category::create_category::CreateCategoryDto;
+use adapters::tasks::http::category::create_category::CreateCategoryResponseDto;
+use adapters::tasks::http::session::create_manual_session::{
+    CreateManualSessionDto, CreateManualSessionResponseDto,
 };
+use adapters::tasks::http::task::create_task::{CreateTaskDto, CreateTaskResponseDto};
+use adapters::user::http::user_setting::get_user_settings::UserSettingsResponseDto;
+use adapters::user::http::user_setting::update_setting::UpdateUserSettingDto;
 use infrastructure::setup::{init_app_state, init_tracing};
 use std::sync::Once;
 use testcontainers::runners::AsyncRunner;
@@ -111,7 +110,7 @@ impl TestContext {
     }
 
     #[allow(dead_code)]
-    pub async fn create_user(&self, dto: &adapters::http::users::create_user::CreateUserDto) {
+    pub async fn create_user(&self, dto: &adapters::user::http::users::create_user::CreateUserDto) {
         let response = self
             .client
             .post(format!("{}/api/users", self.base_url))

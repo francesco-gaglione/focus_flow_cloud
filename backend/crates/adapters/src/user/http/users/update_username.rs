@@ -1,7 +1,7 @@
-use crate::shared::http::app_state::AppState;
-use crate::shared::http::model::session_model::UserSession;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::USERS_TAG;
+use crate::shared::http::app_state::AppState;
+use crate::shared::http::model::session_model::UserSession;
 use application::user::use_cases::user::update_user_username::{
     UpdateUserUsernameCommand, UpdateUserUsernameError,
 };

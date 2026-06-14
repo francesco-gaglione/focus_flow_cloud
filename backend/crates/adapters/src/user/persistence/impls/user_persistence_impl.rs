@@ -1,6 +1,6 @@
-use crate::user::persistence::db_models::db_user::{DbUser, NewDbUser, UpdateDbUser};
 use crate::shared::persistence::schema;
 use crate::shared::persistence::PostgresPersistence;
+use crate::user::persistence::db_models::db_user::{DbUser, NewDbUser, UpdateDbUser};
 use application::shared::traits::persistence_error::{PersistenceError, PersistenceResult};
 use application::user::traits::user_persistence::UserPersistence;
 use async_trait::async_trait;

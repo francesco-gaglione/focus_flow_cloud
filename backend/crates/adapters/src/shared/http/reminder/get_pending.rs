@@ -1,6 +1,6 @@
+use crate::http_error::{map_persistence_error, HttpError, HttpResult};
 use crate::shared::http::app_state::AppState;
 use crate::shared::http::model::session_model::UserSession;
-use crate::http_error::{map_persistence_error, HttpError, HttpResult};
 use application::shared::use_cases::reminder::get_pending_reminders::GetPendingRemindersError;
 use axum::extract::State;
 use axum::Extension;
@@ -37,7 +37,11 @@ pub async fn get_pending_reminders_api(
     State(state): State<AppState>,
     Extension(user): Extension<UserSession>,
 ) -> HttpResult<Json<GetPendingRemindersResponseDto>> {
-    let reminders = state.shared.get_pending_reminders_uc.execute(user.user_id).await?;
+    let reminders = state
+        .shared
+        .get_pending_reminders_uc
+        .execute(user.user_id)
+        .await?;
 
     Ok(Json(GetPendingRemindersResponseDto {
         reminders: reminders

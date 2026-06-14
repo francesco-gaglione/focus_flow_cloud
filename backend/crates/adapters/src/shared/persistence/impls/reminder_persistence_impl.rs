@@ -132,9 +132,9 @@ impl ReminderPersistence for PostgresPersistence {
 
 #[cfg(test)]
 mod tests {
-    use crate::user::persistence::db_models::db_user::NewDbUser;
     use crate::shared::persistence::impls::persistence::postgres_persistence;
     use crate::shared::persistence::schema;
+    use crate::user::persistence::db_models::db_user::NewDbUser;
     use application::shared::traits::reminder_persistence::ReminderPersistence;
     use chrono::Utc;
     use diesel::RunQueryDsl;
@@ -165,7 +165,9 @@ mod tests {
         (persistence, container)
     }
 
-    async fn create_test_user(persistence: &crate::shared::persistence::PostgresPersistence) -> Uuid {
+    async fn create_test_user(
+        persistence: &crate::shared::persistence::PostgresPersistence,
+    ) -> Uuid {
         let new_user = NewDbUser {
             username: format!("user_{}", Uuid::new_v4()),
             hashed_password: "hashed".to_string(),

@@ -1,6 +1,19 @@
 use crate::flashcards::http::flashcards::create_flashcard::{
     CreateFlashcardDto, CreateFlashcardResponseDto,
 };
+use crate::flashcards::http::flashcards::delete_flashcard::DeleteFlashcardResponseDto;
+use crate::flashcards::http::flashcards::get_due_flashcards::{
+    DueFlashcardDto, DueFlashcardsResponseDto,
+};
+use crate::flashcards::http::flashcards::get_flashcard::GetFlashcardResponseDto;
+use crate::flashcards::http::flashcards::review_flashcard::{
+    CardRatingDto, ReviewFlashcardDto, ReviewFlashcardResponseDto,
+};
+use crate::flashcards::http::flashcards::update_flashcard::{
+    UpdateFlashcardDto, UpdateFlashcardResponseDto,
+};
+use crate::flashcards::http::folder::create_folder::{CreateFolderDto, CreateFolderResponseDto};
+use crate::flashcards::http::folder::delete_folder::DeleteFolderResponseDto;
 use crate::flashcards::http::folder::get_folder_content::{
     FlashcardDto, FolderContentsResponseDto, FolderDto,
 };
@@ -119,6 +132,13 @@ impl Modify for SecurityAddon {
         crate::user::http::user_setting::get_user_settings::get_settings_api,
         crate::user::http::user_setting::update_setting::update_setting_api,
         crate::flashcards::http::flashcards::create_flashcard::create_flashcard_api,
+        crate::flashcards::http::flashcards::get_flashcard::get_flashcard_api,
+        crate::flashcards::http::flashcards::update_flashcard::update_flashcard_api,
+        crate::flashcards::http::flashcards::delete_flashcard::delete_flashcard_api,
+        crate::flashcards::http::flashcards::review_flashcard::review_flashcard_api,
+        crate::flashcards::http::flashcards::get_due_flashcards::get_due_flashcards_api,
+        crate::flashcards::http::folder::create_folder::create_folder_api,
+        crate::flashcards::http::folder::delete_folder::delete_folder_api,
         crate::flashcards::http::folder::get_folder_content::get_folder_contents_api,
         crate::flashcards::http::folder::get_root_folder_content::get_root_folder_contents_api,
     ),
@@ -134,6 +154,13 @@ impl Modify for SecurityAddon {
         schemas(CreateTaskDto),
         schemas(DeleteTasksDto, DeleteTaskResponseDto),
         schemas(CreateFlashcardDto, CreateFlashcardResponseDto),
+        schemas(GetFlashcardResponseDto),
+        schemas(UpdateFlashcardDto, UpdateFlashcardResponseDto),
+        schemas(DeleteFlashcardResponseDto),
+        schemas(CardRatingDto, ReviewFlashcardDto, ReviewFlashcardResponseDto),
+        schemas(DueFlashcardDto, DueFlashcardsResponseDto),
+        schemas(CreateFolderDto, CreateFolderResponseDto),
+        schemas(DeleteFolderResponseDto),
         schemas(FolderContentsResponseDto, FolderDto, FlashcardDto),
         schemas(RootFolderContentsResponseDto),
         schemas(CreateManualSessionDto, CreateManualSessionResponseDto),

@@ -1,8 +1,8 @@
-use crate::tasks::http::dto::task_dto::{self, TaskDto};
+use crate::http_error::HttpError;
 use crate::http_error::{map_persistence_error, HttpResult};
 use crate::openapi::TASK_TAG;
 use crate::shared::http::app_state::AppState;
-use crate::http_error::HttpError;
+use crate::tasks::http::dto::task_dto::{self, TaskDto};
 use application::tasks::use_cases::task::get_tasks::{GetTaskError, GetTasksCommand};
 use axum::extract::{Query, State};
 use axum::Json;
@@ -89,7 +89,8 @@ pub async fn get_tasks_api(
 ) -> HttpResult<Json<TasksResponseDto>> {
     tracing::info!("Fetching tasks with completed: {:?}", params.completed);
     let res = state
-        .tasks.get_tasks_uc
+        .tasks
+        .get_tasks_uc
         .execute(GetTasksCommand {
             completed: params.completed,
             today: params.today,

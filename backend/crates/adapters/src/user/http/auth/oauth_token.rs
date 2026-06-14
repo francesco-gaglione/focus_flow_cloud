@@ -1,6 +1,6 @@
-use crate::shared::http::app_state::AppState;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::AUTH_TAG;
+use crate::shared::http::app_state::AppState;
 use application::user::use_cases::user::login_user::LoginCommand;
 use axum::extract::State;
 use axum::Form;
@@ -45,7 +45,12 @@ pub async fn oauth_token_api(
         password: SecretBox::new(form.password.into_boxed_str()),
     };
 
-    let result = state.user.login_uc.execute(cmd).await.map_err(HttpError::from)?;
+    let result = state
+        .user
+        .login_uc
+        .execute(cmd)
+        .await
+        .map_err(HttpError::from)?;
 
     Ok(Json(OAuthTokenResponse {
         access_token: result.token,

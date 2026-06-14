@@ -132,10 +132,10 @@ pub struct WeekCountDto {
     pub count: usize,
 }
 
-use crate::shared::http::app_state::AppState;
-use crate::shared::http::model::session_model::UserSession;
 use crate::http_error::{map_persistence_error, HttpError, HttpResult};
 use crate::openapi::STATS_TAG;
+use crate::shared::http::app_state::AppState;
+use crate::shared::http::model::session_model::UserSession;
 
 impl From<GetStatsError> for HttpError {
     fn from(err: GetStatsError) -> Self {
@@ -237,7 +237,8 @@ pub async fn get_stats_api(
     Query(query): Query<GetStatsQuery>,
 ) -> HttpResult<Json<GetStatsResponseDto>> {
     let result = state
-        .tasks.get_stats_uc
+        .tasks
+        .get_stats_uc
         .execute(GetStatsCommand {
             user_id: session.user_id,
             tz_offset_minutes: query.tz_offset.unwrap_or(0),

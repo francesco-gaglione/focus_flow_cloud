@@ -1,12 +1,11 @@
 mod common;
 
-use adapters::http::dto::common::task_dto::TaskScheduleDto;
-use adapters::http::task::create_task::CreateTaskDto;
-use adapters::http::task::get_tasks::TasksResponseDto;
-use adapters::http::task::update_task::{UpdateTaskDto, UpdateTaskResponseDto};
-use adapters::http::{
-    category::create_category::CreateCategoryDto, task::delete_tasks::DeleteTaskResponseDto,
-};
+use adapters::tasks::http::category::create_category::CreateCategoryDto;
+use adapters::tasks::http::dto::task_dto::TaskScheduleDto;
+use adapters::tasks::http::task::create_task::CreateTaskDto;
+use adapters::tasks::http::task::delete_tasks::DeleteTaskResponseDto;
+use adapters::tasks::http::task::get_tasks::TasksResponseDto;
+use adapters::tasks::http::task::update_task::{UpdateTaskDto, UpdateTaskResponseDto};
 use chrono::Utc;
 
 use crate::common::setup;

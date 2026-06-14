@@ -1,3 +1,5 @@
+use crate::crypto::password_hasher::Argon2Hasher;
+use crate::services::jwt_service::JwtService;
 use adapters::shared::http::app_state::user_state::UserState;
 use adapters::shared::persistence::PostgresPersistence;
 use adapters::user::auth::password_policy_impl::PasswordPolicyImpl;
@@ -9,8 +11,6 @@ use application::user::use_cases::user::update_password::UpdateUserPasswordUseCa
 use application::user::use_cases::user::update_user_username::UpdateUserUsernameUseCase;
 use application::user::use_cases::user_settings::get_settings::GetSettingsUseCase;
 use application::user::use_cases::user_settings::update_setting::UpdateSettingUseCase;
-use crate::crypto::password_hasher::Argon2Hasher;
-use crate::services::jwt_service::JwtService;
 use std::sync::Arc;
 
 pub fn build_user_state(

@@ -1,7 +1,7 @@
-use crate::shared::http::app_state::AppState;
-use crate::shared::http::validators::validate_uuid::validate_uuid;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::TASK_TAG;
+use crate::shared::http::app_state::AppState;
+use crate::shared::http::validators::validate_uuid::validate_uuid;
 use application::tasks::use_cases::task::delete_task::DeleteTaskError;
 use axum::extract::{Query, State};
 use axum::Json;
@@ -59,7 +59,8 @@ pub async fn delete_tasks_api(
         .map_err(|e| HttpError::BadRequest(e.to_string()))?;
 
     let res = state
-        .tasks.delete_tasks_uc
+        .tasks
+        .delete_tasks_uc
         .execute(
             payload.task_id.parse().unwrap(), // should be safe due to dto validation
         )

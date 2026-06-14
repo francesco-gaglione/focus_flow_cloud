@@ -7,6 +7,7 @@ use crate::shared::persistence::PostgresPersistence;
 use application::flashcards::traits::flashcard_persistence::FlashcardPersistence;
 use application::shared::traits::persistence_error::{PersistenceError, PersistenceResult};
 use async_trait::async_trait;
+use chrono::Utc;
 use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, SelectableHelper};
 use domain::flashcards::entities::flashcard::Flashcard;
 use domain::shared::entities::folder_metadata::FolderMetadata;
@@ -170,10 +171,7 @@ impl FlashcardPersistence for PostgresPersistence {
     }
 
     #[instrument(skip(self))]
-    async fn find_root_folder_by_user(
-        &self,
-        user_id: &Uuid,
-    ) -> PersistenceResult<FolderMetadata> {
+    async fn find_root_folder_by_user(&self, user_id: &Uuid) -> PersistenceResult<FolderMetadata> {
         let user_id = *user_id;
 
         let conn = self
@@ -243,6 +241,93 @@ impl FlashcardPersistence for PostgresPersistence {
             true => Ok(()),
             false => Err(PersistenceError::NotFound(format!(
                 "Flashcard with id {} not found",
+                id
+            ))),
+        }
+    }
+
+    #[instrument(skip(self))]
+    async fn find_due_by_user(&self, user_id: &Uuid) -> PersistenceResult<Vec<Flashcard>> {
+        let user_id = *user_id;
+        let now = Utc::now();
+
+        let rows = self
+            .with_transaction(move |conn| {
+                schema::flashcards::table
+                    .filter(schema::flashcards::user_id.eq(user_id))
+                    .filter(schema::flashcards::due_date.le(Some(now)))
+                    .select(DbFlashcard::as_select())
+                    .load::<DbFlashcard>(conn)
+            })
+            .await?;
+
+        Ok(rows.into_iter().map(Flashcard::from).collect())
+    }
+
+    #[instrument(skip(self))]
+    async fn create_folder(
+        &self,
+        name: &str,
+        user_id: &Uuid,
+        parent_id: &Uuid,
+    ) -> PersistenceResult<FolderMetadata> {
+        let user_id_val = *user_id;
+        let parent_id_val = *parent_id;
+        let name_owned = name.to_string();
+        let new_id = Uuid::new_v4();
+
+        let folder = self
+            .with_transaction(move |conn| {
+                let parent: DbFolder = schema::flashcard_folders::table
+                    .filter(schema::flashcard_folders::id.eq(parent_id_val))
+                    .select(DbFolder::as_select())
+                    .first(conn)?;
+
+                let path = if parent.path == "/" {
+                    format!("/{}", new_id)
+                } else {
+                    format!("{}/{}", parent.path, new_id)
+                };
+
+                let row = NewDbFolder {
+                    id: new_id,
+                    user_id: user_id_val,
+                    name: name_owned.clone(),
+                    parent_id: Some(parent_id_val),
+                    path: path.clone(),
+                };
+
+                diesel::insert_into(schema::flashcard_folders::table)
+                    .values(&row)
+                    .execute(conn)?;
+
+                Ok(FolderMetadata::reconstitute(
+                    new_id,
+                    user_id_val,
+                    name_owned,
+                    Some(parent_id_val),
+                    path,
+                ))
+            })
+            .await?;
+
+        Ok(folder)
+    }
+
+    #[instrument(skip(self))]
+    async fn delete_folder(&self, id: Uuid) -> PersistenceResult<()> {
+        let affected = self
+            .with_transaction(move |conn| {
+                diesel::delete(schema::flashcard_folders::table)
+                    .filter(schema::flashcard_folders::id.eq(id))
+                    .execute(conn)
+            })
+            .await?;
+
+        match affected > 0 {
+            true => Ok(()),
+            false => Err(PersistenceError::NotFound(format!(
+                "Folder with id {} not found",
                 id
             ))),
         }

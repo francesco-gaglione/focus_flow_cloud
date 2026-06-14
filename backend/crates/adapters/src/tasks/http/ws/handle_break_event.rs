@@ -1,5 +1,5 @@
-use crate::tasks::http::ws::error::WsHandlerResult;
 use crate::shared::http::app_state::AppState;
+use crate::tasks::http::ws::error::WsHandlerResult;
 use crate::tasks::http::ws::update_pomodoro_state::UpdatePomodoroState;
 use application::tasks::use_cases::pomodoro_state::fetch_user_pomodoro_state::FetchUserPomodoroStateCommand;
 use application::tasks::use_cases::pomodoro_state::pause_session::PauseSessionCommand;
@@ -17,7 +17,8 @@ pub async fn handle_break_event(
     state.tasks.pause_pomo_session_uc.execute(command).await?;
 
     let pomodoro_state = state
-        .tasks.fetch_pomo_session_uc
+        .tasks
+        .fetch_pomo_session_uc
         .execute(FetchUserPomodoroStateCommand { user_id })
         .await?;
 

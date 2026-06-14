@@ -20,7 +20,7 @@ impl Flashcard {
             back: back.to_string(),
             user_id,
             memory_state: MemoryState::new(0., 0.),
-            due_date: None,
+            due_date: Some(Utc::now()),
         }
     }
 
@@ -130,7 +130,7 @@ pub mod flashcard_tests {
         use chrono::Utc;
         let user_id = uuid::Uuid::new_v4();
         let mut flashcard = Flashcard::new("front", "back", user_id);
-        assert!(flashcard.due_date().is_none());
+        assert!(flashcard.due_date().is_some());
         let now = Utc::now();
         flashcard.update_due_date(now);
         assert_eq!(flashcard.due_date(), Some(now));

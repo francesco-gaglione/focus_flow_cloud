@@ -7,3 +7,4 @@ export { statsApi } from "./stats";
 export { users } from "./users";
 export { pushApi } from "./push";
 export { remindersApi } from "./reminders";
+export { flashcardsApi } from "./flashcards";

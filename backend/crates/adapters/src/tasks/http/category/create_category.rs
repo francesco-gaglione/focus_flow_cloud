@@ -1,7 +1,7 @@
-use crate::shared::http::app_state::AppState;
-use crate::shared::http::model::session_model::UserSession;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::CATEGORY_TAG;
+use crate::shared::http::app_state::AppState;
+use crate::shared::http::model::session_model::UserSession;
 use application::tasks::use_cases::category::create_category_usecase::{
     CreateCategoryCommand, CreateCategoryError,
 };
@@ -76,7 +76,8 @@ pub async fn create_category_api(
         .map_err(|e| HttpError::BadRequest(e.to_string()))?;
 
     let category_id = state
-        .tasks.create_category_uc
+        .tasks
+        .create_category_uc
         .execute(CreateCategoryCommand {
             user_id: user.user_id,
             name: payload.name,

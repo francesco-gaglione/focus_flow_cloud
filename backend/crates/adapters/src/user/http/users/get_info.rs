@@ -1,7 +1,7 @@
-use crate::shared::http::app_state::AppState;
-use crate::shared::http::model::session_model::UserSession;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::USERS_TAG;
+use crate::shared::http::app_state::AppState;
+use crate::shared::http::model::session_model::UserSession;
 use application::user::use_cases::user::get_user_info::UserInfoError;
 use axum::extract::{Extension, State};
 use axum::Json;
@@ -44,7 +44,11 @@ pub async fn get_user_info_api(
     State(state): State<AppState>,
     Extension(user_session): Extension<UserSession>,
 ) -> HttpResult<Json<UserInfoResponseDto>> {
-    let result = state.user.get_user_info_uc.execute(user_session.user_id).await?;
+    let result = state
+        .user
+        .get_user_info_uc
+        .execute(user_session.user_id)
+        .await?;
 
     Ok(Json(UserInfoResponseDto {
         id: result.id,

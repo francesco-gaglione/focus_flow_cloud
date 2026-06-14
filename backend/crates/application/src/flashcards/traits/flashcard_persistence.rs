@@ -40,4 +40,15 @@ pub trait FlashcardPersistence: Send + Sync {
         &self,
         user_id: &Uuid,
     ) -> PersistenceResult<FolderMetadata>;
+
+    async fn find_due_by_user(&self, user_id: &Uuid) -> PersistenceResult<Vec<Flashcard>>;
+
+    async fn create_folder(
+        &self,
+        name: &str,
+        user_id: &Uuid,
+        parent_id: &Uuid,
+    ) -> PersistenceResult<FolderMetadata>;
+
+    async fn delete_folder(&self, id: Uuid) -> PersistenceResult<()>;
 }

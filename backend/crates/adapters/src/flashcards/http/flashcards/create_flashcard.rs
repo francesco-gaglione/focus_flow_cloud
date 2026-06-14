@@ -43,7 +43,7 @@ pub struct CreateFlashcardResponseDto {}
 impl From<CreateFlashcardError> for HttpError {
     fn from(value: CreateFlashcardError) -> Self {
         match value {
-            CreateFlashcardError::PersistenceError(e) => {
+            CreateFlashcardError::PersistenceError(_e) => {
                 HttpError::GenericError("Unexpected error".to_string())
             }
             CreateFlashcardError::InvalidFrontSideCard => {
@@ -89,7 +89,7 @@ pub async fn create_flashcard_api(
         folder_id: payload.folder_id,
     };
 
-    let _ = state
+    state
         .flashcards
         .create_flashcard_uc
         .execute(command)

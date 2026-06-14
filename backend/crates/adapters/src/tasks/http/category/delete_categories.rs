@@ -1,7 +1,7 @@
-use crate::shared::http::app_state::AppState;
-use crate::shared::http::validators::validate_uuid::validate_uuid;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::CATEGORY_TAG;
+use crate::shared::http::app_state::AppState;
+use crate::shared::http::validators::validate_uuid::validate_uuid;
 use application::tasks::use_cases::category::delete_categories_usecase::DeleteCategoriesError;
 use axum::extract::{Path, State};
 use axum::Json;
@@ -69,7 +69,8 @@ pub async fn delete_categories_api(
     })?;
 
     let res = state
-        .tasks.delete_categories_uc
+        .tasks
+        .delete_categories_uc
         .execute(vec![category_id])
         .await?;
 

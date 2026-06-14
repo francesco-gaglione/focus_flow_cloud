@@ -1,8 +1,19 @@
-use crate::shared::http::request_id::RequestId;
-use crate::tasks::http::ws::error::WsHandlerResult;
-use crate::tasks::http::ws::handle_update_pomodoro_context::handle_update_pomodoro_context;
+use crate::shared::http::app_state::{AppState, Clients};
 use crate::shared::http::model::session_model::UserSession;
+use crate::shared::http::request_id::RequestId;
 use crate::tasks::http::ws::error::WsHandlerError;
+use crate::tasks::http::ws::error::WsHandlerResult;
+use crate::tasks::http::ws::handle_break_event::handle_break_event;
+use crate::tasks::http::ws::handle_note_update::handle_note_update;
+use crate::tasks::http::ws::handle_start_event::handle_start_event;
+use crate::tasks::http::ws::handle_terminate_event::handle_terminate_event;
+use crate::tasks::http::ws::handle_update_concentration_score::handle_update_concentration_score;
+use crate::tasks::http::ws::handle_update_pomodoro_context::handle_update_pomodoro_context;
+use crate::tasks::http::ws::sync_pomodoro_state::sync_pomodoro_state;
+use crate::tasks::http::ws::update_pomodoro_state::UpdatePomodoroState;
+use crate::tasks::http::ws::ws_message::{
+    BroadcastEvent, ClientMessage, ServerResponse, WsClientRequest,
+};
 use application::tasks::use_cases::pomodoro_state::init_pomodoro_state::InitPomodoroStateCommand;
 use axum::{
     extract::{
@@ -17,16 +28,6 @@ use tokio::sync::Mutex;
 use tracing::{debug, error, info, warn, Instrument};
 use uuid::Uuid;
 use validator::Validate;
-
-use crate::shared::http::app_state::{AppState, Clients};
-use crate::tasks::http::ws::handle_break_event::handle_break_event;
-use crate::tasks::http::ws::handle_note_update::handle_note_update;
-use crate::tasks::http::ws::handle_start_event::handle_start_event;
-use crate::tasks::http::ws::handle_terminate_event::handle_terminate_event;
-use crate::tasks::http::ws::handle_update_concentration_score::handle_update_concentration_score;
-use crate::tasks::http::ws::sync_pomodoro_state::sync_pomodoro_state;
-use crate::tasks::http::ws::update_pomodoro_state::UpdatePomodoroState;
-use crate::tasks::http::ws::ws_message::{BroadcastEvent, ClientMessage, ServerResponse, WsClientRequest};
 
 pub async fn session_handler(
     ws: WebSocketUpgrade,
@@ -59,7 +60,8 @@ async fn handle_socket(ws: WebSocket, state: AppState, request_id: RequestId, us
 
         // Init user state
         if let Err(e) = state
-            .tasks.init_pomodoro_state_uc
+            .tasks
+            .init_pomodoro_state_uc
             .execute(InitPomodoroStateCommand { user_id })
             .await
         {

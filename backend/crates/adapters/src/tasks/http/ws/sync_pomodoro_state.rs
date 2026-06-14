@@ -9,7 +9,8 @@ pub async fn sync_pomodoro_state(
     user_id: Uuid,
 ) -> WsHandlerResult<UpdatePomodoroState> {
     let pomodoro_state = state
-        .tasks.fetch_pomo_session_uc
+        .tasks
+        .fetch_pomo_session_uc
         .execute(FetchUserPomodoroStateCommand { user_id })
         .await?;
 

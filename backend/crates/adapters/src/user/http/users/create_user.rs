@@ -1,8 +1,8 @@
-use crate::shared::http::model::session_model::UserSession;
+use crate::http_error::HttpError;
 use crate::http_error::HttpResult;
 use crate::openapi::USERS_TAG;
 use crate::shared::http::app_state::AppState;
-use crate::http_error::HttpError;
+use crate::shared::http::model::session_model::UserSession;
 use application::user::use_cases::user::register_user::{RegisterUserCommand, RegisterUserError};
 use axum::{extract::State, Extension, Json};
 use secrecy::SecretBox;

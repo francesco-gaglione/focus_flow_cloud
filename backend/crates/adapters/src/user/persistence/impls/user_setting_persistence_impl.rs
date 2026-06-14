@@ -3,9 +3,11 @@ use tracing::instrument;
 
 use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, SelectableHelper};
 
-use crate::user::persistence::db_models::db_user_setting::{DbUserSetting, NewDbUserSetting, UpdateDbUserSetting};
 use crate::shared::persistence::schema;
 use crate::shared::persistence::PostgresPersistence;
+use crate::user::persistence::db_models::db_user_setting::{
+    DbUserSetting, NewDbUserSetting, UpdateDbUserSetting,
+};
 use application::shared::traits::persistence_error::{PersistenceError, PersistenceResult};
 use application::user::traits::user_setting_persistence::UserSettingPersistence;
 use domain::user::entities::user_setting::UserSetting;

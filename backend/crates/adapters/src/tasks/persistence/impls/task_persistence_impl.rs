@@ -1,7 +1,7 @@
-use crate::tasks::persistence::db_models::db_subtask::{DbSubtask, NewDbSubtask};
-use crate::tasks::persistence::db_models::db_task::{DbTask, NewDbTask, UpdateDbTask};
 use crate::shared::persistence::schema;
 use crate::shared::persistence::PostgresPersistence;
+use crate::tasks::persistence::db_models::db_subtask::{DbSubtask, NewDbSubtask};
+use crate::tasks::persistence::db_models::db_task::{DbTask, NewDbTask, UpdateDbTask};
 use application::shared::traits::persistence_error::{PersistenceError, PersistenceResult};
 use application::tasks::traits::task_persistence::TaskPersistence;
 use async_trait::async_trait;

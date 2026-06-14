@@ -1,9 +1,9 @@
-use crate::shared::http::app_state::AppState;
-use crate::tasks::http::dto::session_type_enum::{enum_to_domain, SessionTypeEnum};
-use crate::shared::http::model::session_model::UserSession;
-use crate::shared::http::validators::validate_uuid::validate_uuid;
 use crate::http_error::{HttpError, HttpResult};
 use crate::openapi::SESSION_TAG;
+use crate::shared::http::app_state::AppState;
+use crate::shared::http::model::session_model::UserSession;
+use crate::shared::http::validators::validate_uuid::validate_uuid;
+use crate::tasks::http::dto::session_type_enum::{enum_to_domain, SessionTypeEnum};
 use application::tasks::use_cases::focus_session::create_manual_session::{
     CreateManualFocusSessionCommand, CreateManualSessionError,
 };
@@ -103,7 +103,11 @@ pub async fn create_manual_session_api(
         ended_at,
     };
 
-    let session_id = state.tasks.create_manual_session_uc.execute(command).await?;
+    let session_id = state
+        .tasks
+        .create_manual_session_uc
+        .execute(command)
+        .await?;
 
     Ok(Json(CreateManualSessionResponseDto {
         success: true,
