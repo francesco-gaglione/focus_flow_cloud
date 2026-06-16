@@ -1,6 +1,9 @@
 use crate::http::app_state::AppState;
+use crate::http::task::add_reminder::add_reminder_api;
 use crate::http::task::create_subtask::create_subtask_api;
 use crate::http::task::create_task::create_task_api;
+use crate::http::task::delete_reminder::delete_reminder_api;
+use crate::http::task::delete_subtask::delete_subtask_api;
 use crate::http::task::delete_tasks::delete_tasks_api;
 use crate::http::task::get_tasks::get_tasks_api;
 use crate::http::task::update_subtask::update_subtask_api;
@@ -16,4 +19,7 @@ pub fn router() -> Router<AppState> {
         .route("/{id}", patch(update_task_api))
         .route("/{id}/subtask", post(create_subtask_api))
         .route("/{id}/subtask/{subtask_id}", patch(update_subtask_api))
+        .route("/{id}/subtask/{subtask_id}", delete(delete_subtask_api))
+        .route("/{id}/reminder", post(add_reminder_api))
+        .route("/{id}/reminder/{reminder_id}", delete(delete_reminder_api))
 }

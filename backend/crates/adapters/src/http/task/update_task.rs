@@ -47,6 +47,9 @@ pub struct UpdateTaskDto {
     pub schedule: Option<TaskScheduleDto>,
     pub completed: Option<bool>,
     pub priority: Option<TaskPriorityDto>,
+    /// None (absent/null) = don't change, "" = remove category, UUID string = set category
+    #[serde(default)]
+    pub category_id: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
@@ -97,6 +100,14 @@ pub async fn update_task_api(
         .map(task_schedule_dto_to_app_dto)
         .transpose()?;
 
+    let category_id = payload.category_id.map(|s| {
+        if s.is_empty() {
+            None
+        } else {
+            Uuid::parse_str(&s).ok()
+        }
+    });
+
     let command = UpdateTaskCommand {
         id: task_id,
         title: payload.title,
@@ -109,6 +120,7 @@ pub async fn update_task_api(
             TaskPriorityDto::Urgent => DomainPriority::Urgent,
         }),
         completed: payload.completed,
+        category_id,
     };
 
     state.update_task_uc.execute(command).await?;

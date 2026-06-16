@@ -1,9 +1,17 @@
 <script lang="ts">
-    import { createMutation, useQueryClient } from "@tanstack/svelte-query";
-    import type { TaskDto, TaskPriority, TaskScheduleDto } from "@/types";
-    import { tasks } from "@/lib/api";
+    import { createMutation, createQuery, useQueryClient } from "@tanstack/svelte-query";
+    import type {
+        GetAllCategoryResponseDto,
+        ReminderDto,
+        SubtaskDto,
+        TaskDto,
+        TaskPriority,
+        TaskScheduleDto,
+    } from "@/types";
+    import { categories, tasks } from "@/lib/api";
     import DateInput from "@/components/DateInput.svelte";
     import TimeInput from "@/components/TimeInput.svelte";
+    import DateTimeInput from "@/components/DateTimeInput.svelte";
 
     const {
         task,
@@ -41,6 +49,7 @@
     let title = $state(task.title);
     let description = $state(task.description ?? "");
     let priority = $state<TaskPriority | null>(task.priority ?? null);
+    let categoryId = $state(task.categoryId ?? "");
     let scheduleType = $state<ScheduleType>(initScheduleType(task.schedule));
     let scheduleDate = $state(
         task.schedule.type === "allDay"
@@ -59,6 +68,25 @@
             ? Math.round(task.schedule.duration / 60)
             : 25,
     );
+
+    // Subtasks state
+    let existingSubtasks = $state<SubtaskDto[]>([...task.subtasks]);
+    let subtasksToDelete = $state<string[]>([]);
+    let newSubtasks = $state<string[]>([]);
+    let subtaskInput = $state("");
+
+    // Reminders state
+    let existingReminders = $state<ReminderDto[]>([...task.reminders]);
+    let remindersToDelete = $state<string[]>([]);
+    let newReminders = $state<number[]>([]);
+    let reminderInput = $state("");
+
+    const catsQuery = createQuery<GetAllCategoryResponseDto>({
+        queryKey: ["categories"],
+        queryFn: categories.getAll,
+    });
+
+    let cats = $derived($catsQuery.data?.categories ?? []);
 
     function buildSchedule(): TaskScheduleDto {
         if (scheduleType === "Unscheduled") return { type: "unscheduled" };
@@ -80,15 +108,69 @@
         };
     }
 
+    function addSubtask() {
+        if (subtaskInput.trim()) {
+            newSubtasks = [...newSubtasks, subtaskInput.trim()];
+            subtaskInput = "";
+        }
+    }
+
+    function removeNewSubtask(i: number) {
+        newSubtasks = newSubtasks.filter((_, j) => j !== i);
+    }
+
+    function removeExistingSubtask(id: string) {
+        subtasksToDelete = [...subtasksToDelete, id];
+        existingSubtasks = existingSubtasks.filter((s) => s.id !== id);
+    }
+
+    function addReminder() {
+        if (!reminderInput) return;
+        const ts = Math.floor(new Date(reminderInput).getTime() / 1000);
+        if (!isNaN(ts)) {
+            newReminders = [...newReminders, ts];
+            reminderInput = "";
+        }
+    }
+
+    function removeNewReminder(i: number) {
+        newReminders = newReminders.filter((_, j) => j !== i);
+    }
+
+    function removeExistingReminder(id: string) {
+        remindersToDelete = [...remindersToDelete, id];
+        existingReminders = existingReminders.filter((r) => r.id !== id);
+    }
+
     const update = createMutation({
-        mutationFn: () =>
-            tasks.update(task.id, {
+        mutationFn: async () => {
+            await tasks.update(task.id, {
                 title: title.trim() || null,
                 description: description.trim() || null,
                 schedule: buildSchedule(),
                 priority,
                 completed: null,
-            }),
+                categoryId: categoryId,
+            });
+
+            await Promise.all([
+                ...subtasksToDelete.map((id) =>
+                    tasks.deleteSubtask(task.id, id),
+                ),
+                ...newSubtasks.map((t) =>
+                    tasks.createSubtask(task.id, {
+                        title: t,
+                        description: null,
+                    }),
+                ),
+                ...remindersToDelete.map((id) =>
+                    tasks.deleteReminder(task.id, id),
+                ),
+                ...newReminders.map((ts) =>
+                    tasks.addReminder(task.id, { date: ts }),
+                ),
+            ]);
+        },
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ["tasks"] });
             onClose();
@@ -186,6 +268,26 @@
                 </div>
             </div>
 
+            {#if cats.length > 0}
+                <div>
+                    <label
+                        for="edit-cat"
+                        class="text-xs font-mono text-surface-500 uppercase tracking-widest mb-1 block"
+                        >Category</label
+                    >
+                    <select
+                        id="edit-cat"
+                        class="select w-full text-sm"
+                        bind:value={categoryId}
+                    >
+                        <option value="">None</option>
+                        {#each cats as c (c.id)}
+                            <option value={c.id}>{c.name}</option>
+                        {/each}
+                    </select>
+                </div>
+            {/if}
+
             <div>
                 <p
                     class="text-xs font-mono text-surface-500 uppercase tracking-widest mb-2"
@@ -231,6 +333,155 @@
                         />
                     </div>
                 {/if}
+            </div>
+
+            <div>
+                <p
+                    class="text-xs font-mono text-surface-500 uppercase tracking-widest mb-2"
+                >
+                    Subtasks
+                </p>
+                {#each existingSubtasks as s (s.id)}
+                    <div class="flex items-center gap-2 mb-1.5">
+                        <span class="text-xs text-surface-300 flex-1 truncate"
+                            >{s.title}</span
+                        >
+                        <button
+                            onclick={() => removeExistingSubtask(s.id)}
+                            class="btn btn-icon preset-tonal-error size-6 shrink-0"
+                            aria-label="Remove subtask"
+                        >
+                            <svg
+                                viewBox="0 0 12 12"
+                                width="10"
+                                height="10"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                                stroke-linecap="round"
+                            >
+                                <line x1="2" y1="2" x2="10" y2="10" />
+                                <line x1="10" y1="2" x2="2" y2="10" />
+                            </svg>
+                        </button>
+                    </div>
+                {/each}
+                {#each newSubtasks as s, i (i)}
+                    <div class="flex items-center gap-2 mb-1.5">
+                        <span class="text-xs text-surface-400 flex-1 truncate italic"
+                            >{s}</span
+                        >
+                        <button
+                            onclick={() => removeNewSubtask(i)}
+                            class="btn btn-icon preset-tonal-error size-6 shrink-0"
+                            aria-label="Remove subtask"
+                        >
+                            <svg
+                                viewBox="0 0 12 12"
+                                width="10"
+                                height="10"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                                stroke-linecap="round"
+                            >
+                                <line x1="2" y1="2" x2="10" y2="10" />
+                                <line x1="10" y1="2" x2="2" y2="10" />
+                            </svg>
+                        </button>
+                    </div>
+                {/each}
+                <div class="flex gap-2">
+                    <input
+                        class="input flex-1 text-sm"
+                        placeholder="Add subtask"
+                        bind:value={subtaskInput}
+                        onkeydown={(e) => {
+                            if (e.key === "Enter") addSubtask();
+                        }}
+                    />
+                    <button
+                        onclick={addSubtask}
+                        disabled={!subtaskInput.trim()}
+                        class="btn preset-tonal-surface text-sm px-3 disabled:opacity-50"
+                    >
+                        Add
+                    </button>
+                </div>
+            </div>
+
+            <div>
+                <p
+                    class="text-xs font-mono text-surface-500 uppercase tracking-widest mb-2"
+                >
+                    Reminders
+                </p>
+                {#each existingReminders as r (r.id)}
+                    <div class="flex items-center gap-2 mb-1.5">
+                        <span class="text-xs text-surface-300 flex-1 truncate">
+                            {new Date(r.dateTime * 1000).toLocaleString()}
+                        </span>
+                        <button
+                            onclick={() => removeExistingReminder(r.id)}
+                            class="btn btn-icon preset-tonal-error size-6 shrink-0"
+                            aria-label="Remove reminder"
+                        >
+                            <svg
+                                viewBox="0 0 12 12"
+                                width="10"
+                                height="10"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                                stroke-linecap="round"
+                            >
+                                <line x1="2" y1="2" x2="10" y2="10" />
+                                <line x1="10" y1="2" x2="2" y2="10" />
+                            </svg>
+                        </button>
+                    </div>
+                {/each}
+                {#each newReminders as ts, i (i)}
+                    <div class="flex items-center gap-2 mb-1.5">
+                        <span class="text-xs text-surface-400 flex-1 truncate italic">
+                            {new Date(ts * 1000).toLocaleString()}
+                        </span>
+                        <button
+                            onclick={() => removeNewReminder(i)}
+                            class="btn btn-icon preset-tonal-error size-6 shrink-0"
+                            aria-label="Remove reminder"
+                        >
+                            <svg
+                                viewBox="0 0 12 12"
+                                width="10"
+                                height="10"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                                stroke-linecap="round"
+                            >
+                                <line x1="2" y1="2" x2="10" y2="10" />
+                                <line x1="10" y1="2" x2="2" y2="10" />
+                            </svg>
+                        </button>
+                    </div>
+                {/each}
+                <div class="flex gap-2">
+                    <DateTimeInput
+                        bind:value={reminderInput}
+                        class="flex-1"
+                        onkeydown={(e) => {
+                            if (e.key === "Enter") addReminder();
+                        }}
+                    />
+                    <button
+                        onclick={addReminder}
+                        disabled={!reminderInput}
+                        class="btn preset-tonal-surface text-sm px-3 disabled:opacity-50"
+                    >
+                        Add
+                    </button>
+                </div>
             </div>
         </div>
 

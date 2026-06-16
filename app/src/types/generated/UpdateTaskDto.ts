@@ -2,4 +2,4 @@
 import type { TaskPriority } from "./TaskPriority";
 import type { TaskScheduleDto } from "./TaskScheduleDto";
 
-export type UpdateTaskDto = { title: string | null, description: string | null, schedule: TaskScheduleDto | null, completed: boolean | null, priority: TaskPriority | null, };
+export type UpdateTaskDto = { title: string | null, description: string | null, schedule: TaskScheduleDto | null, completed: boolean | null, priority: TaskPriority | null, categoryId?: string | null, };

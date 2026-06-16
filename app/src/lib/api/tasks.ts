@@ -62,4 +62,19 @@ export const tasks = {
                 dto,
             )
             .then((r) => r.data),
+
+    deleteSubtask: (taskId: string, subtaskId: string) =>
+        apiClient
+            .delete(`/api/task/${taskId}/subtask/${subtaskId}`)
+            .then((r) => r.data),
+
+    addReminder: (taskId: string, dto: { date: number }) =>
+        apiClient
+            .post(`/api/task/${taskId}/reminder`, dto)
+            .then((r) => r.data),
+
+    deleteReminder: (taskId: string, reminderId: string) =>
+        apiClient
+            .delete(`/api/task/${taskId}/reminder/${reminderId}`)
+            .then((r) => r.data),
 };

@@ -1,5 +1,8 @@
+pub mod add_reminder;
 pub mod create_subtask;
 pub mod create_task;
+pub mod delete_reminder;
+pub mod delete_subtask;
 pub mod delete_tasks;
 pub mod get_tasks;
 pub mod routes;

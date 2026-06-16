@@ -11,7 +11,10 @@ use application::use_cases::pomodoro_state::update_pomodoro_context::UpdatePomod
 use application::use_cases::push_subscription::save_push_subscription::SavePushSubscriptionUseCase;
 use application::use_cases::reminder::get_pending_reminders::GetPendingRemindersUseCase;
 use application::use_cases::stats::get_stats::GetStatsUseCase;
+use application::use_cases::task::add_reminder::AddReminderToTaskUseCase;
 use application::use_cases::task::add_subtask::AddSubTaskUseCase;
+use application::use_cases::task::delete_reminder::DeleteReminderUseCase;
+use application::use_cases::task::delete_subtask::DeleteSubTaskUseCase;
 use application::use_cases::task::get_tasks::GetTasksUseCase;
 use application::use_cases::task::update_subtask::UpdateSubTaskUseCase;
 use application::use_cases::user::get_user_info::GetUserInfoUseCase;
@@ -73,6 +76,9 @@ pub struct AppState {
     pub update_task_uc: Arc<UpdateTaskUseCase>,
     pub update_subtask_uc: Arc<UpdateSubTaskUseCase>,
     pub add_subtask_uc: Arc<AddSubTaskUseCase>,
+    pub delete_subtask_uc: Arc<DeleteSubTaskUseCase>,
+    pub add_reminder_uc: Arc<AddReminderToTaskUseCase>,
+    pub delete_reminder_uc: Arc<DeleteReminderUseCase>,
 
     // Stats Use Cases
     pub get_stats_uc: Arc<GetStatsUseCase>,

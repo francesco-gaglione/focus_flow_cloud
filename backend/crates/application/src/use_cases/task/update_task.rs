@@ -28,6 +28,8 @@ pub struct UpdateTaskCommand {
     pub schedule: Option<TaskScheduleAppDto>,
     pub priority: Option<TaskPriority>,
     pub completed: Option<bool>,
+    /// None = don't change, Some(None) = remove category, Some(Some(id)) = set category
+    pub category_id: Option<Option<Uuid>>,
 }
 
 pub struct UpdateTaskUseCase {
@@ -69,6 +71,17 @@ impl UpdateTaskUseCase {
             } else {
                 task.uncomplete();
             }
+        }
+        match command.category_id {
+            Some(Some(cat_id)) => {
+                info!("Updating category to: {}", cat_id);
+                task.update_category_id(cat_id);
+            }
+            Some(None) => {
+                info!("Removing category");
+                task.unlink_category();
+            }
+            None => {}
         }
 
         info!("Updating task: {}", command.id);
@@ -114,6 +127,7 @@ mod tests {
             schedule: None,
             priority: None,
             completed: None,
+            category_id: None,
         };
 
         let result = use_case.execute(command).await;
@@ -136,6 +150,7 @@ mod tests {
             schedule: None,
             priority: None,
             completed: None,
+            category_id: None,
         };
 
         let result = use_case.execute(command).await;
@@ -167,6 +182,7 @@ mod tests {
             schedule: None,
             priority: Some(TaskPriority::High),
             completed: None,
+            category_id: None,
         };
 
         let result = use_case.execute(command).await;

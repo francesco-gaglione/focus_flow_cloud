@@ -9,7 +9,10 @@ use application::use_cases::pomodoro_state::update_pomodoro_context::UpdatePomod
 use application::use_cases::push_subscription::save_push_subscription::SavePushSubscriptionUseCase;
 use application::use_cases::reminder::get_pending_reminders::GetPendingRemindersUseCase;
 use application::use_cases::stats::get_stats::GetStatsUseCase;
+use application::use_cases::task::add_reminder::AddReminderToTaskUseCase;
 use application::use_cases::task::add_subtask::AddSubTaskUseCase;
+use application::use_cases::task::delete_reminder::DeleteReminderUseCase;
+use application::use_cases::task::delete_subtask::DeleteSubTaskUseCase;
 use application::use_cases::task::get_tasks::GetTasksUseCase;
 use application::use_cases::task::update_subtask::UpdateSubTaskUseCase;
 use application::use_cases::user::get_user_info::GetUserInfoUseCase;
@@ -78,6 +81,7 @@ pub async fn init_app_state(
         .await
         .expect("Failed to create sqlx pool for apalis");
     let reminder_worker = Arc::new(ReminderWorkerPortImpl::new(sqlx_pool.clone()));
+    let reminder_worker_arc = reminder_worker.clone();
 
     info!("Spawning reminder worker");
     spawn_reminder_worker(
@@ -143,6 +147,17 @@ pub async fn init_app_state(
     let update_task_uc = Arc::new(UpdateTaskUseCase::new(postgres_arc.clone()));
     let update_subtask_uc = Arc::new(UpdateSubTaskUseCase::new(postgres_arc.clone()));
     let add_subtask_uc = Arc::new(AddSubTaskUseCase::new(postgres_arc.clone()));
+    let delete_subtask_uc = Arc::new(DeleteSubTaskUseCase::new(postgres_arc.clone()));
+    let add_reminder_uc = Arc::new(AddReminderToTaskUseCase::new(
+        postgres_arc.clone(),
+        postgres_arc.clone(),
+        reminder_worker_arc.clone(),
+    ));
+    let delete_reminder_uc = Arc::new(DeleteReminderUseCase::new(
+        postgres_arc.clone(),
+        postgres_arc.clone(),
+        reminder_worker_arc,
+    ));
 
     // Stats Use Cases
     let get_stats_uc = Arc::new(GetStatsUseCase::new(
@@ -248,6 +263,9 @@ pub async fn init_app_state(
         update_task_uc,
         update_subtask_uc,
         add_subtask_uc,
+        delete_subtask_uc,
+        add_reminder_uc,
+        delete_reminder_uc,
         create_manual_session_uc,
         update_focus_session_uc,
         find_sessions_by_filters_uc,
