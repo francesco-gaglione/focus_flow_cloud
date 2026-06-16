@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.3] - 2026-06-16
+
+### Features
+
+- Core entities flashcard folder review
+
+### Other
+
+- Merge branch 'master' of https://github.com/francesco-gaglione/focus_flow_cloud into release/1.2
+- Merge branch 'master' of https://github.com/francesco-gaglione/focus_flow_cloud
+- Merge branch 'master' into release/1.2
+
 ## [1.2.2] - 2026-06-12
 
 ### Bug Fixes
