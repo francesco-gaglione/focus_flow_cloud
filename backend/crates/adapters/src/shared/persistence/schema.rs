@@ -8,6 +8,17 @@ diesel::table! {
 }
 
 diesel::table! {
+    flashcard_reviews (id) {
+        id -> Uuid,
+        flashcard_id -> Uuid,
+        user_id -> Uuid,
+        #[max_length = 10]
+        rating -> Varchar,
+        reviewed_at -> Timestamptz,
+    }
+}
+
+diesel::table! {
     flashcard_folders (id) {
         id -> Uuid,
         user_id -> Uuid,
@@ -168,6 +179,8 @@ diesel::joinable!(flashcard_folder_items -> flashcards (flashcard_id));
 diesel::joinable!(flashcard_folder_items -> flashcard_folders (folder_id));
 diesel::joinable!(flashcard_folders -> users (user_id));
 diesel::joinable!(flashcards -> users (user_id));
+diesel::joinable!(flashcard_reviews -> flashcards (flashcard_id));
+diesel::joinable!(flashcard_reviews -> users (user_id));
 diesel::joinable!(categories -> users (user_id));
 diesel::joinable!(focus_session -> tasks (task_id));
 diesel::joinable!(focus_session -> users (user_id));
@@ -185,6 +198,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     categories,
     flashcard_folder_items,
     flashcard_folders,
+    flashcard_reviews,
     flashcards,
     focus_session,
     push_subscriptions,

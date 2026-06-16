@@ -35,6 +35,22 @@
     });
     let dueCount = $derived($dueQuery.data?.flashcards.length ?? 0);
 
+    // ── Stats for today progress ──────────────────────────────────────
+    const statsQuery = createQuery({
+        queryKey: ["flashcards", "stats"],
+        queryFn: flashcardsApi.getGlobalStats,
+    });
+
+    // ── 7-day sparkline ───────────────────────────────────────────────
+    const activityQuery = createQuery({
+        queryKey: ["flashcards", "stats", "activity", 7],
+        queryFn: () => flashcardsApi.getActivityHeatmap(7),
+    });
+
+    let sparklineMax = $derived(
+        Math.max(...($activityQuery.data?.entries.map((e) => e.count) ?? [0]), 1)
+    );
+
     // ── Folder contents query ─────────────────────────────────────────
     type FolderData = FolderContentsResponseDto | RootFolderContentsResponseDto;
 
@@ -201,8 +217,52 @@
                     onclick={() => goto("/cards/review")}
                     class="btn preset-filled-primary-500 text-sm shrink-0"
                 >
-                    Review
+                    Start Review
                 </button>
+            </div>
+        {/if}
+
+        <!-- Today's progress + 7-day sparkline -->
+        {#if $statsQuery.data}
+            {@const s = $statsQuery.data}
+            <div class="mx-4 mt-2 mb-1 grid grid-cols-2 gap-2">
+                <!-- Today's progress -->
+                <div class="px-3 py-2.5 rounded-xl bg-surface-900 border border-surface-800">
+                    <p class="text-[10px] font-mono text-surface-500 uppercase tracking-widest mb-1.5">Today</p>
+                    <p class="text-sm font-semibold text-surface-100">
+                        {s.reviewedToday} / {s.dueToday > 0 ? s.dueToday : dueCount}
+                    </p>
+                    <div class="h-1 bg-surface-800 rounded-full mt-1.5 overflow-hidden">
+                        {#if s.dueToday > 0}
+                            <div
+                                class="h-full bg-primary-500 rounded-full"
+                                style="width: {Math.min(100, (s.reviewedToday / s.dueToday) * 100).toFixed(0)}%"
+                            ></div>
+                        {:else}
+                            <div class="h-full bg-green-600 rounded-full w-full"></div>
+                        {/if}
+                    </div>
+                </div>
+
+                <!-- 7-day sparkline -->
+                <div class="px-3 py-2.5 rounded-xl bg-surface-900 border border-surface-800">
+                    <p class="text-[10px] font-mono text-surface-500 uppercase tracking-widest mb-1.5">7-day activity</p>
+                    {#if $activityQuery.data}
+                        <div class="flex items-end gap-0.5 h-6">
+                            {#each $activityQuery.data.entries as entry (entry.date)}
+                                <div
+                                    class="flex-1 rounded-sm bg-primary-500 opacity-80 min-h-[2px]"
+                                    style="height: {Math.max(2, (entry.count / sparklineMax) * 24)}px"
+                                    title="{entry.date}: {entry.count}"
+                                ></div>
+                            {/each}
+                        </div>
+                    {:else}
+                        <div class="h-6 flex items-center">
+                            <span class="text-[10px] text-surface-600 font-mono">loading…</span>
+                        </div>
+                    {/if}
+                </div>
             </div>
         {/if}
 

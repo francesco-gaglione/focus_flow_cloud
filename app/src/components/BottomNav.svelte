@@ -16,6 +16,7 @@
     const FLASHCARDS_TABS: Tab[] = [
         { to: '/cards', label: 'Cards', Icon: Layers },
         { to: '/cards/review', label: 'Review', Icon: RotateCcw },
+        { to: '/cards/stats', label: 'Stats', Icon: BarChart2 },
     ]
     const SETTINGS_TABS: Tab[] = [{ to: '/settings', label: 'Settings', Icon: Settings }]
 
@@ -34,6 +35,7 @@
 
     function isActive(to: string) {
         if (to === '/' || to === '/cards') return $page.url.pathname === to
+        if (to === '/cards/review') return $page.url.pathname === '/cards/review'
         return $page.url.pathname.startsWith(to)
     }
 </script>

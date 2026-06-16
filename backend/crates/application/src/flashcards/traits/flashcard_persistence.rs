@@ -1,5 +1,6 @@
 use crate::shared::traits::persistence_error::PersistenceResult;
 use async_trait::async_trait;
+use chrono::{DateTime, Utc};
 use domain::flashcards::entities::flashcard::Flashcard;
 use domain::shared::entities::folder_metadata::FolderMetadata;
 use uuid::Uuid;
@@ -51,4 +52,14 @@ pub trait FlashcardPersistence: Send + Sync {
     ) -> PersistenceResult<FolderMetadata>;
 
     async fn delete_folder(&self, id: Uuid) -> PersistenceResult<()>;
+
+    async fn save_review(
+        &self,
+        flashcard_id: Uuid,
+        user_id: Uuid,
+        rating: &str,
+        reviewed_at: DateTime<Utc>,
+    ) -> PersistenceResult<()>;
+
+    async fn find_due_by_folder(&self, folder_id: &Uuid) -> PersistenceResult<Vec<Flashcard>>;
 }

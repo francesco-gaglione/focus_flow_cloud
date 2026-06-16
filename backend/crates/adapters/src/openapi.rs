@@ -2,10 +2,14 @@ use crate::flashcards::http::flashcards::create_flashcard::{
     CreateFlashcardDto, CreateFlashcardResponseDto,
 };
 use crate::flashcards::http::flashcards::delete_flashcard::DeleteFlashcardResponseDto;
+use crate::flashcards::http::flashcards::get_activity_heatmap::{
+    ActivityEntryDto, ActivityHeatmapResponseDto,
+};
 use crate::flashcards::http::flashcards::get_due_flashcards::{
     DueFlashcardDto, DueFlashcardsResponseDto,
 };
 use crate::flashcards::http::flashcards::get_flashcard::GetFlashcardResponseDto;
+use crate::flashcards::http::flashcards::get_flashcard_stats::FlashcardGlobalStatsDto;
 use crate::flashcards::http::flashcards::review_flashcard::{
     CardRatingDto, ReviewFlashcardDto, ReviewFlashcardResponseDto,
 };
@@ -17,6 +21,10 @@ use crate::flashcards::http::folder::delete_folder::DeleteFolderResponseDto;
 use crate::flashcards::http::folder::get_folder_content::{
     FlashcardDto, FolderContentsResponseDto, FolderDto,
 };
+use crate::flashcards::http::folder::get_folder_review_queue::{
+    FolderDueFlashcardDto, FolderReviewQueueResponseDto,
+};
+use crate::flashcards::http::folder::get_folder_stats::FlashcardFolderStatsDto;
 use crate::flashcards::http::folder::get_root_folder_content::RootFolderContentsResponseDto;
 use crate::tasks::http::category::create_category::{CreateCategoryDto, CreateCategoryResponseDto};
 use crate::tasks::http::category::delete_categories::{
@@ -137,10 +145,14 @@ impl Modify for SecurityAddon {
         crate::flashcards::http::flashcards::delete_flashcard::delete_flashcard_api,
         crate::flashcards::http::flashcards::review_flashcard::review_flashcard_api,
         crate::flashcards::http::flashcards::get_due_flashcards::get_due_flashcards_api,
+        crate::flashcards::http::flashcards::get_flashcard_stats::get_flashcard_stats_api,
+        crate::flashcards::http::flashcards::get_activity_heatmap::get_activity_heatmap_api,
         crate::flashcards::http::folder::create_folder::create_folder_api,
         crate::flashcards::http::folder::delete_folder::delete_folder_api,
         crate::flashcards::http::folder::get_folder_content::get_folder_contents_api,
         crate::flashcards::http::folder::get_root_folder_content::get_root_folder_contents_api,
+        crate::flashcards::http::folder::get_folder_stats::get_folder_stats_api,
+        crate::flashcards::http::folder::get_folder_review_queue::get_folder_review_queue_api,
     ),
     components(
         schemas(CreateCategoryDto, CreateCategoryResponseDto),
@@ -163,6 +175,10 @@ impl Modify for SecurityAddon {
         schemas(DeleteFolderResponseDto),
         schemas(FolderContentsResponseDto, FolderDto, FlashcardDto),
         schemas(RootFolderContentsResponseDto),
+        schemas(FlashcardGlobalStatsDto),
+        schemas(ActivityEntryDto, ActivityHeatmapResponseDto),
+        schemas(FlashcardFolderStatsDto),
+        schemas(FolderDueFlashcardDto, FolderReviewQueueResponseDto),
         schemas(CreateManualSessionDto, CreateManualSessionResponseDto),
         schemas(UpdateFocusSessionDto, UpdateFocusSessionResponseDto),
         schemas(GetSessionFiltersDto, GetSessionFiltersResponseDto),

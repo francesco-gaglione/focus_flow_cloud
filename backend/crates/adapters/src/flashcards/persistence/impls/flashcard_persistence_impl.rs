@@ -1,13 +1,14 @@
 use crate::flashcards::persistence::db_models::db_flashcard::{
     DbFlashcard, DbFlashcardFolderItem, NewDbFlashcard, UpdateDbFlashcard,
 };
+use crate::flashcards::persistence::db_models::db_flashcard_review::NewDbFlashcardReview;
 use crate::flashcards::persistence::db_models::db_folder::{DbFolder, NewDbFolder};
 use crate::shared::persistence::schema;
 use crate::shared::persistence::PostgresPersistence;
 use application::flashcards::traits::flashcard_persistence::FlashcardPersistence;
 use application::shared::traits::persistence_error::{PersistenceError, PersistenceResult};
 use async_trait::async_trait;
-use chrono::Utc;
+use chrono::{DateTime, Utc};
 use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, SelectableHelper};
 use domain::flashcards::entities::flashcard::Flashcard;
 use domain::shared::entities::folder_metadata::FolderMetadata;
@@ -331,5 +332,49 @@ impl FlashcardPersistence for PostgresPersistence {
                 id
             ))),
         }
+    }
+
+    #[instrument(skip(self))]
+    async fn save_review(
+        &self,
+        flashcard_id: Uuid,
+        user_id: Uuid,
+        rating: &str,
+        reviewed_at: DateTime<Utc>,
+    ) -> PersistenceResult<()> {
+        let row = NewDbFlashcardReview {
+            id: Uuid::new_v4(),
+            flashcard_id,
+            user_id,
+            rating: rating.to_string(),
+            reviewed_at,
+        };
+
+        self.with_transaction(move |conn| {
+            diesel::insert_into(schema::flashcard_reviews::table)
+                .values(&row)
+                .execute(conn)?;
+            Ok(())
+        })
+        .await
+    }
+
+    #[instrument(skip(self))]
+    async fn find_due_by_folder(&self, folder_id: &Uuid) -> PersistenceResult<Vec<Flashcard>> {
+        let folder_id = *folder_id;
+        let now = Utc::now();
+
+        let rows = self
+            .with_transaction(move |conn| {
+                schema::flashcards::table
+                    .inner_join(schema::flashcard_folder_items::table)
+                    .filter(schema::flashcard_folder_items::folder_id.eq(folder_id))
+                    .filter(schema::flashcards::due_date.le(Some(now)))
+                    .select(DbFlashcard::as_select())
+                    .load::<DbFlashcard>(conn)
+            })
+            .await?;
+
+        Ok(rows.into_iter().map(Flashcard::from).collect())
     }
 }

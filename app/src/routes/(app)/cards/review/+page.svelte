@@ -24,7 +24,7 @@
     // Populate queue when fresh data arrives (handles stale-cache race)
     $effect(() => {
         const data = $dueQuery.data;
-        if (data && queue.length === 0 && !done) {
+        if (data && data.flashcards.length > 0 && queue.length === 0 && !done) {
             queue = [...data.flashcards];
         }
     });

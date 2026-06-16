@@ -61,6 +61,11 @@ export type { UpdateFlashcardDto } from './generated/UpdateFlashcardDto'
 export type { ReviewFlashcardDto, CardRating } from './generated/ReviewFlashcardDto'
 export type { DueFlashcardsResponseDto } from './generated/DueFlashcardsResponseDto'
 export type { CreateFolderDto } from './generated/CreateFolderDto'
+export type { FlashcardGlobalStatsDto } from './generated/FlashcardGlobalStatsDto'
+export type { ActivityEntryDto } from './generated/ActivityEntryDto'
+export type { ActivityHeatmapResponseDto } from './generated/ActivityHeatmapResponseDto'
+export type { FlashcardFolderStatsDto } from './generated/FlashcardFolderStatsDto'
+export type { FolderDueFlashcardDto, FolderReviewQueueResponseDto } from './generated/FolderReviewQueueResponseDto'
 
 // WebSocket types (not in backend shared crate yet)
 export type WsSessionType = 'Work' | 'ShortBreak' | 'LongBreak'

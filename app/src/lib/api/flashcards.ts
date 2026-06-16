@@ -7,6 +7,10 @@ import type {
     UpdateFlashcardDto,
     ReviewFlashcardDto,
     CreateFolderDto,
+    FlashcardGlobalStatsDto,
+    ActivityHeatmapResponseDto,
+    FlashcardFolderStatsDto,
+    FolderReviewQueueResponseDto,
 } from "@/types";
 
 export const flashcardsApi = {
@@ -53,5 +57,27 @@ export const flashcardsApi = {
     deleteFolder: (id: string) =>
         apiClient
             .delete<void>(`/api/flashcard/folder/${id}`)
+            .then((r) => r.data),
+
+    getGlobalStats: () =>
+        apiClient
+            .get<FlashcardGlobalStatsDto>("/api/flashcard/stats")
+            .then((r) => r.data),
+
+    getActivityHeatmap: (days?: number) =>
+        apiClient
+            .get<ActivityHeatmapResponseDto>("/api/flashcard/stats/activity", {
+                params: days !== undefined ? { days } : undefined,
+            })
+            .then((r) => r.data),
+
+    getFolderStats: (folderId: string) =>
+        apiClient
+            .get<FlashcardFolderStatsDto>(`/api/flashcard/folder/${folderId}/stats`)
+            .then((r) => r.data),
+
+    getFolderReviewQueue: (folderId: string) =>
+        apiClient
+            .get<FolderReviewQueueResponseDto>(`/api/flashcard/folder/${folderId}/review/queue`)
             .then((r) => r.data),
 };

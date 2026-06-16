@@ -12,6 +12,15 @@ use crate::{
     shared::traits::persistence_error::PersistenceError,
 };
 
+fn rating_to_str(rating: &CardRatingCommand) -> &'static str {
+    match rating {
+        CardRatingCommand::Again => "Again",
+        CardRatingCommand::Hard => "Hard",
+        CardRatingCommand::Good => "Good",
+        CardRatingCommand::Easy => "Easy",
+    }
+}
+
 #[derive(Debug, Error, Clone, PartialEq, Eq)]
 pub enum ReviewFlashcardError {
     #[error("persistence error: {0}")]
@@ -58,6 +67,8 @@ impl ReviewFlashcardUseCase {
             .find_by_id(command.flashcard_id)
             .await?;
 
+        let user_id = *flashcard.user_id();
+
         let current_memory_state = {
             let ms = flashcard.memory_state();
             if ms.stability() == 0.0 && ms.difficulty() == 0.0 {
@@ -78,10 +89,16 @@ impl ReviewFlashcardUseCase {
             CardRatingCommand::Easy => next_states.easy,
         };
 
+        let now = Utc::now();
         flashcard.update_memory_state(chosen.memory_state);
-        flashcard.update_due_date(Utc::now() + Duration::days(chosen.interval_days as i64));
+        flashcard.update_due_date(now + Duration::days(chosen.interval_days as i64));
 
         self.flashcard_persistence.update(&flashcard).await?;
+
+        let rating_str = rating_to_str(&command.rating);
+        self.flashcard_persistence
+            .save_review(command.flashcard_id, user_id, rating_str, now)
+            .await?;
 
         tracing::info!(
             "Flashcard reviewed id={} rating={:?} interval_days={}",
@@ -154,6 +171,11 @@ mod tests {
             .times(1)
             .returning(|_| Ok(()));
 
+        mock_persistence
+            .expect_save_review()
+            .times(1)
+            .returning(|_, _, _, _| Ok(()));
+
         let uc = ReviewFlashcardUseCase::new(Arc::new(mock_persistence), Arc::new(MockSrs));
 
         let res = uc
@@ -209,6 +231,11 @@ mod tests {
                 .expect_update()
                 .times(1)
                 .returning(|_| Ok(()));
+
+            mock_persistence
+                .expect_save_review()
+                .times(1)
+                .returning(|_, _, _, _| Ok(()));
 
             let uc = ReviewFlashcardUseCase::new(Arc::new(mock_persistence), Arc::new(MockSrs));
 
