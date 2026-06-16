@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0] - 2026-06-16
+
+### Features
+
+- Flashcards Management System
+- App version in setting page (#155)
+
+### Other
+
+- Release/1.2
+
+* fix: Add overdue section to task page
+
 ## [1.2.2] - 2026-06-12
 
 ### Bug Fixes
