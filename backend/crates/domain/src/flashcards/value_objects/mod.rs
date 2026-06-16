@@ -1,2 +1,1 @@
-pub mod card_rating;
-pub mod card_state;
+pub mod memory_state;

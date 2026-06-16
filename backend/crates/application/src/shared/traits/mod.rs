@@ -1,3 +1,4 @@
+pub mod folder_persistence;
 pub mod persistence_error;
 pub mod push_subscription_persistence;
 pub mod reminder_persistence;

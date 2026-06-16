@@ -1,9 +1,9 @@
 mod common;
 
-use adapters::http::auth::login::{LoginDto, LoginResponseDto};
-use adapters::http::auth::logout::LogoutResponseDto;
-use adapters::http::users::create_user::CreateUserDto;
-use adapters::http::users::get_info::UserInfoResponseDto;
+use adapters::user::http::auth::login::{LoginDto, LoginResponseDto};
+use adapters::user::http::auth::logout::LogoutResponseDto;
+use adapters::user::http::users::create_user::CreateUserDto;
+use adapters::user::http::users::get_info::UserInfoResponseDto;
 use reqwest::StatusCode;
 
 #[tokio::test]

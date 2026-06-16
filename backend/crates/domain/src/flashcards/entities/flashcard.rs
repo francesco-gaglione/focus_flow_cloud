@@ -1,13 +1,15 @@
+use crate::flashcards::value_objects::memory_state::MemoryState;
+use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
-use crate::flashcards::value_objects::card_state::CardState;
-
+#[derive(Debug, Clone, PartialEq)]
 pub struct Flashcard {
     id: Uuid,
     user_id: Uuid,
     front: String,
     back: String,
-    state: CardState,
+    memory_state: MemoryState,
+    due_date: Option<DateTime<Utc>>,
 }
 
 impl Flashcard {
@@ -16,13 +18,28 @@ impl Flashcard {
             id: Uuid::new_v4(),
             front: front.to_string(),
             back: back.to_string(),
-            state: CardState::New,
             user_id,
+            memory_state: MemoryState::new(0., 0.),
+            due_date: Some(Utc::now()),
         }
     }
 
-    pub fn update_state(&mut self, state: CardState) {
-        self.state = state;
+    pub fn reconstitute(
+        id: Uuid,
+        user_id: Uuid,
+        front: String,
+        back: String,
+        memory_state: MemoryState,
+        due_date: Option<DateTime<Utc>>,
+    ) -> Self {
+        Self {
+            id,
+            user_id,
+            front,
+            back,
+            memory_state,
+            due_date,
+        }
     }
 
     pub fn front(&self) -> &str {
@@ -33,16 +50,16 @@ impl Flashcard {
         &self.back
     }
 
-    pub fn state(&self) -> &CardState {
-        &self.state
-    }
-
     pub fn id(&self) -> &Uuid {
         &self.id
     }
 
     pub fn user_id(&self) -> &Uuid {
         &self.user_id
+    }
+
+    pub fn memory_state(&self) -> &MemoryState {
+        &self.memory_state
     }
 
     pub fn update_front(&mut self, front: &str) {
@@ -52,11 +69,24 @@ impl Flashcard {
     pub fn update_back(&mut self, back: &str) {
         self.back = back.to_string();
     }
+
+    pub fn update_memory_state(&mut self, state: MemoryState) {
+        self.memory_state = state;
+    }
+
+    pub fn due_date(&self) -> Option<DateTime<Utc>> {
+        self.due_date
+    }
+
+    pub fn update_due_date(&mut self, due_date: DateTime<Utc>) {
+        self.due_date = Some(due_date);
+    }
 }
 
 #[cfg(test)]
 pub mod flashcard_tests {
-    use crate::flashcards::{entities::flashcard::Flashcard, value_objects::card_state::CardState};
+    use crate::flashcards::entities::flashcard::Flashcard;
+    use crate::flashcards::value_objects::memory_state::MemoryState;
 
     #[test]
     fn test_flashcard_creation() {
@@ -67,19 +97,7 @@ pub mod flashcard_tests {
 
         assert_eq!(flashcard.front(), front);
         assert_eq!(flashcard.back(), back);
-        assert_eq!(flashcard.state(), &CardState::New);
-    }
-
-    #[test]
-    fn test_flashcard_state_transition() {
-        let user_id = uuid::Uuid::new_v4();
-        let mut flashcard = Flashcard::new("front", "back", user_id);
-
-        assert_eq!(flashcard.state, CardState::New);
-        flashcard.update_state(CardState::Learning);
-        assert_eq!(flashcard.state, CardState::Learning);
-        flashcard.update_state(CardState::Review);
-        assert_eq!(flashcard.state, CardState::Review);
+        assert_eq!(flashcard.memory_state(), &MemoryState::new(0., 0.));
     }
 
     #[test]
@@ -96,5 +114,25 @@ pub mod flashcard_tests {
         let mut flashcard = Flashcard::new("front", "back", user_id);
         flashcard.update_back("new back");
         assert_eq!(flashcard.back(), "new back");
+    }
+
+    #[test]
+    fn test_flashcard_update_memory_state() {
+        let user_id = uuid::Uuid::new_v4();
+        let mut flashcard = Flashcard::new("front", "back", user_id);
+        let new_state = MemoryState::new(2.5, 0.3);
+        flashcard.update_memory_state(new_state.clone());
+        assert_eq!(flashcard.memory_state(), &new_state);
+    }
+
+    #[test]
+    fn test_flashcard_update_due_date() {
+        use chrono::Utc;
+        let user_id = uuid::Uuid::new_v4();
+        let mut flashcard = Flashcard::new("front", "back", user_id);
+        assert!(flashcard.due_date().is_some());
+        let now = Utc::now();
+        flashcard.update_due_date(now);
+        assert_eq!(flashcard.due_date(), Some(now));
     }
 }

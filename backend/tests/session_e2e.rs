@@ -1,17 +1,14 @@
 mod common;
 
-use adapters::http::dto::common::task_dto::TaskScheduleDto;
-use adapters::http::task::create_task::CreateTaskDto;
-use adapters::http::task::get_tasks::TasksResponseDto;
-use adapters::http::{
-    category::create_category::CreateCategoryDto,
-    dto::common::session_type_enum::SessionTypeEnum,
-    session::{
-        create_manual_session::CreateManualSessionDto, get_sessions::GetSessionFiltersResponseDto,
-        update_session::UpdateFocusSessionDto,
-    },
-    users::create_user::CreateUserDto,
-};
+use adapters::tasks::http::category::create_category::CreateCategoryDto;
+use adapters::tasks::http::dto::session_type_enum::SessionTypeEnum;
+use adapters::tasks::http::dto::task_dto::TaskScheduleDto;
+use adapters::tasks::http::session::create_manual_session::CreateManualSessionDto;
+use adapters::tasks::http::session::get_sessions::GetSessionFiltersResponseDto;
+use adapters::tasks::http::session::update_session::UpdateFocusSessionDto;
+use adapters::tasks::http::task::create_task::CreateTaskDto;
+use adapters::tasks::http::task::get_tasks::TasksResponseDto;
+use adapters::user::http::users::create_user::CreateUserDto;
 use chrono::Utc;
 use tracing::info;
 

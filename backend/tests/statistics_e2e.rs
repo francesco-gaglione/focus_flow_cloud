@@ -1,8 +1,6 @@
-use adapters::http::stats::get_stats::GetStatsResponseDto;
-use adapters::http::{
-    dto::common::session_type_enum::SessionTypeEnum,
-    session::create_manual_session::CreateManualSessionDto,
-};
+use adapters::tasks::http::dto::session_type_enum::SessionTypeEnum;
+use adapters::tasks::http::session::create_manual_session::CreateManualSessionDto;
+use adapters::tasks::http::stats::get_stats::GetStatsResponseDto;
 use chrono::{Duration, Utc};
 use common::setup;
 

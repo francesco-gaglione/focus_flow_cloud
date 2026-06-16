@@ -11,7 +11,7 @@ use std::{
 use tower::{Layer, Service};
 use uuid::Uuid;
 
-use crate::http::request_id::RequestId;
+use crate::shared::http::request_id::RequestId;
 
 #[derive(Clone)]
 pub struct RequestIdLayer;

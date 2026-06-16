@@ -1,6 +1,6 @@
-use adapters::http::auth::login::{LoginDto, LoginResponseDto};
-use adapters::http::auth::refresh::{RefreshDto, RefreshResponseDto};
-use adapters::http::users::create_user::CreateUserDto;
+use adapters::user::http::auth::login::{LoginDto, LoginResponseDto};
+use adapters::user::http::auth::refresh::{RefreshDto, RefreshResponseDto};
+use adapters::user::http::users::create_user::CreateUserDto;
 use reqwest::StatusCode;
 
 mod common;

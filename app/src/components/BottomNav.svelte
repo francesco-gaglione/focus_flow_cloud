@@ -1,7 +1,7 @@
 <script lang="ts">
     import { goto } from '$app/navigation'
     import { page } from '$app/stores'
-    import { ListTodo, Calendar, Timer, BarChart2, Layers, Settings } from 'lucide-svelte'
+    import { ListTodo, Calendar, Timer, BarChart2, Layers, Settings, RotateCcw } from 'lucide-svelte'
 
     type Section = 'tasks' | 'flashcards' | 'settings'
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -13,7 +13,11 @@
         { to: '/timer', label: 'Timer', Icon: Timer },
         { to: '/stats', label: 'Stats', Icon: BarChart2 },
     ]
-    const FLASHCARDS_TABS: Tab[] = [{ to: '/cards', label: 'Cards', Icon: Layers }]
+    const FLASHCARDS_TABS: Tab[] = [
+        { to: '/cards', label: 'Cards', Icon: Layers },
+        { to: '/cards/review', label: 'Review', Icon: RotateCcw },
+        { to: '/cards/stats', label: 'Stats', Icon: BarChart2 },
+    ]
     const SETTINGS_TABS: Tab[] = [{ to: '/settings', label: 'Settings', Icon: Settings }]
 
     function getSection(pathname: string): Section {
@@ -30,7 +34,9 @@
     )
 
     function isActive(to: string) {
-        return to === '/' ? $page.url.pathname === '/' : $page.url.pathname.startsWith(to)
+        if (to === '/' || to === '/cards') return $page.url.pathname === to
+        if (to === '/cards/review') return $page.url.pathname === '/cards/review'
+        return $page.url.pathname.startsWith(to)
     }
 </script>
 
