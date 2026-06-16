@@ -204,7 +204,7 @@
         </SettingsSection>
 
         <p class="text-center text-[10px] font-mono text-surface-600 mt-2">
-            FocusFlow PWA
+            FocusFlow v{__APP_VERSION__}
         </p>
     </div>
 </div>
